@@ -2,6 +2,7 @@ package com.nickimpact.impactor.configuration;
 
 import com.google.common.collect.ImmutableMap;
 import com.nickimpact.impactor.api.configuration.ConfigKey;
+import com.nickimpact.impactor.api.configuration.IConfigKeys;
 import com.nickimpact.impactor.api.configuration.keys.BooleanKey;
 
 import java.lang.reflect.Field;
@@ -14,14 +15,14 @@ import java.util.Map;
  *
  * @author NickImpact (Nick DeGruccio)
  */
-public class ConfigKeys {
+public class ConfigKeys implements IConfigKeys {
 
 	public static final ConfigKey<Boolean> DEBUG_ENABLED = BooleanKey.of("debug.enabled", false);
 	public static final ConfigKey<Boolean> DEBUG_COMMANDS = BooleanKey.of("debug.commands", false);
 	public static final ConfigKey<Boolean> DEBUG_INVENTORY = BooleanKey.of("debug.inventory", false);
 
-	private static Map<String, ConfigKey<?>> KEYS = null;
-	public static synchronized Map<String, ConfigKey<?>> getAllKeys() {
+	private Map<String, ConfigKey<?>> KEYS = null;
+	public synchronized Map<String, ConfigKey<?>> getAllKeys() {
 		if(KEYS == null) {
 			Map<String, ConfigKey<?>> keys = new LinkedHashMap<>();
 

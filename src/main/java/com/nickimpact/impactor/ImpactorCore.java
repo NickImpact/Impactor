@@ -6,6 +6,7 @@ import com.nickimpact.impactor.api.configuration.ConfigBase;
 import com.nickimpact.impactor.commands.PluginCmd;
 import com.nickimpact.impactor.api.plugins.ConfigurableSpongePlugin;
 import com.nickimpact.impactor.api.plugins.PluginInfo;
+import com.nickimpact.impactor.configuration.ConfigKeys;
 import lombok.Getter;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
@@ -55,7 +56,7 @@ public class ImpactorCore extends ConfigurableSpongePlugin {
 	@Override
 	public void doConnect() {
 		getConsole().ifPresent(console -> console.sendMessage(Text.of(CoreInfo.PREFIX, "Loading configuration...")));
-		this.config = new AbstractConfig(this, new AbstractConfigAdapter(this), "assets/core.conf");
+		this.config = new AbstractConfig(this, new AbstractConfigAdapter(this), new ConfigKeys(), "assets/core.conf");
 		this.config.init();
 
 		getConsole().ifPresent(console -> console.sendMessage(Text.of(CoreInfo.PREFIX, "Registering core commands...")));

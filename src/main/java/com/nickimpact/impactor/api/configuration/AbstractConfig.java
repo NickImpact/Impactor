@@ -34,6 +34,8 @@ public class AbstractConfig implements ConfigBase, CacheLoader<ConfigKey<?>, Opt
 
 	private final ConfigAdapter adapter;
 
+	private final IConfigKeys keys;
+
 	private final String resource;
 
 	@Override
@@ -54,7 +56,7 @@ public class AbstractConfig implements ConfigBase, CacheLoader<ConfigKey<?>, Opt
 
 	@Override
 	public void loadAll() {
-		ConfigKeys.getAllKeys().values().forEach(cache::get);
+		keys.getAllKeys().values().forEach(cache::get);
 	}
 
 	@SuppressWarnings("unchecked")
