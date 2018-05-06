@@ -1,7 +1,9 @@
 package com.nickimpact.impactor.api.plugins;
 
+import com.google.common.collect.Lists;
 import com.nickimpact.impactor.CoreInfo;
 import com.nickimpact.impactor.ImpactorCore;
+import com.nickimpact.impactor.api.logger.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.scheduler.Task;
@@ -18,8 +20,8 @@ import java.util.Optional;
  *
  * @author NickImpact
  */
-public abstract class SpongePlugin
-{
+public abstract class SpongePlugin {
+
 	public abstract PluginInfo getPluginInfo();
 
 	/**
@@ -32,7 +34,9 @@ public abstract class SpongePlugin
 	 */
 	public abstract void doDisconnect();
 
-	/** States whether or not the plugin has been connected */
+	/**
+	 * States whether or not the plugin has been connected
+	 */
 	private boolean connected = true;
 
 	/**
@@ -40,8 +44,7 @@ public abstract class SpongePlugin
 	 *
 	 * @return <code>true</code> if connected, <code>false</code> otherwise
 	 */
-	public boolean isConnected()
-	{
+	public boolean isConnected() {
 		return connected;
 	}
 
@@ -49,93 +52,66 @@ public abstract class SpongePlugin
 	 * Attempts to connect the plugin to the core itself. This method is typically
 	 * called via any starting phase in Sponge.
 	 */
-	public void connect()
-	{
-		if(!PluginRegistry.isLoaded(getPluginInfo().getID()))
-		{
+	public void connect() {
+		if (!PluginRegistry.isLoaded(getPluginInfo().getID())) {
 			connected = true;
 			PluginRegistry.register(this);
 			init();
-		}
-		else
-		{
-			if(!isConnected())
-			{
+		} else {
+			if (!isConnected()) {
 				connected = true;
 				init();
 			}
 		}
 	}
 
-	private void init()
-	{
-		try
-		{
+	private void init() {
+		try {
 			doConnect();
-		}
-		catch (Exception e)
-		{
-			getConsole().ifPresent(console -> {
-				console.sendMessages(
-						Text.of(CoreInfo.ERROR, "======== Plugin Failure ========"),
-						Text.of(CoreInfo.ERROR, TextColors.RED, "The plugin with ID ", TextColors.YELLOW, getPluginInfo().getID()),
-						Text.of(CoreInfo.ERROR, TextColors.RED, "encountered an error..."),
-						Text.of(CoreInfo.ERROR, "================================")
-				);
-			});
+		} catch (Exception e) {
+			ImpactorCore.getInstance().getLogger().send(Logger.Prefixes.ERROR, Lists.newArrayList(
+						Text.of("======== Plugin Failure ========"),
+						Text.of(TextColors.RED, "The plugin with ID ", TextColors.YELLOW, getPluginInfo().getID()),
+						Text.of(TextColors.RED, "encountered an error..."),
+						Text.of("================================")
+			));
 
 			e.printStackTrace();
 			connected = false;
-			if(PluginRegistry.getPlugin(this).isPresent()) {
+			if (PluginRegistry.getPlugin(this).isPresent()) {
 				PluginRegistry.unregister(this);
 			}
 			return;
 		}
-		getConsole().ifPresent(console -> {
-			if(this instanceof ImpactorCore) {
-				console.sendMessage(Text.of(CoreInfo.PREFIX, "Registered core service plugin: ", TextColors.GREEN, getPluginInfo().getName()));
+		ImpactorCore.getInstance().getLogger().send(Logger.Prefixes.INFO, () -> {
+			if (this instanceof ImpactorCore) {
+				return Text.of("Registered core service plugin: ", TextColors.GREEN, getPluginInfo().getName());
 			} else {
-				console.sendMessage(Text.of(CoreInfo.PREFIX, "Registered plugin: ", TextColors.GREEN, getPluginInfo().getName()));
+				return Text.of("Registered plugin: ", TextColors.GREEN, getPluginInfo().getName());
 			}
 		});
 	}
 
-	public void disconnect()
-	{
+	public void disconnect() {
 		doDisconnect();
 		Sponge.getCommandManager().getOwnedBy(this).forEach(Sponge.getCommandManager()::removeMapping);
 		Sponge.getEventManager().unregisterPluginListeners(this);
 		Sponge.getScheduler().getScheduledTasks(this).forEach(Task::cancel);
 		connected = false;
-		getConsole().ifPresent(console -> {
-			if(this instanceof ImpactorCore) {
-				console.sendMessage(Text.of(CoreInfo.PREFIX, "Disabled core service plugin: ", TextColors.GREEN, getPluginInfo().getName()));
+		ImpactorCore.getInstance().getLogger().send(Logger.Prefixes.INFO, () -> {
+			if (this instanceof ImpactorCore) {
+				return Text.of("Disabled core service plugin: ", TextColors.GREEN, getPluginInfo().getName());
 			} else {
-				console.sendMessage(Text.of(CoreInfo.PREFIX, "Disabled plugin: ", TextColors.GREEN, getPluginInfo().getName()));
+				return Text.of("Disabled plugin: ", TextColors.GREEN, getPluginInfo().getName());
 			}
 		});
 	}
 
-	public void reload()
-	{
+	public void reload() {
 		disconnect();
 		connect();
-		getConsole().ifPresent(console -> {
-			console.sendMessage(Text.of(CoreInfo.PREFIX, "Reloaded plugin: ", TextColors.YELLOW, getPluginInfo().getName()));
-		});
+		ImpactorCore.getInstance().getLogger().info(Text.of("Reloaded plugin: ", TextColors.YELLOW, getPluginInfo().getName()));
 	}
 
-	/**
-	 * Returns an Optional value containing the {@link ConsoleSource}
-	 * provided by the server. If, however, we are in a client debug
-	 * environment, the server will not be available, so neither will
-	 * the console be. Therefore, we must adhere to this, and in turn,
-	 * we send back an empty Optional.
-	 *
-	 * @return An optional value of the {@link ConsoleSource}
-	 */
-	public Optional<ConsoleSource> getConsole()
-	{
-		return Optional.ofNullable(Sponge.isServerAvailable() ? Sponge.getServer().getConsole() : null);
-	}
+	public abstract Logger getLogger();
 }

@@ -1,6 +1,8 @@
 package com.nickimpact.impactor.json;
 
+import com.google.common.collect.Lists;
 import com.google.gson.*;
+import com.nickimpact.impactor.api.logger.Logger;
 import com.nickimpact.impactor.api.plugins.SpongePlugin;
 import lombok.RequiredArgsConstructor;
 import org.spongepowered.api.text.Text;
@@ -33,11 +35,11 @@ public abstract class Adapter<E> implements JsonSerializer<E>, JsonDeserializer<
 		try {
 			return (E) getGson().fromJson(obj, getRegistry().get(obj.get("id").getAsString()));
 		} catch (Exception e) {
-			plugin.getConsole().ifPresent(console -> console.sendMessages(
-					Text.of(plugin.getPluginInfo().warning(), "========== JSON Error =========="),
-					Text.of(plugin.getPluginInfo().warning(), "Failed to deserialize JSON data"),
-					Text.of(plugin.getPluginInfo().warning(), "Exception: " + e.getClass().getSimpleName()),
-					Text.of(plugin.getPluginInfo().warning(), "================================")
+			plugin.getLogger().send(Logger.Prefixes.WARN, Lists.newArrayList(
+					Text.of("========== JSON Error =========="),
+					Text.of("Failed to deserialize JSON data"),
+					Text.of("Exception: " + e.getClass().getSimpleName()),
+					Text.of("================================")
 			));
 			throw new JsonParseException(e.getMessage());
 		}

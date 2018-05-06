@@ -3,11 +3,16 @@ package com.nickimpact.impactor;
 import com.nickimpact.impactor.api.configuration.AbstractConfig;
 import com.nickimpact.impactor.api.configuration.AbstractConfigAdapter;
 import com.nickimpact.impactor.api.configuration.ConfigBase;
+import com.nickimpact.impactor.api.logger.Logger;
 import com.nickimpact.impactor.commands.PluginCmd;
 import com.nickimpact.impactor.api.plugins.ConfigurableSpongePlugin;
 import com.nickimpact.impactor.api.plugins.PluginInfo;
 import com.nickimpact.impactor.configuration.ConfigKeys;
+import com.nickimpact.impactor.logging.ConsoleLogger;
+import com.nickimpact.impactor.logging.SpongeLogger;
+import com.nickimpact.impactor.mojang.StatusCheck;
 import lombok.Getter;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
@@ -18,6 +23,7 @@ import org.spongepowered.api.text.Text;
 
 import javax.inject.Inject;
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 /**
  * (Some note will appear here)
@@ -36,6 +42,10 @@ public class ImpactorCore extends ConfigurableSpongePlugin {
 
 	private ConfigBase config;
 
+	@Inject private org.slf4j.Logger fallback;
+
+	private Logger logger;
+
 	@Override
 	public PluginInfo getPluginInfo() {
 		return new CoreInfo();
@@ -44,7 +54,8 @@ public class ImpactorCore extends ConfigurableSpongePlugin {
 	@Listener
 	public void onPreInit(GamePreInitializationEvent e) {
 		instance = this;
-		getConsole().ifPresent(console -> console.sendMessage(Text.of(CoreInfo.PREFIX, "Impactor is now initializing...")));
+		this.logger = new ConsoleLogger(this, new SpongeLogger(this, fallback));
+		this.logger.info(Text.of("Impactor is now initializing..."));
 		connect();
 	}
 
@@ -55,17 +66,34 @@ public class ImpactorCore extends ConfigurableSpongePlugin {
 
 	@Override
 	public void doConnect() {
-		getConsole().ifPresent(console -> console.sendMessage(Text.of(CoreInfo.PREFIX, "Loading configuration...")));
-		this.config = new AbstractConfig(this, new AbstractConfigAdapter(this), new ConfigKeys(), "assets/core.conf");
+		this.logger.info(Text.of("Loading configuration..."));
+		this.config = new AbstractConfig(this, new AbstractConfigAdapter(this), new ConfigKeys(), "core.conf");
 		this.config.init();
 
-		getConsole().ifPresent(console -> console.sendMessage(Text.of(CoreInfo.PREFIX, "Registering core commands...")));
+		this.logger.info(Text.of("Registering core commands..."));
 		new PluginCmd(this).register(this);
-		getConsole().ifPresent(console -> console.sendMessage(Text.of(CoreInfo.PREFIX, "Initialization complete!")));
+		this.logger.info(Text.of("Initialization complete!"));
+
+		final StatusCheck statusChecker = new StatusCheck();
+		Sponge.getScheduler().createTaskBuilder().execute(() -> {
+			if(!statusChecker.allGreen()) {
+				try {
+					statusChecker.fetch().report();
+				} catch (Exception e) {
+					this.getLogger().error("Unable to read Mojang Service Status...");
+					e.printStackTrace();
+				}
+			}
+		}).async().interval(60, TimeUnit.SECONDS).submit(this);
 	}
 
 	@Override
 	public void doDisconnect() {
 
+	}
+
+	@Override
+	public Logger getLogger() {
+		return this.logger;
 	}
 }

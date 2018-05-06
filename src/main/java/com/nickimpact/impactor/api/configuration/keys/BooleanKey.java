@@ -7,10 +7,16 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor(staticName = "of")
 public class BooleanKey implements ConfigKey<Boolean> {
 	private final String path;
-	private final boolean def;
+	private boolean def;
 
 	@Override
 	public Boolean get(ConfigAdapter adapter) {
 		return adapter.getBoolean(path, def);
+	}
+
+	@Override
+	public void set(ConfigAdapter adapter, Boolean value) {
+		this.def = value;
+		adapter.set(path, value);
 	}
 }

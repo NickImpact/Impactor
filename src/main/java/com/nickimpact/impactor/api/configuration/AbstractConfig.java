@@ -56,7 +56,7 @@ public class AbstractConfig implements ConfigBase, CacheLoader<ConfigKey<?>, Opt
 
 	@Override
 	public void loadAll() {
-		keys.getAllKeys().values().forEach(cache::get);
+		this.keys.getAllKeys().values().forEach(cache::get);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -68,6 +68,12 @@ public class AbstractConfig implements ConfigBase, CacheLoader<ConfigKey<?>, Opt
 		}
 
 		return (T) ret.orElse(null);
+	}
+
+	@Override
+	public <T> void set(ConfigKey<T> key, @Nonnull T value) {
+		cache.put(key, Optional.of(value));
+		key.set(adapter, value);
 	}
 
 	@CheckForNull

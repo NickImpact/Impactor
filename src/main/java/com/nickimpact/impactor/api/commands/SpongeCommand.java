@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.nickimpact.impactor.ImpactorCore;
 import com.nickimpact.impactor.api.commands.annotations.Aliases;
 import com.nickimpact.impactor.api.commands.annotations.Permission;
+import com.nickimpact.impactor.api.logger.Logger;
 import com.nickimpact.impactor.configuration.ConfigKeys;
 import com.nickimpact.impactor.api.plugins.SpongePlugin;
 import org.spongepowered.api.Sponge;
@@ -33,22 +34,20 @@ public abstract class SpongeCommand implements CommandExecutor
 	public SpongeCommand(SpongePlugin plugin)
 	{
 		this.plugin = plugin;
-		if(!hasProperAnnotations())
+		if(!hasNeededAnnotations())
 		{
-			plugin.getConsole().ifPresent(console -> {
-				console.sendMessages(
-						Text.of(plugin.getPluginInfo().error(), "======= Invalid Command Structure ======="),
-						Text.of(plugin.getPluginInfo().error(), "Executor: ", TextColors.RED, this.getClass().getSimpleName()),
-						Text.of(plugin.getPluginInfo().error(), "Reason: ", TextColors.RED, "Missing header annotation"),
-						Text.of(plugin.getPluginInfo().error(), "=========================================")
-				);
-			});
+			ImpactorCore.getInstance().getLogger().send(Logger.Prefixes.ERROR, Lists.newArrayList(
+					Text.of("======= Invalid Command Structure ======="),
+					Text.of("Executor: ", TextColors.RED, this.getClass().getSimpleName()),
+					Text.of("Reason: ", TextColors.RED, "Missing header annotation"),
+					Text.of("=========================================")
+			));
 		}
 	}
 
-	public boolean hasProperAnnotations()
+	public boolean hasNeededAnnotations()
 	{
-		return this.getClass().isAnnotationPresent(Aliases.class) && this.getClass().isAnnotationPresent(Permission.class);
+		return this.getClass().isAnnotationPresent(Aliases.class);
 	}
 
 	public List<String> getAllAliases()
@@ -81,13 +80,11 @@ public abstract class SpongeCommand implements CommandExecutor
 			args = new CommandElement[]{GenericArguments.none()};
 
 		if(ImpactorCore.getInstance().getConfig().get(ConfigKeys.DEBUG_ENABLED) && ImpactorCore.getInstance().getConfig().get(ConfigKeys.DEBUG_COMMANDS)) {
-			this.plugin.getConsole().ifPresent(console -> {
-				console.sendMessages(
-						Text.of(plugin.getPluginInfo().error(), "Command Registered: ", TextColors.DARK_AQUA, this.getAllAliases().get(0)),
-						Text.of(plugin.getPluginInfo().error(), "  Aliases: ", TextColors.DARK_AQUA, this.getAllAliases()),
-						Text.of(plugin.getPluginInfo().error(), "  Permission: ", TextColors.DARK_AQUA, this.basePermission)
-				);
-			});
+			ImpactorCore.getInstance().getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
+					Text.of("Command Registered: ", TextColors.DARK_AQUA, this.getAllAliases().get(0)),
+					Text.of("  Aliases: ", TextColors.DARK_AQUA, this.getAllAliases()),
+					Text.of("  Permission: ", TextColors.DARK_AQUA, this.basePermission)
+			));
 		}
 
 		return CommandSpec.builder()
@@ -103,12 +100,12 @@ public abstract class SpongeCommand implements CommandExecutor
 	{
 		try
 		{
-			if(this.hasProperAnnotations())
+			if(this.hasNeededAnnotations())
 				Sponge.getCommandManager().register(plugin, getCommandSpec(), getAllAliases());
 			else
-				plugin.getConsole().ifPresent(console -> console.sendMessage(Text.of(
-						plugin.getPluginInfo().error(), this.getClass().getSimpleName(), " has been restricted from registration"
-				)));
+				plugin.getLogger().send(Logger.Prefixes.ERROR, Lists.newArrayList(
+						Text.of(this.getClass().getSimpleName(), " has been restricted from registration")
+				));
 		}
 		catch (IllegalArgumentException iae)
 		{
@@ -120,9 +117,6 @@ public abstract class SpongeCommand implements CommandExecutor
 		String permission = plugin.getPluginInfo().getID() + ".command.";
 		if(this.getClass().isAnnotationPresent(Permission.class)) {
 			Permission p = this.getClass().getAnnotation(Permission.class);
-			if (p.admin()) {
-				permission += "admin.";
-			}
 
 			if (!p.prefix().equals("")) {
 				permission += p.prefix() + ".";
@@ -134,11 +128,16 @@ public abstract class SpongeCommand implements CommandExecutor
 				permission += this.getAllAliases().get(0).toLowerCase();
 			}
 
+			permission += ".";
 			if (!p.suffix().equals("")) {
 				permission += p.suffix();
+			} else if(p.admin()) {
+				permission += "admin";
+			} else {
+				permission += "base";
 			}
 		} else {
-			permission += this.getAllAliases().get(0).toLowerCase();
+			permission += this.getAllAliases().get(0).toLowerCase() + ".base";
 		}
 
 		return permission;

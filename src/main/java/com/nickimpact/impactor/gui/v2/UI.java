@@ -1,8 +1,10 @@
 package com.nickimpact.impactor.gui.v2;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.nickimpact.impactor.CoreInfo;
 import com.nickimpact.impactor.ImpactorCore;
+import com.nickimpact.impactor.api.logger.Logger;
 import com.nickimpact.impactor.configuration.ConfigKeys;
 import com.nickimpact.impactor.gui.Clickable;
 import com.nickimpact.impactor.api.plugins.SpongePlugin;
@@ -11,9 +13,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryArchetypes;
-import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.*;
 import org.spongepowered.api.item.inventory.property.InventoryDimension;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
@@ -31,35 +31,29 @@ import java.util.function.BiConsumer;
  */
 public class UI {
 
-	@Getter private Player player;
-
 	private final SpongePlugin plugin;
 
 	private Inventory inventory;
+	@Getter private InventoryArchetype archetype;
+	@Getter private InventoryDimension dimension;
 
 	private Map<Integer, Icon> slots;
 	private BiConsumer<InteractInventoryEvent.Close, Player> closeAction;
 
-	private UI(Player player, SpongePlugin plugin, Builder builder) {
-		this.player = player;
+	private UI(SpongePlugin plugin, Builder builder) {
 		this.slots = Maps.newHashMap();
-		this.inventory = Inventory.builder()
-				.of(InventoryArchetypes.MENU_GRID)
-				.property(InventoryTitle.PROPERTY_NAME, InventoryTitle.of(builder.title))
-				.property(InventoryDimension.PROPERTY_NAME, InventoryDimension.of(builder.rows))
+		this.archetype = builder.archetype;
+		this.dimension = builder.dimension;
+		this.inventory = builder.builder
 				.listener(ClickInventoryEvent.class, this::processClick)
 				.listener(InteractInventoryEvent.Close.class, this::processClose)
 				.build(plugin);
 		this.plugin = plugin;
 
-		if(builder.layout != null) {
-			this.applyLayout(builder.layout);
-		}
-
 		this.closeAction = builder.closeAction;
 	}
 
-	public UI applyLayout(Layout layout) {
+	public UI define(Layout layout) {
 		slots.clear();
 		for(int i = 0; i < inventory.capacity(); i++) {
 			setSlot(i, layout.getIcon(i));
@@ -68,36 +62,34 @@ public class UI {
 		return this;
 	}
 
+	public Icon getSlot(int index) {
+		return slots.get(index);
+	}
+
 	public void setSlot(int index, Icon icon) {
-		GridInventory inv = this.inventory.query(GridInventory.class);
-		Slot slot = inv.getSlot(SlotIndex.of(index)).orElseThrow(() -> new IllegalArgumentException("Invalid index: " + index));
-		slot.set(icon.getDisplay());
+		inventory.query(QueryOperationTypes.INVENTORY_PROPERTY.of(SlotIndex.of(index))).first().set(icon.getDisplay());
 		slots.put(index, icon);
 	}
 
-	public void open() {
+	public void open(Player player) {
 		player.openInventory(this.inventory);
 		if(this.debugEnabled()) {
-			plugin.getConsole().ifPresent(console -> {
-				console.sendMessages(
-						Text.of(CoreInfo.DEBUG, "Opening Inventory for ", player.getName(), "..."),
-						Text.of(CoreInfo.DEBUG, "  Title: ", this.inventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME).get().getValue()),
-						Text.of(CoreInfo.DEBUG, "  Provider: ", this.plugin.getPluginInfo().getName(), "-", this.plugin.getPluginInfo().getVersion())
-				);
-			});
+			plugin.getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
+					Text.of("Opening Inventory for ", player.getName(), "..."),
+					Text.of("  Title: ", this.inventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME).get().getValue()),
+					Text.of("  Provider: ", this.plugin.getPluginInfo().getName(), "-", this.plugin.getPluginInfo().getVersion())
+			));
 		}
 	}
 
-	public void close() {
+	public void close(Player player) {
 		player.closeInventory();
 		if(this.debugEnabled()) {
-			plugin.getConsole().ifPresent(console -> {
-				console.sendMessages(
-						Text.of(CoreInfo.DEBUG, "Closing Inventory for ", player.getName(), "..."),
-						Text.of(CoreInfo.DEBUG, "  Title: ", this.inventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME).get().getValue()),
-						Text.of(CoreInfo.DEBUG, "  Provider: ", this.plugin.getPluginInfo().getName(), "-", this.plugin.getPluginInfo().getVersion())
-				);
-			});
+			plugin.getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
+						Text.of("Closing Inventory for ", player.getName(), "..."),
+						Text.of("  Title: ", this.inventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME).get().getValue()),
+						Text.of("  Provider: ", this.plugin.getPluginInfo().getName(), "-", this.plugin.getPluginInfo().getVersion())
+			));
 		}
 	}
 
@@ -116,22 +108,21 @@ public class UI {
 
 	private void processClick(ClickInventoryEvent event) {
 		if(this.debugEnabled()) {
-			plugin.getConsole().ifPresent(console -> {
-				console.sendMessages(
-						Text.of(CoreInfo.DEBUG, "Processing inventory click event for ", player.getName(), "..."),
-						Text.of(CoreInfo.DEBUG, "  Title: ", this.inventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME).get().getValue()),
-						Text.of(CoreInfo.DEBUG, "  Provider: ", this.plugin.getPluginInfo().getName(), "-", this.plugin.getPluginInfo().getVersion())
-				);
-			});
+			Player player = event.getCause().first(Player.class).orElse(null);
+			plugin.getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
+						Text.of("Processing inventory click event for ", player == null ? "Unknown" : player.getName(), "..."),
+						Text.of("  Title: ", this.inventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME).get().getValue()),
+						Text.of("  Provider: ", this.plugin.getPluginInfo().getName(), "-", this.plugin.getPluginInfo().getVersion())
+			));
 		}
 		event.setCancelled(true);
-		event.getCause().first(Player.class).ifPresent(player -> {
+		event.getCause().first(Player.class).ifPresent(pl -> {
 			event.getTransactions().forEach(transaction -> {
 				transaction.getSlot().getProperty(SlotIndex.class, "slotindex").ifPresent(slot -> {
 					Icon icon = slots.get(slot.getValue());
 					if(icon != null) {
 						Sponge.getScheduler().createTaskBuilder()
-								.execute(() -> icon.process(new Clickable(player, event)))
+								.execute(() -> icon.process(new Clickable(pl, event)))
 								.delayTicks(1)
 								.submit(this.plugin);
 					}
@@ -143,13 +134,12 @@ public class UI {
 	private void processClose(InteractInventoryEvent.Close event) {
 		if(closeAction != null) {
 			if(this.debugEnabled()) {
-				plugin.getConsole().ifPresent(console -> {
-					console.sendMessages(
-							Text.of(CoreInfo.DEBUG, "Processing inventory close event for ", player.getName(), "..."),
-							Text.of(CoreInfo.DEBUG, "  Title: ", this.inventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME).get().getValue()),
-							Text.of(CoreInfo.DEBUG, "  Provider: ", this.plugin.getPluginInfo().getName(), "-", this.plugin.getPluginInfo().getVersion())
-					);
-				});
+				Player player = event.getCause().first(Player.class).orElse(null);
+				plugin.getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
+							Text.of("Processing inventory close event for ", player == null ? "Unknown" : player.getName(), "..."),
+							Text.of("  Title: ", this.inventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME).get().getValue()),
+							Text.of("  Provider: ", this.plugin.getPluginInfo().getName(), "-", this.plugin.getPluginInfo().getVersion())
+				));
 			}
 			closeAction.accept(event, event.getCause().first(Player.class).orElse(null));
 		}
@@ -165,19 +155,35 @@ public class UI {
 	}
 
 	public static class Builder {
-		private Text title = Text.EMPTY;
-		private int rows = 6;
-		private Layout layout;
+
+		private Inventory.Builder builder = Inventory.builder();
+		private InventoryArchetype archetype;
+		private InventoryDimension dimension;
 		private BiConsumer<InteractInventoryEvent.Close, Player> closeAction;
 
-		public Builder title(Text title) {
-			this.title = title;
+		public Builder archetype(InventoryArchetype type) {
+			this.archetype = type;
+			this.builder.of(type);
 			return this;
 		}
 
-		public Builder layout(Layout layout) {
-			this.layout = layout;
+		public Builder dimension(InventoryDimension dimension) {
+			this.dimension = dimension;
+			this.property(dimension);
 			return this;
+		}
+
+		public Builder property(InventoryProperty property) {
+			if(property instanceof InventoryDimension && dimension == null) {
+				this.dimension = (InventoryDimension) property;
+			}
+
+			this.builder.property(property);
+			return this;
+		}
+
+		public Builder title(Text title) {
+			return this.property(InventoryTitle.of(title));
 		}
 
 		public Builder closeAction(BiConsumer<InteractInventoryEvent.Close, Player> task) {
@@ -185,8 +191,8 @@ public class UI {
 			return this;
 		}
 
-		public UI build(Player player, SpongePlugin plugin) {
-			return new UI(player, plugin, this);
+		public UI build(SpongePlugin plugin) {
+			return new UI(plugin, this);
 		}
 	}
 }

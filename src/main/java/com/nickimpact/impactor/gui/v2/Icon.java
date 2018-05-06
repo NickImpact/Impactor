@@ -25,6 +25,8 @@ public class Icon {
 	public static final Icon EMPTY = from(ItemStack.empty());
 	public static final Icon BORDER = from(ItemStack.builder().itemType(ItemTypes.STAINED_GLASS_PANE).add(Keys.DISPLAY_NAME, Text.EMPTY).add(Keys.DYE_COLOR, DyeColors.BLACK).build());
 	public static final Icon ERROR = from(ItemStack.builder().itemType(ItemTypes.BARRIER).add(Keys.DISPLAY_NAME, Text.of(TextColors.RED, "ERROR")).build());
+	public static final Icon CONFIRM = from(ItemStack.builder().itemType(ItemTypes.DYE).add(Keys.DYE_COLOR, DyeColors.LIME).add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "Confirm Selection")).build());
+	public static final Icon CANCEL = from(ItemStack.builder().itemType(ItemTypes.DYE).add(Keys.DYE_COLOR, DyeColors.LIME).add(Keys.DISPLAY_NAME, Text.of(TextColors.RED, "Cancel")).build());
 
 	@Getter @Setter private ItemStack display;
 	@Getter private Set<Consumer<Clickable>> listeners;

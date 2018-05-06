@@ -6,10 +6,15 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor(staticName = "of")
 public class StaticKey<T> implements ConfigKey<T> {
-	private final T val;
+	private T val;
 
 	@Override
 	public T get(ConfigAdapter adapter) {
 		return val;
+	}
+
+	@Override
+	public void set(ConfigAdapter adapter, T value) {
+		this.val = value;
 	}
 }

@@ -1,5 +1,7 @@
 package com.nickimpact.impactor.gui.v2;
 
+import org.spongepowered.api.entity.living.player.Player;
+
 /**
  * (Some note will appear here)
  *
@@ -9,11 +11,11 @@ public interface Displayable {
 
 	UI getDisplay();
 
-	default void open() {
-		this.getDisplay().open();
+	default void open(Player player) {
+		this.getDisplay().open(player);
 	}
 
-	default void close() {
-		this.getDisplay().close();
+	default void close(Player player) {
+		this.getDisplay().close(player);
 	}
 }

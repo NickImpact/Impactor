@@ -7,10 +7,16 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor(staticName = "of")
 public class StringKey implements ConfigKey<String> {
 	private final String path;
-	private final String def;
+	private String def;
 
 	@Override
 	public String get(ConfigAdapter adapter) {
 		return adapter.getString(path, def);
+	}
+
+	@Override
+	public void set(ConfigAdapter adapter, String value) {
+		this.def = value;
+		adapter.set(path, value);
 	}
 }

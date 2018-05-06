@@ -18,4 +18,5 @@ public interface ConfigKey<T> {
 	 */
 	T get(ConfigAdapter adapter);
 
+	void set(ConfigAdapter adapter, T value);
 }

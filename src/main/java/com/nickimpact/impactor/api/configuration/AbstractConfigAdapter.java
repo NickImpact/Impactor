@@ -1,7 +1,9 @@
 package com.nickimpact.impactor.api.configuration;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
+import com.nickimpact.impactor.api.logger.Logger;
 import com.nickimpact.impactor.api.plugins.ConfigurableSpongePlugin;
 import com.nickimpact.impactor.api.plugins.SpongePlugin;
 import lombok.Getter;
@@ -80,28 +82,24 @@ public class AbstractConfigAdapter implements ConfigAdapter {
 		if (!cfg.exists()) {
 			try (InputStream is = plugin.getClass().getClassLoader().getResourceAsStream(resource)) {
 				Files.copy(is, cfg.toPath());
+			} catch (Exception e) {
+				cfg.getParentFile().mkdirs();
+				cfg.createNewFile();
 			}
 		}
 
 		return cfg.toPath();
 	}
 
-	private <T> T getValue(String path, T def) {
-		if(this.contains(path)) {
-			return (T) resolvePath(path).getValue();
-		} else {
-			plugin.getConsole().ifPresent(console -> console.sendMessages(
-					Text.of(plugin.getPluginInfo().warning(), String.format("Found missing config option for plugin \"%s\"...", plugin.getPluginInfo().getName())),
-					Text.of(plugin.getPluginInfo().warning(), String.format("  Permission: %s", path)),
-					Text.of(plugin.getPluginInfo().warning(), "  Adding it now...")
-			));
+	private <T> void checkMissing(String path, T def) {
+		if(!this.contains(path)) {
+			this.getPlugin().getLogger().warn(String.format("Found missing config option (%s)... Adding it!", path));
 			resolvePath(path).setValue(def);
 			try {
 				this.loader.save(root);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			return def;
 		}
 	}
 
@@ -111,28 +109,43 @@ public class AbstractConfigAdapter implements ConfigAdapter {
 	}
 
 	@Override
+	public <T> void set(String path, T def) {
+		resolvePath(path).setValue(def);
+		try {
+			this.loader.save(root);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
 	public String getString(String path, String def) {
-		return getValue(path, def);
+		this.checkMissing(path, def);
+		return resolvePath(path).getString(def);
 	}
 
 	@Override
 	public int getInt(String path, int def) {
-		return getValue(path, def);
+		this.checkMissing(path, def);
+		return resolvePath(path).getInt(def);
 	}
 
 	@Override
 	public double getDouble(String path, double def) {
-		return getValue(path, def);
+		this.checkMissing(path, def);
+		return resolvePath(path).getDouble(def);
 	}
 
 	@Override
 	public long getLong(String path, long def) {
-		return getValue(path, def);
+		this.checkMissing(path, def);
+		return resolvePath(path).getLong(def);
 	}
 
 	@Override
 	public boolean getBoolean(String path, boolean def) {
-		return getValue(path, def);
+		this.checkMissing(path, def);
+		return resolvePath(path).getBoolean(def);
 	}
 
 	@Override

@@ -7,10 +7,16 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor(staticName = "of")
 public class DoubleKey implements ConfigKey<Double> {
 	private final String path;
-	private final double def;
+	private double def;
 
 	@Override
 	public Double get(ConfigAdapter adapter) {
 		return adapter.getDouble(path, def);
+	}
+
+	@Override
+	public void set(ConfigAdapter adapter, Double value) {
+		this.def = value;
+		adapter.set(path, value);
 	}
 }

@@ -15,4 +15,9 @@ public class MapKey implements ConfigKey<Map<String, String>> {
 	public Map<String, String> get(ConfigAdapter adapter) {
 		return ImmutableMap.copyOf(adapter.getMap(path, ImmutableMap.of()));
 	}
+
+	@Override
+	public void set(ConfigAdapter adapter, Map<String, String> value) {
+		throw new IllegalStateException("Unsupported operation");
+	}
 }

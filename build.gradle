@@ -18,7 +18,7 @@ plugins {
 }
 
 group 'com.nickimpact.impactor'
-version '1.2.1'
+version '1.0.1'
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
@@ -28,13 +28,13 @@ compileJava {
 }
 
 ext {
-    pluginversion = '1.2.1'
+    pluginversion = '1.0.1'
     spongeapiversion = '7.1.0-SNAPSHOT'
     completeversion = "-S${spongeapiversion.substring(0, 5)}-${pluginversion}"
 }
 
 jar {
-    archiveName = "Impactor-${pluginversion}.jar"
+    archiveName = "Impactor${completeversion}.jar"
 }
 
 repositories {
@@ -43,6 +43,7 @@ repositories {
         name = 'sponge'
         url = 'http://repo.spongepowered.org/maven'
     }
+    maven { url 'https://jitpack.io' }
 }
 
 minecraft {
@@ -66,6 +67,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile 'org.spongepowered:spongeapi:7.1.0-SNAPSHOT'
     compile "org.projectlombok:lombok:1.16.10"
+    compile 'com.github.SparklingComet:java-mojang-api:-SNAPSHOT'
+    compile 'com.github.rojo8399:PlaceholderAPI:master-SNAPSHOT'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
