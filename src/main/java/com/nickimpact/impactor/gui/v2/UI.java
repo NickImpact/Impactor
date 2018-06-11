@@ -2,7 +2,6 @@ package com.nickimpact.impactor.gui.v2;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.nickimpact.impactor.CoreInfo;
 import com.nickimpact.impactor.ImpactorCore;
 import com.nickimpact.impactor.api.logger.Logger;
 import com.nickimpact.impactor.configuration.ConfigKeys;
@@ -18,7 +17,6 @@ import org.spongepowered.api.item.inventory.property.InventoryDimension;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
-import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.text.Text;
 
 import java.util.Map;

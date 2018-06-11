@@ -2,6 +2,7 @@ package com.nickimpact.impactor.api.configuration;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
 import com.google.common.reflect.TypeToken;
 import com.nickimpact.impactor.api.logger.Logger;
 import com.nickimpact.impactor.api.plugins.ConfigurableSpongePlugin;
@@ -103,6 +104,18 @@ public class AbstractConfigAdapter implements ConfigAdapter {
 		}
 	}
 
+	private <T> void checkMissing(String path, T def, TypeToken<T> type) {
+		try {
+			if (!this.contains(path)) {
+				this.getPlugin().getLogger().warn(String.format("Found missing config option (%s)... Adding it!", path));
+				resolvePath(path).setValue(type, def);
+				this.loader.save(root);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	public boolean contains(String path) {
 		return !resolvePath(path).isVirtual();
@@ -150,32 +163,14 @@ public class AbstractConfigAdapter implements ConfigAdapter {
 
 	@Override
 	public List<String> getList(String path, List<String> def) {
-		ConfigurationNode node = resolvePath(path);
-		if (node.isVirtual()) {
-			try {
-				resolvePath(path).setValue(new TypeToken<List<String>>() {}, def);
-			} catch (ObjectMappingException e) {
-				e.printStackTrace();
-			}
-			return def;
-		}
-
-		return node.getList(Object::toString);
+		this.checkMissing(path, def, new TypeToken<List<String>>() {});
+		return resolvePath(path).getList(Object::toString);
 	}
 
 	@Override
 	public List<String> getObjectList(String path, List<String> def) {
-		ConfigurationNode node = resolvePath(path);
-		if (node.isVirtual()) {
-			try {
-				resolvePath(path).setValue(new TypeToken<List<String>>() {}, def);
-			} catch (ObjectMappingException e) {
-				e.printStackTrace();
-			}
-			return def;
-		}
-
-		return node.getChildrenMap().keySet().stream().map(Object::toString).collect(Collectors.toList());
+		this.checkMissing(path, def, new TypeToken<List<String>>() {});
+		return resolvePath(path).getChildrenMap().keySet().stream().map(Object::toString).collect(Collectors.toList());
 	}
 
 	@SuppressWarnings("unchecked")

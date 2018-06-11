@@ -63,29 +63,35 @@ public abstract class SpongeCommand implements CommandExecutor
 
 	public abstract SpongeCommand[] getSubCommands();
 
-	private CommandSpec getCommandSpec()
+	private CommandSpec getCommandSpec(String current)
 	{
 		this.basePermission = buildPermission(plugin);
+
+		if(current == null) {
+			current = "/" + this.getAllAliases().get(0);
+		} else {
+			current += " " + this.getAllAliases().get(0);
+		}
+
+		if(ImpactorCore.getInstance().getConfig().get(ConfigKeys.DEBUG_ENABLED) && ImpactorCore.getInstance().getConfig().get(ConfigKeys.DEBUG_COMMANDS)) {
+			ImpactorCore.getInstance().getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
+					Text.of("Registering Command: ", TextColors.DARK_AQUA, current),
+					Text.of("  Aliases: ", TextColors.DARK_AQUA, this.getAllAliases()),
+					Text.of("  Permission: ", TextColors.DARK_AQUA, this.basePermission)
+			));
+		}
 
 		SpongeCommand[] subCmds = getSubCommands();
 		HashMap<List<String>, CommandSpec> subCommands = new HashMap<>();
 		if (subCmds != null && subCmds.length > 0)
 			for (SpongeCommand cmd : subCmds)
 			{
-				subCommands.put(cmd.getAllAliases(), cmd.getCommandSpec());
+				subCommands.put(cmd.getAllAliases(), cmd.getCommandSpec(current));
 			}
 
 		CommandElement[] args = getArgs();
 		if (args == null || args.length == 0)
 			args = new CommandElement[]{GenericArguments.none()};
-
-		if(ImpactorCore.getInstance().getConfig().get(ConfigKeys.DEBUG_ENABLED) && ImpactorCore.getInstance().getConfig().get(ConfigKeys.DEBUG_COMMANDS)) {
-			ImpactorCore.getInstance().getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
-					Text.of("Command Registered: ", TextColors.DARK_AQUA, this.getAllAliases().get(0)),
-					Text.of("  Aliases: ", TextColors.DARK_AQUA, this.getAllAliases()),
-					Text.of("  Permission: ", TextColors.DARK_AQUA, this.basePermission)
-			));
-		}
 
 		return CommandSpec.builder()
 				.children(subCommands)
@@ -101,7 +107,7 @@ public abstract class SpongeCommand implements CommandExecutor
 		try
 		{
 			if(this.hasNeededAnnotations())
-				Sponge.getCommandManager().register(plugin, getCommandSpec(), getAllAliases());
+				Sponge.getCommandManager().register(plugin, getCommandSpec(null), getAllAliases());
 			else
 				plugin.getLogger().send(Logger.Prefixes.ERROR, Lists.newArrayList(
 						Text.of(this.getClass().getSimpleName(), " has been restricted from registration")

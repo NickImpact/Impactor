@@ -33,7 +33,7 @@ public abstract class Adapter<E> implements JsonSerializer<E>, JsonDeserializer<
 	{
 		JsonObject obj = (JsonObject)json;
 		try {
-			return (E) getGson().fromJson(obj, getRegistry().get(obj.get("id").getAsString()));
+			return (E) getGson().fromJson(obj, getRegistry().get(obj.get("type").getAsString().toLowerCase()));
 		} catch (Exception e) {
 			plugin.getLogger().send(Logger.Prefixes.WARN, Lists.newArrayList(
 					Text.of("========== JSON Error =========="),

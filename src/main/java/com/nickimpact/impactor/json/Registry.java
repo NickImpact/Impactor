@@ -32,7 +32,7 @@ public class Registry<E> {
 		if(!clazz.isAnnotationPresent(Typing.class))
 			throw new Exception("Missing typing annotation, class registration cancelled");
 
-		this.register(clazz.getAnnotation(Typing.class).value(), clazz);
+		this.register(clazz.getAnnotation(Typing.class).value().toLowerCase(), clazz);
 	}
 
 	/**

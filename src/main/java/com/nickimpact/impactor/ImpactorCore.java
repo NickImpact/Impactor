@@ -4,13 +4,18 @@ import com.nickimpact.impactor.api.configuration.AbstractConfig;
 import com.nickimpact.impactor.api.configuration.AbstractConfigAdapter;
 import com.nickimpact.impactor.api.configuration.ConfigBase;
 import com.nickimpact.impactor.api.logger.Logger;
+import com.nickimpact.impactor.api.services.mojang.MojangStatus;
 import com.nickimpact.impactor.commands.PluginCmd;
 import com.nickimpact.impactor.api.plugins.ConfigurableSpongePlugin;
 import com.nickimpact.impactor.api.plugins.PluginInfo;
 import com.nickimpact.impactor.configuration.ConfigKeys;
+import com.nickimpact.impactor.configuration.MsgConfigKeys;
 import com.nickimpact.impactor.logging.ConsoleLogger;
 import com.nickimpact.impactor.logging.SpongeLogger;
 import com.nickimpact.impactor.mojang.StatusCheck;
+import com.pixelmonmod.pixelmon.blocks.furniture.BoxBlock;
+import com.pixelmonmod.pixelmon.config.PixelmonItems;
+import com.pixelmonmod.pixelmon.items.PixelmonItemBlock;
 import lombok.Getter;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
@@ -41,6 +46,7 @@ public class ImpactorCore extends ConfigurableSpongePlugin {
 	@Inject @ConfigDir(sharedRoot = false) private Path configDir;
 
 	private ConfigBase config;
+	private ConfigBase msgConfig;
 
 	@Inject private org.slf4j.Logger fallback;
 
@@ -69,22 +75,24 @@ public class ImpactorCore extends ConfigurableSpongePlugin {
 		this.logger.info(Text.of("Loading configuration..."));
 		this.config = new AbstractConfig(this, new AbstractConfigAdapter(this), new ConfigKeys(), "core.conf");
 		this.config.init();
+		this.msgConfig = new AbstractConfig(this, new AbstractConfigAdapter(this), new MsgConfigKeys(), "messages.conf");
+		this.msgConfig.init();
 
 		this.logger.info(Text.of("Registering core commands..."));
 		new PluginCmd(this).register(this);
 		this.logger.info(Text.of("Initialization complete!"));
 
-		final StatusCheck statusChecker = new StatusCheck();
-		Sponge.getScheduler().createTaskBuilder().execute(() -> {
-			if(!statusChecker.allGreen()) {
-				try {
-					statusChecker.fetch().report();
-				} catch (Exception e) {
-					this.getLogger().error("Unable to read Mojang Service Status...");
-					e.printStackTrace();
-				}
-			}
-		}).async().interval(60, TimeUnit.SECONDS).submit(this);
+//		Sponge.getScheduler().createTaskBuilder().execute(() -> {
+//			try {
+//				StatusCheck.fetch();
+//				if (!StatusCheck.allGreen()) {
+//					StatusCheck.report();
+//				}
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//
+//		}).async().interval(30, TimeUnit.SECONDS).submit(this);
 	}
 
 	@Override

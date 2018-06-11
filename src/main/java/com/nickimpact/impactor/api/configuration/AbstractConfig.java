@@ -4,7 +4,6 @@ import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.nickimpact.impactor.api.configuration.keys.EnduringKey;
-import com.nickimpact.impactor.configuration.ConfigKeys;
 import com.nickimpact.impactor.api.plugins.SpongePlugin;
 import lombok.AccessLevel;
 import lombok.Getter;

@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * (Some note will appear here)
+ * Describes the contents of a UI with their exact positioning. For instance, a Layout would typically contain
+ * the icons that describe quick and easy actions, or no actions at all. For example, a Layout can be described
+ * with a border,
  *
  * @author NickImpact (Nick DeGruccio)
  */
@@ -89,6 +91,11 @@ public class Layout {
 		}
 
 		public Builder replace(Icon prior, Icon replacement) {
+			for (Map.Entry<Integer, Icon> entry : elements.entrySet()) {
+				if (entry.getValue() == prior) {
+					entry.setValue(replacement);
+				}
+			}
 			return this;
 		}
 

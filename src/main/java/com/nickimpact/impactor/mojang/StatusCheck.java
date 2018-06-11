@@ -32,13 +32,13 @@ import java.util.Map;
 
 public class StatusCheck {
 
-	private final SimpleDateFormat sdf = new SimpleDateFormat("EEEEE MM/dd/yy HH:mm:ss z");
-	private final Gson gson = new Gson();
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("EEEEE MM/dd/yy HH:mm:ss z");
+	private static final Gson gson = new Gson();
 
-	private Map<ServiceType, Status> statuses = Maps.newHashMap();
-	private Date lastCheck = Date.from(Instant.now());
+	private static Map<ServiceType, Status> statuses = Maps.newHashMap();
+	private static Date lastCheck = Date.from(Instant.now());
 
-	public void report() {
+	public static void report() {
 		List<Text> report = Lists.newArrayList();
 		for(ServiceType st : statuses.keySet()) {
 			Status status = statuses.get(st);
@@ -75,7 +75,7 @@ public class StatusCheck {
 				.forEach(pagination::sendTo);
 	}
 
-	public boolean allGreen() {
+	public static boolean allGreen() {
 		for(Status status : statuses.values()) {
 			if(!status.status.equals(ServiceStatus.GREEN)) {
 				return false;
@@ -86,7 +86,7 @@ public class StatusCheck {
 	}
 
 	@SuppressWarnings("unchecked")
-	public StatusCheck fetch() throws Exception {
+	public static void fetch() throws Exception {
 		lastCheck = Date.from(Instant.now());
 		List<Map<String, String>> mapping = gson.fromJson(readURL("https://status.mojang.com/check"), new TypeToken<List<Map<String, String>>>() {}.getType());
 		mapping.forEach(m -> {
@@ -118,10 +118,9 @@ public class StatusCheck {
 				statuses.put(service, status);
 			});
 		});
-		return this;
 	}
 
-	private String readURL(String urlString) throws Exception {
+	private static String readURL(String urlString) throws Exception {
 		URL url = new URL(urlString);
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
 			StringBuilder data = new StringBuilder();

@@ -51,8 +51,8 @@ public class ItemUtils {
 				.itemType(ItemTypes.SKULL)
 				.add(Keys.DISPLAY_NAME, name)
 				.add(Keys.ITEM_LORE, lore)
-				.add(Keys.REPRESENTED_PLAYER, profile)
 				.add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
+				.add(Keys.REPRESENTED_PLAYER, profile)
 				.build();
 	}
 }
