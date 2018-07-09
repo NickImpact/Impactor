@@ -154,6 +154,17 @@ public class Page {
 		return this;
 	}
 
+	public Page update(List<Icon> icons, InventoryDimension dimension, int rOffset, int cOffset) {
+		int capacity = dimension.getRows() * dimension.getColumns();
+		int pages = icons.isEmpty() ? 1 : icons.size() % capacity == 0 ? icons.size() / capacity : icons.size() / capacity + 1;
+		for(int i = 1; i <= pages; i++) {
+			Layout.Builder page = Layout.builder().from(layout).page(icons.subList((i - 1) * capacity, i == pages ? icons.size() : i * capacity), dimension, rOffset, cOffset);
+			this.views.get(i - 1).define(page.build());
+		}
+
+		return this;
+	}
+
 	private Icon update(Icon icon, Text name, int page, int target) {
 		icon.getDisplay().offer(Keys.DISPLAY_NAME, name);
 		icon.getDisplay().setQuantity(target);

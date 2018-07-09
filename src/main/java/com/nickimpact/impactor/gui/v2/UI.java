@@ -51,6 +51,7 @@ public class UI {
 				.build(plugin);
 		this.plugin = plugin;
 
+		this.openAction = builder.openAction;
 		this.closeAction = builder.closeAction;
 	}
 
