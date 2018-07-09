@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.nickimpact.impactor.ImpactorCore;
+import com.nickimpact.impactor.api.logger.Logger;
 import com.nickimpact.impactor.api.plugins.SpongePlugin;
 import com.nickimpact.impactor.configuration.MsgConfigKeys;
 import lombok.AccessLevel;
@@ -13,6 +14,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.InventoryProperty;
@@ -20,17 +22,19 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.InventoryDimension;
+import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class Page {
 
 	public final Map<PageIconType, PageIcon> pageIcons = Maps.newHashMap();
 
-	private final List<UI> views = Lists.newArrayList();
+	@Getter private final List<UI> views = Lists.newArrayList();
 	private final InventoryArchetype archetype;
 	private final ImmutableList<InventoryProperty> properties;
 	private final Layout layout;
@@ -195,6 +199,8 @@ public class Page {
 		private PageIcon curr;
 		private PageIcon next;
 		private PageIcon last;
+
+		private BiConsumer<InteractInventoryEvent.Close, Player> closeAction;
 
 		/**
 		 * Sets the archetype used for the backing {@link UI}s.

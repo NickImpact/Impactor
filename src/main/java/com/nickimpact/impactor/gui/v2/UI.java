@@ -8,6 +8,7 @@ import com.nickimpact.impactor.configuration.ConfigKeys;
 import com.nickimpact.impactor.gui.Clickable;
 import com.nickimpact.impactor.api.plugins.SpongePlugin;
 import lombok.Getter;
+import lombok.Setter;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
@@ -36,7 +37,8 @@ public class UI {
 	@Getter private InventoryDimension dimension;
 
 	private Map<Integer, Icon> slots;
-	private BiConsumer<InteractInventoryEvent.Close, Player> closeAction;
+	@Setter private BiConsumer<InteractInventoryEvent.Open, Player> openAction;
+	@Setter private BiConsumer<InteractInventoryEvent.Close, Player> closeAction;
 
 	private UI(SpongePlugin plugin, Builder builder) {
 		this.slots = Maps.newHashMap();
@@ -44,6 +46,7 @@ public class UI {
 		this.dimension = builder.dimension;
 		this.inventory = builder.builder
 				.listener(ClickInventoryEvent.class, this::processClick)
+				.listener(InteractInventoryEvent.Open.class, this::processOpen)
 				.listener(InteractInventoryEvent.Close.class, this::processClose)
 				.build(plugin);
 		this.plugin = plugin;
@@ -129,6 +132,20 @@ public class UI {
 		});
 	}
 
+	private void processOpen(InteractInventoryEvent.Open event) {
+		if(openAction != null) {
+			if(this.debugEnabled()) {
+				Player player = event.getCause().first(Player.class).orElse(null);
+				plugin.getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
+						Text.of("Processing inventory open event for ", player == null ? "Unknown" : player.getName(), "..."),
+						Text.of("  Title: ", this.inventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME).get().getValue()),
+						Text.of("  Provider: ", this.plugin.getPluginInfo().getName(), "-", this.plugin.getPluginInfo().getVersion())
+				));
+			}
+			openAction.accept(event, event.getCause().first(Player.class).orElse(null));
+		}
+	}
+
 	private void processClose(InteractInventoryEvent.Close event) {
 		if(closeAction != null) {
 			if(this.debugEnabled()) {
@@ -157,6 +174,7 @@ public class UI {
 		private Inventory.Builder builder = Inventory.builder();
 		private InventoryArchetype archetype;
 		private InventoryDimension dimension;
+		private BiConsumer<InteractInventoryEvent.Open, Player> openAction;
 		private BiConsumer<InteractInventoryEvent.Close, Player> closeAction;
 
 		public Builder archetype(InventoryArchetype type) {
@@ -182,6 +200,11 @@ public class UI {
 
 		public Builder title(Text title) {
 			return this.property(InventoryTitle.of(title));
+		}
+
+		public Builder openAction(BiConsumer<InteractInventoryEvent.Open, Player> task) {
+			this.openAction = task;
+			return this;
 		}
 
 		public Builder closeAction(BiConsumer<InteractInventoryEvent.Close, Player> task) {
