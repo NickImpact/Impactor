@@ -82,6 +82,7 @@ dependencies {
     compile 'io.github.nucleuspowered:nucleus-api:1.4.5-SNAPSHOT-S7.0'
     compile 'org.spongepowered:spongeapi:7.1.0-SNAPSHOT'
     compile "org.projectlombok:lombok:1.16.10"
+    compile group: 'com.zaxxer', name: 'HikariCP', version: '2.5.1'
     compile 'com.github.SparklingComet:java-mojang-api:-SNAPSHOT'
     compile 'com.github.rojo8399:PlaceholderAPI:master-SNAPSHOT'
     compile 'com.github.Sansko1337:NoteBlockAPI-Sponge:1.9.0-Sponge'
