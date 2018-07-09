@@ -41,7 +41,7 @@ public class NBSSong {
 		}
 
 		public NBSSong build() {
-			File location = new File("songs/" + filename);
+			File location = new File("songs/" + filename + ".nbs");
 			Song song = NBSDecoder.parse(location);
 			return new NBSSong(song, title, location);
 		}

@@ -124,6 +124,10 @@ public abstract class SpongeCommand implements CommandExecutor
 		if(this.getClass().isAnnotationPresent(Permission.class)) {
 			Permission p = this.getClass().getAnnotation(Permission.class);
 
+			if(p.admin()) {
+				permission += "admin.";
+			}
+
 			if (!p.prefix().equals("")) {
 				permission += p.prefix() + ".";
 			}
@@ -137,8 +141,6 @@ public abstract class SpongeCommand implements CommandExecutor
 			permission += ".";
 			if (!p.suffix().equals("")) {
 				permission += p.suffix();
-			} else if(p.admin()) {
-				permission += "admin";
 			} else {
 				permission += "base";
 			}

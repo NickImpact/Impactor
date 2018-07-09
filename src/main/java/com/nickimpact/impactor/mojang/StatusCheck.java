@@ -45,7 +45,6 @@ public class StatusCheck {
 			Text out = Text.of(TextColors.DARK_AQUA, st.display, TextColors.GRAY, " \u00bb ");
 			out = Text.of(out, status.getStatus().getColor(), status.getStatus().getRep());
 			if(!status.getStatus().equals(ServiceStatus.GREEN)) {
-				out = Text.of(out, " - ", status.getStatus().rep);
 				if(status.getStatus().equals(ServiceStatus.RED)) {
 					Date now = Date.from(Instant.now());
 					Time time = new Time(now.toInstant().minusSeconds(status.down.toInstant().getEpochSecond()).getEpochSecond());
@@ -112,6 +111,14 @@ public class StatusCheck {
 					} else if(prior.getStatus().equals(ServiceStatus.YELLOW)) {
 						if(status.getStatus().equals(ServiceStatus.RED)) {
 							status.down = Date.from(Instant.now());
+						}
+					} else if(prior.getStatus().equals(ServiceStatus.DOWN)) {
+						if(status.getStatus().equals(ServiceStatus.RED)) {
+							status.down = prior.getDown();
+						}
+					} else if(prior.getStatus().equals(ServiceStatus.BACK)) {
+						if (status.getStatus().equals(ServiceStatus.GREEN)) {
+							status.down = null;
 						}
 					}
 				}

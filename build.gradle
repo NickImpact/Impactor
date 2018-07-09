@@ -36,7 +36,6 @@ ext {
 jar {
     archiveName = "Impactor${completeversion}.jar"
 }
-
 repositories {
     mavenCentral()
     maven {
@@ -44,7 +43,22 @@ repositories {
         url = 'http://repo.spongepowered.org/maven'
     }
     maven { url = 'https://jitpack.io' }
+    maven {
+        name 'drnaylor-minecraft'
+        url 'http://repo.drnaylor.co.uk/artifactory/list/minecraft'
+    }
+    maven {
+        name 'drnaylor'
+        url 'http://repo.drnaylor.co.uk/artifactory/list/quickstart'
+    }
+    ivy {
+        url "https://download.nodecdn.net/containers"
+        layout "pattern", {
+            artifact "/[organisation]/[module]/release/[revision]/[ext]"
+        }
+    }
 }
+
 
 minecraft {
     version = "1.12.2-14.23.1.2555"
@@ -64,7 +78,8 @@ spongestart{
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: '*.jar')
+    compile 'reforged:server:6.3.2@Pixelmon-1.12.2-6.3.2-server.jar'
+    compile 'io.github.nucleuspowered:nucleus-api:1.4.5-SNAPSHOT-S7.0'
     compile 'org.spongepowered:spongeapi:7.1.0-SNAPSHOT'
     compile "org.projectlombok:lombok:1.16.10"
     compile 'com.github.SparklingComet:java-mojang-api:-SNAPSHOT'
@@ -75,6 +90,12 @@ dependencies {
 
 //Fix forges AT breaking everything because the AT checker is stupid
 [tasks.deobfMcMCP, tasks.deobfMcSRG].each { it.failOnAtError = false }
+
+tasks.withType(JavaCompile) { task ->
+    task.options.encoding = 'UTF-8'
+    task.options.fork = true
+}
+
 
 processResources
 {
