@@ -76,7 +76,7 @@ public class UI {
 	public void open(Player player) {
 		player.openInventory(this.inventory);
 		if(this.debugEnabled()) {
-			plugin.getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
+			ImpactorCore.getInstance().getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
 					Text.of("Opening Inventory for ", player.getName(), "..."),
 					Text.of("  Title: ", this.inventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME).get().getValue()),
 					Text.of("  Provider: ", this.plugin.getPluginInfo().getName(), "-", this.plugin.getPluginInfo().getVersion())
@@ -87,7 +87,7 @@ public class UI {
 	public void close(Player player) {
 		player.closeInventory();
 		if(this.debugEnabled()) {
-			plugin.getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
+			ImpactorCore.getInstance().getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
 						Text.of("Closing Inventory for ", player.getName(), "..."),
 						Text.of("  Title: ", this.inventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME).get().getValue()),
 						Text.of("  Provider: ", this.plugin.getPluginInfo().getName(), "-", this.plugin.getPluginInfo().getVersion())
@@ -111,7 +111,7 @@ public class UI {
 	private void processClick(ClickInventoryEvent event) {
 		if(this.debugEnabled()) {
 			Player player = event.getCause().first(Player.class).orElse(null);
-			plugin.getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
+			ImpactorCore.getInstance().getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
 						Text.of("Processing inventory click event for ", player == null ? "Unknown" : player.getName(), "..."),
 						Text.of("  Title: ", this.inventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME).get().getValue()),
 						Text.of("  Provider: ", this.plugin.getPluginInfo().getName(), "-", this.plugin.getPluginInfo().getVersion())
@@ -137,7 +137,7 @@ public class UI {
 		if(openAction != null) {
 			if(this.debugEnabled()) {
 				Player player = event.getCause().first(Player.class).orElse(null);
-				plugin.getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
+				ImpactorCore.getInstance().getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
 						Text.of("Processing inventory open event for ", player == null ? "Unknown" : player.getName(), "..."),
 						Text.of("  Title: ", this.inventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME).get().getValue()),
 						Text.of("  Provider: ", this.plugin.getPluginInfo().getName(), "-", this.plugin.getPluginInfo().getVersion())
@@ -151,7 +151,7 @@ public class UI {
 		if(closeAction != null) {
 			if(this.debugEnabled()) {
 				Player player = event.getCause().first(Player.class).orElse(null);
-				plugin.getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
+				ImpactorCore.getInstance().getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
 							Text.of("Processing inventory close event for ", player == null ? "Unknown" : player.getName(), "..."),
 							Text.of("  Title: ", this.inventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME).get().getValue()),
 							Text.of("  Provider: ", this.plugin.getPluginInfo().getName(), "-", this.plugin.getPluginInfo().getVersion())

@@ -2,22 +2,14 @@ package com.nickimpact.impactor.api.rewards;
 
 import org.spongepowered.api.entity.living.player.Player;
 
-public interface Reward {
+public interface Reward<T> {
 
 	/**
-	 * Retrieves the ID for this reward. This will be the primary key for referencing
-	 * reward types.
+	 * Returns an instance of the reward based on the specs of its design.
 	 *
-	 * @return The ID of the reward.
+	 * @return An instance of the defined reward
 	 */
-	String getID();
-
-	/**
-	 * Retrieves the name of the reward. This represents the actual display name for the reward.
-	 *
-	 * @return The name of the reward.
-	 */
-	String getName();
+	T getReward();
 
 	/**
 	 * Gives the current instance of a Reward to a player.
