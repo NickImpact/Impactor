@@ -1,11 +1,7 @@
 package com.nickimpact.impactor.api.configuration;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Range;
 import com.google.common.reflect.TypeToken;
-import com.nickimpact.impactor.api.logger.Logger;
-import com.nickimpact.impactor.api.plugins.ConfigurableSpongePlugin;
 import com.nickimpact.impactor.api.plugins.SpongePlugin;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +11,6 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import org.spongepowered.api.text.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AbstractConfigAdapter implements ConfigAdapter {
 
-	private final ConfigurableSpongePlugin plugin;
+	private final SpongePlugin plugin;
 
 	private ConfigurationNode root;
 

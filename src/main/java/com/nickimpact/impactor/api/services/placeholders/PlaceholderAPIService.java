@@ -3,7 +3,6 @@ package com.nickimpact.impactor.api.services.placeholders;
 import com.google.common.collect.Lists;
 import com.nickimpact.impactor.api.plugins.SpongePlugin;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;

@@ -5,8 +5,10 @@ import com.nickimpact.impactor.ImpactorCore;
 import com.nickimpact.impactor.api.commands.annotations.Aliases;
 import com.nickimpact.impactor.api.commands.annotations.Permission;
 import com.nickimpact.impactor.api.logger.Logger;
-import com.nickimpact.impactor.configuration.ConfigKeys;
+import com.nickimpact.impactor.api.plugins.IPlugin;
 import com.nickimpact.impactor.api.plugins.SpongePlugin;
+import com.nickimpact.impactor.configuration.ConfigKeys;
+import lombok.Getter;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -25,17 +27,15 @@ import java.util.List;
  *
  * @author NickImpact
  */
-public abstract class SpongeCommand implements CommandExecutor
-{
-	private String basePermission;
+public abstract class SpongeCommand implements CommandExecutor {
+	@Getter
+	private String permission;
 
 	protected final SpongePlugin plugin;
 
-	public SpongeCommand(SpongePlugin plugin)
-	{
+	public SpongeCommand(SpongePlugin plugin) {
 		this.plugin = plugin;
-		if(!hasNeededAnnotations())
-		{
+		if (!hasNeededAnnotations()) {
 			ImpactorCore.getInstance().getLogger().send(Logger.Prefixes.ERROR, Lists.newArrayList(
 					Text.of("======= Invalid Command Structure ======="),
 					Text.of("Executor: ", TextColors.RED, this.getClass().getSimpleName()),
@@ -45,13 +45,11 @@ public abstract class SpongeCommand implements CommandExecutor
 		}
 	}
 
-	public boolean hasNeededAnnotations()
-	{
+	public boolean hasNeededAnnotations() {
 		return this.getClass().isAnnotationPresent(Aliases.class);
 	}
 
-	public List<String> getAllAliases()
-	{
+	public List<String> getAllAliases() {
 		return Lists.newArrayList(this.getClass().getAnnotation(Aliases.class).value());
 	}
 
@@ -63,29 +61,27 @@ public abstract class SpongeCommand implements CommandExecutor
 
 	public abstract SpongeCommand[] getSubCommands();
 
-	private CommandSpec getCommandSpec(String current)
-	{
-		this.basePermission = buildPermission(plugin);
+	private CommandSpec getCommandSpec(String current) {
+		this.permission = buildPermission(plugin);
 
-		if(current == null) {
+		if (current == null) {
 			current = "/" + this.getAllAliases().get(0);
 		} else {
 			current += " " + this.getAllAliases().get(0);
 		}
 
-		if(ImpactorCore.getInstance().getConfig().get(ConfigKeys.DEBUG_ENABLED) && ImpactorCore.getInstance().getConfig().get(ConfigKeys.DEBUG_COMMANDS)) {
+		if (ImpactorCore.getInstance().getConfig().get(ConfigKeys.DEBUG_ENABLED) && ImpactorCore.getInstance().getConfig().get(ConfigKeys.DEBUG_COMMANDS)) {
 			ImpactorCore.getInstance().getLogger().send(Logger.Prefixes.DEBUG, Lists.newArrayList(
 					Text.of("Registering Command: ", TextColors.DARK_AQUA, current),
 					Text.of("  Aliases: ", TextColors.DARK_AQUA, this.getAllAliases()),
-					Text.of("  Permission: ", TextColors.DARK_AQUA, this.basePermission)
+					Text.of("  Permission: ", TextColors.DARK_AQUA, this.permission)
 			));
 		}
 
 		SpongeCommand[] subCmds = getSubCommands();
 		HashMap<List<String>, CommandSpec> subCommands = new HashMap<>();
 		if (subCmds != null && subCmds.length > 0)
-			for (SpongeCommand cmd : subCmds)
-			{
+			for (SpongeCommand cmd : subCmds) {
 				subCommands.put(cmd.getAllAliases(), cmd.getCommandSpec(current));
 			}
 
@@ -95,36 +91,32 @@ public abstract class SpongeCommand implements CommandExecutor
 
 		return CommandSpec.builder()
 				.children(subCommands)
-				.permission(this.basePermission)
+				.permission(this.permission)
 				.description(getDescription())
 				.executor(this)
 				.arguments(args)
 				.build();
 	}
 
-	public void register(SpongePlugin plugin)
-	{
-		try
-		{
-			if(this.hasNeededAnnotations())
+	public void register(SpongePlugin plugin) {
+		try {
+			if (this.hasNeededAnnotations())
 				Sponge.getCommandManager().register(plugin, getCommandSpec(null), getAllAliases());
 			else
 				plugin.getLogger().send(Logger.Prefixes.ERROR, Lists.newArrayList(
 						Text.of(this.getClass().getSimpleName(), " has been restricted from registration")
 				));
-		}
-		catch (IllegalArgumentException iae)
-		{
+		} catch (IllegalArgumentException iae) {
 			iae.printStackTrace();
 		}
 	}
 
-	private String buildPermission(SpongePlugin plugin) {
+	private String buildPermission(IPlugin plugin) {
 		String permission = plugin.getPluginInfo().getID() + ".command.";
-		if(this.getClass().isAnnotationPresent(Permission.class)) {
+		if (this.getClass().isAnnotationPresent(Permission.class)) {
 			Permission p = this.getClass().getAnnotation(Permission.class);
 
-			if(p.admin()) {
+			if (p.admin()) {
 				permission += "admin.";
 			}
 

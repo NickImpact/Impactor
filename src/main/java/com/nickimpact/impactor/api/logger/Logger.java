@@ -2,7 +2,6 @@ package com.nickimpact.impactor.api.logger;
 
 import com.nickimpact.impactor.api.plugins.SpongePlugin;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageReceiver;
 
 import java.util.List;
 import java.util.function.Supplier;

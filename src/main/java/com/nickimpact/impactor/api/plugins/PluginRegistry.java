@@ -6,11 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * (Some note will appear here)
- *
- * @author NickImpact (Nick DeGruccio)
- */
 public class PluginRegistry {
 
 	private static List<SpongePlugin> plugins = Lists.newArrayList();

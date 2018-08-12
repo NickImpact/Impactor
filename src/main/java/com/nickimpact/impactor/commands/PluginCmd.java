@@ -5,8 +5,9 @@ import com.nickimpact.impactor.api.commands.SpongeCommand;
 import com.nickimpact.impactor.api.commands.annotations.Aliases;
 import com.nickimpact.impactor.api.commands.annotations.Permission;
 import com.nickimpact.impactor.api.messaging.Coreination;
-import com.nickimpact.impactor.api.plugins.PluginRegistry;
+import com.nickimpact.impactor.api.plugins.IPlugin;
 import com.nickimpact.impactor.api.plugins.SpongePlugin;
+import com.nickimpact.impactor.api.plugins.PluginRegistry;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -30,8 +31,7 @@ import java.util.List;
  */
 @Aliases({"plugins"})
 @Permission(admin = true)
-public class PluginCmd extends SpongeCommand
-{
+public class PluginCmd extends SpongeCommand {
 	public PluginCmd(SpongePlugin plugin) {
 		super(plugin);
 	}
