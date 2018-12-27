@@ -2,11 +2,10 @@ package com.nickimpact.impactor.api.services.music;
 
 import com.xxmicloxx.NoteBlockAPI.SongPlayer;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.spongepowered.api.entity.living.player.Player;
-import scala.actors.threadpool.Arrays;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

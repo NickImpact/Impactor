@@ -1,8 +1,8 @@
 package com.nickimpact.impactor.api.registers;
 
 import com.google.common.collect.Lists;
-import scala.actors.threadpool.Arrays;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;

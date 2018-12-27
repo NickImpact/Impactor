@@ -103,7 +103,6 @@ public class ImpactorCore extends SpongePlugin {
 		this.getLogger().info("Phase complete!");
 	}
 
-
 	@Listener
 	public void init(GameInitializationEvent e) {
 		this.getLogger().info("Starting phase: " + e.getState().name() + "...");

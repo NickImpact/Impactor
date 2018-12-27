@@ -4,8 +4,8 @@ import com.nickimpact.impactor.api.rewards.Reward;
 import com.nickimpact.impactor.json.Typing;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import scala.actors.threadpool.Arrays;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Typing("CommandSeries")

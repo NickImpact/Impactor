@@ -52,5 +52,6 @@ public abstract class SpongePlugin implements IPlugin {
 		this.getConfigs().forEach(ConfigBase::reload);
 		this.getCommands().forEach(cmd -> cmd.register(this));
 		this.getListeners().forEach(listener -> Sponge.getEventManager().registerListeners(this, listener));
+		this.onReload();
 	}
 }

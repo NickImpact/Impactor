@@ -41,6 +41,7 @@ public abstract class Adapter<E> implements JsonSerializer<E>, JsonDeserializer<
 					Text.of("Exception: " + e.getClass().getSimpleName()),
 					Text.of("================================")
 			));
+			e.printStackTrace();
 			throw new JsonParseException(e.getMessage());
 		}
 	}

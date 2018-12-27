@@ -219,6 +219,23 @@ public class Layout {
 		}
 
 		/**
+		 * Fills a set of rows based off the 0-based index location of a position in the layout.
+		 * E.G. <code>...row(icon, 0, 5)</code> would decorate the top and bottom rows of a 9x6
+		 * layout with the specified icon.
+		 *
+		 * @param icon The icon to decorate the rows with.
+		 * @param rows The rows to decorate
+		 * @return An updated version of this builder
+		 */
+		public Builder rows(Icon icon, int... rows) {
+			for(int row : rows) {
+				this.row(icon, row);
+			}
+
+			return this;
+		}
+
+		/**
 		 * Fills an entire column based off the 0-based index location of a position in the layout.
 		 * E.g. <code>...column(icon, 0)</code> would decorate the entire left side of a layout with
 		 * whatever icon is given.
@@ -230,6 +247,23 @@ public class Layout {
 		public Builder column(Icon icon, int column) {
 			for(int i = column; i < capacity; i += 9) {
 				slot(icon, i);
+			}
+
+			return this;
+		}
+
+		/**
+		 * Fills a set of columns based off the 0-based index location of a position in the layout.
+		 * E.G. <code>...row(icon, 0, 8)</code> would decorate the left and right columns of a layout
+		 * of 9 columns with the specified icon.
+		 *
+		 * @param icon The icon to decorate the rows with.
+		 * @param cols The rows to decorate
+		 * @return An updated version of this builder
+		 */
+		public Builder columns(Icon icon, int... cols) {
+			for(int col : cols) {
+				this.column(icon, col);
 			}
 
 			return this;
@@ -309,7 +343,7 @@ public class Layout {
 		}
 
 		public Layout build() {
-			Preconditions.checkArgument(rows > 0 && rows <= 6);
+			Preconditions.checkArgument(rows > 0);
 			return new Layout(ImmutableMap.copyOf(this.elements), this.dimension);
 		}
 	}
