@@ -20,6 +20,7 @@ import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.text.Text;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -39,6 +40,7 @@ public class UI {
 	private Map<Integer, Icon> slots;
 	@Setter private BiConsumer<InteractInventoryEvent.Open, Player> openAction;
 	@Setter private BiConsumer<InteractInventoryEvent.Close, Player> closeAction;
+	private List<BiConsumer<ClickInventoryEvent, Player>> additionals = Lists.newArrayList();
 
 	private UI(SpongePlugin plugin, Builder builder) {
 		this.slots = Maps.newHashMap();
@@ -108,6 +110,11 @@ public class UI {
 		}
 	}
 
+	public UI attachExtraListener(BiConsumer<ClickInventoryEvent, Player> extra) {
+		this.additionals.add(extra);
+		return this;
+	}
+
 	private void processClick(ClickInventoryEvent event) {
 		if(this.debugEnabled()) {
 			Player player = event.getCause().first(Player.class).orElse(null);
@@ -124,9 +131,15 @@ public class UI {
 					Icon icon = slots.get(slot.getValue());
 					if(icon != null) {
 						Sponge.getScheduler().createTaskBuilder()
-								.execute(() -> icon.process(new Clickable(pl, event)))
+								.execute(() -> {
+									icon.process(new Clickable(pl, event));
+								})
 								.delayTicks(1)
 								.submit(this.plugin);
+					}
+
+					for(BiConsumer<ClickInventoryEvent, Player> extra : additionals) {
+						Sponge.getScheduler().createTaskBuilder().execute(() -> extra.accept(event, pl)).delayTicks(1).submit(this.plugin);
 					}
 				});
 			});

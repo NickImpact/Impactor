@@ -13,7 +13,7 @@ compileJava {
 }
 
 ext {
-    pluginversion = '1.4.1'
+    pluginversion = '1.4.4'
     spongeapiversion = '7.1.0-SNAPSHOT'
     completeversion = "-S${spongeapiversion.substring(0, 5)}-${pluginversion}"
 }
@@ -51,7 +51,7 @@ dependencies {
     compile 'org.spongepowered:spongeapi:7.1.0'
     compile "org.projectlombok:lombok:1.18.4"
     compile group: 'com.zaxxer', name: 'HikariCP', version: '2.5.1'
-    compile 'com.github.SparklingComet:java-mojang-api:-SNAPSHOT'
+    compile 'com.github.SparklingComet:java-mojang-api:60d6231d42'
     compile 'com.github.rojo8399:PlaceholderAPI:master-SNAPSHOT'
     compile 'com.github.Sansko1337:NoteBlockAPI-Sponge:1.9.0-Sponge'
     testCompile group: 'junit', name: 'junit', version: '4.12'

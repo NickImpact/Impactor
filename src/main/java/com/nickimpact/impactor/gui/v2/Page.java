@@ -148,73 +148,7 @@ public class Page {
 	}
 
 	public Page update(List<Icon> icons, InventoryDimension dimension, int rOffset, int cOffset) {
-		int capacity = dimension.getRows() * dimension.getColumns();
-		int pages = icons.isEmpty() ? 1 : icons.size() % capacity == 0 ? icons.size() / capacity : icons.size() / capacity + 1;
-		for(int i = 1; i <= pages; i++) {
-			Layout.Builder page = Layout.builder().from(layout).page(icons.subList((i - 1) * capacity, i == pages ? icons.size() : i * capacity), dimension, rOffset, cOffset);
-			for(Map.Entry<PageIconType, PageIcon> pgt : pageIcons.entrySet()) {
-				Icon icon = Icon.from(pgt.getValue().rep.getDisplay());
-				int slot = pgt.getValue().slot;
-				switch (pgt.getKey()) {
-					case FIRST:
-						icon = this.update(
-								icon,
-								TextSerializers.FORMATTING_CODE.deserialize(
-										ImpactorCore.getInstance().getMsgConfig().get(MsgConfigKeys.PAGES_FIRST).replaceAll("\\{\\{page}}", "1")
-								),
-								i,
-								1
-						);
-						break;
-					case PREV:
-						icon = this.update(
-								icon,
-								TextSerializers.FORMATTING_CODE.deserialize(
-										ImpactorCore.getInstance().getMsgConfig().get(MsgConfigKeys.PAGES_PREV).replaceAll("\\{\\{page}}", "" + (i == 1 ? pages : i - 1))
-								),
-								i,
-								i == 1 ? pages : i - 1
-						);
-						break;
-					case CURRENT:
-						icon = this.update(
-								icon,
-								TextSerializers.FORMATTING_CODE.deserialize(
-										ImpactorCore.getInstance().getMsgConfig().get(MsgConfigKeys.PAGES_CURR).replaceAll("\\{\\{page}}", "" + i)
-								),
-								i,
-								i
-						);
-						break;
-					case NEXT:
-						icon = this.update(
-								icon,
-								TextSerializers.FORMATTING_CODE.deserialize(
-										ImpactorCore.getInstance().getMsgConfig().get(MsgConfigKeys.PAGES_NEXT).replaceAll("\\{\\{page}}", "" + (i == pages ? 1 : i + 1))
-								),
-								i,
-								i == pages ? 1 : i + 1
-						);
-						break;
-					case LAST:
-						icon = this.update(
-								icon,
-								TextSerializers.FORMATTING_CODE.deserialize(
-										ImpactorCore.getInstance().getMsgConfig().get(MsgConfigKeys.PAGES_FIRST).replaceAll("\\{\\{page}}", "" + pages)
-								),
-								i,
-								pages
-						);
-						break;
-				}
-
-				page.slot(icon, slot);
-			}
-
-			this.views.get(i - 1).define(page.build());
-		}
-
-		return this;
+		return this.define(icons, dimension, rOffset, cOffset);
 	}
 
 	private Icon update(Icon icon, Text name, int page, int target) {

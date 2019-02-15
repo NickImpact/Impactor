@@ -135,17 +135,17 @@ public class ImpactorCore extends SpongePlugin {
 		if(Sponge.getPluginManager().isLoaded("plan")) {
 			this.getLogger().info("Registering data provided by supporting Plan implementations...");
 
-			this.provider = new PlanProvider();
-			for(ProvidedDataImplementations pdi : ProvidedDataImplementations.values()) {
-				this.provider.register(pdi.getImplementation());
-				this.getLogger().info(String.format("Data for %s loaded!", pdi.getImplementation().getSourcePlugin()));
-			}
-			for (SpongePlugin plugin : PluginRegistry.getConnected()) {
-				plugin.getPlanData().ifPresent(data -> {
-					this.provider.register(data.getData());
-					this.getLogger().info(String.format("Data for %s loaded!", plugin.getPluginInfo().getName()));
-				});
-			}
+//			this.provider = new PlanProvider();
+//			for(ProvidedDataImplementations pdi : ProvidedDataImplementations.values()) {
+//				this.provider.register(pdi.getImplementation());
+//				this.getLogger().info(String.format("Data for %s loaded!", pdi.getImplementation().getSourcePlugin()));
+//			}
+//			for (SpongePlugin plugin : PluginRegistry.getConnected()) {
+//				plugin.getPlanData().ifPresent(data -> {
+//					this.provider.register(data.getData());
+//					this.getLogger().info(String.format("Data for %s loaded!", plugin.getPluginInfo().getName()));
+//				});
+//			}
 		}
 
 		this.getLogger().info("Phase complete!");
