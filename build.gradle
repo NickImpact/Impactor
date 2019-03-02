@@ -13,9 +13,9 @@ compileJava {
 }
 
 ext {
-    pluginversion = '1.4.4'
-    spongeapiversion = '7.1.0-SNAPSHOT'
-    completeversion = "-S${spongeapiversion.substring(0, 5)}-${pluginversion}"
+    pluginversion = '1.4.5'
+    spongeapiversion = '7.1.5'
+    completeversion = "-S${spongeapiversion}-${pluginversion}"
 }
 
 jar {

@@ -107,6 +107,7 @@ public class UI {
 	public void clear(int... slots) {
 		for(int slot : slots) {
 			this.slots.remove(slot);
+			this.inventory.query(QueryOperationTypes.INVENTORY_PROPERTY.of(SlotIndex.of(slot))).first().set(ItemStack.empty());
 		}
 	}
 

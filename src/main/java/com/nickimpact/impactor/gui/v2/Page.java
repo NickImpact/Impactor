@@ -22,6 +22,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class Page {
 
@@ -70,6 +71,10 @@ public class Page {
 
 	public Page define(List<Icon> icons, InventoryDimension dimension) {
 		return this.define(icons, dimension, 0, 0);
+	}
+
+	public Page define(List<Icon> icons, InventoryDimension dimension, int offsets) {
+		return this.define(icons, dimension, offsets, offsets);
 	}
 
 	public Page define(List<Icon> icons, InventoryDimension dimension, int rOffset, int cOffset) {
