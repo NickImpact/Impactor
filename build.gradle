@@ -13,7 +13,7 @@ compileJava {
 }
 
 ext {
-    pluginversion = '1.4.5'
+    pluginversion = '1.4.6'
     spongeapiversion = '7.1.5'
     completeversion = "-S${spongeapiversion}-${pluginversion}"
 }

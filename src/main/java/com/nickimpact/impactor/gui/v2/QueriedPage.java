@@ -157,6 +157,11 @@ public class QueriedPage<T> {
 
 		int capacity = this.contentZone.getColumns() * this.contentZone.getRows();
 		int pages = this.contents.isEmpty() ? 1 : contents.size() % capacity == 0 ? contents.size() / capacity : contents.size() / capacity + 1;
+
+		if(pages < this.page) {
+			this.page = pages;
+		}
+
 		List<T> viewable = this.contents.subList((this.page - 1) * capacity, this.page == pages ? this.contents.size() : this.page * capacity);
 		List<Icon> translated = viewable.stream().map(obj -> this.applier.apply(obj)).collect(Collectors.toList());
 

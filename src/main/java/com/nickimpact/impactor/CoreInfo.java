@@ -13,7 +13,7 @@ public class CoreInfo implements PluginInfo {
 
 	public static final String ID = "impactor";
 	public static final String NAME = "Impactor API";
-	public static final String VERSION = "1.4.4";
+	public static final String VERSION = "1.4.6";
 	public static final String DESCRIPTION = "A core system to link plugins to one similar API service";
 
 	@Override
