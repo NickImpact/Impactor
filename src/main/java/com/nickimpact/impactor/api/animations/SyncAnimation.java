@@ -19,7 +19,7 @@ public abstract class SyncAnimation implements Animation {
 	@Override
 	public void play(long delay, boolean loop) {
 		this.runner = Task.builder().execute(() -> this.run(loop))
-				.interval((long)Math.round(1000 / getFPS()), TimeUnit.MILLISECONDS)
+				.interval(Math.round(1000.0 / getFPS()), TimeUnit.MILLISECONDS)
 				.delay(delay, TimeUnit.MILLISECONDS)
 				.submit(plugin);
 	}

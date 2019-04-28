@@ -1,2 +1,5 @@
 rootProject.name = 'Impactor'
+include 'api'
+include 'spigot'
+include 'sponge'
 

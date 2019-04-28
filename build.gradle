@@ -1,11 +1,11 @@
 plugins {
     id 'com.qixalite.spongestart' version '1.6.2'
     id 'maven'
-    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
 }
 
 group 'com.nickimpact.impactor'
-version '1.4.1'
+version '2.0.0-DEV'
 
 sourceCompatibility = targetCompatibility = "1.8" // Need this here so eclipse task generates correctly.
 compileJava {
@@ -13,14 +13,14 @@ compileJava {
 }
 
 ext {
-    pluginversion = '1.4.6'
     spongeapiversion = '7.1.5'
-    completeversion = "-S${spongeapiversion}-${pluginversion}"
+    completeversion = "-S${spongeapiversion}-${project.version}"
 }
 
 jar {
     archiveName = "Impactor${completeversion}.jar"
 }
+
 repositories {
     mavenCentral()
     maven {
@@ -60,3 +60,49 @@ dependencies {
 tasks.withType(JavaCompile) { task ->
     task.options.encoding = 'UTF-8'
 }
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'com.github.johnrengelman.shadow'
+
+    group = 'com.nickimpact.impactor'
+    version = '2.0.0-DEV'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    project.ext.sponge = 'S7.1'
+    project.ext.spigot = '1.12.2'
+
+    repositories {
+        mavenCentral()
+        maven { url = 'https://jitpack.io' }
+    }
+
+    dependencies {
+        shadow "org.projectlombok:lombok:1.18.4"
+        shadow 'com.google.guava:guava:27.1-jre'
+        shadow 'com.google.code.gson:gson:2.8.5'
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+    }
+}
+
+task copyJars(type: Copy) {
+    from subprojects.collect { it.tasks.withType(Jar) }
+    into "$buildDir/allJars"
+    exclude '*-all.jar'
+    exclude '*-sources.jar'
+    exclude 'api*.jar'
+    exclude 'common*.jar'
+    exclude 'spigot*.jar'
+    exclude 'sponge*.jar'
+    exclude '*API.jar'
+    exclude '*Common.jar'
+}
+
+build.dependsOn copyJars

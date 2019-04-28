@@ -1,0 +1,8 @@
+main: com.nickimpact.impactor.spigot.SpigotImpactorPlugin
+name: Impactor
+version: 2.0.0-DEV
+author: NickImpact
+
+commands:
+  plugin:
+    description: Allows for controlling connected-plugin states
