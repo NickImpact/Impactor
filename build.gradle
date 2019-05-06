@@ -49,7 +49,7 @@ dependencies {
     compile fileTree(dir: '/libs', include: '*.jar')
     compile 'io.github.nucleuspowered:nucleus-api:1.7.0-S7.1'
     compile 'org.spongepowered:spongeapi:7.1.0'
-    compile "org.projectlombok:lombok:1.18.4"
+    compile "org.projectlombok:lombok:1.18.6"
     compile group: 'com.zaxxer', name: 'HikariCP', version: '2.5.1'
     compile 'com.github.SparklingComet:java-mojang-api:60d6231d42'
     compile 'com.github.rojo8399:PlaceholderAPI:master-SNAPSHOT'
