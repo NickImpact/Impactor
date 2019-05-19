@@ -4,6 +4,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import com.nickimpact.impactor.api.configuration.ConfigurationAdapter;
+import com.nickimpact.impactor.api.plugin.ImpactorPlugin;
 import com.nickimpact.impactor.sponge.SpongeImpactorPlugin;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -11,6 +12,7 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.spongepowered.api.text.Text;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,12 +23,14 @@ import java.util.stream.Collectors;
 
 public class SpongeConfigAdapter implements ConfigurationAdapter {
 
+	private final ImpactorPlugin plugin;
 	private final Path path;
 	private ConfigurationNode root;
 	private ConfigurationLoader<CommentedConfigurationNode> loader;
 
-	public SpongeConfigAdapter(Path path) {
-		this.path = path;
+	public SpongeConfigAdapter(ImpactorPlugin plugin, File path) {
+		this.plugin = plugin;
+		this.path = path.toPath();
 		this.createConfigIfMissing();
 		reload();
 	}
@@ -74,9 +78,7 @@ public class SpongeConfigAdapter implements ConfigurationAdapter {
 
 	private <T> void checkMissing(String path, T def) {
 		if(!this.contains(path)) {
-			if(SpongeImpactorPlugin.getInstance() != null) {
-				SpongeImpactorPlugin.getInstance().getPluginLogger().warn(Lists.newArrayList(String.format("Found missing config option (%s)... Adding it!", path)));
-			}
+			plugin.getPluginLogger().warn(Lists.newArrayList(String.format("Found missing config option (%s)... Adding it!", path)));
 			resolvePath(path).setValue(def);
 			try {
 				this.loader.save(root);
@@ -89,9 +91,7 @@ public class SpongeConfigAdapter implements ConfigurationAdapter {
 	private <T> void checkMissing(String path, T def, TypeToken<T> type) {
 		try {
 			if (!this.contains(path)) {
-				if(SpongeImpactorPlugin.getInstance() != null) {
-					SpongeImpactorPlugin.getInstance().getPluginLogger().warn(Lists.newArrayList(String.format("Found missing config option (%s)... Adding it!", path)));
-				}
+				plugin.getPluginLogger().warn(Lists.newArrayList(String.format("Found missing config option (%s)... Adding it!", path)));
 				resolvePath(path).setValue(type, def);
 				this.loader.save(root);
 			}

@@ -4,12 +4,15 @@ import com.nickimpact.impactor.api.plugin.ImpactorPlugin;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public interface UI<T, V, U extends Icon> {
+public interface UI<T, V, E, U extends Icon> {
 
 	ImpactorPlugin getPlugin();
 
-	UI<T, V, U> define(Layout<U> layout);
+	Layout<U> getLayout();
+
+	UI<T, V, E, U> define(Layout<U> layout);
 
 	Optional<U> getIcon(int slot);
 
@@ -24,6 +27,8 @@ public interface UI<T, V, U extends Icon> {
 	void clear(int... slots);
 
 	UI attachListener(BiConsumer<T, V> listener);
+
+	UI attachCloseListener(Consumer<E> listener);
 
 	InventoryDimensions getDimension();
 

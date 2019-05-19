@@ -9,27 +9,33 @@ import com.nickimpact.impactor.api.plugin.ImpactorPlugin;
 import com.nickimpact.impactor.spigot.SpigotImpactorPlugin;
 import lombok.AllArgsConstructor;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class SpigotUI implements UI<Player, InventoryClickEvent, SpigotIcon> {
+public class SpigotUI implements UI<Player, InventoryClickEvent, InventoryCloseEvent, SpigotIcon> {
 
 	private final ImpactorPlugin plugin;
 
 	private Inventory inventory;
 	private InventoryDimensions dimensions;
 
+	private SpigotLayout layout;
+
 	private Map<Integer, SpigotIcon> slots;
 	private List<BiConsumer<Player, InventoryClickEvent>> additionals = Lists.newArrayList();
+	private List<Consumer<InventoryCloseEvent>> closeAdditionals = Lists.newArrayList();
 
 	private UIListener listener;
 
@@ -46,7 +52,13 @@ public class SpigotUI implements UI<Player, InventoryClickEvent, SpigotIcon> {
 	}
 
 	@Override
+	public SpigotLayout getLayout() {
+		return this.layout;
+	}
+
+	@Override
 	public SpigotUI define(Layout<SpigotIcon> layout) {
+		this.layout = (SpigotLayout) layout;
 		this.slots.clear();
 		for(int i = 0; i < inventory.getSize(); i++) {
 			final int slot = i;
@@ -99,6 +111,12 @@ public class SpigotUI implements UI<Player, InventoryClickEvent, SpigotIcon> {
 	}
 
 	@Override
+	public UI attachCloseListener(Consumer<InventoryCloseEvent> listener) {
+		this.closeAdditionals.add(listener);
+		return this;
+	}
+
+	@Override
 	public InventoryDimensions getDimension() {
 		return this.dimensions;
 	}
@@ -113,7 +131,7 @@ public class SpigotUI implements UI<Player, InventoryClickEvent, SpigotIcon> {
 		private int size;
 
 		public SpigotUIBuilder title(String title) {
-			this.title = title;
+			this.title = ChatColor.translateAlternateColorCodes('&', title);
 			return this;
 		}
 
@@ -140,13 +158,21 @@ public class SpigotUI implements UI<Player, InventoryClickEvent, SpigotIcon> {
 					return;
 				}
 
-				if(e.getClickedInventory().getTitle().equals(ui.inventory.getTitle())) {
+				if(e.getClickedInventory().getTitle().equals(ui.inventory.getTitle()) || player.getOpenInventory().getTitle().equals(ui.inventory.getTitle())) {
 					e.setCancelled(true);
 					ui.getIcon(e.getRawSlot()).ifPresent(icon -> icon.process(new SpigotClickable(this.player, e)));
 					for (BiConsumer<Player, InventoryClickEvent> extra : ui.additionals) {
 						extra.accept(this.player, e);
 					}
 				}
+			}
+		}
+
+		@EventHandler
+		public void onInventoryClose(InventoryCloseEvent e) {
+			if(e.getInventory().getTitle().equals(ui.inventory.getTitle())) {
+				HandlerList.unregisterAll(this);
+				this.ui.closeAdditionals.forEach(c -> c.accept(e));
 			}
 		}
 	}

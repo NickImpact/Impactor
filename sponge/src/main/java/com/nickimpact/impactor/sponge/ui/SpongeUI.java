@@ -8,6 +8,7 @@ import com.nickimpact.impactor.sponge.SpongeImpactorPlugin;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
+import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
@@ -22,16 +23,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class SpongeUI implements UI<Player, ClickInventoryEvent, SpongeIcon> {
+public class SpongeUI implements UI<Player, ClickInventoryEvent, InteractInventoryEvent.Close, SpongeIcon> {
 
 	private final ImpactorPlugin plugin;
 
 	private Inventory inventory;
 	private InventoryDimensions dimensions;
 
+	private SpongeLayout layout;
+
 	private Map<Integer, SpongeIcon> slots;
 	private List<BiConsumer<Player, ClickInventoryEvent>> additionals = Lists.newArrayList();
+	private List<Consumer<InteractInventoryEvent.Close>> closeAdditionals = Lists.newArrayList();
 
 	private SpongeUI(ImpactorPlugin plugin, SpongeUIBuilder builder) {
 		this.plugin = plugin;
@@ -49,7 +54,13 @@ public class SpongeUI implements UI<Player, ClickInventoryEvent, SpongeIcon> {
 	}
 
 	@Override
+	public SpongeLayout getLayout() {
+		return this.layout;
+	}
+
+	@Override
 	public SpongeUI define(Layout<SpongeIcon> layout) {
+		this.layout = (SpongeLayout) layout;
 		this.slots.clear();
 		for(int i = 0; i < inventory.capacity(); i++) {
 			final int slot = i;
@@ -97,6 +108,12 @@ public class SpongeUI implements UI<Player, ClickInventoryEvent, SpongeIcon> {
 	@Override
 	public UI attachListener(BiConsumer<Player, ClickInventoryEvent> listener) {
 		this.additionals.add(listener);
+		return this;
+	}
+
+	@Override
+	public UI attachCloseListener(Consumer<InteractInventoryEvent.Close> listener) {
+		this.closeAdditionals.add(listener);
 		return this;
 	}
 
