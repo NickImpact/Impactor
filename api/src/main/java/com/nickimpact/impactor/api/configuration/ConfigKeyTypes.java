@@ -39,6 +39,7 @@ public class ConfigKeyTypes {
 	private static final KeyFactory<Boolean> BOOLEAN = ConfigurationAdapter::getBoolean;
 	private static final KeyFactory<String> STRING = ConfigurationAdapter::getString;
 	private static final KeyFactory<Integer> INTEGER = ConfigurationAdapter::getInteger;
+	private static final KeyFactory<Long> LONG = ConfigurationAdapter::getLong;
 	private static final KeyFactory<Double> DOUBLE = ConfigurationAdapter::getDouble;
 	private static final KeyFactory<List<String>> LIST = ConfigurationAdapter::getStringList;
 	private static final KeyFactory<String> LOWERCASE_STRING = (adapter, path, def) -> adapter.getString(path, def).toLowerCase();
@@ -58,6 +59,10 @@ public class ConfigKeyTypes {
 
 	public static BaseConfigKey<Integer> intKey(String path, int def) {
 		return INTEGER.createKey(path, def);
+	}
+
+	public static BaseConfigKey<Long> longKey(String path, long def) {
+		return LONG.createKey(path, def);
 	}
 
 	public static BaseConfigKey<Double> doubleKey(String path, double def) {

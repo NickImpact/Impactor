@@ -36,6 +36,8 @@ public interface ConfigurationAdapter {
 
 	int getInteger(String path, int def);
 
+	long getLong(String path, long def);
+
 	double getDouble(String path, double def);
 
 	boolean getBoolean(String path, boolean def);

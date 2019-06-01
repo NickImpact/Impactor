@@ -126,6 +126,12 @@ public class SpongeConfigAdapter implements ConfigurationAdapter {
 	}
 
 	@Override
+	public long getLong(String path, long def) {
+		this.checkMissing(path, def);
+		return resolvePath(path).getLong(def);
+	}
+
+	@Override
 	public double getDouble(String path, double def) {
 		this.checkMissing(path, def);
 		return resolvePath(path).getDouble(def);

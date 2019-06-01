@@ -78,6 +78,12 @@ public class SpigotConfigAdapter implements ConfigurationAdapter {
 	}
 
 	@Override
+	public long getLong(String path, long def) {
+		this.checkMissing(path, def);
+		return this.configuration.getLong(path, def);
+	}
+
+	@Override
 	public double getDouble(String path, double def) {
 		this.checkMissing(path, def);
 		return this.configuration.getDouble(path, def);

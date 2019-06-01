@@ -24,8 +24,6 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin {
 
 	@Getter private static SpongeImpactorPlugin instance;
 
-	private SpongeImpactorInfo info = new SpongeImpactorInfo();
-
 	@Getter private SpongeMojangServerStatusService mojangServerStatusService;
 
 	@Inject
@@ -37,7 +35,7 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin {
 	public void onInit(GameInitializationEvent e) {
 		instance = this;
 		new ImpactorService();
-		this.logger = new SpongeLogger(this.fallback);
+		this.logger = new SpongeLogger(this, this.fallback);
 		mojangServerStatusService = new SpongeMojangServerStatusService();
 	}
 
@@ -48,7 +46,7 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin {
 
 	@Override
 	public PluginInfo getPluginInfo() {
-		return this.info;
+		return new SpongeImpactorInfo();
 	}
 
 	@Override

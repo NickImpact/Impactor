@@ -1,7 +1,7 @@
 package com.nickimpact.impactor.sponge.logging;
 
 import com.nickimpact.impactor.api.logging.Logger;
-import com.nickimpact.impactor.sponge.SpongeImpactorPlugin;
+import com.nickimpact.impactor.api.plugin.ImpactorPlugin;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -11,9 +11,11 @@ import java.util.List;
 
 public class SpongeLogger implements Logger {
 
+	private ImpactorPlugin plugin;
 	private org.slf4j.Logger fallback;
 
-	public SpongeLogger(org.slf4j.Logger fallback) {
+	public SpongeLogger(ImpactorPlugin plugin, org.slf4j.Logger fallback) {
+		this.plugin = plugin;
 		this.fallback = fallback;
 	}
 
@@ -34,7 +36,7 @@ public class SpongeLogger implements Logger {
 	@Override
 	public void info(String message) {
 		if(Sponge.isServerAvailable()) {
-			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, SpongeImpactorPlugin.getInstance().getPluginInfo().getName(), TextColors.GRAY, " \u00bb ", this.toText(message)));
+			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, plugin.getPluginInfo().getName(), TextColors.GRAY, " \u00bb ", this.toText(message)));
 		} else {
 			fallback.info(message);
 		}
@@ -48,7 +50,7 @@ public class SpongeLogger implements Logger {
 	@Override
 	public void warn(String message) {
 		if(Sponge.isServerAvailable()) {
-			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, SpongeImpactorPlugin.getInstance().getPluginInfo().getName(), TextColors.GRAY, " (", TextColors.GOLD, "Warning", TextColors.GRAY, ") ", this.toText(message)));
+			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, plugin.getPluginInfo().getName(), TextColors.GRAY, " (", TextColors.GOLD, "Warning", TextColors.GRAY, ") ", this.toText(message)));
 		} else {
 			fallback.warn(message);
 		}
@@ -62,7 +64,7 @@ public class SpongeLogger implements Logger {
 	@Override
 	public void error(String message) {
 		if(Sponge.isServerAvailable()) {
-			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, SpongeImpactorPlugin.getInstance().getPluginInfo().getName(), TextColors.GRAY, " (", TextColors.RED, "Error", TextColors.GRAY, ") ", this.toText(message)));
+			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, plugin.getPluginInfo().getName(), TextColors.GRAY, " (", TextColors.RED, "Error", TextColors.GRAY, ") ", this.toText(message)));
 		} else {
 			fallback.warn(message);
 		}
@@ -76,7 +78,7 @@ public class SpongeLogger implements Logger {
 	@Override
 	public void debug(String message) {
 		if(Sponge.isServerAvailable()) {
-			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, SpongeImpactorPlugin.getInstance().getPluginInfo().getName(), TextColors.GRAY, " (", TextColors.AQUA, "Debug", TextColors.GRAY, ") ", this.toText(message)));
+			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, plugin.getPluginInfo().getName(), TextColors.GRAY, " (", TextColors.AQUA, "Debug", TextColors.GRAY, ") ", this.toText(message)));
 		} else {
 			fallback.warn(message);
 		}
