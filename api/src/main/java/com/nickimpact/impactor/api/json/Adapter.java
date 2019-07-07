@@ -15,9 +15,8 @@ public abstract class Adapter<E> implements JsonSerializer<E>, JsonDeserializer<
 
 	@Override
 	public E deserialize(JsonElement json, Type type, JsonDeserializationContext ctx) throws JsonParseException {
-		JsonObject obj = (JsonObject) json;
 		try {
-			return (E) this.getGson().fromJson(obj, Objects.requireNonNull(this.getRegistry().get(obj.get("type").getAsString().toLowerCase())));
+			return ctx.deserialize(json, Objects.requireNonNull(this.getRegistry().get(json.getAsJsonObject().get("type").getAsString().toLowerCase())));
 		} catch (Exception e) {
 			plugin.getPluginLogger().error(Lists.newArrayList(
 				"Unable to parse JSON data, an error will be listed below:"
@@ -34,8 +33,6 @@ public abstract class Adapter<E> implements JsonSerializer<E>, JsonDeserializer<
 		obj.addProperty("type", src.getClass().isAnnotationPresent(JsonTyping.class) ? src.getClass().getAnnotation(JsonTyping.class).value() : (this.plugin.getPluginInfo().getID() + "_" + src.getClass().getSimpleName()).toLowerCase());
 		return obj;
 	}
-
-	protected abstract Gson getGson();
 
 	protected abstract Registry<E> getRegistry();
 }
