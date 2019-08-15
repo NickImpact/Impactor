@@ -1,0 +1,14 @@
+image: gradle:4.4.1-jdk8
+
+stages:
+  - build
+
+job:
+  stage: build
+  script:
+    - gradle clean build
+  artifacts:
+    when: on_success
+    name: Impactor-${CI_COMMIT_REF_NAME}
+  tags:
+    - build
