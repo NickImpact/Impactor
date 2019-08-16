@@ -10,6 +10,6 @@ job:
   artifacts:
     name: Impactor-${CI_COMMIT_REF_NAME}
     paths:
-      - build/libs
+      - build/allJars
   tags:
     - build
