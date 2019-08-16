@@ -57,7 +57,7 @@ public abstract class HikariConnectionFactory extends AbstractSQLConnectionFacto
 
 		config.setConnectionTestQuery("/* Peanut Butter Crates ping */ SELECT 1");
 
-		config.setInitializationFailFast(false);
+		config.setInitializationFailTimeout(-1);
 
 		hikari = new HikariDataSource(config);
 	}

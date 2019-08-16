@@ -21,6 +21,7 @@ public abstract class Adapter<E> implements JsonSerializer<E>, JsonDeserializer<
 			plugin.getPluginLogger().error(Lists.newArrayList(
 				"Unable to parse JSON data, an error will be listed below:"
 			));
+			plugin.getPluginLogger().error("Unparsable JSON: \n" + json.toString());
 			e.printStackTrace();
 			throw new JsonParseException(e.getMessage());
 		}

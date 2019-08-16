@@ -6,7 +6,6 @@ shadowJar {
     archiveName = "Impactor-Spigot-${spigot}-${version}.jar"
 }
 
-
 repositories {
     mavenCentral()
     mavenLocal()

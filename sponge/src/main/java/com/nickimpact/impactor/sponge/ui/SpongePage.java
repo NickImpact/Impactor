@@ -62,11 +62,13 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 			ItemStack item = ItemStack.builder().itemType(entry.getValue().getRep()).build();
 			item.offer(Keys.DISPLAY_NAME, TextSerializers.FORMATTING_CODE.deserialize(entry.getKey().getTitle().replaceAll("\\{\\{impactor_page_number}}", "" + page)));
 			SpongeIcon icon = new SpongeIcon(item);
-			icon.addListener(clickable -> {
-				int capacity = this.contentZone.getColumns() * this.contentZone.getRows();
-				this.page = entry.getKey().getUpdater().apply(this.page, this.contents.isEmpty() ? 1 : contents.size() % capacity == 0 ? contents.size() / capacity : contents.size() / capacity + 1);
-				this.apply();
-			});
+			if(!entry.getKey().equals(PageIconType.CURRENT)) {
+				icon.addListener(clickable -> {
+					int capacity = this.contentZone.getColumns() * this.contentZone.getRows();
+					this.page = entry.getKey().getUpdater().apply(this.page, this.contents.isEmpty() ? 1 : contents.size() % capacity == 0 ? contents.size() / capacity : contents.size() / capacity + 1);
+					this.apply();
+				});
+			}
 
 			updated.slot(icon, entry.getValue().getSlot());
 		}
@@ -137,6 +139,7 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 
 		List<U> viewable = this.contents.subList((this.page - 1) * capacity, this.page == pages ? this.contents.size() : this.page * capacity);
 		List<SpongeIcon> translated = viewable.stream().map(obj -> this.applier.apply(obj)).collect(Collectors.toList());
+
 
 		int index = cOffset + this.view.getDimension().getColumns() * rOffset;
 		int r = 0;

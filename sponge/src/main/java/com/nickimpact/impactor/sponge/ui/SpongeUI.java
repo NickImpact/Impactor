@@ -45,7 +45,7 @@ public class SpongeUI implements UI<Player, ClickInventoryEvent, InteractInvento
 				.listener(ClickInventoryEvent.class, this::processClick)
 				.build(plugin);
 
-		this.dimensions = new InventoryDimensions(builder.dimension.getRows(), builder.dimension.getColumns());
+		this.dimensions = new InventoryDimensions(builder.dimension.getColumns(), builder.dimension.getRows());
 	}
 
 	@Override

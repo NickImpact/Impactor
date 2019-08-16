@@ -43,7 +43,7 @@ public class SpigotUI implements UI<Player, InventoryClickEvent, InventoryCloseE
 		this.plugin = plugin;
 		this.slots = Maps.newHashMap();
 		this.inventory = Bukkit.createInventory(null, builder.size, builder.title);
-		this.dimensions = new InventoryDimensions(9, 6);
+		this.dimensions = new InventoryDimensions(9, builder.size / 9);
 	}
 
 	@Override

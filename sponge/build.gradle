@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
     compile project(':api')
-    shadow 'io.github.nucleuspowered:nucleus-api:1.7.0-S7.1'
+    shadow 'io.github.nucleuspowered:nucleus-api:1.11.0-S7.1'
     shadow 'org.spongepowered:spongeapi:7.1.0'
+    shadow 'com.github.Sansko1337:NoteBlockAPI-Sponge:1.9.0-Sponge'
 }
