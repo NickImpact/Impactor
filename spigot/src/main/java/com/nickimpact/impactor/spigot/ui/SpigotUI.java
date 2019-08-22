@@ -21,6 +21,7 @@ import org.bukkit.inventory.Inventory;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -36,8 +37,6 @@ public class SpigotUI implements UI<Player, InventoryClickEvent, InventoryCloseE
 	private Map<Integer, SpigotIcon> slots;
 	private List<BiConsumer<Player, InventoryClickEvent>> additionals = Lists.newArrayList();
 	private List<Consumer<InventoryCloseEvent>> closeAdditionals = Lists.newArrayList();
-
-	private UIListener listener;
 
 	private SpigotUI(ImpactorPlugin plugin, SpigotUIBuilder builder) {
 		this.plugin = plugin;
@@ -81,13 +80,12 @@ public class SpigotUI implements UI<Player, InventoryClickEvent, InventoryCloseE
 	@Override
 	public void open(Player player) {
 		player.openInventory(this.inventory);
-		Bukkit.getServer().getPluginManager().registerEvents(this.listener = new UIListener(player, this), SpigotImpactorPlugin.getInstance());
+		UIListener.register(player.getUniqueId(), this);
 	}
 
 	@Override
 	public void close(Player player) {
 		player.closeInventory();
-		HandlerList.unregisterAll(this.listener);
 	}
 
 	@Override
@@ -148,21 +146,31 @@ public class SpigotUI implements UI<Player, InventoryClickEvent, InventoryCloseE
 	@AllArgsConstructor
 	public static class UIListener implements Listener {
 
-		private Player player;
-		private SpigotUI ui;
+		private static Map<UUID, SpigotUI> viewers = Maps.newHashMap();
+
+		public static void register(UUID uuid, SpigotUI ui) {
+			viewers.put(uuid, ui);
+		}
+
+		public static SpigotUI unregister(UUID uuid) {
+			return viewers.remove(uuid);
+		}
 
 		@EventHandler
 		public void onInventoryClick(InventoryClickEvent e) {
-			if(e.getWhoClicked().getUniqueId().equals(this.player.getUniqueId())) {
+			if(viewers.containsKey(e.getWhoClicked().getUniqueId())) {
 				if(e.getClickedInventory() == null) {
 					return;
 				}
 
+				Player player = Bukkit.getPlayer(e.getWhoClicked().getUniqueId());
+				SpigotUI ui = viewers.get(player.getUniqueId());
+
 				if(e.getClickedInventory().getTitle().equals(ui.inventory.getTitle()) || player.getOpenInventory().getTitle().equals(ui.inventory.getTitle())) {
 					e.setCancelled(true);
-					ui.getIcon(e.getRawSlot()).ifPresent(icon -> icon.process(new SpigotClickable(this.player, e)));
+					ui.getIcon(e.getRawSlot()).ifPresent(icon -> icon.process(new SpigotClickable(player, e)));
 					for (BiConsumer<Player, InventoryClickEvent> extra : ui.additionals) {
-						extra.accept(this.player, e);
+						extra.accept(player, e);
 					}
 				}
 			}
@@ -170,9 +178,12 @@ public class SpigotUI implements UI<Player, InventoryClickEvent, InventoryCloseE
 
 		@EventHandler
 		public void onInventoryClose(InventoryCloseEvent e) {
-			if(e.getInventory().getTitle().equals(ui.inventory.getTitle())) {
-				HandlerList.unregisterAll(this);
-				this.ui.closeAdditionals.forEach(c -> c.accept(e));
+			if(viewers.containsKey(e.getPlayer().getUniqueId())) {
+				SpigotUI ui = viewers.get(e.getPlayer().getUniqueId());
+				if (e.getInventory().getTitle().equals(ui.inventory.getTitle())) {
+					unregister(e.getPlayer().getUniqueId());
+					ui.closeAdditionals.forEach(c -> c.accept(e));
+				}
 			}
 		}
 	}

@@ -1,9 +1,9 @@
 package com.nickimpact.impactor.sponge;
 
+import co.aikar.commands.BaseCommand;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.nickimpact.impactor.api.ImpactorService;
-import com.nickimpact.impactor.api.commands.Command;
 import com.nickimpact.impactor.api.configuration.Config;
 import com.nickimpact.impactor.api.logging.Logger;
 import com.nickimpact.impactor.api.platform.Platform;
@@ -60,7 +60,7 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin {
 	}
 
 	@Override
-	public List<Command> getCommands() {
+	public List<BaseCommand> getCommands() {
 		return Lists.newArrayList();
 	}
 

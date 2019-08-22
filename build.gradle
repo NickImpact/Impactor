@@ -91,12 +91,16 @@ subprojects {
     repositories {
         mavenCentral()
         maven { url = 'https://jitpack.io' }
+        maven { url = "https://repo.aikar.co/content/groups/aikar/" }
+        maven { url = "https://hub.spigotmc.org/nexus/content/groups/public/" }
     }
 
     dependencies {
+        compile fileTree(dir: '../libs', include: '*.jar')
         shadow "org.projectlombok:lombok:1.18.4"
         shadow 'com.google.guava:guava:27.1-jre'
         shadow 'com.google.code.gson:gson:2.8.5'
+        compile "co.aikar:acf-core:0.5.0-SNAPSHOT"
         testCompile group: 'junit', name: 'junit', version: '4.12'
     }
 }

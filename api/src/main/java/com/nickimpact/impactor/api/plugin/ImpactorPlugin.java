@@ -1,12 +1,11 @@
 package com.nickimpact.impactor.api.plugin;
 
-import com.nickimpact.impactor.api.commands.Command;
+import co.aikar.commands.BaseCommand;
 import com.nickimpact.impactor.api.configuration.Config;
 import com.nickimpact.impactor.api.logging.Logger;
 import com.nickimpact.impactor.api.platform.Platform;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 public interface ImpactorPlugin {
@@ -19,7 +18,7 @@ public interface ImpactorPlugin {
 
 	List<Config> getConfigs();
 
-	List<Command> getCommands();
+	List<BaseCommand> getCommands();
 
 	List<Object> getListeners();
 
