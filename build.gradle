@@ -123,10 +123,10 @@ publishing {
         maven {
             name = "Unbound-Public"
             url = "https://nexus.unboundnetwork.net/repository/unbound-public/"
-//            credentials {
-//                username project.hasProperty('nexus-username') ? project.property('nexus-username') : ''
-//                password project.hasProperty('nexus-password') ? project.property('nexus-password') : ''
-//            }
+            credentials {
+                username project.hasProperty('nexus-username') ? project.property('nexus-username') : ''
+                password project.hasProperty('nexus-password') ? project.property('nexus-password') : ''
+            }
         }
     }
 
