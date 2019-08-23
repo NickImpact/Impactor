@@ -131,6 +131,14 @@ publishing {
     }
 
     publications {
+        api(MavenPublication) {
+            def project = project(':api')
+            from project.components.java
+            groupId project.group
+            artifactId "api"
+            version project.version
+        }
+        
         spigot(MavenPublication) {
             def project = project(':spigot')
             from project.components.java
