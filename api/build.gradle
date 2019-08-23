@@ -1,12 +1,3 @@
-plugins {
-    id 'java'
-}
-
-group 'com.nickimpact.impactor'
-version '2.0.0'
-
-sourceCompatibility = 1.8
-
 repositories {
     mavenCentral()
 }
