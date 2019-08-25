@@ -141,4 +141,8 @@ public class ConfigurateStorage {
         ex.printStackTrace();
         throw Throwables.propagate(ex);
     }
+
+    public Path getDataDir() {
+        return dataDir;
+    }
 }
