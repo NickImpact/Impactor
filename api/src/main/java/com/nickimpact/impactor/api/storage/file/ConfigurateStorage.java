@@ -30,7 +30,6 @@ import com.nickimpact.impactor.api.plugin.Configurable;
 import com.nickimpact.impactor.api.plugin.ImpactorPlugin;
 import com.nickimpact.impactor.api.plugin.Tasking;
 import com.nickimpact.impactor.api.storage.file.loaders.ConfigurateLoader;
-import ninja.leaping.configurate.ConfigurationNode;
 
 
 import java.io.IOException;
@@ -49,8 +48,6 @@ public class ConfigurateStorage {
 
     private Path dataDir;
     private String dataDirName;
-
-    private Path userDir;
 
     private FileWatcher.WatchedLocation userWatcher = null;
 
@@ -75,12 +72,9 @@ public class ConfigurateStorage {
             this.dataDir = ((Configurable) this.plugin).getConfigDir().resolve(this.dataDirName);
             this.createDirectoriesIfNotExists(this.dataDir);
 
-            this.userDir = this.dataDir.resolve("data");
-            this.createDirectoriesIfNotExists(this.userDir);
-
             FileWatcher watcher = new FileWatcher((Tasking) this.plugin, dataDir);
-            this.userWatcher = watcher.getWatcher(this.userDir);
-            this.userWatcher.addListener(path -> {
+//            this.userWatcher = watcher.getWatcher(this.userDir);
+//            this.userWatcher.addListener(path -> {
 //            String s = path.getFileName().toString();
 //
 //            if (!s.endsWith(this.extension)) {
@@ -94,38 +88,38 @@ public class ConfigurateStorage {
 //            } catch (Exception e) {
 //                return;
 //            }
-            });
+//            });
         } else {
             throw new Exception("Plugin must inherit the configurable and tasking interfaces...");
         }
     }
 
-    private ConfigurationNode readFile(String name) throws IOException {
-        Path file = this.userDir.resolve(name + this.extension);
-        if(this.userWatcher != null) {
-            this.userWatcher.recordChange(file.getFileName().toString());
-        }
-
-        if(!Files.exists(file)) {
-            return null;
-        }
-
-        return this.loader.loader(file).load();
-    }
-
-    private void saveFile(String name, ConfigurationNode node) throws IOException {
-        Path file = this.userDir.resolve(name + this.extension);
-        if(this.userWatcher != null) {
-            this.userWatcher.recordChange(file.getFileName().toString());
-        }
-
-        if(node == null) {
-            Files.deleteIfExists(file);
-            return;
-        }
-
-        this.loader.loader(file).save(node);
-    }
+//    private ConfigurationNode readFile(String name) throws IOException {
+//        Path file = this.userDir.resolve(name + this.extension);
+//        if(this.userWatcher != null) {
+//            this.userWatcher.recordChange(file.getFileName().toString());
+//        }
+//
+//        if(!Files.exists(file)) {
+//            return null;
+//        }
+//
+//        return this.loader.loader(file).load();
+//    }
+//
+//    private void saveFile(String name, ConfigurationNode node) throws IOException {
+//        Path file = this.userDir.resolve(name + this.extension);
+//        if(this.userWatcher != null) {
+//            this.userWatcher.recordChange(file.getFileName().toString());
+//        }
+//
+//        if(node == null) {
+//            Files.deleteIfExists(file);
+//            return;
+//        }
+//
+//        this.loader.loader(file).save(node);
+//    }
 
     private void createDirectoriesIfNotExists(Path path) throws IOException {
         if (Files.exists(path) && (Files.isDirectory(path) || Files.isSymbolicLink(path))) {
