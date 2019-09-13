@@ -51,7 +51,7 @@ public class SpigotImpactorPlugin extends JavaPlugin implements ImpactorPlugin, 
 		instance = this;
 		this.logger = new SpigotLogger(this);
 		new ImpactorService();
-		this.mojangServerStatusService = new SpigotMojangServerStatusService();
+//		this.mojangServerStatusService = new SpigotMojangServerStatusService();
 		Bukkit.getPluginManager().registerEvents(new SpigotUI.UIListener(), this);
 
 		this.logger.info("Pooling plugin dependencies...");

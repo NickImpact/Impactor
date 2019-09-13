@@ -2,6 +2,7 @@ package com.nickimpact.impactor.sponge.configuration;
 
 import com.google.common.collect.ImmutableMap;
 import com.nickimpact.impactor.api.configuration.ConfigKey;
+import com.nickimpact.impactor.api.configuration.ConfigKeyHolder;
 import com.nickimpact.impactor.api.configuration.keys.BaseConfigKey;
 
 import java.lang.reflect.Field;
@@ -9,7 +10,11 @@ import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ConfigKeys {
+import static com.nickimpact.impactor.api.configuration.ConfigKeyTypes.*;
+
+public class ConfigKeys implements ConfigKeyHolder {
+
+	public static ConfigKey<Boolean> USE_MOJANG_STATUS_FETCHER = booleanKey("options.use-mojang-status-fetcher", false);
 
 	private static final Map<String, ConfigKey<?>> KEYS;
 	private static final int SIZE;
@@ -54,16 +59,13 @@ public class ConfigKeys {
 	 *
 	 * @return the defined keys
 	 */
-	public static Map<String, ConfigKey<?>> getKeys() {
+	@Override
+	public Map<String, ConfigKey<?>> getKeys() {
 		return KEYS;
 	}
 
-	/**
-	 * Gets the number of defined keys.
-	 *
-	 * @return how many keys are defined in this class
-	 */
-	public static int size() {
+	@Override
+	public int getSize() {
 		return SIZE;
 	}
 
