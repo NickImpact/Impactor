@@ -161,12 +161,14 @@ public class SpigotPage<U> implements Page<Player, U, SpigotUI, SpigotIcon> {
 			r++;
 		}
 
-		Material rep = this.pageIcons.get(PageIconType.CURRENT).getRep();
-		ItemStack c = ItemStackUtils.itemBuilder()
-				.material(rep)
-				.name("&eCurrent Page &7(&a" + this.page + "&7)")
-				.build();
-		this.view.setSlot(this.pageIcons.get(PageIconType.CURRENT).getSlot(), new SpigotIcon(c));
+		if(this.pageIcons.containsKey(PageIconType.CURRENT)) {
+			Material rep = this.pageIcons.get(PageIconType.CURRENT).getRep();
+			ItemStack c = ItemStackUtils.itemBuilder()
+					.material(rep)
+					.name("&eCurrent Page &7(&a" + this.page + "&7)")
+					.build();
+			this.view.setSlot(this.pageIcons.get(PageIconType.CURRENT).getSlot(), new SpigotIcon(c));
+		}
 	}
 
 	public static SpigotPageBuilder builder() {

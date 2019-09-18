@@ -37,6 +37,8 @@ public class ItemStackUtils {
 
 		public ItemStackBuilder fromItem(ItemStack item) {
 			this.original = item;
+			this.amount = item.getAmount();
+			this.damage = item.getDurability();
 			return this;
 		}
 
@@ -77,6 +79,8 @@ public class ItemStackUtils {
 
 		@NotNull
 		private ItemStack buildStack(ItemStack item) {
+			this.original.setAmount(this.amount);
+			this.original.setDurability(this.damage);
 			ItemMeta meta = item.getItemMeta();
 			if (this.name != null) {
 				meta.setDisplayName(this.name);

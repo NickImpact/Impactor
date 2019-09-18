@@ -44,7 +44,7 @@ public class MySQLConnectionFactory extends HikariConnectionFactory {
 
     @Override
     protected String getDriverClass() {
-        return "com.mysql.jdbc.jdbc2.optional.MysqlDataSource";
+        return "net.unboundnetwork.impactor.lib.mysql.jdbc.jdbc2.optional.MysqlDataSource";
     }
 
     @Override
