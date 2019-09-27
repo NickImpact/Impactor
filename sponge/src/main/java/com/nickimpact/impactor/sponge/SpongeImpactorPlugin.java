@@ -92,7 +92,7 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		this.manager.loadDependencies(EnumSet.of(Dependency.CONFIGURATE_CORE, Dependency.CONFIGURATE_HOCON, Dependency.HOCON_CONFIG, Dependency.CONFIGURATE_GSON, Dependency.CONFIGURATE_YAML));
 		this.logger.info("Initializing plugin dependencies...");
 		for(StorageType st : toLaunch) {
-			this.logger.debug("Loading storage type: " + st.getName());
+			this.logger.info("Loading storage type module: " + st.getName());
 			this.manager.loadStorageDependencies(ImmutableSet.of(st));
 		}
 	}

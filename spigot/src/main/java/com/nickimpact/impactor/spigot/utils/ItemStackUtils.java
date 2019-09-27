@@ -72,15 +72,15 @@ public class ItemStackUtils {
 			if(this.original != null) {
 				return buildStack(original);
 			} else {
-				ItemStack stack = new ItemStack(this.material, this.amount, this.damage);
+				ItemStack stack = new ItemStack(this.material);
 				return buildStack(stack);
 			}
 		}
 
 		@NotNull
 		private ItemStack buildStack(ItemStack item) {
-			this.original.setAmount(this.amount);
-			this.original.setDurability(this.damage);
+			item.setAmount(this.amount);
+			item.setDurability(this.damage);
 			ItemMeta meta = item.getItemMeta();
 			if (this.name != null) {
 				meta.setDisplayName(this.name);
