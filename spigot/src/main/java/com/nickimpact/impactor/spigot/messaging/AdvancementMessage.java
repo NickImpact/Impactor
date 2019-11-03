@@ -73,6 +73,10 @@ public class AdvancementMessage {
 		return new GsonBuilder().setPrettyPrinting().create().toJson(json);
 	}
 
+	public static AdvancementMessageBuilder builder() {
+		return new AdvancementMessageBuilder();
+	}
+
 	public static class AdvancementMessageBuilder implements Builder<AdvancementMessage> {
 
 		private String title;
