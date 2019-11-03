@@ -26,7 +26,7 @@
 package com.nickimpact.impactor.api.storage.sql.hikari;
 
 import com.nickimpact.impactor.api.storage.StorageCredentials;
-import com.zaxxer.hikari.HikariConfig;
+import net.unboundnetwork.impactor.lib.hikari.HikariConfig;
 
 import java.util.Map;
 import java.util.function.Function;

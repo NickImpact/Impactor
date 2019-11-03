@@ -26,7 +26,7 @@
 package com.nickimpact.impactor.api.storage.sql.hikari;
 
 import com.nickimpact.impactor.api.storage.StorageCredentials;
-import com.zaxxer.hikari.HikariConfig;
+import net.unboundnetwork.impactor.lib.hikari.HikariConfig;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -60,7 +60,6 @@ public class MariaDBConnectionFactory extends HikariConnectionFactory {
         // onto the connections.
         config.addDataSourceProperty("properties", propertiesString);
     }
-
 
     @Override
     public Function<String, String> getStatementProcessor() {
