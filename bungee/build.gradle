@@ -1,0 +1,41 @@
+repositories {
+    mavenCentral()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url 'https://repo.lucko.me/' }
+}
+
+dependencies {
+    compile project(':api')
+    compile project(':common')
+    shadow 'net.md-5:bungeecord-api:1.15-SNAPSHOT'
+    shadow 'com.imaginarycode.minecraft:RedisBungee:0.4'
+    compile "me.lucko:jar-relocator:1.4"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+shadowJar {
+    archiveName = "Impactor-Bungee-${project.version}.jar"
+
+    // Shaded Components
+    relocate 'com.github.ben-manes', 'com.nickimpact.impactor.relocations.com.github.ben-manes'
+    relocate 'me.lucko.jarrelocator', 'com.nickimpact.impactor.relocations.me.lucko.jarrelocator'
+    relocate 'net.bytebuddy', 'com.nickimpact.impactor.relocations.net.bytebuddy'
+    relocate 'net.kyori.event', 'com.nickimpact.impactor.relocations.net.kyori.event'
+    relocate 'ninja.leaping.configurate', 'com.nickimpact.impactor.relocations.ninja.leaping.configurate'
+    relocate 'org.yaml', 'com.nickimpact.impactor.relocations.org.yaml'
+    relocate 'org.checkerframework', 'com.nickimpact.impactor.relocations.org.checkerframework'
+    relocate 'org.objectweb', 'com.nickimpact.impactor.relocations.org.objectweb'
+    relocate 'co.aikar', 'com.nickimpact.impactor.relocations.co.aikar'
+
+    // Storage Based Relocations
+    relocate 'com.zaxxer.hikari', 'com.nickimpact.impactor.lib.hikari'
+    relocate 'org.mariadb.jdbc', 'com.nickimpact.impactor.lib.mariadb'
+    relocate 'com.mysql', 'com.nickimpact.impactor.lib.mysql'
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        expand 'pluginVersion': project.version
+        include 'plugin.yml'
+    }
+}

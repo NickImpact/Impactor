@@ -3,16 +3,25 @@ package com.nickimpact.impactor.api.plugin;
 import co.aikar.commands.BaseCommand;
 import com.nickimpact.impactor.api.configuration.Config;
 import com.nickimpact.impactor.api.logging.Logger;
-import com.nickimpact.impactor.api.platform.Platform;
+import com.nickimpact.impactor.api.plugin.components.Reloadable;
 
 import java.util.List;
-import java.util.function.Consumer;
 
+/**
+ * Represents a basic plugin style that'll surround the basis to a plugin that can be deployed off
+ * Impactor. Functionality of a plugin can be extended using the additional components available
+ * within this containing package.
+ *
+ * By default, a plugin implementing this interface is expected to provide a set of metadata that'll
+ * be used to identify the plugin. Additionally, a plugin is expected to provide the logger it is using,
+ * as well as any configs, commands, and listeners it has registered such that they can be reloaded
+ * should the plugin implement the {@link Reloadable Reloadable} component.
+ *
+ *
+ */
 public interface ImpactorPlugin {
 
-	Platform getPlatform();
-
-	PluginInfo getPluginInfo();
+	PluginMetadata getMetadata();
 
 	Logger getPluginLogger();
 
@@ -22,33 +31,5 @@ public interface ImpactorPlugin {
 
 	List<Object> getListeners();
 
-	Consumer<ImpactorPlugin> onReload();
 
-	boolean isConnected();
-
-	void setConnected();
-
-	void handleDisconnect();
-
-	/**
-	 * Attempts to connect the plugin to the core itself. This method is typically
-	 * called via any starting phase in Sponge.
-	 */
-	default void connect() {
-		if (!PluginRegistry.isLoaded(this.getPluginInfo().getID())) {
-			PluginRegistry.register(this);
-			this.setConnected();
-		} else {
-			if (!isConnected()) {
-				this.setConnected();
-			}
-		}
-	}
-
-	default void disconnect() {
-		if(PluginRegistry.isLoaded(this.getPluginInfo().getID())) {
-			PluginRegistry.unregister(this);
-			this.handleDisconnect();
-		}
-	}
 }

@@ -1,6 +1,6 @@
 package com.nickimpact.impactor.spigot.utils;
 
-import com.nickimpact.impactor.api.building.Builder;
+import com.nickimpact.impactor.api.utilities.Builder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -9,7 +9,6 @@ import org.bukkit.block.Skull;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,7 +23,7 @@ public class ItemStackUtils {
 		return new ItemStackBuilder();
 	}
 
-	public static class ItemStackBuilder implements Builder<ItemStack> {
+	public static class ItemStackBuilder implements Builder<ItemStack, ItemStackBuilder> {
 
 		private ItemStack original;
 
@@ -68,6 +67,11 @@ public class ItemStackUtils {
 		}
 
 		@Override
+		public ItemStackBuilder from(ItemStack input) {
+			return null;
+		}
+
+		@Override
 		public ItemStack build() {
 			if(this.original != null) {
 				return buildStack(original);
@@ -77,7 +81,6 @@ public class ItemStackUtils {
 			}
 		}
 
-		@NotNull
 		private ItemStack buildStack(ItemStack item) {
 			item.setAmount(this.amount);
 			item.setDurability(this.damage);

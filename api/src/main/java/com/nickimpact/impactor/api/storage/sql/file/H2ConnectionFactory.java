@@ -25,9 +25,10 @@
 
 package com.nickimpact.impactor.api.storage.sql.file;
 
-import com.nickimpact.impactor.api.plugin.Dependable;
-import com.nickimpact.impactor.api.plugin.ImpactorPlugin;
+import com.nickimpact.impactor.api.Impactor;
+import com.nickimpact.impactor.api.plugin.components.Depending;
 import com.nickimpact.impactor.api.storage.dependencies.Dependency;
+import com.nickimpact.impactor.api.storage.dependencies.DependencyManager;
 import com.nickimpact.impactor.api.storage.dependencies.classloader.IsolatedClassLoader;
 
 import java.lang.reflect.InvocationTargetException;
@@ -45,10 +46,10 @@ public class H2ConnectionFactory extends FlatfileConnectionFactory {
     private final Driver driver;
     private NonClosableConnection connection;
 
-    public H2ConnectionFactory(Dependable plugin, Path file) {
+    public H2ConnectionFactory(Path file) {
         super(file);
 
-        IsolatedClassLoader classLoader = plugin.getDependencyManager().obtainClassLoaderWith(EnumSet.of(Dependency.H2_DRIVER));
+        IsolatedClassLoader classLoader = Impactor.getInstance().getRegistry().get(DependencyManager.class).obtainClassLoaderWith(EnumSet.of(Dependency.H2_DRIVER));
         try {
             Class<?> driverClass = classLoader.loadClass("org.h2.Driver");
             Method loadMethod = driverClass.getMethod("load");

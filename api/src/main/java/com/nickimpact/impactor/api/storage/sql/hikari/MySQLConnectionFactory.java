@@ -26,7 +26,7 @@
 package com.nickimpact.impactor.api.storage.sql.hikari;
 
 import com.nickimpact.impactor.api.storage.StorageCredentials;
-import net.unboundnetwork.impactor.lib.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariConfig;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -44,7 +44,7 @@ public class MySQLConnectionFactory extends HikariConnectionFactory {
 
     @Override
     protected String getDriverClass() {
-        return "net.unboundnetwork.impactor.lib.mysql.jdbc.jdbc2.optional.MysqlDataSource";
+        return "com.mysql.jdbc.jdbc2.optional.MysqlDataSource";
     }
 
     @Override

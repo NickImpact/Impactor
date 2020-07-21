@@ -28,7 +28,7 @@ public class SpigotLogger implements Logger {
 
 	@Override
 	public void info(String message) {
-		System.out.println(ChatColor.translateAlternateColorCodes('&', "&e" + plugin.getPluginInfo().getName() + " &7\u00bb " + message));
+		System.out.println(ChatColor.translateAlternateColorCodes('&', "&e" + plugin.getMetadata().getName() + " &7\u00bb " + message));
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class SpigotLogger implements Logger {
 
 	@Override
 	public void warn(String message) {
-		System.out.println(ChatColor.translateAlternateColorCodes('&', "&e" + plugin.getPluginInfo().getName() + " &7(&6Warning&7) " + message));
+		System.out.println(ChatColor.translateAlternateColorCodes('&', "&e" + plugin.getMetadata().getName() + " &7(&6Warning&7) " + message));
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class SpigotLogger implements Logger {
 
 	@Override
 	public void error(String message) {
-		System.out.println(ChatColor.translateAlternateColorCodes('&', "&e" + plugin.getPluginInfo().getName() + " &7(&cError&7) " + message));
+		System.out.println(ChatColor.translateAlternateColorCodes('&', "&e" + plugin.getMetadata().getName() + " &7(&cError&7) " + message));
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class SpigotLogger implements Logger {
 
 	@Override
 	public void debug(String message) {
-		System.out.println(ChatColor.translateAlternateColorCodes('&', "&e" + plugin.getPluginInfo().getName() + " &7(&bDebug&7) " + message));
+		System.out.println(ChatColor.translateAlternateColorCodes('&', "&e" + plugin.getMetadata().getName() + " &7(&bDebug&7) " + message));
 	}
 
 	@Override

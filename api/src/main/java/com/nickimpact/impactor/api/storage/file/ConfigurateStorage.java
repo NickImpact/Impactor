@@ -26,9 +26,9 @@
 package com.nickimpact.impactor.api.storage.file;
 
 import com.google.common.base.Throwables;
-import com.nickimpact.impactor.api.plugin.Configurable;
+import com.nickimpact.impactor.api.plugin.components.Configurable;
 import com.nickimpact.impactor.api.plugin.ImpactorPlugin;
-import com.nickimpact.impactor.api.plugin.Tasking;
+import com.nickimpact.impactor.api.plugin.components.Tasking;
 import com.nickimpact.impactor.api.storage.file.loaders.ConfigurateLoader;
 
 
@@ -72,7 +72,7 @@ public class ConfigurateStorage {
             this.dataDir = ((Configurable) this.plugin).getConfigDir().resolve(this.dataDirName);
             this.createDirectoriesIfNotExists(this.dataDir);
 
-            FileWatcher watcher = new FileWatcher((Tasking) this.plugin, dataDir);
+            FileWatcher watcher = new FileWatcher(dataDir);
 //            this.userWatcher = watcher.getWatcher(this.userDir);
 //            this.userWatcher.addListener(path -> {
 //            String s = path.getFileName().toString();

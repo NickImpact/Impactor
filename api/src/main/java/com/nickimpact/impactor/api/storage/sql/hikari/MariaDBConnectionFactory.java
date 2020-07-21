@@ -26,7 +26,7 @@
 package com.nickimpact.impactor.api.storage.sql.hikari;
 
 import com.nickimpact.impactor.api.storage.StorageCredentials;
-import net.unboundnetwork.impactor.lib.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariConfig;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -45,7 +45,7 @@ public class MariaDBConnectionFactory extends HikariConnectionFactory {
 
     @Override
     protected String getDriverClass() {
-        return "net.unboundnetwork.impactor.lib.mariadb.MariaDbDataSource";
+        return "org.mariadb.jdbc.MariaDbDataSource";
     }
 
     @Override

@@ -17,7 +17,7 @@ public class SpongeConfig implements Config {
 	private Object[] values = null;
 
 	private final ConfigurationAdapter adapter;
-	private ConfigKeyHolder holder;
+	private final ConfigKeyHolder holder;
 
 	public SpongeConfig(ConfigurationAdapter adapter, ConfigKeyHolder holder) {
 		this.adapter = adapter;

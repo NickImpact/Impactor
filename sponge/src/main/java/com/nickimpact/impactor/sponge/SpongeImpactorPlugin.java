@@ -4,78 +4,90 @@ import co.aikar.commands.BaseCommand;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
-import com.nickimpact.impactor.api.ImpactorService;
+import com.nickimpact.impactor.api.Impactor;
 import com.nickimpact.impactor.api.configuration.Config;
-import com.nickimpact.impactor.api.logging.Logger;
-import com.nickimpact.impactor.api.platform.Platform;
-import com.nickimpact.impactor.api.plugin.Dependable;
 import com.nickimpact.impactor.api.plugin.ImpactorPlugin;
-import com.nickimpact.impactor.api.plugin.PluginInfo;
-import com.nickimpact.impactor.api.plugin.PluginRegistry;
+import com.nickimpact.impactor.api.plugin.PluginMetadata;
+import com.nickimpact.impactor.api.plugin.components.Depending;
+import com.nickimpact.impactor.api.plugin.registry.PluginRegistry;
+import com.nickimpact.impactor.api.services.text.MessageService;
 import com.nickimpact.impactor.api.storage.StorageType;
 import com.nickimpact.impactor.api.storage.dependencies.Dependency;
 import com.nickimpact.impactor.api.storage.dependencies.DependencyManager;
 import com.nickimpact.impactor.api.storage.dependencies.classloader.PluginClassLoader;
 import com.nickimpact.impactor.api.storage.dependencies.classloader.ReflectionClassLoader;
+import com.nickimpact.impactor.sponge.api.SpongeImpactorAPIProvider;
 import com.nickimpact.impactor.sponge.configuration.ConfigKeys;
 import com.nickimpact.impactor.sponge.configuration.SpongeConfig;
 import com.nickimpact.impactor.sponge.configuration.SpongeConfigAdapter;
-import com.nickimpact.impactor.sponge.logging.SpongeLogger;
+import com.nickimpact.impactor.sponge.plugin.AbstractSpongePlugin;
+import com.nickimpact.impactor.sponge.scheduler.SpongeSchedulerAdapter;
 import com.nickimpact.impactor.sponge.services.SpongeMojangServerStatusService;
+import com.nickimpact.impactor.sponge.text.SpongeMessageService;
 import lombok.Getter;
+import com.nickimpact.impactor.common.api.ApiRegistrationUtil;
+import org.slf4j.Logger;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.scheduler.AsynchronousExecutor;
+import org.spongepowered.api.scheduler.SpongeExecutorService;
+import org.spongepowered.api.scheduler.SynchronousExecutor;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.function.Consumer;
 
-@Plugin(id = "impactor", name = "ImpactorAPI", version = "2.0.0", description = "A universal API for multiple tools for development")
-public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Dependable {
+@Plugin(id = "impactor", name = "ImpactorAPI", version = "@version@", description = "A universal API for multiple tools for development")
+public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depending {
 
 	@Getter private static SpongeImpactorPlugin instance;
 
 	@Getter private SpongeMojangServerStatusService mojangServerStatusService;
 
 	@Inject
-	private org.slf4j.Logger fallback;
-	private SpongeLogger logger;
-
-	@Inject
 	@ConfigDir(sharedRoot = false)
 	private Path configDir;
 	private Config config;
 
-	private PluginClassLoader loader;
-	private DependencyManager manager;
+	@Inject
+	public SpongeImpactorPlugin(Logger fallback, @SynchronousExecutor SpongeExecutorService sync, @AsynchronousExecutor SpongeExecutorService async) {
+		super(PluginMetadata.builder().id("impactor").name("Impactor").version("@version@").build(), fallback);
+		ApiRegistrationUtil.register(new SpongeImpactorAPIProvider(SpongeSchedulerAdapter.builder()
+				.bootstrap(this)
+				.sync(sync)
+				.async(async)
+				.scheduler(Sponge.getScheduler())
+				.build()
+		));
+	}
 
-	public SpongeImpactorPlugin() {
-		this.connect();
+	@Listener
+	public void onPreInit(GamePreInitializationEvent e) {
+		Impactor.getInstance().getRegistry().register(MessageService.class, new SpongeMessageService());
 	}
 
 	@Listener
 	public void onInit(GameInitializationEvent e) {
 		instance = this;
-		new ImpactorService();
-		this.logger = new SpongeLogger(this, this.fallback);
 		this.config = new SpongeConfig(new SpongeConfigAdapter(this, new File(configDir.toFile(), "settings.conf")), new ConfigKeys());
 
 		if(this.config.get(ConfigKeys.USE_MOJANG_STATUS_FETCHER)) {
-			this.logger.info("Enabling Mojang Status Watcher...");
+			this.getPluginLogger().info("Enabling Mojang Status Watcher...");
 			mojangServerStatusService = new SpongeMojangServerStatusService();
 		}
 
-		this.logger.info("Pooling plugin dependencies...");
+		this.getPluginLogger().info("Pooling plugin dependencies...");
 		List<StorageType> toLaunch = Lists.newArrayList();
-		for(ImpactorPlugin plugin : PluginRegistry.getConnected()) {
-			if(plugin instanceof Dependable) {
-				Dependable dependable = (Dependable) plugin;
+		for(ImpactorPlugin plugin : PluginRegistry.getAll()) {
+			if(plugin instanceof Depending) {
+				Depending dependable = (Depending) plugin;
 
-				for(StorageType st : dependable.getStorageTypes()) {
+				for(StorageType st : dependable.getStorageRequirements()) {
 					if(toLaunch.contains(st)) {
 						continue;
 					}
@@ -85,31 +97,16 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 			}
 		}
 
-		this.logger.info("Dependencies found, setting these up now...");
-		this.loader = new ReflectionClassLoader(this);
-		this.manager = new DependencyManager(this);
-		this.logger.info("Initializing default dependencies...");
-		this.manager.loadDependencies(EnumSet.of(Dependency.CONFIGURATE_CORE, Dependency.CONFIGURATE_HOCON, Dependency.HOCON_CONFIG, Dependency.CONFIGURATE_GSON, Dependency.CONFIGURATE_YAML));
-		this.logger.info("Initializing plugin dependencies...");
+		this.getPluginLogger().info("Dependencies found, setting these up now...");
+		Impactor.getInstance().getRegistry().register(PluginClassLoader.class, new ReflectionClassLoader(this));
+		Impactor.getInstance().getRegistry().register(DependencyManager.class, new DependencyManager(this));
+		this.getPluginLogger().info("Initializing default dependencies...");
+		this.getDependencyManager().loadDependencies(EnumSet.of(Dependency.CONFIGURATE_CORE, Dependency.CONFIGURATE_HOCON, Dependency.HOCON_CONFIG, Dependency.CONFIGURATE_GSON, Dependency.CONFIGURATE_YAML));
+		this.getPluginLogger().info("Initializing plugin dependencies...");
 		for(StorageType st : toLaunch) {
-			this.logger.info("Loading storage type module: " + st.getName());
-			this.manager.loadStorageDependencies(ImmutableSet.of(st));
+			this.getPluginLogger().info("Loading storage type module: " + st.getName());
+			this.getDependencyManager().loadStorageDependencies(ImmutableSet.of(st));
 		}
-	}
-
-	@Override
-	public Platform getPlatform() {
-		return Platform.Sponge;
-	}
-
-	@Override
-	public PluginInfo getPluginInfo() {
-		return new SpongeImpactorInfo();
-	}
-
-	@Override
-	public Logger getPluginLogger() {
-		return this.logger;
 	}
 
 	@Override
@@ -127,27 +124,20 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		return Lists.newArrayList();
 	}
 
-	@Override
-	public Consumer<ImpactorPlugin> onReload() {
-		return plugin -> {};
-	}
-
 	public Config getConfig() {
 		return this.config;
 	}
 
-	@Override
 	public PluginClassLoader getPluginClassLoader() {
-		return this.loader;
+		return Impactor.getInstance().getRegistry().get(PluginClassLoader.class);
 	}
 
-	@Override
 	public DependencyManager getDependencyManager() {
-		return this.manager;
+		return Impactor.getInstance().getRegistry().get(DependencyManager.class);
 	}
 
 	@Override
-	public List<StorageType> getStorageTypes() {
+	public List<StorageType> getStorageRequirements() {
 		return Lists.newArrayList();
 	}
 }

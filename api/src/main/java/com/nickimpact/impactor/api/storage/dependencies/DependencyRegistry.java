@@ -28,8 +28,6 @@ package com.nickimpact.impactor.api.storage.dependencies;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.gson.JsonElement;
-import com.nickimpact.impactor.api.platform.Platform;
-import com.nickimpact.impactor.api.plugin.ImpactorPlugin;
 import com.nickimpact.impactor.api.storage.StorageType;
 import com.nickimpact.impactor.api.storage.dependencies.relocation.Relocation;
 import com.nickimpact.impactor.api.storage.dependencies.relocation.RelocationHandler;

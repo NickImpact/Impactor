@@ -5,15 +5,14 @@ import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import com.nickimpact.impactor.api.configuration.ConfigurationAdapter;
 import com.nickimpact.impactor.api.plugin.ImpactorPlugin;
-import com.nickimpact.impactor.sponge.SpongeImpactorPlugin;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
-import org.spongepowered.api.text.Text;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;

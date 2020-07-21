@@ -1,10 +1,15 @@
 package com.nickimpact.impactor.sponge.ui;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.nickimpact.impactor.api.gui.*;
 import com.nickimpact.impactor.api.plugin.ImpactorPlugin;
 import com.nickimpact.impactor.sponge.SpongeImpactorPlugin;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
@@ -18,10 +23,13 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -37,6 +45,8 @@ public class SpongeUI implements UI<Player, ClickInventoryEvent, InteractInvento
 	private Map<Integer, SpongeIcon> slots;
 	private List<BiConsumer<Player, ClickInventoryEvent>> additionals = Lists.newArrayList();
 	private List<Consumer<InteractInventoryEvent.Close>> closeAdditionals = Lists.newArrayList();
+
+	private Multimap<UUID, TimeMap> cooldowns = ArrayListMultimap.create();
 
 	private SpongeUI(ImpactorPlugin plugin, SpongeUIBuilder builder) {
 		this.plugin = plugin;
@@ -93,8 +103,8 @@ public class SpongeUI implements UI<Player, ClickInventoryEvent, InteractInvento
 
 	@Override
 	public void clear() {
-		this.slots.clear();
 		this.slots.forEach((slot, icon) -> this.inventory.query(QueryOperationTypes.INVENTORY_PROPERTY.of(SlotIndex.of(slot))).first().clear());
+		this.slots.clear();
 	}
 
 	@Override
@@ -122,6 +132,7 @@ public class SpongeUI implements UI<Player, ClickInventoryEvent, InteractInvento
 		return this.dimensions;
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	private void processClick(ClickInventoryEvent event) {
 		event.setCancelled(true);
 		event.getCause().first(Player.class).ifPresent(pl -> {
@@ -129,12 +140,30 @@ public class SpongeUI implements UI<Player, ClickInventoryEvent, InteractInvento
 				transaction.getSlot().getProperty(SlotIndex.class, "slotindex").ifPresent(slot -> {
 					SpongeIcon icon = slots.get(slot.getValue());
 					if(icon != null) {
-						Sponge.getScheduler().createTaskBuilder()
-								.execute(() -> {
-									icon.process(new SpongeClickable(pl, event));
-								})
-								.delayTicks(1)
-								.submit(this.plugin);
+						Optional<TimeMap> cache = this.cooldowns.get(pl.getUniqueId())
+								.stream()
+								.filter(x -> x.getSlot() == slot.getValue())
+								.findAny();
+
+						boolean operate = true;
+						if(cache.isPresent()) {
+							if(cache.get().getTime().plusMillis(500).isAfter(Instant.now())) {
+								operate = false;
+							}
+						}
+
+						if(operate) {
+							cache.ifPresent(timeMap -> this.cooldowns.remove(pl.getUniqueId(), timeMap));
+							this.cooldowns.put(pl.getUniqueId(), new TimeMap(slot.getValue(), Instant.now()));
+							Sponge.getScheduler().createTaskBuilder()
+									.execute(() -> {
+										icon.process(new SpongeClickable(pl, event));
+									})
+									.delayTicks(1)
+									.submit(this.plugin);
+						} else {
+							pl.sendMessage(Text.of(TextColors.RED, "Please wait to click this icon again!"));
+						}
 					}
 
 					for(BiConsumer<Player, ClickInventoryEvent> extra : additionals) {
@@ -183,5 +212,13 @@ public class SpongeUI implements UI<Player, ClickInventoryEvent, InteractInvento
 		public SpongeUI build() {
 			return new SpongeUI(SpongeImpactorPlugin.getInstance(), this);
 		}
+	}
+
+	@Getter
+	@EqualsAndHashCode
+	@RequiredArgsConstructor
+	private static class TimeMap {
+		private final int slot;
+		private final Instant time;
 	}
 }

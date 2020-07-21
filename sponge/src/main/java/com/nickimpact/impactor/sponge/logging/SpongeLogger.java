@@ -36,7 +36,7 @@ public class SpongeLogger implements Logger {
 	@Override
 	public void info(String message) {
 		if(Sponge.isServerAvailable()) {
-			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, plugin.getPluginInfo().getName(), TextColors.GRAY, " \u00bb ", this.toText(message)));
+			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, plugin.getMetadata().getName(), TextColors.GRAY, " \u00bb ", this.toText(message)));
 		} else {
 			fallback.info(message);
 		}
@@ -50,7 +50,7 @@ public class SpongeLogger implements Logger {
 	@Override
 	public void warn(String message) {
 		if(Sponge.isServerAvailable()) {
-			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, plugin.getPluginInfo().getName(), TextColors.GRAY, " (", TextColors.GOLD, "Warning", TextColors.GRAY, ") ", this.toText(message)));
+			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, plugin.getMetadata().getName(), TextColors.GRAY, " (", TextColors.GOLD, "Warning", TextColors.GRAY, ") ", this.toText(message)));
 		} else {
 			fallback.warn(message);
 		}
@@ -64,7 +64,7 @@ public class SpongeLogger implements Logger {
 	@Override
 	public void error(String message) {
 		if(Sponge.isServerAvailable()) {
-			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, plugin.getPluginInfo().getName(), TextColors.GRAY, " (", TextColors.RED, "Error", TextColors.GRAY, ") ", this.toText(message)));
+			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, plugin.getMetadata().getName(), TextColors.GRAY, " (", TextColors.RED, "Error", TextColors.GRAY, ") ", this.toText(message)));
 		} else {
 			fallback.warn(message);
 		}
@@ -78,7 +78,7 @@ public class SpongeLogger implements Logger {
 	@Override
 	public void debug(String message) {
 		if(Sponge.isServerAvailable()) {
-			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, plugin.getPluginInfo().getName(), TextColors.GRAY, " (", TextColors.AQUA, "Debug", TextColors.GRAY, ") ", this.toText(message)));
+			Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.YELLOW, plugin.getMetadata().getName(), TextColors.GRAY, " (", TextColors.AQUA, "Debug", TextColors.GRAY, ") ", this.toText(message)));
 		} else {
 			fallback.warn(message);
 		}

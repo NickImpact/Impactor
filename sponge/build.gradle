@@ -4,6 +4,25 @@ ext {
 
 shadowJar {
     archiveName = "Impactor-Sponge-${sponge}-${version}.jar"
+
+    exclude 'META-INF/versions/9/module-info.class'
+    exclude 'module-info.class'
+
+    // Shaded Components
+//    relocate 'com.github.ben-manes', 'com.nickimpact.impactor.relocations.com.github.ben-manes'
+//    relocate 'me.lucko.jarrelocator', 'com.nickimpact.impactor.relocations.me.lucko.jarrelocator'
+//    relocate 'net.bytebuddy', 'com.nickimpact.impactor.relocations.net.bytebuddy'
+//    relocate 'net.kyori.event', 'com.nickimpact.impactor.relocations.net.kyori.event'
+//    relocate 'ninja.leaping.configurate', 'com.nickimpact.impactor.relocations.ninja.leaping.configurate'
+//    relocate 'org.yaml', 'com.nickimpact.impactor.relocations.org.yaml'
+//    relocate 'org.checkerframework', 'com.nickimpact.impactor.relocations.org.checkerframework'
+//    relocate 'org.objectweb', 'com.nickimpact.impactor.relocations.org.objectweb'
+    //relocate 'co.aikar', 'com.nickimpact.impactor.relocations.co.aikar'
+
+    // Storage Based Relocations
+    relocate 'com.zaxxer.hikari', 'com.nickimpact.impactor.lib.hikari'
+    relocate 'org.mariadb.jdbc', 'com.nickimpact.impactor.lib.mariadb'
+    relocate 'com.mysql', 'com.nickimpact.impactor.lib.mysql'
 }
 
 repositories {
@@ -25,8 +44,12 @@ repositories {
 
 dependencies {
     compile project(':api')
-    shadow 'io.github.nucleuspowered:nucleus-api:1.11.0-S7.1'
-    shadow 'org.spongepowered:spongeapi:7.1.0'
+    compile project(':common')
+    shadow 'org.spongepowered:spongeapi:7.3.0-SNAPSHOT'
     compile "co.aikar:acf-sponge:0.5.0-SNAPSHOT"
+    compile "me.lucko:jar-relocator:1.4"
+}
 
+blossom {
+    replaceToken '@version@', version
 }

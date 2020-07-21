@@ -25,7 +25,7 @@
 
 package com.nickimpact.impactor.api.storage.file;
 
-import com.nickimpact.impactor.api.plugin.Tasking;
+import com.nickimpact.impactor.api.Impactor;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -58,13 +58,13 @@ public class FileWatcher {
 
     private boolean initialised = false;
 
-    public FileWatcher(Tasking plugin, Path basePath) throws IOException {
+    public FileWatcher(Path basePath) throws IOException {
         this.watchedLocations = Collections.synchronizedMap(new HashMap<>());
         this.basePath = basePath;
         this.watchService = basePath.getFileSystem().newWatchService();
 
-        plugin.getAsyncExecutor().schedule(this::initLocations, 5, TimeUnit.SECONDS);
-        plugin.getAsyncExecutor().scheduleAtFixedRate(this::tick, 0, 1, TimeUnit.SECONDS);
+        Impactor.getInstance().getScheduler().asyncLater(this::initLocations, 5, TimeUnit.SECONDS);
+        Impactor.getInstance().getScheduler().asyncRepeating(this::tick, 1, TimeUnit.SECONDS);
     }
 
     public WatchedLocation getWatcher(Path path) {

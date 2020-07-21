@@ -28,7 +28,7 @@ package com.nickimpact.impactor.api.storage.dependencies.relocation;
 import java.util.Objects;
 
 public final class Relocation {
-	public static final String RELOCATION_PREFIX = "net.unboundnetwork.impactor.lib.";
+	public static final String RELOCATION_PREFIX = "com.nickimpact.impactor.lib.";
 
 	public static Relocation of(String id, String pattern) {
 		return new Relocation(pattern.replace("{}", "."), RELOCATION_PREFIX + id);

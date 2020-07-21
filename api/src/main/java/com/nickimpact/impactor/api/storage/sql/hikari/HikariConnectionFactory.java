@@ -27,8 +27,8 @@ package com.nickimpact.impactor.api.storage.sql.hikari;
 
 import com.nickimpact.impactor.api.storage.StorageCredentials;
 import com.nickimpact.impactor.api.storage.sql.ConnectionFactory;
-import net.unboundnetwork.impactor.lib.hikari.HikariConfig;
-import net.unboundnetwork.impactor.lib.hikari.HikariDataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;

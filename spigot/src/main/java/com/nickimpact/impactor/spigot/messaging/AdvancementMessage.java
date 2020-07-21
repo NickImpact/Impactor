@@ -2,7 +2,7 @@ package com.nickimpact.impactor.spigot.messaging;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.nickimpact.impactor.api.building.Builder;
+import com.nickimpact.impactor.api.utilities.Builder;
 import com.nickimpact.impactor.spigot.SpigotImpactorPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -55,7 +55,7 @@ public class AdvancementMessage {
 		JsonObject message = new JsonObject();
 		message.add("icon", icon);
 		message.addProperty("title", this.title);
-		message.addProperty("message", this.message);
+		message.addProperty("description", this.message);
 		message.addProperty("background", "minecraft:textures/gui/advancements/backgrounds/adventure.png");
 		message.addProperty("frame", this.frame.name().toLowerCase());
 		message.addProperty("announce_to_chat", false);
@@ -77,7 +77,7 @@ public class AdvancementMessage {
 		return new AdvancementMessageBuilder();
 	}
 
-	public static class AdvancementMessageBuilder implements Builder<AdvancementMessage> {
+	public static class AdvancementMessageBuilder implements Builder<AdvancementMessage, AdvancementMessageBuilder> {
 
 		private String title;
 		private String message;
@@ -102,6 +102,11 @@ public class AdvancementMessage {
 		public AdvancementMessageBuilder frame(AdvancementFrame frame) {
 			this.frame = frame;
 			return this;
+		}
+
+		@Override
+		public AdvancementMessageBuilder from(AdvancementMessage input) {
+			return null;
 		}
 
 		@Override

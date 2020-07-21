@@ -27,9 +27,11 @@ package com.nickimpact.impactor.api.storage.dependencies;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.ByteStreams;
-import com.nickimpact.impactor.api.plugin.Dependable;
+import com.nickimpact.impactor.api.Impactor;
+import com.nickimpact.impactor.api.plugin.components.Depending;
 import com.nickimpact.impactor.api.storage.StorageType;
 import com.nickimpact.impactor.api.storage.dependencies.classloader.IsolatedClassLoader;
+import com.nickimpact.impactor.api.storage.dependencies.classloader.PluginClassLoader;
 import com.nickimpact.impactor.api.storage.dependencies.relocation.Relocation;
 import com.nickimpact.impactor.api.storage.dependencies.relocation.RelocationHandler;
 
@@ -57,14 +59,14 @@ import java.util.concurrent.TimeUnit;
  * Responsible for loading runtime dependencies.
  */
 public class DependencyManager {
-	private final Dependable plugin;
+	private final Depending plugin;
 	private final MessageDigest digest;
 	private final DependencyRegistry registry;
 	private final EnumMap<Dependency, Path> loaded = new EnumMap<>(Dependency.class);
 	private final Map<ImmutableSet<Dependency>, IsolatedClassLoader> loaders = new HashMap<>();
 	private RelocationHandler relocationHandler = null;
 
-	public DependencyManager(Dependable plugin) {
+	public DependencyManager(Depending plugin) {
 		this.plugin = plugin;
 		try {
 			this.digest = MessageDigest.getInstance("SHA-256");
@@ -194,7 +196,7 @@ public class DependencyManager {
 			}
 
 			try {
-				this.plugin.getPluginClassLoader().loadJar(source.file);
+				Impactor.getInstance().getRegistry().get(PluginClassLoader.class).loadJar(source.file);
 				this.loaded.put(source.dependency, source.file);
 			} catch (Throwable e) {
 				this.plugin.getPluginLogger().error("Failed to load dependency jar '" + source.file.getFileName().toString() + "'.");
