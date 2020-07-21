@@ -1,0 +1,25 @@
+ext {
+    spigot = "1.12.2"
+}
+
+shadowJar {
+    archiveName = "Impactor-Spigot-${spigot}-${version}.jar"
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
+    }
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+}
+
+dependencies {
+    compile project(':api')
+    shadow "org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT"
+    compile "co.aikar:acf-paper:0.5.0-SNAPSHOT"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}

@@ -1,0 +1,164 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "http://repository.jboss.org/nexus/content/groups/public/"
+        }
+    }
+    dependencies {
+        classpath 'org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1'
+    }
+}
+
+plugins {
+    id 'com.qixalite.spongestart' version '1.6.2'
+    id 'maven'
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
+}
+
+apply plugin: 'maven-publish'
+apply plugin: 'maven-publish-auth'
+
+group 'com.nickimpact.impactor'
+version '2.1.1-SNAPSHOT'
+
+sourceCompatibility = targetCompatibility = "1.8" // Need this here so eclipse task generates correctly.
+compileJava {
+    sourceCompatibility = targetCompatibility = "1.8"
+}
+
+ext {
+    spongeapiversion = '7.1.5'
+    completeversion = "-S${spongeapiversion}-${project.version}"
+}
+
+jar {
+    archiveName = "Impactor${completeversion}.jar"
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'sponge'
+        url = 'http://repo.spongepowered.org/maven'
+    }
+    maven { url = 'https://jitpack.io' }
+    maven {
+        name 'drnaylor-minecraft'
+        url 'http://repo.drnaylor.co.uk/artifactory/list/minecraft'
+    }
+    maven {
+        name 'drnaylor'
+        url 'http://repo.drnaylor.co.uk/artifactory/list/quickstart'
+    }
+}
+
+spongestart{
+    eula true
+
+    //optional settings, takes latest version by default
+    minecraft '1.12.2'
+}
+
+dependencies {
+    shadow "org.projectlombok:lombok:1.18.6"
+    compile group: 'com.zaxxer', name: 'HikariCP', version: '3.3.1'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+tasks.withType(JavaCompile) { task ->
+    task.options.encoding = 'UTF-8'
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'com.github.johnrengelman.shadow'
+
+    group = 'com.nickimpact.impactor'
+    version = '2.1.1-SNAPSHOT'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    project.ext.sponge = 'S7.1'
+    project.ext.spigot = '1.12.2'
+
+    repositories {
+        mavenCentral()
+        maven { url = 'https://jitpack.io' }
+        maven { url = "https://repo.aikar.co/content/groups/aikar/" }
+        maven { url = "https://hub.spigotmc.org/nexus/content/groups/public/" }
+    }
+
+    dependencies {
+        compile fileTree(dir: '../libs', include: '*.jar')
+        shadow "org.projectlombok:lombok:1.18.4"
+        shadow 'com.google.guava:guava:27.1-jre'
+        shadow 'com.google.code.gson:gson:2.8.5'
+        compile "co.aikar:acf-core:0.5.0-SNAPSHOT"
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+    }
+
+    shadowJar {
+        exclude "remapped*"
+    }
+}
+
+task copyJars(type: Copy) {
+    from subprojects.collect { it.tasks.withType(Jar) }
+    into "$buildDir/allJars"
+    exclude '*-all.jar'
+    exclude '*-sources.jar'
+    exclude 'api*.jar'
+    exclude 'common*.jar'
+    exclude 'spigot*.jar'
+    exclude 'sponge*.jar'
+    exclude '*API.jar'
+    exclude '*Common.jar'
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "Unbound-Public"
+            url = "https://nexus.unboundnetwork.net/repository/unbound-public/"
+            credentials {
+                username project.hasProperty('nexus-username') ? project.property('nexus-username') : ''
+                password project.hasProperty('nexus-password') ? project.property('nexus-password') : ''
+            }
+        }
+    }
+
+    publications {
+        api(MavenPublication) {
+            def project = project(':api')
+            from project.components.java
+            groupId project.group
+            artifactId "api"
+            version project.version
+        }
+        
+        spigot(MavenPublication) {
+            def project = project(':spigot')
+            from project.components.java
+            groupId project.group
+            artifactId "spigot"
+            version project.version
+        }
+
+        sponge(MavenPublication) {
+            def project = project(':sponge')
+            from project.components.java
+            groupId project.group
+            artifactId "sponge"
+            version project.version
+        }
+    }
+}
+
+build.dependsOn copyJars
