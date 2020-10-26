@@ -2,4 +2,4 @@ name: Impactor
 version: ${pluginVersion}
 description: General API for minecraft servers
 author: NickImpact
-main: com.nickimpact.impactor.bungee.BungeeImpactorBootstrap
+main: net.impactdev.impactor.bungee.BungeeImpactorBootstrap

@@ -1,28 +1,34 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = 'sponge'
+            url = 'https://repo.spongepowered.org/maven'
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'org.spongepowered.mixin'
+
 ext {
     sponge = "7.1.5"
 }
 
-shadowJar {
-    archiveName = "Impactor-Sponge-${sponge}-${version}.jar"
-
-    exclude 'META-INF/versions/9/module-info.class'
-    exclude 'module-info.class'
-
-    // Shaded Components
-//    relocate 'com.github.ben-manes', 'com.nickimpact.impactor.relocations.com.github.ben-manes'
-//    relocate 'me.lucko.jarrelocator', 'com.nickimpact.impactor.relocations.me.lucko.jarrelocator'
-//    relocate 'net.bytebuddy', 'com.nickimpact.impactor.relocations.net.bytebuddy'
-//    relocate 'net.kyori.event', 'com.nickimpact.impactor.relocations.net.kyori.event'
-//    relocate 'ninja.leaping.configurate', 'com.nickimpact.impactor.relocations.ninja.leaping.configurate'
-//    relocate 'org.yaml', 'com.nickimpact.impactor.relocations.org.yaml'
-//    relocate 'org.checkerframework', 'com.nickimpact.impactor.relocations.org.checkerframework'
-//    relocate 'org.objectweb', 'com.nickimpact.impactor.relocations.org.objectweb'
-    //relocate 'co.aikar', 'com.nickimpact.impactor.relocations.co.aikar'
-
-    // Storage Based Relocations
-    relocate 'com.zaxxer.hikari', 'com.nickimpact.impactor.lib.hikari'
-    relocate 'org.mariadb.jdbc', 'com.nickimpact.impactor.lib.mariadb'
-    relocate 'com.mysql', 'com.nickimpact.impactor.lib.mysql'
+minecraft {
+    version = "1.12.2-14.23.5.2768"
+    runDir = "run"
+    mappings = "snapshot_20180324"
+    useDepAts = true
+    makeObfSourceJar = false
 }
 
 repositories {
@@ -40,16 +46,86 @@ repositories {
         name 'drnaylor'
         url 'http://repo.drnaylor.co.uk/artifactory/list/quickstart'
     }
+    maven {
+        name 'Protocol Control'
+        url "https://repo.ichorpowered.com/repository/maven-public"
+    }
 }
 
 dependencies {
     compile project(':api')
     compile project(':common')
     shadow 'org.spongepowered:spongeapi:7.3.0-SNAPSHOT'
-    compile "co.aikar:acf-sponge:0.5.0-SNAPSHOT"
-    compile "me.lucko:jar-relocator:1.4"
+    shadow "co.aikar:acf-sponge:0.5.0-SNAPSHOT"
+    shadow "me.lucko:jar-relocator:1.4"
+    shadow "com.ichorpowered:protocolcontrol:0.0.2"
+    shadow('org.spongepowered:mixin:0.8-SNAPSHOT')
 }
 
+sourceMainJava.finalizedBy(blossomSourceReplacementJava)
 blossom {
+    blossomSourceReplacementJava.output = file("$buildDir/sources/main/java")
     replaceToken '@version@', version
 }
+
+jar {
+    manifest.attributes(
+            'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+            'MixinConfigs': 'mixins.impactor.json',
+            'FMLCorePluginContainsFMLMod': 'true',
+            'ForceLoadAsMod': 'true',
+            'TweakOrder': 0,
+    )
+}
+
+shadowJar {
+    dependsOn reobfJar
+    archiveName = "Impactor-Sponge-${sponge}-${version}.jar"
+
+    exclude 'META-INF/versions/9/module-info.class'
+    exclude 'module-info.class'
+
+    // Shaded Components
+//    relocate 'com.github.ben-manes', 'com.nickimpact.impactor.relocations.com.github.ben-manes'
+//    relocate 'me.lucko.jarrelocator', 'com.nickimpact.impactor.relocations.me.lucko.jarrelocator'
+    relocate 'net.bytebuddy', 'net.impactdev.impactor.relocations.bytebuddy'
+
+    // Setup Kyori Event Shading. Due to additional shading made by Protocol Control, we need to handle
+    // the shading specifically here.
+    //
+    // In other words, we should only attempt to relocate everything but the Subscribe annotation,
+    // as Impactor uses it's own version.
+    relocate ('net.kyori.event', 'net.impactdev.impactor.relocations.eventbus') {
+        exclude 'net.kyori.event.method.annotation.Subscribe'
+    }
+    relocate ('net.kyori.text', 'net.impactdev.impactor.relocations.text')
+    relocate("net.kyori", "com.ichorpowered.protocolcontrol.lib.kyori")
+
+//    relocate 'ninja.leaping.configurate', 'com.nickimpact.impactor.relocations.ninja.leaping.configurate'
+//    relocate 'org.yaml', 'com.nickimpact.impactor.relocations.org.yaml'
+//    relocate 'org.checkerframework', 'com.nickimpact.impactor.relocations.org.checkerframework'
+//    relocate 'org.objectweb', 'com.nickimpact.impactor.relocations.objectweb'
+    //relocate 'co.aikar', 'com.nickimpact.impactor.relocations.co.aikar'
+
+    // Storage Based Relocations
+    relocate ('com.zaxxer.hikari', 'net.impactdev.impactor.relocations.hikari')
+    relocate ('org.mariadb.jdbc', 'net.impactdev.impactor.relocations.mariadb')
+    relocate ('com.mysql', 'net.impactdev.impactor.relocations.mysql')
+
+    afterEvaluate {
+        from zipTree(reobfJar.jar)
+    }
+}
+
+reobf {
+    shadowJar {
+        mappingType = 'SEARGE'
+    }
+}
+
+mixin {
+    importConfig 'mixins'
+    add sourceSets.main, "mixins.impactor.refmap.json"
+}
+
+build.dependsOn reobfShadowJar

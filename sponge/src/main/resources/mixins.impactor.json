@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.7.4",
+  "package": "net.impactdev.impactor.sponge.mixins",
+  "refmap": "mixins.impactor.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "ImpactorTickTimeWatcher"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
