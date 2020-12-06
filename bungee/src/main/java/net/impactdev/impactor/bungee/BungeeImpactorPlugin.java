@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.Dependency;
+import net.impactdev.impactor.api.event.EventBus;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.api.plugin.components.Depending;
@@ -14,6 +15,7 @@ import net.impactdev.impactor.api.dependencies.DependencyManager;
 import net.impactdev.impactor.api.dependencies.classloader.PluginClassLoader;
 import net.impactdev.impactor.api.dependencies.classloader.ReflectionClassLoader;
 import net.impactdev.impactor.bungee.api.BungeeImpactorAPIProvider;
+import net.impactdev.impactor.bungee.event.BungeeEventBus;
 import net.impactdev.impactor.bungee.plugin.AbstractBungeePlugin;
 import net.impactdev.impactor.bungee.scheduler.BungeeSchedulerAdapter;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
@@ -31,7 +33,9 @@ public class BungeeImpactorPlugin extends AbstractBungeePlugin implements Depend
 		this.bootstrap = bootstrap;
 	}
 
-	public void onLoad() {
+	public void onLoad() {}
+
+	public void onEnable() {
 		ApiRegistrationUtil.register(new BungeeImpactorAPIProvider(
 				new BungeeSchedulerAdapter(this.bootstrap)
 		));
@@ -40,11 +44,6 @@ public class BungeeImpactorPlugin extends AbstractBungeePlugin implements Depend
 		Impactor.getInstance().getRegistry().register(PluginClassLoader.class, new ReflectionClassLoader(this));
 		Impactor.getInstance().getRegistry().register(DependencyManager.class, new DependencyManager(this));
 
-		//Impactor.getInstance().getRegistry().register(EventBus.class, new BungeeEventBus(this.bootstrap));
-
-	}
-
-	public void onEnable() {
 		this.getPluginLogger().info("Pooling plugin dependencies...");
 		List<Dependency> toLaunch = Lists.newArrayList();
 		for(ImpactorPlugin plugin : PluginRegistry.getAll()) {
@@ -73,6 +72,8 @@ public class BungeeImpactorPlugin extends AbstractBungeePlugin implements Depend
 		this.getPluginLogger().info("Initializing default dependencies...");
 		this.getDependencyManager().loadDependencies(EnumSet.of(Dependency.CONFIGURATE_CORE, Dependency.CONFIGURATE_HOCON, Dependency.HOCON_CONFIG, Dependency.CONFIGURATE_GSON, Dependency.CONFIGURATE_YAML));
 		this.getDependencyManager().loadDependencies(new HashSet<>(toLaunch));
+
+		Impactor.getInstance().getRegistry().register(EventBus.class, new BungeeEventBus(this.bootstrap));
 	}
 
 	public PluginClassLoader getPluginClassLoader() {
@@ -89,7 +90,8 @@ public class BungeeImpactorPlugin extends AbstractBungeePlugin implements Depend
 				Dependency.KYORI_EVENT,
 				Dependency.KYORI_EVENT_METHOD,
 				Dependency.KYORI_EVENT_METHOD_ASM,
-				Dependency.BYTEBUDDY
+				Dependency.BYTEBUDDY,
+				Dependency.OBJECT_WEB
 		));
 	}
 

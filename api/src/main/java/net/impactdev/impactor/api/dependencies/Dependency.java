@@ -264,6 +264,20 @@ public enum Dependency {
 			"1.0.3",
 			"3qIBAx92YOvMdgQTZdeNdLm/s2+uxw0+oNz8UD09xnQ=",
 			Relocation.of("flowmath", "com{}flowpowered{}math")
+	),
+	OBJECT_WEB(
+			"org{}ow2{}asm",
+			"asm",
+			"8.0.1",
+			"yluNEVaeU5IbDjSGRp58Z0Nhx5hF2tPVFPOKtuDIwQo=",
+			Relocation.of("ow2", "org{}objectweb")
+	),
+	MXPARSER(
+			"org.mariuszgromada.math",
+			"MathParser.org-mXparser",
+			"4.4.2",
+			"z+nZN08mJQ8UniReVzNorIApq3QhAUws6ZtNrtWR8dA=",
+			Relocation.of("mxparser", "org{}mariuszgromada{}math{}mxparser")
 	)
 	;
 

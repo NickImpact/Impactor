@@ -11,6 +11,7 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.services.text.MessageService;
+import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.Style;
 import net.kyori.text.format.TextColor;
@@ -25,7 +26,7 @@ import org.spongepowered.api.text.placeholder.PlaceholderContext;
 import org.spongepowered.api.text.placeholder.PlaceholderParser;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
@@ -34,6 +35,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class SpongeMessageService implements MessageService<Text> {
 
@@ -85,13 +87,11 @@ public class SpongeMessageService implements MessageService<Text> {
 				TextRepresentable out = parser.isPresent() ? this.parseToken(parser.get(), associations, arguments) : Text.EMPTY;
 
 				if(matcher.group(1) != null) {
-					Style inherit = style;
-
 					String in = matcher.group(1);
 					style = parseStyle(in);
 
 					String prior = LegacyComponentSerializer.legacy().serialize(output.build(), '&');
-					inherit = parseStyle(prior);
+					Style inherit = parseStyle(prior);
 
 					output.append(LegacyComponentSerializer.legacy().deserialize(in, '&').style(inherit));
 					reference = reference.replaceFirst("^[^{]+", "");
@@ -99,11 +99,7 @@ public class SpongeMessageService implements MessageService<Text> {
 
 				TextComponent result = ((TextComponent) GsonComponentSerializer.INSTANCE.deserialize(TextSerializers.JSON.serialize(out.toText())));
 				if(result.style().color() == null && result.style().decorations().isEmpty()) {
-					result = result.style(
-							style.hoverEvent(result.hoverEvent())
-									.clickEvent(result.clickEvent())
-
-					);
+					result = result.style(style.hoverEvent(result.hoverEvent()).clickEvent(result.clickEvent()));
 				}
 
 				if(!result.isEmpty()) {
@@ -111,6 +107,9 @@ public class SpongeMessageService implements MessageService<Text> {
 						result = modifier.apply(result);
 					}
 
+					if(!result.children().isEmpty()) {
+						style = this.locateNonEmptyStyle(result).orElse(style);
+					}
 					output.append(result);
 				}
 
@@ -223,6 +222,27 @@ public class SpongeMessageService implements MessageService<Text> {
 		}
 
 		return result;
+	}
+
+	private Optional<Style> locateNonEmptyStyle(TextComponent component) {
+		List<TextComponent> children = component.children().stream()
+				.filter(c -> c instanceof TextComponent)
+				.map(c -> (TextComponent) c)
+				.collect(Collectors.toList());
+
+		Collections.reverse(children);
+
+		for(TextComponent child : children) {
+			if(!child.style().equals(Style.empty())) {
+				return Optional.of(child.style());
+			}
+
+			if(!child.children().isEmpty()) {
+				return this.locateNonEmptyStyle(child);
+			}
+		}
+
+		return Optional.empty();
 	}
 
 }

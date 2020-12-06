@@ -55,10 +55,10 @@ repositories {
 dependencies {
     compile project(':api')
     compile project(':common')
+    shadow fileTree(dir: 'libs', include: '*.jar')
     shadow 'org.spongepowered:spongeapi:7.3.0-SNAPSHOT'
     shadow "co.aikar:acf-sponge:0.5.0-SNAPSHOT"
     shadow "me.lucko:jar-relocator:1.4"
-    shadow "com.ichorpowered:protocolcontrol:0.0.2"
     shadow('org.spongepowered:mixin:0.8-SNAPSHOT')
 }
 
@@ -82,6 +82,7 @@ shadowJar {
     dependsOn reobfJar
     archiveName = "Impactor-Sponge-${sponge}-${version}.jar"
 
+    exclude 'protocolcontrol*.jar'
     exclude 'META-INF/versions/9/module-info.class'
     exclude 'module-info.class'
 

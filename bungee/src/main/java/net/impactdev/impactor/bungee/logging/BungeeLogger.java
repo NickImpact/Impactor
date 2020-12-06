@@ -4,11 +4,13 @@ import net.impactdev.impactor.api.logging.Logger;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 public class BungeeLogger implements Logger {
 
 	private final java.util.logging.Logger delegate;
+	private final Function<String, String> preprocessor = in -> in.replaceAll("[&]", "\u00a7");
 
 	@Override
 	public void noTag(String message) {
@@ -22,12 +24,14 @@ public class BungeeLogger implements Logger {
 
 	@Override
 	public void info(String message) {
-		delegate.info(message);
+		this.delegate.info(this.preprocessor.apply(message));
 	}
 
 	@Override
 	public void info(List<String> message) {
-
+		for(String s : message) {
+			this.info(s);
+		}
 	}
 
 	@Override
@@ -42,12 +46,14 @@ public class BungeeLogger implements Logger {
 
 	@Override
 	public void error(String message) {
-
+		this.delegate.severe(this.preprocessor.apply(message));
 	}
 
 	@Override
 	public void error(List<String> message) {
-
+		for(String s : message) {
+			this.error(s);
+		}
 	}
 
 	@Override
@@ -59,4 +65,5 @@ public class BungeeLogger implements Logger {
 	public void debug(List<String> message) {
 
 	}
+
 }
