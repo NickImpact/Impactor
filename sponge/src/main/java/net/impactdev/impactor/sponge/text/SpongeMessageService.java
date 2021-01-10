@@ -12,12 +12,14 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
-import net.kyori.text.TextComponent;
-import net.kyori.text.format.Style;
-import net.kyori.text.format.TextColor;
-import net.kyori.text.format.TextDecoration;
-import net.kyori.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
@@ -40,7 +42,7 @@ import java.util.stream.Collectors;
 public class SpongeMessageService implements MessageService<Text> {
 
 	private static final Pattern MODIFIERS = Pattern.compile(":([sp]+)$", Pattern.CASE_INSENSITIVE);
-	private static final Pattern TOKEN_LOCATOR = Pattern.compile("(^[^{]+)?([{][{][\\w-:]+[}][}])(.+)?");
+	private static final Pattern TOKEN_LOCATOR = Pattern.compile("(^[^{]+)?([{][{](?<placeholder>[\\w-:]+)(\\|(?<arguments>.+))?[}][}])(.+)?");
 
 	private static final Pattern STYLE_LOCATOR = Pattern.compile("([&][a-f0-9klmnor])");
 
@@ -54,22 +56,18 @@ public class SpongeMessageService implements MessageService<Text> {
 		Preconditions.checkNotNull(message, "Input must not be null");
 		Preconditions.checkNotNull(associations, "Associations must not be null");
 
-		TextComponent.Builder output = TextComponent.builder();
-		final List<Function<TextComponent, TextComponent>> modifiers = Lists.newArrayList();
+		TextComponent.Builder output = Component.text();
 
 		String reference = message;
 
 		Style style = Style.empty();
 		while(!reference.isEmpty()) {
+			final List<Function<TextComponent, TextComponent>> modifiers = Lists.newArrayList();
+
 			Matcher matcher = TOKEN_LOCATOR.matcher(reference);
 			if(matcher.find()) {
-				String[] token = matcher.group(2).replace("{{", "").replace("}}", "").split("\\|");
-
-				String placeholder = token[0];
-				String arguments = null;
-				if(token.length > 1) {
-					arguments = token[1];
-				}
+				String placeholder = matcher.group("placeholder");
+				String arguments = matcher.group("arguments");
 
 				final Matcher m = MODIFIERS.matcher(placeholder);
 				if(m.find()) {
@@ -90,19 +88,24 @@ public class SpongeMessageService implements MessageService<Text> {
 					String in = matcher.group(1);
 					style = parseStyle(in);
 
-					String prior = LegacyComponentSerializer.legacy().serialize(output.build(), '&');
+					String prior = LegacyComponentSerializer.legacyAmpersand().serialize(output.build());
 					Style inherit = parseStyle(prior);
 
-					output.append(LegacyComponentSerializer.legacy().deserialize(in, '&').style(inherit));
+					TextComponent test = Component.text()
+							.style(inherit)
+							.append(LegacyComponentSerializer.legacyAmpersand().deserialize(in))
+							.build();
+
+					output.append(test);
 					reference = reference.replaceFirst("^[^{]+", "");
 				}
 
-				TextComponent result = ((TextComponent) GsonComponentSerializer.INSTANCE.deserialize(TextSerializers.JSON.serialize(out.toText())));
-				if(result.style().color() == null && result.style().decorations().isEmpty()) {
+				TextComponent result = ((TextComponent) GsonComponentSerializer.gson().deserialize(TextSerializers.JSON.serialize(out.toText())));
+				if(result.style().color() == null && result.style().decorations().values().stream().allMatch(state -> state == TextDecoration.State.NOT_SET)) {
 					result = result.style(style.hoverEvent(result.hoverEvent()).clickEvent(result.clickEvent()));
 				}
 
-				if(!result.isEmpty()) {
+				if(!result.equals(Component.empty())) {
 					for (Function<TextComponent, TextComponent> modifier : modifiers) {
 						result = modifier.apply(result);
 					}
@@ -113,14 +116,18 @@ public class SpongeMessageService implements MessageService<Text> {
 					output.append(result);
 				}
 
-				reference = reference.replaceFirst("[{][{][\\w-:]+[}][}]", "");
+				reference = reference.replaceFirst("[{][{]([\\w-:]+)(\\|(.+))?[}][}]", "");
 			} else {
-				output.append(LegacyComponentSerializer.legacy().deserialize(reference, '&').style(style));
+				output.append(Component.text()
+						.append(LegacyComponentSerializer.legacyAmpersand().deserialize(reference))
+						.style(style)
+						.build()
+				);
 				break;
 			}
 		}
 
-		return TextSerializers.JSON.deserialize(GsonComponentSerializer.INSTANCE.serialize(output.build()));
+		return TextSerializers.JSON.deserialize(GsonComponentSerializer.gson().serialize(output.build()));
 	}
 
 	private TextRepresentable parseToken(PlaceholderParser parser, List<Supplier<Object>> associations, String arguments) {
@@ -151,32 +158,32 @@ public class SpongeMessageService implements MessageService<Text> {
 	private static final BiMap<Character, TextColor> ID_TO_COLOR =
 			HashBiMap.create(
 					ImmutableMap.<Character, TextColor>builder()
-							.put('0', TextColor.BLACK)
-							.put('1', TextColor.DARK_BLUE)
-							.put('2', TextColor.DARK_GREEN)
-							.put('3', TextColor.DARK_AQUA)
-							.put('4', TextColor.DARK_RED)
-							.put('5', TextColor.DARK_PURPLE)
-							.put('6', TextColor.GOLD)
-							.put('7', TextColor.GRAY)
-							.put('8', TextColor.DARK_GRAY)
-							.put('9', TextColor.BLUE)
-							.put('a', TextColor.GREEN)
-							.put('b', TextColor.AQUA)
-							.put('c', TextColor.RED)
-							.put('d', TextColor.LIGHT_PURPLE)
-							.put('e', TextColor.YELLOW)
-							.put('f', TextColor.WHITE)
+							.put('0', NamedTextColor.BLACK)
+							.put('1', NamedTextColor.DARK_BLUE)
+							.put('2', NamedTextColor.DARK_GREEN)
+							.put('3', NamedTextColor.DARK_AQUA)
+							.put('4', NamedTextColor.DARK_RED)
+							.put('5', NamedTextColor.DARK_PURPLE)
+							.put('6', NamedTextColor.GOLD)
+							.put('7', NamedTextColor.GRAY)
+							.put('8', NamedTextColor.DARK_GRAY)
+							.put('9', NamedTextColor.BLUE)
+							.put('a', NamedTextColor.GREEN)
+							.put('b', NamedTextColor.AQUA)
+							.put('c', NamedTextColor.RED)
+							.put('d', NamedTextColor.LIGHT_PURPLE)
+							.put('e', NamedTextColor.YELLOW)
+							.put('f', NamedTextColor.WHITE)
 							.build()
 			);
 	private static final BiMap<Character, Style> ID_TO_STYLE =
 			HashBiMap.create(
 					ImmutableMap.<Character, Style>builder()
-							.put('l', Style.of(TextDecoration.BOLD))
-							.put('o', Style.of(TextDecoration.ITALIC))
-							.put('n', Style.of(TextDecoration.UNDERLINED))
-							.put('m', Style.of(TextDecoration.STRIKETHROUGH))
-							.put('k', Style.of(TextDecoration.OBFUSCATED))
+							.put('l', Style.style(TextDecoration.BOLD))
+							.put('o', Style.style(TextDecoration.ITALIC))
+							.put('n', Style.style(TextDecoration.UNDERLINED))
+							.put('m', Style.style(TextDecoration.STRIKETHROUGH))
+							.put('k', Style.style(TextDecoration.OBFUSCATED))
 							.put('r', Style.empty())
 							.build()
 			);

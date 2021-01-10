@@ -6,4 +6,5 @@ include (
         'spigot',
         'sponge'
 )
+include 'velocity'
 

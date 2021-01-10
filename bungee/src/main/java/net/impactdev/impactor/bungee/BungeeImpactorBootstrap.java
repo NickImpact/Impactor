@@ -20,7 +20,6 @@ public class BungeeImpactorBootstrap extends Plugin {
             exception = e;
             e.printStackTrace();
         }
-        this.plugin.getPluginLogger().info("&eTest");
     }
 
     @Override

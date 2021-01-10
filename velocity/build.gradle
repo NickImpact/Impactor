@@ -2,13 +2,17 @@ repositories {
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url 'https://repo.lucko.me/' }
+    maven {
+        name = "Velocity"
+        url = "https://nexus.velocitypowered.com/repository/maven-public/"
+    }
 }
 
 dependencies {
     compile project(':api')
     compile project(':common')
-    shadow 'net.md-5:bungeecord-api:1.15-SNAPSHOT'
-    shadow 'com.imaginarycode.minecraft:RedisBungee:0.4'
+    shadow('com.velocitypowered:velocity-api:1.1.2')
+
     shadow 'org.spongepowered:configurate-hocon:3.7.1'
     shadow 'org.spongepowered:configurate-gson:3.7.1'
     shadow 'org.spongepowered:configurate-yaml:3.7.1'
@@ -47,13 +51,6 @@ shadowJar {
     relocate ('com.zaxxer.hikari', 'net.impactdev.impactor.relocations.hikari')
     relocate ('org.mariadb.jdbc', 'net.impactdev.impactor.relocations.mariadb')
     relocate ('com.mysql', 'net.impactdev.impactor.relocations.mysql')
-}
-
-processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        expand 'pluginVersion': project.version
-        include 'plugin.yml'
-    }
 }
 
 //sourceMainJava.finalizedBy(blossomSourceReplacementJava)

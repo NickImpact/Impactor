@@ -4,7 +4,8 @@
  */
 package net.impactdev.impactor.sponge.text;
 
-import net.kyori.text.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 
 import java.util.function.Function;
 
@@ -13,13 +14,13 @@ public enum TextModifiers implements Function<TextComponent, TextComponent> {
     SPACE_AFTER("s") {
         @Override
         public TextComponent apply(TextComponent text) {
-            return text.append(TextComponent.space());
+            return text.append(Component.space());
         }
     },
     SPACE_BEFORE("p") {
         @Override
         public TextComponent apply(TextComponent text) {
-            return TextComponent.space().append(text);
+            return Component.space().append(text);
         }
     };
 

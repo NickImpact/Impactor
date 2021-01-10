@@ -7,11 +7,12 @@ import net.impactdev.impactor.api.placeholders.PlaceholderManager;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.text.placeholders.provided.Memory;
 import net.impactdev.impactor.sponge.text.placeholders.provided.tick.MeanTickTime;
-import net.impactdev.impactor.sponge.text.placeholders.provided.tick.TPS;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.placeholder.PlaceholderContext;
 import org.spongepowered.api.text.placeholder.PlaceholderParser;
 
@@ -44,9 +45,13 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderP
 
     public void populate() {
         PluginContainer container = SpongeImpactorPlugin.getInstance().getPluginContainer();
+        SpongeImpactorPlugin plugin = SpongeImpactorPlugin.getInstance();
 
-        this.register(this.create("tps", "Server Ticks per Second", container, context -> TPS.getTPS(false)));
-        this.register(this.create("tps_color", "Server Ticks per Second (With Colored Styling)", container, context -> TPS.getTPS(true)));
+        this.register(this.create("tps", "Server Ticks per Second", container, context -> formatTps(plugin.getWatcher().tps5Sec())));
+        this.register(this.create("tps_10sec", "Server Ticks per Second", container, context -> formatTps(plugin.getWatcher().tps10Sec())));
+        this.register(this.create("tps_1min", "Server Ticks per Second", container, context -> formatTps(plugin.getWatcher().tps1Min())));
+        this.register(this.create("tps_5min", "Server Ticks per Second", container, context -> formatTps(plugin.getWatcher().tps5Min())));
+        this.register(this.create("tps_15min", "Server Ticks per Second", container, context -> formatTps(plugin.getWatcher().tps15Min())));
         this.register(this.create("mspt", "Average Milliseconds per Tick", container, context -> Impactor.getInstance().getRegistry().get(MeanTickTime.class).getFormatted()));
         this.register(this.create("memory_used", "Server Memory In Use", container, context -> Text.of(Memory.getCurrent())));
         this.register(this.create("memory_allocated", "Server Memory Allocated", container, context -> Text.of(Memory.getAllocated())));
@@ -67,4 +72,16 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderP
                 .build();
     }
 
+    private static Text formatTps(double tps) {
+        TextColor color;
+        if (tps > 18.0) {
+            color = TextColors.GREEN;
+        } else if (tps > 16.0) {
+            color = TextColors.YELLOW;
+        } else {
+            color = TextColors.RED;
+        }
+
+        return Text.of(color, (tps > 20.0 ? "*" : "") + Math.min(Math.round(tps * 100.0) / 100.0, 20.0));
+    }
 }

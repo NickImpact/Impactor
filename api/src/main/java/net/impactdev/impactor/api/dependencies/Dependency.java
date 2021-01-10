@@ -181,54 +181,49 @@ public enum Dependency {
 			"KV9YN5gQj6b507VJApJpPF5PkCon0DZqAi0T7Ln0lag=",
 			Relocation.of("caffeine", "com{}github{}benmanes{}caffeine")
 	),
+	KYORI_EXAMINATION(
+			"net{}kyori",
+			"examination-api",
+			"1.0.0",
+			"YkD5iBwKfZrwTxX8p72X7s1glP+51dWfFtla/6WhDZY=",
+			Relocation.of("examination", "net{}kyori{}examination")
+	),
+	KYORI_EXAMINATION_STRING(
+			"net{}kyori",
+			"examination-string",
+			"1.0.0",
+			"BIbWM4Imuof26TxQZQGspF9UjSpGmLwaEw265K76pFk=",
+			Relocation.of("examination", "net{}kyori{}examination")
+	),
 	KYORI_TEXT(
 			"net{}kyori",
-			"text-api",
-			"3.0.4",
-			"qJCoD0fTnRhI0EpqdiLAT9QH5gIyY8aNw4Exe/gTWm0=",
-			Relocation.of("text", "net{}kyori{}text")
+			"adventure-api",
+			"4.3.0",
+			"IwJ1wTO/6Pv6uBb2MEuoYnWEzPL6CaxWanks38ePd0A=",
+			Relocation.of("adventure", "net{}kyori{}adventure"),
+			Relocation.of("examination", "net{}kyori{}examination")
 	),
 	KYORI_TEXT_SERIALIZER_GSON(
 			"net{}kyori",
-			"text-serializer-gson",
-			"3.0.4",
-			"pes03k1/XKS9OpiK+xqVmk+lXSJIsCEkkg3g36PV65A=",
-			Relocation.of("text", "net{}kyori{}text")
+			"adventure-text-serializer-gson",
+			"4.3.0",
+			"TN0xO2U38FO/SxovWNzou5LkVBjak1oUX81+4lDBfQs=",
+			Relocation.of("adventure", "net{}kyori{}adventure")
 	),
 	KYORI_TEXT_SERIALIZER_LEGACY(
 			"net{}kyori",
-			"text-serializer-legacy",
-			"3.0.4",
-			"1ZYqzZ7zhnN2AyU/n/NeRQv0A9R01j/gX1Uq/nE02SI=",
-			Relocation.of("text", "net{}kyori{}text")
-	),
-	KYORI_TEXT_ADAPTER_BUKKIT(
-			"net{}kyori",
-			"text-adapter-bukkit",
-			"3.0.5",
-			"cXA/7PDtnWpd8l7H4AEhP/3Z/WRNiFhDSqKbqO/1+ig=",
-			Relocation.of("text", "net{}kyori{}text")
-	),
-	KYORI_TEXT_ADAPTER_BUNGEECORD(
-			"net{}kyori",
-			"text-adapter-bungeecord",
-			"3.0.5",
-			"+yU9AB1mG5wTAFeZc6zArs67loFz00w8VqE34QCjCdw=",
-			Relocation.of("text", "net{}kyori{}text")
-	),
-	KYORI_TEXT_ADAPTER_SPONGEAPI(
-			"net{}kyori",
-			"text-adapter-spongeapi",
-			"3.0.5",
-			"/plXxpvDwqYECq+0saN13Y/Qf6F7GthJPc/hjR7SL5s=",
-			Relocation.of("text", "net{}kyori{}text")
+			"adventure-text-serializer-legacy",
+			"4.3.0",
+			"9KWVLdlnsHW/t9ezA+TNsmuVHE590NBagFL5luaOAIc=",
+			Relocation.of("adventure", "net{}kyori{}adventure")
 	),
 	ACF_SPONGE(
 			"co{}aikar",
 			"acf-sponge",
 			"0.5.0-SNAPSHOT",
 			"20200704.153520-158",
-			Relocation.of("commands", "co{}aikar{}commands")
+			Relocation.of("commands", "co{}aikar{}commands"),
+			Relocation.of("aikar-locales", "co{}aikar{}locales")
 	),
 	PIXELMON_BRIDGE_API(
 			"net{}impactdev",

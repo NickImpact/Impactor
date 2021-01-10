@@ -32,6 +32,7 @@ import net.impactdev.impactor.sponge.scheduler.SpongeSchedulerAdapter;
 import net.impactdev.impactor.sponge.services.SpongeMojangServerStatusService;
 import net.impactdev.impactor.sponge.text.SpongeMessageService;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
+import net.impactdev.impactor.sponge.text.placeholders.provided.tick.TPSWatcher;
 import net.impactdev.impactor.sponge.ui.signs.SpongeSignQuery;
 import lombok.Getter;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
@@ -70,6 +71,8 @@ import java.util.regex.Pattern;
 public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depending {
 
 	@Getter private static SpongeImpactorPlugin instance;
+
+	@Getter private TPSWatcher watcher;
 
 	@Getter private SpongeMojangServerStatusService mojangServerStatusService;
 
@@ -136,6 +139,7 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		Impactor.getInstance().getRegistry().register(SpongePlaceholderManager.class, new SpongePlaceholderManager());
 		Impactor.getInstance().getRegistry().register(EventBus.class, new SpongeEventBus());
 		((SpongeEventBus)Impactor.getInstance().getEventBus()).enable();
+		this.watcher = new TPSWatcher(false);
 	}
 
 	@Listener
@@ -213,6 +217,8 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 				Dependency.KYORI_EVENT,
 				Dependency.KYORI_EVENT_METHOD,
 				Dependency.KYORI_EVENT_METHOD_ASM,
+				Dependency.KYORI_EXAMINATION,
+				Dependency.KYORI_EXAMINATION_STRING,
 				Dependency.KYORI_TEXT,
 				Dependency.KYORI_TEXT_SERIALIZER_GSON,
 				Dependency.KYORI_TEXT_SERIALIZER_LEGACY,
