@@ -273,7 +273,22 @@ public enum Dependency {
 			"4.4.2",
 			"z+nZN08mJQ8UniReVzNorIApq3QhAUws6ZtNrtWR8dA=",
 			Relocation.of("mxparser", "org{}mariuszgromada{}math{}mxparser")
-	)
+	),
+	JEDIS(
+			"redis.clients",
+			"jedis",
+			"3.3.0",
+			"HuTfz9xW/mi1fwVQ3xgPmd6qwTRMF/3fyMzw2LmOgy4=",
+			Relocation.of("jedis", "redis{}clients{}jedis"),
+			Relocation.of("commonspool2", "org{}apache{}commons{}pool2")
+	),
+	COMMONS_POOL_2(
+            "org.apache.commons",
+            "commons-pool2",
+            "2.8.0",
+            "Xvqfu1SlixoSIFpfrFZfaYKr/rD/Rb28MYdI71/To/8=",
+            Relocation.of("commonspool2", "org{}apache{}commons{}pool2")
+    ),
 	;
 
 	private final String mavenPath;
