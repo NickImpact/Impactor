@@ -1,7 +1,10 @@
 rootProject.name = 'Impactor'
 include (
         'api',
+        'common',
+        'bungee',
         'spigot',
         'sponge'
 )
+include 'velocity'
 
