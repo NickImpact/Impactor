@@ -55,7 +55,7 @@ public class AdvancementMessage {
 		JsonObject message = new JsonObject();
 		message.add("icon", icon);
 		message.addProperty("title", this.title);
-		message.addProperty("message", this.message);
+		message.addProperty("description", this.message);
 		message.addProperty("background", "minecraft:textures/gui/advancements/backgrounds/adventure.png");
 		message.addProperty("frame", this.frame.name().toLowerCase());
 		message.addProperty("announce_to_chat", false);

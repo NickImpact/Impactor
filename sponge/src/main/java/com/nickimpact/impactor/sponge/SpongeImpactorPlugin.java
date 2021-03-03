@@ -34,7 +34,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 
-@Plugin(id = "impactor", name = "ImpactorAPI", version = "2.0.0", description = "A universal API for multiple tools for development")
+@Plugin(id = "impactor", name = "ImpactorAPI", version = "2.2.0", description = "A universal API for multiple tools for development")
 public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Dependable {
 
 	@Getter private static SpongeImpactorPlugin instance;

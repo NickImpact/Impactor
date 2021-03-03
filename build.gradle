@@ -76,7 +76,7 @@ subprojects {
     apply plugin: 'com.github.johnrengelman.shadow'
 
     group = 'com.nickimpact.impactor'
-    version = '2.1.1-SNAPSHOT'
+    version = '2.2.0'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -118,47 +118,48 @@ task copyJars(type: Copy) {
     exclude 'common*.jar'
     exclude 'spigot*.jar'
     exclude 'sponge*.jar'
+    exclude 'bungee*.jar'
     exclude '*API.jar'
     exclude '*Common.jar'
 }
 
-publishing {
-    repositories {
-        maven {
-            name = "Unbound-Public"
-            url = "https://nexus.unboundnetwork.net/repository/unbound-public/"
-            credentials {
-                username project.hasProperty('nexus-username') ? project.property('nexus-username') : ''
-                password project.hasProperty('nexus-password') ? project.property('nexus-password') : ''
-            }
-        }
-    }
-
-    publications {
-        api(MavenPublication) {
-            def project = project(':api')
-            from project.components.java
-            groupId project.group
-            artifactId "api"
-            version project.version
-        }
-        
-        spigot(MavenPublication) {
-            def project = project(':spigot')
-            from project.components.java
-            groupId project.group
-            artifactId "spigot"
-            version project.version
-        }
-
-        sponge(MavenPublication) {
-            def project = project(':sponge')
-            from project.components.java
-            groupId project.group
-            artifactId "sponge"
-            version project.version
-        }
-    }
-}
+//publishing {
+//    repositories {
+//        maven {
+//            name = "Impact Dev - Public"
+//            url = "http://192.99.160.76/repository/impactdev-public/"
+//            credentials {
+//                username 'admin'
+//                password '7c7fe70c-9b05-4b74-a14d-5b06a4bccb42'
+//            }
+//        }
+//    }
+//
+//    publications {
+//        api(MavenPublication) {
+//            def project = project(':api')
+//            from project.components.java
+//            groupId project.group
+//            artifactId "api"
+//            version project.version
+//        }
+//
+//        spigot(MavenPublication) {
+//            def project = project(':spigot')
+//            from project.components.java
+//            groupId project.group
+//            artifactId "spigot"
+//            version project.version
+//        }
+//
+//        sponge(MavenPublication) {
+//            def project = project(':sponge')
+//            from project.components.java
+//            groupId project.group
+//            artifactId "sponge"
+//            version project.version
+//        }
+//    }
+//}
 
 build.dependsOn copyJars
