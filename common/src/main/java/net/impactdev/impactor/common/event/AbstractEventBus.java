@@ -238,5 +238,9 @@ public abstract class AbstractEventBus<P> implements EventBus, AutoCloseable {
             }
         }
 
+        @Override
+        protected boolean eventCancelled(@NonNull ImpactorEvent event) {
+            return event instanceof Cancellable && ((Cancellable) event).isCancelled();
+        }
     }
 }

@@ -111,7 +111,7 @@ public abstract class HikariConnectionFactory implements ConnectionFactory {
         long duration = System.currentTimeMillis() - start;
 
         if (success) {
-            ret.put("Ping", "&a" + duration + "ms");
+            ret.put("Ping", duration + "ms");
             ret.put("Connected", "true");
         } else {
             ret.put("Connected", "false");

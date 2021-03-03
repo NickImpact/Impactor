@@ -21,7 +21,7 @@ dependencies {
 }
 
 shadowJar {
-    archiveName = "Impactor-Bungee-${project.version}.jar"
+    archiveName = "Impactor-Velocity-${project.version}.jar"
 
     // Shaded Components
 //    relocate 'com.github.ben-manes', 'com.nickimpact.impactor.relocations.com.github.ben-manes'

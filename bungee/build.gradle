@@ -17,6 +17,7 @@ dependencies {
 }
 
 shadowJar {
+    dependsOn(compileJava)
     archiveName = "Impactor-Bungee-${project.version}.jar"
 
     // Shaded Components
@@ -52,12 +53,10 @@ shadowJar {
 processResources {
     from(sourceSets.main.resources.srcDirs) {
         expand 'pluginVersion': project.version
-        include 'plugin.yml'
     }
 }
 
-//sourceMainJava.finalizedBy(blossomSourceReplacementJava)
 blossom {
-    blossomSourceReplacementJava.output = file("$buildDir/sources/main/java")
+    blossomSourceReplacementJava.output = file("$buildDir/sources/java")
     replaceToken '@version@', version
 }

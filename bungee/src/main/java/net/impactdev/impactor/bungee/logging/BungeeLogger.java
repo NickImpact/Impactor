@@ -14,12 +14,12 @@ public class BungeeLogger implements Logger {
 
 	@Override
 	public void noTag(String message) {
-
+		this.info(message);
 	}
 
 	@Override
 	public void noTag(List<String> message) {
-
+		this.info(message);
 	}
 
 	@Override
@@ -36,12 +36,14 @@ public class BungeeLogger implements Logger {
 
 	@Override
 	public void warn(String message) {
-
+		this.delegate.warning(this.preprocessor.apply(message));
 	}
 
 	@Override
 	public void warn(List<String> message) {
-
+		for(String s : message) {
+			this.warn(s);
+		}
 	}
 
 	@Override
@@ -58,12 +60,14 @@ public class BungeeLogger implements Logger {
 
 	@Override
 	public void debug(String message) {
-
+		this.delegate.info(this.preprocessor.apply("&3DEBUG &7\u00bb " + message));
 	}
 
 	@Override
 	public void debug(List<String> message) {
-
+		for(String s : message) {
+			this.debug(s);
+		}
 	}
 
 }
