@@ -36,8 +36,6 @@ shadowJar {
     relocate ('net.kyori.event', 'net.impactdev.impactor.relocations.eventbus') {
         exclude 'net.kyori.event.method.annotation.Subscribe'
     }
-    relocate ('net.kyori.text', 'net.impactdev.impactor.relocations.text')
-    relocate("net.kyori", "com.ichorpowered.protocolcontrol.lib.kyori")
 
     relocate 'ninja.leaping.configurate', 'net.impactdev.impactor.relocations.configurate'
 //    relocate 'org.yaml', 'com.nickimpact.impactor.relocations.org.yaml'
@@ -53,8 +51,7 @@ shadowJar {
     relocate ('com.mysql', 'net.impactdev.impactor.relocations.mysql')
 }
 
-//sourceMainJava.finalizedBy(blossomSourceReplacementJava)
 blossom {
-    blossomSourceReplacementJava.output = file("$buildDir/sources/main/java")
+    blossomSourceReplacementJava.output = file("$buildDir/sources/java")
     replaceToken '@version@', version
 }

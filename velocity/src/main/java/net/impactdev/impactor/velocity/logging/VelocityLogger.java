@@ -18,11 +18,9 @@ public class VelocityLogger implements net.impactdev.impactor.api.logging.Logger
 
     @Override
     public void noTag(String message) {
-        String actual = plugin.getMetadata().getName() + " &7\u00bb " + message;
-
         VelocityImpactorBootstrap.getInstance().getProxy().getConsoleCommandSource().sendMessage(
                 Identity.nil(),
-                LegacyComponentSerializer.legacyAmpersand().deserialize(actual),
+                LegacyComponentSerializer.legacyAmpersand().deserialize(message),
                 MessageType.SYSTEM
         );
     }
@@ -34,7 +32,13 @@ public class VelocityLogger implements net.impactdev.impactor.api.logging.Logger
 
     @Override
     public void info(String message) {
+        String actual = plugin.getMetadata().getName() + " &7\u00bb " + message;
 
+        VelocityImpactorBootstrap.getInstance().getProxy().getConsoleCommandSource().sendMessage(
+                Identity.nil(),
+                LegacyComponentSerializer.legacyAmpersand().deserialize(actual),
+                MessageType.SYSTEM
+        );
     }
 
     @Override
@@ -45,7 +49,13 @@ public class VelocityLogger implements net.impactdev.impactor.api.logging.Logger
 
     @Override
     public void warn(String message) {
+        String actual = plugin.getMetadata().getName() + " &7(&6Warning&7) " + message;
 
+        VelocityImpactorBootstrap.getInstance().getProxy().getConsoleCommandSource().sendMessage(
+                Identity.nil(),
+                LegacyComponentSerializer.legacyAmpersand().deserialize(actual),
+                MessageType.SYSTEM
+        );
     }
 
     @Override
@@ -55,7 +65,13 @@ public class VelocityLogger implements net.impactdev.impactor.api.logging.Logger
 
     @Override
     public void error(String message) {
+        String actual = plugin.getMetadata().getName() + " &7(&cError&7) " + message;
 
+        VelocityImpactorBootstrap.getInstance().getProxy().getConsoleCommandSource().sendMessage(
+                Identity.nil(),
+                LegacyComponentSerializer.legacyAmpersand().deserialize(actual),
+                MessageType.SYSTEM
+        );
     }
 
     @Override
@@ -65,7 +81,13 @@ public class VelocityLogger implements net.impactdev.impactor.api.logging.Logger
 
     @Override
     public void debug(String message) {
+        String actual = plugin.getMetadata().getName() + " &7(&bDebug&7) " + message;
 
+        VelocityImpactorBootstrap.getInstance().getProxy().getConsoleCommandSource().sendMessage(
+                Identity.nil(),
+                LegacyComponentSerializer.legacyAmpersand().deserialize(actual),
+                MessageType.SYSTEM
+        );
     }
 
     public void debug(List<String> message) {

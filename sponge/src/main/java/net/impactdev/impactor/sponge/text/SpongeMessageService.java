@@ -11,7 +11,6 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.services.text.MessageService;
-import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -101,20 +100,21 @@ public class SpongeMessageService implements MessageService<Text> {
 				}
 
 				TextComponent result = ((TextComponent) GsonComponentSerializer.gson().deserialize(TextSerializers.JSON.serialize(out.toText())));
-				if(result.style().color() == null && result.style().decorations().values().stream().allMatch(state -> state == TextDecoration.State.NOT_SET)) {
+				if (result.style().color() == null && result.style().decorations().values().stream().allMatch(state -> state == TextDecoration.State.NOT_SET)) {
 					result = result.style(style.hoverEvent(result.hoverEvent()).clickEvent(result.clickEvent()));
 				}
 
-				if(!result.equals(Component.empty())) {
+				if (!result.equals(Component.empty())) {
 					for (Function<TextComponent, TextComponent> modifier : modifiers) {
 						result = modifier.apply(result);
 					}
 
-					if(!result.children().isEmpty()) {
+					if (!result.children().isEmpty()) {
 						style = this.locateNonEmptyStyle(result).orElse(style);
 					}
 					output.append(result);
 				}
+
 
 				reference = reference.replaceFirst("[{][{]([\\w-:]+)(\\|(.+))?[}][}]", "");
 			} else {

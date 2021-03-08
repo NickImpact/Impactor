@@ -76,10 +76,6 @@ public class BungeeImpactorPlugin extends AbstractBungeePlugin implements Depend
 		Impactor.getInstance().getRegistry().register(EventBus.class, new BungeeEventBus(this.bootstrap));
 	}
 
-	public PluginClassLoader getPluginClassLoader() {
-		return Impactor.getInstance().getRegistry().get(PluginClassLoader.class);
-	}
-
 	public DependencyManager getDependencyManager() {
 		return Impactor.getInstance().getRegistry().get(DependencyManager.class);
 	}
