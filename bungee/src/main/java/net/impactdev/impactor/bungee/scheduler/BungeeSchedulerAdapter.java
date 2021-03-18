@@ -48,6 +48,13 @@ public class BungeeSchedulerAdapter implements SchedulerAdapter {
     }
 
     @Override
+    public SchedulerTask asyncDelayedAndRepeating(Runnable task, long delay, TimeUnit dUnit, long interval, TimeUnit iUnit) {
+        ScheduledTask t = this.bootstrap.getProxy().getScheduler().schedule(this.bootstrap, task, interval, interval, iUnit);
+        this.tasks.add(t);
+        return t::cancel;
+    }
+
+    @Override
     public void shutdownScheduler() {
         for(ScheduledTask task : this.tasks) {
             try {

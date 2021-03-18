@@ -1,13 +1,14 @@
 package net.impactdev.impactor.api.gui;
 
+import java.util.List;
 import java.util.function.Consumer;
 
-public interface Icon<T, U, V> {
+public interface Icon<T, L> {
 
 	T getDisplay();
 
-	void addListener(Consumer<Clickable<U, V>> listener);
+	void addListener(L listener);
 
-	void process(Clickable<U, V> clickable);
+	List<L> getListeners();
 
 }

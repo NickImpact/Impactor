@@ -9,17 +9,17 @@ import net.kyori.adventure.text.TextComponent;
 
 import java.util.function.Function;
 
-public enum TextModifiers implements Function<TextComponent, TextComponent> {
+public enum TextModifiers implements Function<Component, Component> {
 
     SPACE_AFTER("s") {
         @Override
-        public TextComponent apply(TextComponent text) {
+        public Component apply(Component text) {
             return text.append(Component.space());
         }
     },
     SPACE_BEFORE("p") {
         @Override
-        public TextComponent apply(TextComponent text) {
+        public Component apply(Component text) {
             return Component.space().append(text);
         }
     };

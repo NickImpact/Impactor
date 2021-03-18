@@ -8,10 +8,11 @@ import com.typesafe.config.ConfigRenderOptions;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.configuration.ConfigurationAdapter;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.configurate.loader.ConfigurationLoader;
+import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class SpongeConfigAdapter implements ConfigurationAdapter {
@@ -64,7 +66,7 @@ public class SpongeConfigAdapter implements ConfigurationAdapter {
 	}
 
 	private ConfigurationLoader<? extends ConfigurationNode> createLoader(Path path) {
-		return (this.loader = HoconConfigurationLoader.builder().setPath(path).build());
+		return (this.loader = HoconConfigurationLoader.builder().path(path).build());
 	}
 
 	@Override
@@ -79,8 +81,8 @@ public class SpongeConfigAdapter implements ConfigurationAdapter {
 
 	private <T> void checkMissing(String path, T def) {
 		if (update && !this.contains(path)) {
-			resolvePath(path).setValue(def);
 			try {
+				resolvePath(path).set(def);
 				this.loader.save(root);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -91,7 +93,7 @@ public class SpongeConfigAdapter implements ConfigurationAdapter {
 	private <T> void checkMissing(String path, T def, TypeToken<T> type) {
 		if (update && !this.contains(path)) {
 			try {
-				resolvePath(path).setValue(type, def);
+				resolvePath(path).set(type.getType(), def);
 				this.loader.save(root);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -100,7 +102,7 @@ public class SpongeConfigAdapter implements ConfigurationAdapter {
 	}
 
 	public boolean contains(String path) {
-		return !resolvePath(path).isVirtual();
+		return !resolvePath(path).virtual();
 	}
 
 	private ConfigurationNode resolvePath(String path) {
@@ -108,7 +110,7 @@ public class SpongeConfigAdapter implements ConfigurationAdapter {
 			throw new RuntimeException("Config is not loaded.");
 		}
 
-		return this.root.getNode(Splitter.on('.').splitToList(path).toArray());
+		return this.root.node(Splitter.on('.').splitToList(path).toArray());
 	}
 
 	@Override
@@ -145,22 +147,27 @@ public class SpongeConfigAdapter implements ConfigurationAdapter {
 	public List<String> getStringList(String path, List<String> def) {
 		this.checkMissing(path, def, new TypeToken<List<String>>() {});
 		ConfigurationNode node = resolvePath(path);
-		if (node.isVirtual()) {
+		if (node.virtual()) {
 			return def;
 		}
 
-		return node.getList(Object::toString);
+		try {
+			return node.getList(String.class);
+		} catch (SerializationException e) {
+			e.printStackTrace();
+			return Lists.newArrayList();
+		}
 	}
 
 	@Override
 	public List<String> getKeys(String path, List<String> def) {
 		this.checkMissing(path, def, new TypeToken<List<String>>() {});
 		ConfigurationNode node = resolvePath(path);
-		if (node.isVirtual()) {
+		if (node.virtual()) {
 			return def;
 		}
 
-		return node.getChildrenMap().keySet().stream().map(Object::toString).collect(Collectors.toList());
+		return node.childrenMap().keySet().stream().map(Object::toString).collect(Collectors.toList());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -168,11 +175,17 @@ public class SpongeConfigAdapter implements ConfigurationAdapter {
 	public Map<String, String> getStringMap(String path, Map<String, String> def) {
 		this.checkMissing(path, def, new TypeToken<Map<String, String>>() {});
 		ConfigurationNode node = resolvePath(path);
-		if (node.isVirtual()) {
+		if (node.virtual()) {
 			return def;
 		}
 
-		Map<String, Object> m = (Map<String, Object>) node.getValue(Collections.emptyMap());
+		Map<String, Object> m;
+		try {
+			m = Optional.ofNullable(node.get(new io.leangen.geantyref.TypeToken<Map<String, Object>>() {})).orElse(Collections.emptyMap());
+		} catch (SerializationException e) {
+			e.printStackTrace();
+			m = Collections.emptyMap();
+		}
 		return m.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().toString()));
 	}
 }

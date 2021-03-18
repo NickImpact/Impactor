@@ -1,6 +1,6 @@
 package net.impactdev.impactor.sponge.text.placeholders.provided.tick;
 
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.TextComponent;
 
 import java.text.DecimalFormat;
 
@@ -10,6 +10,6 @@ public interface MeanTickTime {
 
     double get();
 
-    Text getFormatted();
+    TextComponent getFormatted();
 
 }

@@ -4,6 +4,9 @@ buildscript {
         maven {
             url "http://repository.jboss.org/nexus/content/groups/public/"
         }
+        maven {
+            url = 'https://repo-new.spongepowered.org/repository/maven-snapshots'
+        }
     }
     dependencies {
         classpath 'org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1'
@@ -41,7 +44,7 @@ repositories {
     mavenCentral()
     maven {
         name = 'sponge'
-        url = 'http://repo.spongepowered.org/maven'
+        url = 'https://repo-new.spongepowered.org/maven'
     }
     maven { url = 'https://jitpack.io' }
     maven {
@@ -87,7 +90,7 @@ subprojects {
         options.encoding = 'UTF-8'
     }
 
-    project.ext.sponge = 'S7.3'
+    project.ext.sponge = 'S8.0.0'
     project.ext.spigot = '1.12.2'
 
     repositories {
@@ -175,13 +178,13 @@ publishing {
             version project.version
         }
 
-        spigot(MavenPublication) {
-            def project = project(':spigot')
-            from project.components.java
-            groupId project.group
-            artifactId "spigot"
-            version project.version
-        }
+//        spigot(MavenPublication) {
+//            def project = project(':spigot')
+//            from project.components.java
+//            groupId project.group
+//            artifactId "spigot"
+//            version project.version
+//        }
 
         sponge(MavenPublication) {
             def project = project(':sponge')

@@ -5,13 +5,13 @@ import com.google.common.collect.ImmutableMultimap;
 
 import java.util.Optional;
 
-public interface PlaceholderManager<T> {
+public interface PlaceholderManager<T, S> {
 
     void register(T parser);
 
     ImmutableList<T> getAllInternalParsers();
 
-    ImmutableList<T> getAllPlatformParsers();
+    ImmutableList<S> getAllPlatformParsers();
 
     void populate();
 

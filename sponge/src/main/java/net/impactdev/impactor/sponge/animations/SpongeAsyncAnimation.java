@@ -1,13 +1,13 @@
 package net.impactdev.impactor.sponge.animations;
 
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.animations.AsyncAnimation;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.scheduler.Task;
+import net.impactdev.impactor.api.scheduler.SchedulerTask;
 
 import java.util.concurrent.TimeUnit;
 
-public abstract class SpongeAsyncAnimation extends AsyncAnimation<Task> {
+public abstract class SpongeAsyncAnimation extends AsyncAnimation<SchedulerTask> {
 
 	public SpongeAsyncAnimation(ImpactorPlugin plugin) {
 		super(plugin);
@@ -15,11 +15,11 @@ public abstract class SpongeAsyncAnimation extends AsyncAnimation<Task> {
 
 	@Override
 	public void play(long delay, boolean loop) {
-		this.runner = Task.builder().execute(() -> this.run(loop))
-				.interval(Math.round(1000.0 / getFPS()), TimeUnit.MILLISECONDS)
-				.delay(delay, TimeUnit.MILLISECONDS)
-				.async()
-				.submit(this.plugin);
+		this.runner = Impactor.getInstance().getScheduler().asyncDelayedAndRepeating(
+				() -> this.run(loop),
+				delay, TimeUnit.MILLISECONDS,
+				Math.round(1000.0 / getFPS()), TimeUnit.MILLISECONDS
+		);
 	}
 
 	@Override
@@ -31,6 +31,6 @@ public abstract class SpongeAsyncAnimation extends AsyncAnimation<Task> {
 
 	@Override
 	public void fireSync(Runnable runnable) {
-		Sponge.getScheduler().createTaskBuilder().execute(runnable).submit(this.plugin);
+		Impactor.getInstance().getScheduler().executeSync(runnable);
 	}
 }

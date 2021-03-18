@@ -25,14 +25,31 @@
 
 package net.impactdev.impactor.api.dependencies.classloader;
 
+import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.util.function.Function;
 
 public class ReflectionClassLoader implements PluginClassLoader {
+
+	private static URLClassLoader extractClassLoaderFromBootstrap(ImpactorPlugin bootstrap) {
+		return castToUrlClassLoader(bootstrap.getClass().getClassLoader());
+	}
+
+	public static URLClassLoader castToUrlClassLoader(Object classLoader) {
+		if (classLoader instanceof URLClassLoader) {
+			return (URLClassLoader) classLoader;
+		} else {
+			throw new IllegalStateException("ClassLoader is not instance of URLClassLoader: " + classLoader.getClass().getName());
+		}
+	}
+
+
 	private static final Method ADD_URL_METHOD;
 
 	static {
@@ -46,13 +63,12 @@ public class ReflectionClassLoader implements PluginClassLoader {
 
 	private final URLClassLoader classLoader;
 
-	public ReflectionClassLoader(Object plugin) throws IllegalStateException {
-		ClassLoader classLoader = plugin.getClass().getClassLoader();
-		if (classLoader instanceof URLClassLoader) {
-			this.classLoader = (URLClassLoader) classLoader;
-		} else {
-			throw new IllegalStateException("ClassLoader is not instance of URLClassLoader");
-		}
+	public ReflectionClassLoader(ImpactorPlugin bootstrap) throws IllegalStateException {
+		this(bootstrap, ReflectionClassLoader::extractClassLoaderFromBootstrap);
+	}
+
+	public ReflectionClassLoader(ImpactorPlugin bootstrap, Function<ImpactorPlugin, ? extends URLClassLoader> classLoader) {
+		this.classLoader = classLoader.apply(bootstrap);
 	}
 
 	@Override

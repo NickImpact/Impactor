@@ -5,11 +5,12 @@ import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.sponge.text.placeholders.provided.tick.MeanTickTime;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.util.datafix.DataFixer;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -39,8 +40,8 @@ public abstract class ImpactorTickTimeWatcher extends MinecraftServer implements
     }
 
     @Override
-    public Text getFormatted() {
-        return Text.of(MeanTickTime.FORMATTER.format(this.get()));
+    public TextComponent getFormatted() {
+        return Component.text(MeanTickTime.FORMATTER.format(this.get()));
     }
 
     private static long mean(long[] input) {

@@ -55,6 +55,17 @@ public class VelocitySchedulerAdapter implements SchedulerAdapter {
     }
 
     @Override
+    public SchedulerTask asyncDelayedAndRepeating(Runnable task, long delay, TimeUnit dUnit, long interval, TimeUnit iUnit) {
+        ScheduledTask t = this.bootstrap.getProxy().getScheduler().buildTask(this.bootstrap, task)
+                .delay((int) delay, dUnit)
+                .repeat((int) interval, iUnit)
+                .schedule();
+
+        this.tasks.add(t);
+        return t::cancel;
+    }
+
+    @Override
     public void shutdownScheduler() {
         for(ScheduledTask task : this.tasks) {
             try {

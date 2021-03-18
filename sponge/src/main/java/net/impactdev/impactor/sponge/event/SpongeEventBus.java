@@ -2,7 +2,7 @@ package net.impactdev.impactor.sponge.event;
 
 import net.impactdev.impactor.common.event.AbstractEventBus;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 public final class SpongeEventBus extends AbstractEventBus<PluginContainer> {
 

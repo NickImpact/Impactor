@@ -18,9 +18,10 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
+//apply plugin: 'org.spongepowered.gradle.plugin'
 
 ext {
-    sponge = "7.1.5"
+    sponge = "8.0.0"
 }
 
 minecraft {
@@ -34,7 +35,15 @@ minecraft {
 repositories {
     mavenCentral()
     maven {
-        name 'sponge-repo'
+        name 'Sponge Snapshots'
+        url 'https://repo.spongepowered.org/repository/maven-snapshots'
+    }
+    maven {
+        name 'Sponge Releases'
+        url 'https://repo.spongepowered.org/repository/maven-releases'
+    }
+    maven {
+        name 'Sponge Legacy Repository'
         url 'https://repo.spongepowered.org/repository/sponge-legacy'
     }
     maven { url = 'https://jitpack.io' }
@@ -56,9 +65,10 @@ dependencies {
     compile project(':api')
     compile project(':common')
     shadow fileTree(dir: 'libs', include: '*.jar')
-    shadow 'org.spongepowered:spongeapi:7.3.0-SNAPSHOT'
-    shadow "com.ichorpowered:protocolcontrol:0.0.2"
-    shadow "co.aikar:acf-sponge:0.5.0-SNAPSHOT"
+    shadow 'org.spongepowered:spongeapi:8.0.0-SNAPSHOT'
+    shadow 'org.spongepowered:math:2.0.0-SNAPSHOT'
+//    shadow "com.ichorpowered:protocolcontrol:0.0.2"
+//    shadow "co.aikar:acf-sponge:0.5.0-SNAPSHOT"
     shadow "me.lucko:jar-relocator:1.4"
     shadow('org.spongepowered:mixin:0.8-SNAPSHOT')
 }
@@ -99,9 +109,8 @@ shadowJar {
     relocate ('net.kyori.event', 'net.impactdev.impactor.relocations.eventbus') {
         exclude 'net.kyori.event.method.annotation.Subscribe'
     }
-    relocate ('net.kyori.adventure', 'net.impactdev.impactor.relocations.adventure')
-    relocate ('net.kyori.examination', 'net.impactdev.impactor.relocations.examination')
-    relocate("net.kyori", "com.ichorpowered.protocolcontrol.lib.kyori")
+
+    relocate("net.kyori.event", "com.ichorpowered.protocolcontrol.lib.kyori")
 
 //    relocate 'ninja.leaping.configurate', 'com.nickimpact.impactor.relocations.ninja.leaping.configurate'
 //    relocate 'org.yaml', 'com.nickimpact.impactor.relocations.org.yaml'
@@ -116,6 +125,13 @@ shadowJar {
 
     afterEvaluate {
         from zipTree(reobfJar.jar)
+    }
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        expand 'pluginVersion': version
+        include 'META-INF/plugins.json'
     }
 }
 

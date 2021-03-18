@@ -1,10 +1,11 @@
-package net.impactdev.impactor.sponge.ui;
+package net.impactdev.impactor.sponge.ui.rework;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.gui.InventoryDimensions;
 import net.impactdev.impactor.api.gui.Layout;
 import lombok.RequiredArgsConstructor;
+import net.impactdev.impactor.sponge.ui.rework.SpongeIcon;
 
 import java.util.Map;
 import java.util.Optional;
@@ -83,7 +84,7 @@ public class SpongeLayout implements Layout<SpongeIcon> {
 		}
 
 		public SpongeLayoutBuilder border() {
-			return this.border(SpongeIcon.BORDER);
+			return this.border(SpongeIcons.BORDER);
 		}
 
 		public SpongeLayoutBuilder border(SpongeIcon icon) {

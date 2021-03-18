@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
-import com.ichorpowered.protocolcontrol.service.ProtocolService;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.configuration.Config;
 import net.impactdev.impactor.api.event.EventBus;
@@ -26,32 +25,45 @@ import net.impactdev.impactor.sponge.configuration.ConfigKeys;
 import net.impactdev.impactor.sponge.configuration.SpongeConfig;
 import net.impactdev.impactor.sponge.configuration.SpongeConfigAdapter;
 import net.impactdev.impactor.sponge.event.SpongeEventBus;
-import net.impactdev.impactor.sponge.listeners.SignListener;
 import net.impactdev.impactor.sponge.plugin.AbstractSpongePlugin;
 import net.impactdev.impactor.sponge.scheduler.SpongeSchedulerAdapter;
 import net.impactdev.impactor.sponge.services.SpongeMojangServerStatusService;
 import net.impactdev.impactor.sponge.text.SpongeMessageService;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
 import net.impactdev.impactor.sponge.text.placeholders.provided.tick.TPSWatcher;
+import net.impactdev.impactor.sponge.ui.SpongePage;
+import net.impactdev.impactor.sponge.ui.SpongeUI;
+import net.impactdev.impactor.sponge.ui.rework.SpongeIcon;
+import net.impactdev.impactor.sponge.ui.rework.SpongeLayout;
 import net.impactdev.impactor.sponge.ui.signs.SpongeSignQuery;
 import lombok.Getter;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
-import org.slf4j.Logger;
+import net.impactdev.impactor.sponge.util.SpongeClassLoader;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.game.GameRegistryEvent;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
-import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.AsynchronousExecutor;
-import org.spongepowered.api.scheduler.SpongeExecutorService;
-import org.spongepowered.api.scheduler.SynchronousExecutor;
-import org.spongepowered.api.text.placeholder.PlaceholderParser;
+import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
+import org.spongepowered.api.event.lifecycle.RegisterRegistryValueEvent;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
+import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ContainerTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
+import org.spongepowered.api.placeholder.PlaceholderParser;
+import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.math.vector.Vector2i;
+import org.spongepowered.plugin.PluginContainer;
+import org.spongepowered.plugin.jvm.Plugin;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -60,14 +72,11 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Plugin(id = "impactor",
-		name = "ImpactorAPI",
-		version = "@version@",
-		description = "A universal API for multiple tools for development"
-)
+@Plugin("impactor")
 public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depending {
 
 	@Getter private static SpongeImpactorPlugin instance;
@@ -76,9 +85,8 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 
 	@Getter private SpongeMojangServerStatusService mojangServerStatusService;
 
-	@Inject
 	@Getter
-	private PluginContainer pluginContainer;
+	private final PluginContainer pluginContainer;
 
 	@Inject
 	@ConfigDir(sharedRoot = false)
@@ -86,23 +94,18 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 	private Config config;
 
 	@Inject
-	public SpongeImpactorPlugin(Logger fallback, @SynchronousExecutor SpongeExecutorService sync, @AsynchronousExecutor SpongeExecutorService async) {
+	public SpongeImpactorPlugin(PluginContainer container, Logger fallback) {
 		super(PluginMetadata.builder().id("impactor").name("Impactor").version("@version@").build(), fallback);
-		ApiRegistrationUtil.register(new SpongeImpactorAPIProvider(SpongeSchedulerAdapter.builder()
-				.bootstrap(this)
-				.sync(sync)
-				.async(async)
-				.scheduler(Sponge.getScheduler())
-				.build()
-		));
+		this.pluginContainer = container;
+		ApiRegistrationUtil.register(new SpongeImpactorAPIProvider(new SpongeSchedulerAdapter(this, Sponge.getGame())));
 	}
 
 	@Listener(order = Order.FIRST)
-	public void onPreInit(GamePreInitializationEvent e) {
+	public void onConstruct(ConstructPluginEvent e) {
 		instance = this;
 
 		Impactor.getInstance().getRegistry().register(ImpactorPlugin.class, this);
-		Impactor.getInstance().getRegistry().register(PluginClassLoader.class, new ReflectionClassLoader(this));
+		Impactor.getInstance().getRegistry().register(PluginClassLoader.class, new SpongeClassLoader(this));
 		Impactor.getInstance().getRegistry().register(DependencyManager.class, new DependencyManager(this));
 
 		this.getPluginLogger().info("Pooling plugin dependencies...");
@@ -139,11 +142,10 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		Impactor.getInstance().getRegistry().register(SpongePlaceholderManager.class, new SpongePlaceholderManager());
 		Impactor.getInstance().getRegistry().register(EventBus.class, new SpongeEventBus());
 		((SpongeEventBus)Impactor.getInstance().getEventBus()).enable();
-		this.watcher = new TPSWatcher(false);
 	}
 
 	@Listener
-	public void onInit(GameInitializationEvent e) {
+	public void onInit(StartingEngineEvent<Server> e) {
 		this.config = new SpongeConfig(new SpongeConfigAdapter(this, new File(configDir.toFile(), "settings.conf")), new ConfigKeys());
 
 		if(this.config.get(ConfigKeys.USE_MOJANG_STATUS_FETCHER)) {
@@ -151,25 +153,81 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 			mojangServerStatusService = new SpongeMojangServerStatusService();
 		}
 
-		Sponge.getServiceManager().provideUnchecked(ProtocolService.class).events().register(new SignListener());
+		this.watcher = new TPSWatcher(false);
+		//Sponge.getServiceManager().provideUnchecked(ProtocolService.class).events().register(new SignListener());
 	}
 
 	@Listener
-	public void onServerStart(GameStartedServerEvent event) {
+	public void onPlayerJoin(ServerSideConnectionEvent.Join event) {
+		Impactor.getInstance().getScheduler().asyncLater(() -> {
+			Impactor.getInstance().getScheduler().executeSync(() -> {
+//				ViewableInventory test = ViewableInventory.builder()
+//						.type(ContainerTypes.GENERIC_9X6)
+//						.completeStructure().build();
+//
+//				SpongeLayout layout = SpongeLayout.builder()
+//						.border()
+//						.fill(SpongeIcon.builder()
+//								.delegate(ItemStack.builder().itemType(ItemTypes.DIRT).build())
+//								.listener((cause, container, clickType) -> {
+//									this.getPluginLogger().info("Click detected");
+//									return true;
+//								})
+//								.build()
+//						)
+//						.build();
+//
+//				SpongeUI.builder()
+//						.view(test)
+//						.title(Component.text("Testing").color(NamedTextColor.RED))
+//						.build()
+//						.define(layout)
+//						.open(event.getPlayer());
+
+				SpongePage<Integer> test = SpongePage.builder()
+						.title(Component.text("Page Test").color(NamedTextColor.RED))
+						.viewer(event.getPlayer())
+						.view(SpongeLayout.builder().border().build())
+						.offsets(new Vector2i(1, 1))
+						.contentZone(new Vector2i(7, 4))
+						.build();
+				test.applier(x -> SpongeIcon.builder()
+						.delegate(ItemStack.builder()
+								.itemType(ItemTypes.GOLD_NUGGET)
+								.add(Keys.CUSTOM_NAME, Component.text(x).color(NamedTextColor.YELLOW))
+								.build()
+						)
+						.listener((cause, container, clickType) -> {
+							SpongeImpactorPlugin.getInstance().getPluginLogger().info("" + x);
+							return true;
+						})
+						.build()
+				);
+				test.define(Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18));
+				test.open();
+			});
+		}, 10, TimeUnit.SECONDS);
+	}
+
+	@Listener
+	public void onServerStart(StartedEngineEvent<Server> event) {
 		ImmutableList<PlaceholderParser> parsers = Impactor.getInstance().getRegistry().get(SpongePlaceholderManager.class).getAllPlatformParsers();
 		this.getPluginLogger().info("&eAvailable Placeholders:");
-		Multimap<String, PlaceholderParser> sorted = ArrayListMultimap.create();
+		Multimap<String, ResourceKey> sorted = ArrayListMultimap.create();
 		Pattern pattern = Pattern.compile("(.+):(.+)");
 
-		parsers.stream().sorted(Comparator.comparing(PlaceholderParser::getId)).forEach(parser -> {
-			Matcher matcher = pattern.matcher(parser.getId());
-			if(matcher.find()) {
-				Optional<PluginContainer> container = Sponge.getPluginManager().getPlugin(matcher.group(1));
-				sorted.put(container.map(PluginContainer::getName).orElse("Custom"), parser);
-			} else {
-				sorted.put("Custom", parser);
-			}
-		});
+		parsers.stream()
+				.map(parser -> parser.key(RegistryTypes.PLACEHOLDER_PARSER))
+				.sorted(Comparator.comparing(ResourceKey::getFormatted))
+				.forEach(parser -> {
+					Matcher matcher = pattern.matcher(parser.getFormatted());
+					if(matcher.find()) {
+						Optional<PluginContainer> container = Sponge.getPluginManager().getPlugin(matcher.group(1));
+						sorted.put(container.map(c -> c.getMetadata().getName().orElse("Unknown")).orElse("Custom"), parser);
+					} else {
+						sorted.put("Custom", parser);
+					}
+				});
 
 		sorted.keySet().stream().sorted((s1, s2) -> {
 			if(s1.equals("Custom")) {
@@ -181,22 +239,24 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 			}
 		}).forEach(key -> {
 			this.getPluginLogger().info("&3" + key);
-			for(PlaceholderParser parser : sorted.get(key)) {
-				this.getPluginLogger().info("&a- " + parser.getId() + " : " + parser.getName());
+			for(ResourceKey parser : sorted.get(key)) {
+				this.getPluginLogger().info("&a- " + parser.getFormatted());
 			}
 		});
 	}
 
 	@Listener
-	public void onShutdown(GameStoppedServerEvent event) {
+	public void onShutdown(StoppingEngineEvent<Server> event) {
 		((SpongeEventBus)Impactor.getInstance().getEventBus()).disable();
 	}
 
 	@Listener
-	public void onPlaceholderRegistryEvent(GameRegistryEvent.Register<PlaceholderParser> event) {
-		for(PlaceholderParser parser : Impactor.getInstance().getRegistry().get(SpongePlaceholderManager.class).getAllInternalParsers()) {
-			event.register(parser);
-		}
+	public void onGlobalRegistryValueRegistrationEvent(final RegisterRegistryValueEvent.GameScoped event) {
+//		final RegisterRegistryValueEvent.RegistryStep<PlaceholderParser> placeholderParserRegistryStep =
+//				event.registry(RegistryTypes.PLACEHOLDER_PARSER);
+//		new SpongePlaceholderManager().getAllInternalParsers().forEach(metadata -> {
+//			placeholderParserRegistryStep.register(ResourceKey.of(this.pluginContainer, metadata.getToken()), metadata.getParser());
+//		});
 	}
 
 	public Config getConfig() {

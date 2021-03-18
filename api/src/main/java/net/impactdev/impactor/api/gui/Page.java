@@ -22,8 +22,6 @@ public interface Page<T, U, W extends UI, V extends Icon> {
 
 	void close();
 
-	void clean();
-
 	void apply();
 
 	@Getter

@@ -1,77 +1,88 @@
 package net.impactdev.impactor.sponge.scheduler;
 
+import com.google.common.base.Suppliers;
 import net.impactdev.impactor.api.scheduler.SchedulerAdapter;
 import net.impactdev.impactor.api.scheduler.SchedulerTask;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
-import lombok.Builder;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Scheduler;
-import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.scheduler.TaskExecutorService;
 
 import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-@Builder
 public class SpongeSchedulerAdapter implements SchedulerAdapter {
 
     private final SpongeImpactorPlugin bootstrap;
+    private final Game game;
 
-    private final Scheduler scheduler;
-    private final SpongeExecutorService sync;
-    private final SpongeExecutorService async;
+    private final Scheduler asyncScheduler;
+    private final Supplier<TaskExecutorService> sync;
+    private final TaskExecutorService async;
 
-    private final Set<Task> tasks = Collections.newSetFromMap(new WeakHashMap<>());
+    private final Set<ScheduledTask> tasks = Collections.newSetFromMap(new WeakHashMap<>());
+
+    public SpongeSchedulerAdapter(SpongeImpactorPlugin plugin, Game game) {
+        this.game = game;
+        this.bootstrap = plugin;
+
+        this.asyncScheduler = game.getAsyncScheduler();
+        this.async = this.asyncScheduler.createExecutor(plugin.getPluginContainer());
+        this.sync = Suppliers.memoize(() -> this.game.getServer().getScheduler().createExecutor(plugin.getPluginContainer()));
+    }
 
     @Override
-    public SpongeExecutorService async() {
+    public Executor async() {
         return this.async;
     }
 
     @Override
-    public SpongeExecutorService sync() {
-        return this.sync;
+    public Executor sync() {
+        return this.sync.get();
     }
 
-    @Override
-    public void executeAsync(Runnable task) {
-        this.scheduler.createTaskBuilder().async().execute(task).submit(this.bootstrap);
+    public Scheduler getSyncScheduler() {
+        return this.game.getServer().getScheduler();
     }
 
-    @Override
-    public void executeSync(Runnable task) {
-        this.scheduler.createTaskBuilder().execute(task).submit(this.bootstrap);
+    private SchedulerTask submitAsyncTask(Runnable runnable, Consumer<Task.Builder> config) {
+        Task.Builder builder = Task.builder();
+        config.accept(builder);
+
+        Task task = builder
+                .execute(runnable)
+                .plugin(this.bootstrap.getPluginContainer())
+                .build();
+        ScheduledTask scheduledTask = this.asyncScheduler.submit(task);
+        this.tasks.add(scheduledTask);
+        return scheduledTask::cancel;
     }
 
     @Override
     public SchedulerTask asyncLater(Runnable task, long delay, TimeUnit unit) {
-        Task t = this.scheduler.createTaskBuilder()
-                .async()
-                .execute(task)
-                .delay(delay, unit)
-                .submit(this.bootstrap);
-
-        this.tasks.add(t);
-        return t::cancel;
+        return this.submitAsyncTask(task, builder -> builder.delay(delay, unit));
     }
 
     @Override
     public SchedulerTask asyncRepeating(Runnable task, long interval, TimeUnit unit) {
-        Task t = this.scheduler.createTaskBuilder()
-                .async()
-                .execute(task)
-                .delay(interval, unit)
-                .interval(interval, unit)
-                .submit(this.bootstrap);
+        return this.submitAsyncTask(task, builder -> builder.delay(interval, unit).interval(interval, unit));
+    }
 
-        this.tasks.add(t);
-        return t::cancel;
+    @Override
+    public SchedulerTask asyncDelayedAndRepeating(Runnable task, long delay, TimeUnit dUnit, long interval, TimeUnit iUnit) {
+        return this.submitAsyncTask(task, builder -> builder.delay(delay, dUnit).interval(interval, iUnit));
     }
 
     @Override
     public void shutdownScheduler() {
-        for(Task task : this.tasks) {
+        for(ScheduledTask task : this.tasks) {
             try {
                 task.cancel();
             } catch (Exception e) {

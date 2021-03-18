@@ -2,13 +2,11 @@ package net.impactdev.impactor.sponge.text.placeholders.provided.tick;
 
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.Ticks;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -51,12 +49,12 @@ public class TPSWatcher {
 
     public TPSWatcher(boolean supportsDuration) {
         this.durationSupported = supportsDuration;
-        Sponge.getScheduler().createTaskBuilder().execute(() -> {
+        Sponge.getServer().getScheduler().submit(Task.builder().execute(() -> {
             this.onTick(this.tick++);
             if(this.tick == Integer.MAX_VALUE - 8) {
                 this.tick = 0;
             }
-        }).intervalTicks(1).submit(SpongeImpactorPlugin.getInstance());
+        }).interval(Ticks.of(1)).plugin(SpongeImpactorPlugin.getInstance().getPluginContainer()).build());
     }
 
     public boolean isDurationSupported() {

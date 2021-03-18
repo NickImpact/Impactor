@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.Optional;
 
-public interface Layout<U extends Icon> {
+public interface Layout<U extends Icon<?, ?>> {
 
 	ImmutableMap<Integer, U> getElements();
 

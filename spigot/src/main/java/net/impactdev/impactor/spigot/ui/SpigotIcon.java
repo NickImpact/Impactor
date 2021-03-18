@@ -1,6 +1,5 @@
 package net.impactdev.impactor.spigot.ui;
 
-import net.impactdev.impactor.api.gui.Clickable;
 import net.impactdev.impactor.api.gui.Icon;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

@@ -1,16 +1,27 @@
 package net.impactdev.impactor.sponge.ui;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import net.impactdev.impactor.api.gui.Page;
-import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
-import org.spongepowered.api.data.key.Keys;
+import net.impactdev.impactor.sponge.ui.rework.SpongeIcon;
+import net.impactdev.impactor.sponge.ui.rework.SpongeLayout;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.ContainerTypes;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.property.InventoryDimension;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.menu.handler.ClickHandler;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
+import org.spongepowered.math.vector.Vector2i;
 
 import java.util.List;
 import java.util.Map;
@@ -19,39 +30,30 @@ import java.util.stream.Collectors;
 
 public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 
-	private Player viewer;
-
-	private SpongeUI view;
-
-	private SpongeLayout layout;
-
+	private final ServerPlayer viewer;
+	private final SpongeUI view;
 	private int page;
 
-	private ImpactorPlugin plugin;
-
 	private List<U> contents;
-
 	private Function<U, SpongeIcon> applier;
 
-	private Text title;
+	private final TextComponent title;
 
-	private InventoryDimension contentZone;
+	private final Vector2i contentZone;
+	private final Vector2i offsets;
 
-	private int rOffset;
+	private SpongeLayout layout;
+	private final List<InternalPage> pages = Lists.newArrayList();
 
-	private int cOffset;
+	private final Map<PageIconType, PageIcon<ItemType>> pageIcons;
 
-	private Map<PageIconType, PageIcon<ItemType>> pageIcons;
-
-	private SpongePage(ImpactorPlugin plugin, SpongePageBuilder builder) {
-		this.plugin = plugin;
+	private SpongePage(SpongePageBuilder builder) {
 		this.viewer = builder.viewer;
 		this.pageIcons = builder.pageIcons;
 		this.title = builder.title;
 		this.page = 1;
 		this.contentZone = builder.contentZone;
-		this.rOffset = builder.rOffset;
-		this.cOffset = builder.cOffset;
+		this.offsets = builder.offsets;
 		this.layout = builder.view;
 		this.view = this.forgeFromLayout(builder.view);
 	}
@@ -60,25 +62,30 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 		SpongeLayout.SpongeLayoutBuilder updated = SpongeLayout.builder().from(layout);
 		for(Map.Entry<PageIconType, PageIcon<ItemType>> entry : this.pageIcons.entrySet()) {
 			ItemStack item = ItemStack.builder().itemType(entry.getValue().getRep()).build();
-			item.offer(Keys.DISPLAY_NAME, TextSerializers.FORMATTING_CODE.deserialize(entry.getKey().getTitle().replaceAll("\\{\\{impactor_page_number}}", "" + page)));
-			SpongeIcon icon = new SpongeIcon(item);
+			item.offer(Keys.DISPLAY_NAME, LegacyComponentSerializer.legacyAmpersand().deserialize(entry.getKey().getTitle().replaceAll("\\{\\{impactor_page_number}}", "" + page)));
+			SpongeIcon icon = SpongeIcon.builder().delegate(item).build();
 			if(!entry.getKey().equals(PageIconType.CURRENT)) {
-				icon.addListener(clickable -> {
-					int capacity = this.contentZone.getColumns() * this.contentZone.getRows();
+				icon.addListener((cause, container, clickType) -> {
+					int capacity = this.contentZone.getX() * this.contentZone.getY();
 					this.page = entry.getKey().getUpdater().apply(this.page, this.contents.isEmpty() ? 1 : contents.size() % capacity == 0 ? contents.size() / capacity : contents.size() / capacity + 1);
 					this.apply();
+					return true;
 				});
 			}
 
 			updated.slot(icon, entry.getValue().getSlot());
 		}
 
-		SpongeLayout modified = updated.build();
+		this.layout = updated.build();
+		ViewableInventory view = ViewableInventory.builder()
+				.type(ContainerTypes.GENERIC_9X6)
+				.completeStructure().build();
+
 		return SpongeUI.builder()
 				.title(this.title)
-				.dimension(InventoryDimension.of(this.layout.getDimensions().getColumns(), this.layout.getDimensions().getRows()))
+				.view(view)
 				.build()
-				.define(modified);
+				.define(this.layout);
 	}
 
 	@Override
@@ -97,9 +104,68 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 		return this;
 	}
 
+	private int calculateSlot(int in) {
+		int col = in % this.contentZone.getX() + this.offsets.getX();
+		int row = in / this.contentZone.getX() + this.offsets.getY();
+
+		return col + (9 * row);
+	}
+
 	@Override
 	public void define(List<U> contents) {
+		Preconditions.checkNotNull(this.applier, "Applier must be set before page definition!");
 		this.contents = contents;
+
+		int capacity = this.view.getBackingMenu().getInventory().capacity();
+		int pages = this.contents.isEmpty() ? 1 : contents.size() % capacity == 0 ? contents.size() / capacity : contents.size() / capacity + 1;
+
+		int columns = Math.max(1, Math.min(9, this.contentZone.getX()));
+		int rows = Math.max(1, Math.min(9, this.contentZone.getY()));
+
+		List<U> viewable = this.contents.subList((this.page - 1) * capacity, this.page == pages ? this.contents.size() : this.page * capacity);
+		List<SpongeIcon> translated = viewable.stream().map(obj -> this.applier.apply(obj)).collect(Collectors.toList());
+
+		for (int i = 0; i < pages; i++) {
+			Inventory page = Inventory.builder()
+					.grid(columns, rows)
+					.completeStructure()
+					.build();
+
+			ViewableInventory view = ViewableInventory.builder()
+					.type(ContainerTypes.GENERIC_9X6)
+					.grid(page.slots(), new Vector2i(columns, rows), this.offsets)
+					.completeStructure().build();
+
+			for(int k = 0; k < view.capacity(); k++) {
+				final int slot = i;
+				layout.getIcon(i).ifPresent(icon -> {
+					view.set(slot, icon.getDisplay());
+					if(icon.getListeners().size() > 0) {
+						icon.getListeners().forEach(listener -> {
+							view.getSlot(slot).ifPresent(s -> {
+								this.view.getListener().register(slot, listener);
+							});
+						});
+					}
+				});
+			}
+
+			InternalPage ip = new InternalPage(view);
+
+			int s = 0;
+			for(SpongeIcon icon : translated) {
+				Slot slot = page.getSlot(s++).orElseThrow(() -> new IllegalStateException("Unable to locate target slot"));
+				slot.set(icon.getDisplay());
+
+				int index = this.calculateSlot(slot.get(Keys.SLOT_INDEX).get());
+				SpongeImpactorPlugin.getInstance().getPluginLogger().info("Page: Slot Index = " + index);
+
+				ip.handlers.putAll(index, icon.getListeners());
+			}
+
+			this.pages.add(ip);
+		}
+
 		this.apply();
 	}
 
@@ -114,49 +180,13 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 	}
 
 	@Override
-	public void clean() {
-		int index = cOffset + this.view.getDimension().getColumns() * rOffset;
-		for(int r = 0; r < this.contentZone.getRows(); r++) {
-			for(int c = 0; c < this.contentZone.getColumns(); c++) {
-				int slot = index + c;
-				this.view.clear(slot);
-			}
-
-			index += 9;
-		}
-	}
-
-	@Override
 	public void apply() {
-		this.clean();
+		InternalPage page = this.pages.get(this.page - 1);
 
-		int capacity = this.contentZone.getColumns() * this.contentZone.getRows();
-		int pages = this.contents.isEmpty() ? 1 : contents.size() % capacity == 0 ? contents.size() / capacity : contents.size() / capacity + 1;
-
-		if(pages < this.page) {
-			this.page = pages;
-		}
-
-		List<U> viewable = this.contents.subList((this.page - 1) * capacity, this.page == pages ? this.contents.size() : this.page * capacity);
-		List<SpongeIcon> translated = viewable.stream().map(obj -> this.applier.apply(obj)).collect(Collectors.toList());
-
-		int index = cOffset + this.view.getDimension().getColumns() * rOffset;
-		int r = 0;
-		int cap = index + contentZone.getColumns() - 1 + 9 * (contentZone.getRows() - 1);
-		for(SpongeIcon icon : translated) {
-			if(index > cap) {
-				break;
-			}
-
-			if(r == contentZone.getColumns()) {
-				index += this.view.getDimension().getColumns() - contentZone.getColumns();
-				r = 0;
-			}
-
-			this.view.setSlot(index, icon);
-
-			index++;
-			r++;
+		this.view.getBackingMenu().setCurrentInventory(page.view);
+		this.view.getListener().clear();
+		for(Map.Entry<Integer, ClickHandler> entry : page.handlers.entries()) {
+			this.view.getListener().register(entry.getKey(), entry.getValue());
 		}
 	}
 
@@ -167,27 +197,24 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 	public static class SpongePageBuilder {
 
 		/** The player viewing the inventory */
-		private Player viewer;
+		private ServerPlayer viewer;
 
 		/** The base view of all pages */
 		private SpongeLayout view;
 
 		/** The title of the representation */
-		private Text title;
+		private TextComponent title;
 
 		/** Represents the area the contents can be displayed in the inventory */
-		private InventoryDimension contentZone;
+		private Vector2i contentZone;
 
 		/** Represents the row offset for the contentZone, if it is defined */
-		private int rOffset;
-
-		/** Represents the column offset for the contentZone, if it is defined */
-		private int cOffset;
+		private Vector2i offsets;
 
 		/** Represents the actual buttons which will be in charge of updating pages */
-		private Map<PageIconType, PageIcon<ItemType>> pageIcons = Maps.newHashMap();
+		private final Map<PageIconType, PageIcon<ItemType>> pageIcons = Maps.newHashMap();
 
-		public SpongePageBuilder viewer(Player viewer) {
+		public SpongePageBuilder viewer(ServerPlayer viewer) {
 			this.viewer = viewer;
 			return this;
 		}
@@ -197,28 +224,18 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 			return this;
 		}
 
-		public SpongePageBuilder title(Text title) {
+		public SpongePageBuilder title(TextComponent title) {
 			this.title = title;
 			return this;
 		}
 
-		public SpongePageBuilder contentZone(InventoryDimension dimension) {
+		public SpongePageBuilder contentZone(Vector2i dimension) {
 			this.contentZone = dimension;
 			return this;
 		}
 
-		public SpongePageBuilder rOffset(int offset) {
-			this.rOffset = offset;
-			return this;
-		}
-
-		public SpongePageBuilder cOffset(int offset) {
-			this.cOffset = offset;
-			return this;
-		}
-
-		public SpongePageBuilder offsets(int offset) {
-			this.rOffset = this.cOffset = offset;
+		public SpongePageBuilder offsets(Vector2i offsets) {
+			this.offsets = offsets;
 			return this;
 		}
 
@@ -248,7 +265,23 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 		}
 
 		public <T> SpongePage<T> build() {
-			return new SpongePage<>(SpongeImpactorPlugin.getInstance(), this);
+			return new SpongePage<>(this);
 		}
+	}
+
+	private static class InternalPage {
+
+		private final ViewableInventory view;
+		private final Multimap<Integer, ClickHandler> handlers;
+
+		public InternalPage(ViewableInventory view) {
+			this.view = view;
+			this.handlers = ArrayListMultimap.create();
+		}
+
+		public void register(int slot, ClickHandler listener) {
+			this.handlers.put(slot, listener);
+		}
+
 	}
 }

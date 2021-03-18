@@ -85,6 +85,8 @@ public interface SchedulerAdapter {
      */
     SchedulerTask asyncRepeating(Runnable task, long interval, TimeUnit unit);
 
+    SchedulerTask asyncDelayedAndRepeating(Runnable task, long delay, TimeUnit dUnit, long interval, TimeUnit iUnit);
+
     /**
      * Shuts down the scheduler instance.
      *

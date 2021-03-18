@@ -6,14 +6,14 @@ import net.impactdev.impactor.api.utilities.Builder;
 
 import java.util.List;
 
-public interface SignQuery<T, P> {
+public interface SignQuery<T, P, M> {
 
     String TEXT_FORMAT = "{\"text\":\"%s\"}";
     int action = 9;
 
     List<T> getText();
 
-    Vector3d getSignPosition();
+    M getSignPosition();
 
     boolean shouldReopenOnFailure();
 
@@ -22,19 +22,19 @@ public interface SignQuery<T, P> {
     void sendTo(P player);
 
     @SuppressWarnings("unchecked")
-    static <T, P> SignQueryBuilder<T, P> builder() {
+    static <T, P, M> SignQueryBuilder<T, P, M> builder() {
         return Impactor.getInstance().getRegistry().createBuilder(SignQueryBuilder.class);
     }
 
-    interface SignQueryBuilder<T, P> extends Builder<SignQuery<T, P>, SignQueryBuilder<T, P>> {
+    interface SignQueryBuilder<T, P, M> extends Builder<SignQuery<T, P, M>, SignQueryBuilder<T, P, M>> {
 
-        SignQueryBuilder<T, P> text(List<T> text);
+        SignQueryBuilder<T, P, M> text(List<T> text);
 
-        SignQueryBuilder<T, P> position(Vector3d position);
+        SignQueryBuilder<T, P, M> position(M position);
 
-        SignQueryBuilder<T, P> reopenOnFailure(boolean state);
+        SignQueryBuilder<T, P, M> reopenOnFailure(boolean state);
 
-        SignQueryBuilder<T, P> response(SignSubmission response);
+        SignQueryBuilder<T, P, M> response(SignSubmission response);
 
     }
 
