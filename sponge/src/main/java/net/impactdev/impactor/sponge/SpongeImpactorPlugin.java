@@ -19,7 +19,6 @@ import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.api.dependencies.Dependency;
 import net.impactdev.impactor.api.dependencies.DependencyManager;
 import net.impactdev.impactor.api.dependencies.classloader.PluginClassLoader;
-import net.impactdev.impactor.api.dependencies.classloader.ReflectionClassLoader;
 import net.impactdev.impactor.sponge.api.SpongeImpactorAPIProvider;
 import net.impactdev.impactor.sponge.configuration.ConfigKeys;
 import net.impactdev.impactor.sponge.configuration.SpongeConfig;
@@ -30,10 +29,9 @@ import net.impactdev.impactor.sponge.scheduler.SpongeSchedulerAdapter;
 import net.impactdev.impactor.sponge.services.SpongeMojangServerStatusService;
 import net.impactdev.impactor.sponge.text.SpongeMessageService;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
-import net.impactdev.impactor.sponge.text.placeholders.provided.tick.TPSWatcher;
 import net.impactdev.impactor.sponge.ui.SpongePage;
-import net.impactdev.impactor.sponge.ui.SpongeUI;
 import net.impactdev.impactor.sponge.ui.rework.SpongeIcon;
+import net.impactdev.impactor.sponge.ui.rework.SpongeIcons;
 import net.impactdev.impactor.sponge.ui.rework.SpongeLayout;
 import net.impactdev.impactor.sponge.ui.signs.SpongeSignQuery;
 import lombok.Getter;
@@ -56,9 +54,7 @@ import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.ContainerTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.math.vector.Vector2i;
@@ -81,8 +77,6 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 
 	@Getter private static SpongeImpactorPlugin instance;
 
-	@Getter private TPSWatcher watcher;
-
 	@Getter private SpongeMojangServerStatusService mojangServerStatusService;
 
 	@Getter
@@ -97,7 +91,7 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 	public SpongeImpactorPlugin(PluginContainer container, Logger fallback) {
 		super(PluginMetadata.builder().id("impactor").name("Impactor").version("@version@").build(), fallback);
 		this.pluginContainer = container;
-		ApiRegistrationUtil.register(new SpongeImpactorAPIProvider(new SpongeSchedulerAdapter(this, Sponge.getGame())));
+		ApiRegistrationUtil.register(new SpongeImpactorAPIProvider(new SpongeSchedulerAdapter(this, Sponge.game())));
 	}
 
 	@Listener(order = Order.FIRST)
@@ -153,10 +147,10 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 			mojangServerStatusService = new SpongeMojangServerStatusService();
 		}
 
-		this.watcher = new TPSWatcher(false);
 		//Sponge.getServiceManager().provideUnchecked(ProtocolService.class).events().register(new SignListener());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Listener
 	public void onPlayerJoin(ServerSideConnectionEvent.Join event) {
 		Impactor.getInstance().getScheduler().asyncLater(() -> {
@@ -186,10 +180,13 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 
 				SpongePage<Integer> test = SpongePage.builder()
 						.title(Component.text("Page Test").color(NamedTextColor.RED))
-						.viewer(event.getPlayer())
-						.view(SpongeLayout.builder().border().build())
+						.viewer(event.player())
+						.view(SpongeLayout.builder().dimension(9, 5).border().dimension(9, 6).slots(SpongeIcons.BORDER, 45, 53).build())
 						.offsets(new Vector2i(1, 1))
-						.contentZone(new Vector2i(7, 4))
+						.contentZone(new Vector2i(7, 3))
+						.currentPage(ItemTypes.PAPER, 49)
+						.nextPage(ItemTypes.ARROW, 50)
+						.previousPage(ItemTypes.ARROW, 48)
 						.build();
 				test.applier(x -> SpongeIcon.builder()
 						.delegate(ItemStack.builder()
@@ -203,7 +200,7 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 						})
 						.build()
 				);
-				test.define(Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18));
+				test.define(Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47));
 				test.open();
 			});
 		}, 10, TimeUnit.SECONDS);
@@ -218,11 +215,11 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 
 		parsers.stream()
 				.map(parser -> parser.key(RegistryTypes.PLACEHOLDER_PARSER))
-				.sorted(Comparator.comparing(ResourceKey::getFormatted))
+				.sorted(Comparator.comparing(ResourceKey::formatted))
 				.forEach(parser -> {
-					Matcher matcher = pattern.matcher(parser.getFormatted());
+					Matcher matcher = pattern.matcher(parser.formatted());
 					if(matcher.find()) {
-						Optional<PluginContainer> container = Sponge.getPluginManager().getPlugin(matcher.group(1));
+						Optional<PluginContainer> container = Sponge.pluginManager().plugin(matcher.group(1));
 						sorted.put(container.map(c -> c.getMetadata().getName().orElse("Unknown")).orElse("Custom"), parser);
 					} else {
 						sorted.put("Custom", parser);
@@ -240,7 +237,7 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		}).forEach(key -> {
 			this.getPluginLogger().info("&3" + key);
 			for(ResourceKey parser : sorted.get(key)) {
-				this.getPluginLogger().info("&a- " + parser.getFormatted());
+				this.getPluginLogger().info("&a- " + parser.formatted());
 			}
 		});
 	}
@@ -252,11 +249,11 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 
 	@Listener
 	public void onGlobalRegistryValueRegistrationEvent(final RegisterRegistryValueEvent.GameScoped event) {
-//		final RegisterRegistryValueEvent.RegistryStep<PlaceholderParser> placeholderParserRegistryStep =
-//				event.registry(RegistryTypes.PLACEHOLDER_PARSER);
-//		new SpongePlaceholderManager().getAllInternalParsers().forEach(metadata -> {
-//			placeholderParserRegistryStep.register(ResourceKey.of(this.pluginContainer, metadata.getToken()), metadata.getParser());
-//		});
+		final RegisterRegistryValueEvent.RegistryStep<PlaceholderParser> placeholderParserRegistryStep =
+				event.registry(RegistryTypes.PLACEHOLDER_PARSER);
+		new SpongePlaceholderManager().getAllInternalParsers().forEach(metadata -> {
+			placeholderParserRegistryStep.register(ResourceKey.of(this.pluginContainer, metadata.getToken()), metadata.getParser());
+		});
 	}
 
 	public Config getConfig() {

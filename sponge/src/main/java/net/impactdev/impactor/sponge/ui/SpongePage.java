@@ -20,12 +20,15 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.menu.handler.ClickHandler;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.math.vector.Vector2i;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
@@ -62,7 +65,7 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 		SpongeLayout.SpongeLayoutBuilder updated = SpongeLayout.builder().from(layout);
 		for(Map.Entry<PageIconType, PageIcon<ItemType>> entry : this.pageIcons.entrySet()) {
 			ItemStack item = ItemStack.builder().itemType(entry.getValue().getRep()).build();
-			item.offer(Keys.DISPLAY_NAME, LegacyComponentSerializer.legacyAmpersand().deserialize(entry.getKey().getTitle().replaceAll("\\{\\{impactor_page_number}}", "" + page)));
+			item.offer(Keys.CUSTOM_NAME, LegacyComponentSerializer.legacyAmpersand().deserialize(entry.getKey().getTitle().replaceAll("\\{\\{impactor_page_number}}", "" + page)));
 			SpongeIcon icon = SpongeIcon.builder().delegate(item).build();
 			if(!entry.getKey().equals(PageIconType.CURRENT)) {
 				icon.addListener((cause, container, clickType) -> {
@@ -116,51 +119,44 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 		Preconditions.checkNotNull(this.applier, "Applier must be set before page definition!");
 		this.contents = contents;
 
-		int capacity = this.view.getBackingMenu().getInventory().capacity();
-		int pages = this.contents.isEmpty() ? 1 : contents.size() % capacity == 0 ? contents.size() / capacity : contents.size() / capacity + 1;
-
 		int columns = Math.max(1, Math.min(9, this.contentZone.getX()));
 		int rows = Math.max(1, Math.min(9, this.contentZone.getY()));
 
-		List<U> viewable = this.contents.subList((this.page - 1) * capacity, this.page == pages ? this.contents.size() : this.page * capacity);
-		List<SpongeIcon> translated = viewable.stream().map(obj -> this.applier.apply(obj)).collect(Collectors.toList());
+		int capacity = columns * rows;
+		int pages = this.contents.isEmpty() ? 1 : contents.size() % capacity == 0 ? contents.size() / capacity : contents.size() / capacity + 1;
 
 		for (int i = 0; i < pages; i++) {
-			Inventory page = Inventory.builder()
-					.grid(columns, rows)
-					.completeStructure()
-					.build();
+			List<U> viewable = this.contents.subList((i) * capacity, i + 1 == pages ? this.contents.size() : (i + 1) * capacity);
+			List<SpongeIcon> translated = viewable.stream().map(obj -> this.applier.apply(obj)).collect(Collectors.toList());
 
 			ViewableInventory view = ViewableInventory.builder()
 					.type(ContainerTypes.GENERIC_9X6)
-					.grid(page.slots(), new Vector2i(columns, rows), this.offsets)
 					.completeStructure().build();
 
+			InternalPage ip = new InternalPage(view);
+
 			for(int k = 0; k < view.capacity(); k++) {
-				final int slot = i;
-				layout.getIcon(i).ifPresent(icon -> {
+				final int slot = k;
+				layout.getIcon(k).ifPresent(icon -> {
 					view.set(slot, icon.getDisplay());
 					if(icon.getListeners().size() > 0) {
 						icon.getListeners().forEach(listener -> {
-							view.getSlot(slot).ifPresent(s -> {
-								this.view.getListener().register(slot, listener);
+							view.slot(slot).ifPresent(s -> {
+								ip.register(slot, listener);
 							});
 						});
 					}
 				});
 			}
 
-			InternalPage ip = new InternalPage(view);
 
 			int s = 0;
 			for(SpongeIcon icon : translated) {
-				Slot slot = page.getSlot(s++).orElseThrow(() -> new IllegalStateException("Unable to locate target slot"));
+				int key = this.calculateSlot(s++);
+				Slot slot = view.slot(key).orElseThrow(() -> new IllegalStateException("Unable to locate target slot"));
 				slot.set(icon.getDisplay());
 
-				int index = this.calculateSlot(slot.get(Keys.SLOT_INDEX).get());
-				SpongeImpactorPlugin.getInstance().getPluginLogger().info("Page: Slot Index = " + index);
-
-				ip.handlers.putAll(index, icon.getListeners());
+				ip.handlers.putAll(key, icon.getListeners());
 			}
 
 			this.pages.add(ip);
@@ -239,28 +235,28 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 			return this;
 		}
 
-		public SpongePageBuilder firstPage(ItemType type, int slot) {
-			this.pageIcons.put(PageIconType.FIRST, new PageIcon<>(type, slot));
+		public SpongePageBuilder firstPage(Supplier<? extends ItemType> type, int slot) {
+			this.pageIcons.put(PageIconType.FIRST, new PageIcon<>(type.get(), slot));
 			return this;
 		}
 
-		public SpongePageBuilder previousPage(ItemType type, int slot) {
-			this.pageIcons.put(PageIconType.PREV, new PageIcon<>(type, slot));
+		public SpongePageBuilder previousPage(Supplier<? extends ItemType> type, int slot) {
+			this.pageIcons.put(PageIconType.PREV, new PageIcon<>(type.get(), slot));
 			return this;
 		}
 
-		public SpongePageBuilder currentPage(ItemType type, int slot) {
-			this.pageIcons.put(PageIconType.CURRENT, new PageIcon<>(type, slot));
+		public SpongePageBuilder currentPage(Supplier<? extends ItemType> type, int slot) {
+			this.pageIcons.put(PageIconType.CURRENT, new PageIcon<>(type.get(), slot));
 			return this;
 		}
 
-		public SpongePageBuilder nextPage(ItemType type, int slot) {
-			this.pageIcons.put(PageIconType.NEXT, new PageIcon<>(type, slot));
+		public SpongePageBuilder nextPage(Supplier<? extends ItemType> type, int slot) {
+			this.pageIcons.put(PageIconType.NEXT, new PageIcon<>(type.get(), slot));
 			return this;
 		}
 
-		public SpongePageBuilder lastPage(ItemType type, int slot) {
-			this.pageIcons.put(PageIconType.LAST, new PageIcon<>(type, slot));
+		public SpongePageBuilder lastPage(Supplier<? extends ItemType> type, int slot) {
+			this.pageIcons.put(PageIconType.LAST, new PageIcon<>(type.get(), slot));
 			return this;
 		}
 

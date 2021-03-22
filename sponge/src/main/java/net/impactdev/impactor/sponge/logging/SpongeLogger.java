@@ -25,7 +25,7 @@ public class SpongeLogger implements Logger {
     @Override
     public void noTag(String message) {
         if (Sponge.isServerAvailable()) {
-            Sponge.getServer().sendMessage(Identity.nil(), this.toText(message), MessageType.SYSTEM);
+            Sponge.server().sendMessage(Identity.nil(), this.toText(message), MessageType.SYSTEM);
         } else {
             fallback.info(message);
         }
@@ -39,7 +39,7 @@ public class SpongeLogger implements Logger {
     @Override
     public void info(String message) {
         if (Sponge.isServerAvailable()) {
-            Sponge.getGame().getSystemSubject().sendMessage(
+            Sponge.game().systemSubject().sendMessage(
                     Identity.nil(),
                     Component.text(plugin.getMetadata().getName()).color(NamedTextColor.YELLOW)
                             .append(Component.text(" \u00bb ").color(NamedTextColor.GRAY))
@@ -59,7 +59,7 @@ public class SpongeLogger implements Logger {
     @Override
     public void warn(String message) {
         if (Sponge.isServerAvailable()) {
-            Sponge.getGame().getSystemSubject().sendMessage(
+            Sponge.game().systemSubject().sendMessage(
                     Identity.nil(),
                     Component.text(plugin.getMetadata().getName()).color(NamedTextColor.YELLOW)
                             .append(Component.text("(").color(NamedTextColor.GRAY))
@@ -81,7 +81,7 @@ public class SpongeLogger implements Logger {
     @Override
     public void error(String message) {
         if (Sponge.isServerAvailable()) {
-            Sponge.getGame().getSystemSubject().sendMessage(
+            Sponge.game().systemSubject().sendMessage(
                     Identity.nil(),
                     Component.text(plugin.getMetadata().getName()).color(NamedTextColor.YELLOW)
                             .append(Component.text("(").color(NamedTextColor.GRAY))
@@ -104,7 +104,7 @@ public class SpongeLogger implements Logger {
     public void debug(String message) {
         if (this.plugin.inDebugMode()) {
             if (Sponge.isServerAvailable()) {
-                Sponge.getGame().getSystemSubject().sendMessage(
+                Sponge.game().systemSubject().sendMessage(
                         Identity.nil(),
                         Component.text(plugin.getMetadata().getName()).color(NamedTextColor.YELLOW)
                                 .append(Component.text("(").color(NamedTextColor.GRAY))

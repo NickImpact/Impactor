@@ -131,15 +131,16 @@ public class SpongeMessageService implements MessageService<Component> {
 	private Component parseToken(PlaceholderParser parser, List<Supplier<Object>> associations, String arguments) {
 		if(associations.isEmpty()) {
 			return parser.parse(PlaceholderContext.builder()
-					.setArgumentString(arguments)
+					.argumentString(arguments)
 					.build());
 		} else {
 			for (Supplier<Object> association : associations) {
 				Component result = parser.parse(PlaceholderContext.builder()
-						.setAssociatedObject(association)
-						.setArgumentString(arguments)
+						.associatedObject(association)
+						.argumentString(arguments)
 						.build()
 				);
+
 				if (result != Component.empty()) {
 					return result;
 				}
@@ -152,7 +153,7 @@ public class SpongeMessageService implements MessageService<Component> {
 	private Optional<PlaceholderParser> getParser(String key) {
 		return RegistryTypes.PLACEHOLDER_PARSER.get()
 				.stream()
-				.filter(parser -> parser.key(RegistryTypes.PLACEHOLDER_PARSER).getFormatted().equals(key))
+				.filter(parser -> parser.key(RegistryTypes.PLACEHOLDER_PARSER).formatted().equals(key))
 				.findAny();
 	}
 

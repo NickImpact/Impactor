@@ -12,7 +12,7 @@ public final class SpongeEventBus extends AbstractEventBus<PluginContainer> {
             return (PluginContainer) plugin;
         }
 
-        PluginContainer pluginContainer = Sponge.getPluginManager().fromInstance(plugin).orElse(null);
+        PluginContainer pluginContainer = Sponge.pluginManager().fromInstance(plugin).orElse(null);
         if (pluginContainer != null) {
             return pluginContainer;
         }
