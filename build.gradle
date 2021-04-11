@@ -24,7 +24,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'maven-publish-auth'
 
 group 'net.impactdev.impactor'
-version '3.2.0-SNAPSHOT'
+version '4.0.0-SNAPSHOT'
 
 sourceCompatibility = targetCompatibility = "1.8" // Need this here so eclipse task generates correctly.
 compileJava {
@@ -81,7 +81,7 @@ subprojects {
     apply plugin: 'ninja.miserable.blossom'
 
     group = 'net.impactdev.impactor'
-    version = '3.2.0-SNAPSHOT'
+    version = '4.0.0-SNAPSHOT'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -110,7 +110,6 @@ subprojects {
         shadow 'net.kyori:adventure-text-serializer-legacy:4.7.0'
         shadow 'net.kyori:adventure-text-serializer-gson:4.7.0'
         shadow 'net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT'
-        //compile 'com.github.ben-manes.caffeine:caffeine:2.8.2'
         testCompile group: 'junit', name: 'junit', version: '4.12'
     }
 

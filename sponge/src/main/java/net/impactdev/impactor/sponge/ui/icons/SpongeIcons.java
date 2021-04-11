@@ -1,4 +1,4 @@
-package net.impactdev.impactor.sponge.ui.rework;
+package net.impactdev.impactor.sponge.ui.icons;
 
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.data.Keys;

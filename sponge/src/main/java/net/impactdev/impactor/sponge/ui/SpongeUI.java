@@ -8,9 +8,8 @@ import net.impactdev.impactor.api.gui.UI;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.utilities.Builder;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
-import net.impactdev.impactor.sponge.ui.rework.SpongeLayout;
-import net.impactdev.impactor.sponge.ui.rework.SpongeIcon;
-import net.kyori.adventure.text.TextComponent;
+import net.impactdev.impactor.sponge.ui.icons.SpongeIcon;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cause;
@@ -21,11 +20,9 @@ import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 import org.spongepowered.api.item.inventory.menu.handler.ClickHandler;
 import org.spongepowered.api.item.inventory.menu.handler.SlotClickHandler;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
-import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Ticks;
 
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -98,16 +95,21 @@ public class SpongeUI implements UI<ServerPlayer, SpongeIcon> {
         return this;
     }
 
+    @Override
+    public void set(SpongeIcon icon, int slot) {
+        this.getBackingMenu().inventory().set(slot, icon.getDisplay());
+    }
+
     public static SpongeUIBuilder builder() {
         return new SpongeUIBuilder();
     }
 
     public static class SpongeUIBuilder implements Builder<SpongeUI, SpongeUIBuilder> {
 
-        private TextComponent title;
+        private Component title;
         private ViewableInventory view;
 
-        public SpongeUIBuilder title(TextComponent title) {
+        public SpongeUIBuilder title(Component title) {
             this.title = title;
             return this;
         }
@@ -131,7 +133,7 @@ public class SpongeUI implements UI<ServerPlayer, SpongeIcon> {
         }
     }
 
-    static class CooldownClickHandler implements SlotClickHandler {
+    public static class CooldownClickHandler implements SlotClickHandler {
 
         private final SpongeUI parent;
         private final ArrayListMultimap<Integer, ClickHandler> delegates;

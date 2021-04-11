@@ -6,9 +6,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import net.impactdev.impactor.api.gui.Page;
-import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
-import net.impactdev.impactor.sponge.ui.rework.SpongeIcon;
-import net.impactdev.impactor.sponge.ui.rework.SpongeLayout;
+import net.impactdev.impactor.sponge.ui.icons.SpongeIcon;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.data.Keys;
@@ -16,13 +15,10 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ContainerTypes;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.menu.handler.ClickHandler;
-import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
-import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.math.vector.Vector2i;
 
 import java.util.List;
@@ -31,7 +27,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
+public class SpongePage<U> implements Page<ServerPlayer, U, SpongeUI, SpongeIcon> {
 
 	private final ServerPlayer viewer;
 	private final SpongeUI view;
@@ -40,7 +36,7 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 	private List<U> contents;
 	private Function<U, SpongeIcon> applier;
 
-	private final TextComponent title;
+	private final Component title;
 
 	private final Vector2i contentZone;
 	private final Vector2i offsets;
@@ -92,7 +88,7 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 	}
 
 	@Override
-	public Player getViewer() {
+	public ServerPlayer getViewer() {
 		return this.viewer;
 	}
 
@@ -102,7 +98,7 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 	}
 
 	@Override
-	public Page<Player, U, SpongeUI, SpongeIcon> applier(Function<U, SpongeIcon> applier) {
+	public Page<ServerPlayer, U, SpongeUI, SpongeIcon> applier(Function<U, SpongeIcon> applier) {
 		this.applier = applier;
 		return this;
 	}
@@ -199,7 +195,7 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 		private SpongeLayout view;
 
 		/** The title of the representation */
-		private TextComponent title;
+		private Component title;
 
 		/** Represents the area the contents can be displayed in the inventory */
 		private Vector2i contentZone;
@@ -220,7 +216,7 @@ public class SpongePage<U> implements Page<Player, U, SpongeUI, SpongeIcon> {
 			return this;
 		}
 
-		public SpongePageBuilder title(TextComponent title) {
+		public SpongePageBuilder title(Component title) {
 			this.title = title;
 			return this;
 		}

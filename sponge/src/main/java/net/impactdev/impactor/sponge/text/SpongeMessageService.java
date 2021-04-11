@@ -11,6 +11,7 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.services.text.MessageService;
+import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;

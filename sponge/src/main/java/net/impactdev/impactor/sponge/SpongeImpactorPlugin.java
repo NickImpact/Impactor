@@ -30,9 +30,9 @@ import net.impactdev.impactor.sponge.services.SpongeMojangServerStatusService;
 import net.impactdev.impactor.sponge.text.SpongeMessageService;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
 import net.impactdev.impactor.sponge.ui.SpongePage;
-import net.impactdev.impactor.sponge.ui.rework.SpongeIcon;
-import net.impactdev.impactor.sponge.ui.rework.SpongeIcons;
-import net.impactdev.impactor.sponge.ui.rework.SpongeLayout;
+import net.impactdev.impactor.sponge.ui.icons.SpongeIcon;
+import net.impactdev.impactor.sponge.ui.icons.SpongeIcons;
+import net.impactdev.impactor.sponge.ui.SpongeLayout;
 import net.impactdev.impactor.sponge.ui.signs.SpongeSignQuery;
 import lombok.Getter;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
@@ -57,18 +57,23 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.Ticks;
 import org.spongepowered.math.vector.Vector2i;
 import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.jvm.Plugin;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -204,6 +209,18 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 				test.open();
 			});
 		}, 10, TimeUnit.SECONDS);
+
+		AtomicReference<Instant> prior = new AtomicReference<>(Instant.now());
+		Sponge.server().scheduler().submit(Task.builder()
+				.execute(() -> {
+					Instant now = Instant.now();
+					this.getPluginLogger().info("Timestamp: " + now + " - " + Duration.between(prior.get(), now).toMillis() + "ms since last iteration");
+					prior.set(now);
+				})
+				.interval(Ticks.single())
+				.plugin(this.getPluginContainer())
+				.build()
+		);
 	}
 
 	@Listener

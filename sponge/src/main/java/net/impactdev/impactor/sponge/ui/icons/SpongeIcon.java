@@ -1,4 +1,4 @@
-package net.impactdev.impactor.sponge.ui.rework;
+package net.impactdev.impactor.sponge.ui.icons;
 
 import net.impactdev.impactor.api.gui.Icon;
 import net.impactdev.impactor.api.utilities.Builder;
@@ -47,6 +47,8 @@ public class SpongeIcon implements Icon<ItemStack, ClickHandler> {
 
         public SpongeIconBuilder delegate(ItemStack delegate) {
             this.delegate = delegate;
+
+
             return this;
         }
 

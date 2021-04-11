@@ -2,7 +2,7 @@ package net.impactdev.impactor.api.gui;
 
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 
-public interface UI<V, U extends Icon<?, ?>> {
+public interface UI<V, I extends Icon<?, ?>> {
 
 	ImpactorPlugin getPlugin();
 
@@ -10,8 +10,11 @@ public interface UI<V, U extends Icon<?, ?>> {
 
 	boolean close(V viewer);
 
-	Layout<U> getLayout();
+	Layout<I> getLayout();
 
-	UI<V, U> define(Layout<U> layout);
+	UI<V, I> define(Layout<I> layout);
+
+	void set(I icon, int slot);
+
 
 }
