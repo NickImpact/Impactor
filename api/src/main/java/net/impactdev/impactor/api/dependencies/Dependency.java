@@ -217,6 +217,13 @@ public enum Dependency {
 			"9KWVLdlnsHW/t9ezA+TNsmuVHE590NBagFL5luaOAIc=",
 			Relocation.of("adventure", "net{}kyori{}adventure")
 	),
+	KYORI_TEXT_MINIMESSAGE(
+			"net{}kyori",
+			"adventure-text-minimessage",
+			"4.1.0",
+			"9KWVLdlnsHW/t9ezA+TNsmuVHE590NBagFL5luaOAIc=",
+			Relocation.of("adventure", "net{}kyori{}adventure")
+	),
 	ACF_SPONGE(
 			"co{}aikar",
 			"acf-sponge",

@@ -1,233 +1,181 @@
 package net.impactdev.impactor.sponge.ui;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import net.impactdev.impactor.api.gui.InventoryDimensions;
 import net.impactdev.impactor.api.gui.Layout;
 import net.impactdev.impactor.api.gui.UI;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+import net.impactdev.impactor.api.utilities.Builder;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import net.impactdev.impactor.sponge.ui.icons.SpongeIcon;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
-import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryProperty;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.property.InventoryDimension;
-import org.spongepowered.api.item.inventory.property.InventoryTitle;
-import org.spongepowered.api.item.inventory.property.SlotIndex;
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.Cause;
+import org.spongepowered.api.item.inventory.Container;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.menu.ClickType;
+import org.spongepowered.api.item.inventory.menu.InventoryMenu;
+import org.spongepowered.api.item.inventory.menu.handler.ClickHandler;
+import org.spongepowered.api.item.inventory.menu.handler.SlotClickHandler;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
+import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.Ticks;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class SpongeUI implements UI<Player, ClickInventoryEvent, InteractInventoryEvent.Close, SpongeIcon> {
+public class SpongeUI implements UI<ServerPlayer, SpongeIcon> {
 
-	private final ImpactorPlugin plugin;
+    private final ImpactorPlugin plugin;
+    private final InventoryMenu viewable;
 
-	private Inventory inventory;
-	private InventoryDimensions dimensions;
+    private SpongeLayout layout;
 
-	private SpongeLayout layout;
+    private final CooldownClickHandler listener;
+    private final Cache<UUID, Boolean> cooldowns = Caffeine.newBuilder()
+            .expireAfterWrite(1, TimeUnit.SECONDS)
+            .build();
 
-	private Map<Integer, SpongeIcon> slots;
-	private List<BiConsumer<Player, ClickInventoryEvent>> additionals = Lists.newArrayList();
-	private List<Consumer<InteractInventoryEvent.Close>> closeAdditionals = Lists.newArrayList();
+    private SpongeUI(ImpactorPlugin plugin, InventoryMenu viewable) {
+        this.plugin = plugin;
+        this.viewable = viewable;
 
-	private Multimap<UUID, TimeMap> cooldowns = ArrayListMultimap.create();
+        this.listener = new CooldownClickHandler(this);
+        this.viewable.registerSlotClick(this.listener);
+        this.viewable.setReadOnly(true);
+    }
 
-	private SpongeUI(ImpactorPlugin plugin, SpongeUIBuilder builder) {
-		this.plugin = plugin;
-		this.slots = Maps.newHashMap();
-		this.inventory = builder.builder
-				.listener(ClickInventoryEvent.class, this::processClick)
-				.listener(InteractInventoryEvent.Close.class, this::processClose)
-				.build(plugin);
+    @Override
+    public ImpactorPlugin getPlugin() {
+        return this.plugin;
+    }
 
-		this.dimensions = new InventoryDimensions(builder.dimension.getColumns(), builder.dimension.getRows());
-	}
+    public InventoryMenu getBackingMenu() {
+        return this.viewable;
+    }
 
-	@Override
-	public ImpactorPlugin getPlugin() {
-		return this.plugin;
-	}
+    public CooldownClickHandler getListener() {
+        return this.listener;
+    }
 
-	@Override
-	public SpongeLayout getLayout() {
-		return this.layout;
-	}
+    @Override
+    public boolean open(ServerPlayer viewer) {
+        return this.viewable.open(viewer).isPresent();
+    }
 
-	@Override
-	public SpongeUI define(Layout<SpongeIcon> layout) {
-		this.layout = (SpongeLayout) layout;
-		this.slots.clear();
-		for(int i = 0; i < inventory.capacity(); i++) {
-			final int slot = i;
-			layout.getIcon(i).ifPresent(icon -> this.setSlot(slot, icon));
-		}
+    @Override
+    public boolean close(ServerPlayer viewer) {
+        return viewer.closeInventory();
+    }
 
-		return this;
-	}
+    @Override
+    public SpongeLayout getLayout() {
+        return this.layout;
+    }
 
-	@Override
-	public Optional<SpongeIcon> getIcon(int slot) {
-		return Optional.ofNullable(this.slots.get(slot));
-	}
+    @Override
+    public SpongeUI define(Layout<SpongeIcon> layout) {
+        this.layout = (SpongeLayout) layout;
 
-	@Override
-	public void setSlot(int slot, SpongeIcon icon) {
-		this.inventory.query(QueryOperationTypes.INVENTORY_PROPERTY.of(SlotIndex.of(slot))).first().set(icon.getDisplay());
-		this.slots.put(slot, icon);
-	}
+        for (int i = 0; i < this.viewable.inventory().capacity(); i++) {
+            final int slot = i;
+            layout.getIcon(i).ifPresent(icon -> {
+                this.viewable.inventory().set(slot, icon.getDisplay());
+                if (icon.getListeners().size() > 0) {
+                    icon.getListeners().forEach(listener -> {
+                        this.listener.register(slot, listener);
+                    });
+                }
+            });
+        }
 
-	@Override
-	public void open(Player player) {
-		player.openInventory(this.inventory);
-	}
+        return this;
+    }
 
-	@Override
-	public void close(Player player) {
-		player.closeInventory();
-	}
+    @Override
+    public void set(SpongeIcon icon, int slot) {
+        this.getBackingMenu().inventory().set(slot, icon.getDisplay());
+    }
 
-	@Override
-	public void clear() {
-		this.slots.forEach((slot, icon) -> this.inventory.query(QueryOperationTypes.INVENTORY_PROPERTY.of(SlotIndex.of(slot))).first().clear());
-		this.slots.clear();
-	}
+    public static SpongeUIBuilder builder() {
+        return new SpongeUIBuilder();
+    }
 
-	@Override
-	public void clear(int... slots) {
-		for(int slot : slots) {
-			this.slots.remove(slot);
-			this.inventory.query(QueryOperationTypes.INVENTORY_PROPERTY.of(SlotIndex.of(slot))).first().set(ItemStack.empty());
-		}
-	}
+    public static class SpongeUIBuilder implements Builder<SpongeUI, SpongeUIBuilder> {
 
-	@Override
-	public UI<?, ?, ?, ?> attachListener(BiConsumer<Player, ClickInventoryEvent> listener) {
-		this.additionals.add(listener);
-		return this;
-	}
+        private Component title;
+        private ViewableInventory view;
 
-	@Override
-	public UI<?, ?, ?, ?> attachCloseListener(Consumer<InteractInventoryEvent.Close> listener) {
-		this.closeAdditionals.add(listener);
-		return this;
-	}
+        public SpongeUIBuilder title(Component title) {
+            this.title = title;
+            return this;
+        }
 
-	@Override
-	public InventoryDimensions getDimension() {
-		return this.dimensions;
-	}
+        public SpongeUIBuilder view(ViewableInventory view) {
+            this.view = view;
+            return this;
+        }
 
-	@SuppressWarnings("ConstantConditions")
-	private void processClick(ClickInventoryEvent event) {
-		event.setCancelled(true);
-		event.getCause().first(Player.class).ifPresent(pl -> {
-			event.getTransactions().forEach(transaction -> {
-				transaction.getSlot().getProperty(SlotIndex.class, "slotindex").ifPresent(slot -> {
-					SpongeIcon icon = slots.get(slot.getValue());
-					if(icon != null) {
-						Optional<TimeMap> cache = this.cooldowns.get(pl.getUniqueId())
-								.stream()
-								.filter(x -> x.getSlot() == slot.getValue())
-								.findAny();
+        @Override
+        public SpongeUIBuilder from(SpongeUI input) {
+            return null;
+        }
 
-						boolean operate = true;
-						if(cache.isPresent()) {
-							if(cache.get().getTime().plusMillis(500).isAfter(Instant.now())) {
-								operate = false;
-							}
-						}
+        @Override
+        public SpongeUI build() {
+            InventoryMenu menu = InventoryMenu.of(this.view);
+            menu.setTitle(this.title);
 
-						if(operate) {
-							cache.ifPresent(timeMap -> this.cooldowns.remove(pl.getUniqueId(), timeMap));
-							this.cooldowns.put(pl.getUniqueId(), new TimeMap(slot.getValue(), Instant.now()));
-							Sponge.getScheduler().createTaskBuilder()
-									.execute(() -> {
-										icon.process(new SpongeClickable(pl, event));
-									})
-									.delayTicks(1)
-									.submit(this.plugin);
-						} else {
-							pl.sendMessage(Text.of(TextColors.RED, "Please wait to click this icon again!"));
-						}
-					}
+            return new SpongeUI(SpongeImpactorPlugin.getInstance(), menu);
+        }
+    }
 
-					for(BiConsumer<Player, ClickInventoryEvent> extra : additionals) {
-						Sponge.getScheduler().createTaskBuilder().execute(() -> extra.accept(pl, event)).delayTicks(1).submit(this.plugin);
-					}
-				});
-			});
-		});
-	}
+    public static class CooldownClickHandler implements SlotClickHandler {
 
-	private void processClose(InteractInventoryEvent.Close event) {
-		for(Consumer<InteractInventoryEvent.Close> consumer : this.closeAdditionals) {
-			consumer.accept(event);
-		}
-	}
+        private final SpongeUI parent;
+        private final ArrayListMultimap<Integer, ClickHandler> delegates;
 
-	public static SpongeUIBuilder builder() {
-		return new SpongeUIBuilder();
-	}
+        public CooldownClickHandler(SpongeUI parent) {
+            this.parent = parent;
+            this.delegates = ArrayListMultimap.create();
+        }
 
-	public static class SpongeUIBuilder {
+        public void register(int slot, ClickHandler handler) {
+            this.delegates.put(slot, handler);
+        }
 
-		private Inventory.Builder builder = Inventory.builder();
-		private InventoryArchetype archetype;
-		private InventoryDimension dimension;
+        public void clear() {
+            this.delegates.clear();
+        }
 
-		public SpongeUIBuilder archetype(InventoryArchetype type) {
-			this.archetype = type;
-			this.builder.of(type);
-			return this;
-		}
+        @Override
+        public boolean handle(Cause cause, Container container, Slot slot, int slotIndex, ClickType<?> clickType) {
+            ServerPlayer player = cause.first(ServerPlayer.class).orElseThrow(() -> new IllegalStateException("Unable to locate viewer that caused click"));
+            boolean visible = this.parent.cooldowns.asMap().containsKey(player.uniqueId());
 
-		public SpongeUIBuilder dimension(InventoryDimension dimension) {
-			this.dimension = dimension;
-			this.property(dimension);
-			return this;
-		}
+            if (!visible) {
+                this.parent.cooldowns.put(player.uniqueId(), true);
+                AtomicBoolean result = new AtomicBoolean(true);
+                this.delegates.get(slotIndex).forEach(handler -> {
+                    Sponge.server().scheduler().submit(Task.builder()
+                            .execute(() -> {
+                                if (result.get()) {
+                                    if (!handler.handle(cause, container, clickType)) {
+                                        result.set(false);
+                                    }
+                                }
+                            })
+                            .delay(Ticks.of(1))
+                            .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                            .build()
+                    );
+                });
+            }
 
-		public SpongeUIBuilder property(InventoryProperty property) {
-			if(property instanceof InventoryDimension && dimension == null) {
-				this.dimension = (InventoryDimension) property;
-			}
-
-			this.builder.property(property);
-			return this;
-		}
-
-		public SpongeUIBuilder title(Text title) {
-			return this.property(InventoryTitle.of(title));
-		}
-
-		public SpongeUI build() {
-			return new SpongeUI(SpongeImpactorPlugin.getInstance(), this);
-		}
-	}
-
-	@Getter
-	@EqualsAndHashCode
-	@RequiredArgsConstructor
-	private static class TimeMap {
-		private final int slot;
-		private final Instant time;
-	}
+            return false;
+        }
+    }
 }

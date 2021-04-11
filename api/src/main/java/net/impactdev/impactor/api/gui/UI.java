@@ -2,34 +2,19 @@ package net.impactdev.impactor.api.gui;
 
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
-public interface UI<T, V, E, U extends Icon> {
+public interface UI<V, I extends Icon<?, ?>> {
 
 	ImpactorPlugin getPlugin();
 
-	Layout<U> getLayout();
+	boolean open(V viewer);
 
-	UI<T, V, E, U> define(Layout<U> layout);
+	boolean close(V viewer);
 
-	Optional<U> getIcon(int slot);
+	Layout<I> getLayout();
 
-	void setSlot(int slot, U icon);
+	UI<V, I> define(Layout<I> layout);
 
-	void open(T player);
+	void set(I icon, int slot);
 
-	void close(T player);
-
-	void clear();
-
-	void clear(int... slots);
-
-	UI attachListener(BiConsumer<T, V> listener);
-
-	UI attachCloseListener(Consumer<E> listener);
-
-	InventoryDimensions getDimension();
 
 }

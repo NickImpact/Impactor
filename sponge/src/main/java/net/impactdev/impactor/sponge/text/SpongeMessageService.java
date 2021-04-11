@@ -11,6 +11,7 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.services.text.MessageService;
+import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -21,11 +22,9 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextRepresentable;
-import org.spongepowered.api.text.placeholder.PlaceholderContext;
-import org.spongepowered.api.text.placeholder.PlaceholderParser;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.placeholder.PlaceholderContext;
+import org.spongepowered.api.placeholder.PlaceholderParser;
+import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +37,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class SpongeMessageService implements MessageService<Text> {
+public class SpongeMessageService implements MessageService<Component> {
 
 	private static final Pattern MODIFIERS = Pattern.compile(":([sp]+)$", Pattern.CASE_INSENSITIVE);
 	private static final Pattern TOKEN_LOCATOR = Pattern.compile("(^[^{]+)?([{][{](?<placeholder>[\\w-:]+)(\\|(?<arguments>.+))?[}][}])(.+)?");
@@ -51,7 +50,7 @@ public class SpongeMessageService implements MessageService<Text> {
 	}
 
 	@Override
-	public Text parse(@NonNull String message, @NonNull List<Supplier<Object>> associations) {
+	public Component parse(@NonNull String message, @NonNull List<Supplier<Object>> associations) {
 		Preconditions.checkNotNull(message, "Input must not be null");
 		Preconditions.checkNotNull(associations, "Associations must not be null");
 
@@ -61,7 +60,7 @@ public class SpongeMessageService implements MessageService<Text> {
 
 		Style style = Style.empty();
 		while(!reference.isEmpty()) {
-			final List<Function<TextComponent, TextComponent>> modifiers = Lists.newArrayList();
+			final List<Function<Component, Component>> modifiers = Lists.newArrayList();
 
 			Matcher matcher = TOKEN_LOCATOR.matcher(reference);
 			if(matcher.find()) {
@@ -81,7 +80,7 @@ public class SpongeMessageService implements MessageService<Text> {
 				}
 
 				Optional<PlaceholderParser> parser = this.getParser(placeholder);
-				TextRepresentable out = parser.isPresent() ? this.parseToken(parser.get(), associations, arguments) : Text.EMPTY;
+				Component out = parser.isPresent() ? this.parseToken(parser.get(), associations, arguments) : Component.empty();
 
 				if(matcher.group(1) != null) {
 					String in = matcher.group(1);
@@ -99,13 +98,13 @@ public class SpongeMessageService implements MessageService<Text> {
 					reference = reference.replaceFirst("^[^{]+", "");
 				}
 
-				TextComponent result = ((TextComponent) GsonComponentSerializer.gson().deserialize(TextSerializers.JSON.serialize(out.toText())));
+				Component result = out;
 				if (result.style().color() == null && result.style().decorations().values().stream().allMatch(state -> state == TextDecoration.State.NOT_SET)) {
 					result = result.style(style.hoverEvent(result.hoverEvent()).clickEvent(result.clickEvent()));
 				}
 
 				if (!result.equals(Component.empty())) {
-					for (Function<TextComponent, TextComponent> modifier : modifiers) {
+					for (Function<Component, Component> modifier : modifiers) {
 						result = modifier.apply(result);
 					}
 
@@ -127,32 +126,36 @@ public class SpongeMessageService implements MessageService<Text> {
 			}
 		}
 
-		return TextSerializers.JSON.deserialize(GsonComponentSerializer.gson().serialize(output.build()));
+		return output.build();
 	}
 
-	private TextRepresentable parseToken(PlaceholderParser parser, List<Supplier<Object>> associations, String arguments) {
+	private Component parseToken(PlaceholderParser parser, List<Supplier<Object>> associations, String arguments) {
 		if(associations.isEmpty()) {
 			return parser.parse(PlaceholderContext.builder()
-					.setArgumentString(arguments)
+					.argumentString(arguments)
 					.build());
 		} else {
 			for (Supplier<Object> association : associations) {
-				Text result = parser.parse(PlaceholderContext.builder()
-						.setAssociatedObject(association)
-						.setArgumentString(arguments)
+				Component result = parser.parse(PlaceholderContext.builder()
+						.associatedObject(association)
+						.argumentString(arguments)
 						.build()
 				);
-				if (result != Text.EMPTY) {
+
+				if (result != Component.empty()) {
 					return result;
 				}
 			}
 		}
 
-		return Text.EMPTY;
+		return Component.empty();
 	}
 
 	private Optional<PlaceholderParser> getParser(String key) {
-		return Sponge.getRegistry().getType(PlaceholderParser.class, key);
+		return RegistryTypes.PLACEHOLDER_PARSER.get()
+				.stream()
+				.filter(parser -> parser.key(RegistryTypes.PLACEHOLDER_PARSER).formatted().equals(key))
+				.findAny();
 	}
 
 	private static final BiMap<Character, TextColor> ID_TO_COLOR =
@@ -231,7 +234,7 @@ public class SpongeMessageService implements MessageService<Text> {
 		return result;
 	}
 
-	private Optional<Style> locateNonEmptyStyle(TextComponent component) {
+	private Optional<Style> locateNonEmptyStyle(Component component) {
 		List<TextComponent> children = component.children().stream()
 				.filter(c -> c instanceof TextComponent)
 				.map(c -> (TextComponent) c)

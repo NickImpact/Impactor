@@ -2,86 +2,122 @@ package net.impactdev.impactor.sponge.text.placeholders;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.gson.reflect.TypeToken;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderManager;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.text.placeholders.provided.Memory;
-import net.impactdev.impactor.sponge.text.placeholders.provided.tick.MeanTickTime;
+import net.impactdev.impactor.sponge.text.processors.gradients.NumberBasedGradientProcessor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.placeholder.PlaceholderContext;
-import org.spongepowered.api.text.placeholder.PlaceholderParser;
 
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.placeholder.PlaceholderContext;
+import org.spongepowered.api.placeholder.PlaceholderParser;
+import org.spongepowered.api.registry.RegistryTypes;
+
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderParser> {
+public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderMetadata, PlaceholderParser> {
 
     private static final Pattern PARSER_MATCHER = Pattern.compile("(\\w+):(\\w+)");
 
-    private final List<PlaceholderParser> parsers = Lists.newArrayList();
+    private final List<PlaceholderMetadata> parsers = Lists.newArrayList();
 
     public SpongePlaceholderManager() {
         this.populate();
     }
 
-    public void register(PlaceholderParser parser) {
+    public void register(PlaceholderMetadata parser) {
         this.parsers.add(parser);
     }
 
-    public ImmutableList<PlaceholderParser> getAllInternalParsers() {
+    public ImmutableList<PlaceholderMetadata> getAllInternalParsers() {
         return ImmutableList.copyOf(this.parsers);
     }
 
     public ImmutableList<PlaceholderParser> getAllPlatformParsers() {
-        List<PlaceholderParser> parsers = Lists.newArrayList(Sponge.getRegistry().getAllOf(PlaceholderParser.class));
+        List<PlaceholderParser> parsers = RegistryTypes.PLACEHOLDER_PARSER.get().stream().collect(Collectors.toList());
         return ImmutableList.copyOf(parsers);
     }
 
     public void populate() {
-        PluginContainer container = SpongeImpactorPlugin.getInstance().getPluginContainer();
-        SpongeImpactorPlugin plugin = SpongeImpactorPlugin.getInstance();
-
-        this.register(this.create("tps", "Server Ticks per Second", container, context -> formatTps(plugin.getWatcher().tps5Sec())));
-        this.register(this.create("tps_10sec", "Server Ticks per Second", container, context -> formatTps(plugin.getWatcher().tps10Sec())));
-        this.register(this.create("tps_1min", "Server Ticks per Second", container, context -> formatTps(plugin.getWatcher().tps1Min())));
-        this.register(this.create("tps_5min", "Server Ticks per Second", container, context -> formatTps(plugin.getWatcher().tps5Min())));
-        this.register(this.create("tps_15min", "Server Ticks per Second", container, context -> formatTps(plugin.getWatcher().tps15Min())));
-        this.register(this.create("mspt", "Average Milliseconds per Tick", container, context -> Impactor.getInstance().getRegistry().get(MeanTickTime.class).getFormatted()));
-        this.register(this.create("memory_used", "Server Memory In Use", container, context -> Text.of(Memory.getCurrent())));
-        this.register(this.create("memory_allocated", "Server Memory Allocated", container, context -> Text.of(Memory.getAllocated())));
-        this.register(this.create("player_count", "Current Online Player Count", container, context -> Text.of(Sponge.getServer().getOnlinePlayers().size())));
-        this.register(this.create("ping", "Player's Ping", container, context -> this.filterSource(Player.class, context.getAssociatedObject())
-                .map(player -> Text.of(player.getConnection().getLatency()))
-                .orElse(Text.EMPTY)
+        this.register(this.create("tps", context -> formatTps(Sponge.server().ticksPerSecond())));
+        this.register(this.create("mspt", context -> formatMilliseconds(Sponge.server().averageTickTime())));
+        this.register(this.create("memory_used", context -> Component.text(Memory.getCurrent())));
+        this.register(this.create("memory_allocated", context -> Component.text(Memory.getAllocated())));
+        this.register(this.create("player_count", context -> Component.text(Sponge.server().onlinePlayers().size())));
+        this.register(this.create("ping", context -> this.filterSource(ServerPlayer.class, context.associatedObject())
+                .map(player -> PING_PROCESSOR.process(player.connection().latency()))
+                .orElse(Component.empty())
         ));
-
+        AtomicInteger step = new AtomicInteger();
+        this.register(this.create("test", context -> {
+            if(step.get() > 200) {
+                step.set(0);
+            }
+            return PING_PROCESSOR.process(step.getAndIncrement());
+        }));
     }
 
-    private PlaceholderParser create(String id, String name, PluginContainer plugin, Function<PlaceholderContext, Text> parser) {
-        return PlaceholderParser.builder()
-                .id(id)
-                .name(name)
-                .plugin(plugin)
-                .parser(parser)
-                .build();
+    private PlaceholderMetadata create(String id, Function<PlaceholderContext, Component> parser) {
+        return new PlaceholderMetadata(id, PlaceholderParser.builder().parser(parser).build());
     }
 
-    private static Text formatTps(double tps) {
-        TextColor color;
-        if (tps > 18.0) {
-            color = TextColors.GREEN;
-        } else if (tps > 16.0) {
-            color = TextColors.YELLOW;
-        } else {
-            color = TextColors.RED;
-        }
+    private static final TextColor min = NamedTextColor.RED;
+    private static final TextColor max = NamedTextColor.GREEN;
 
-        return Text.of(color, (tps > 20.0 ? "*" : "") + Math.min(Math.round(tps * 100.0) / 100.0, 20.0));
+    private static final NumberBasedGradientProcessor<Double> TPS_PROCESSOR = NumberBasedGradientProcessor.builder()
+            .type(new TypeToken<Double>(){})
+            .min(10)
+            .max(20)
+            .translator(x -> Component.text(Math.min(Math.round(x * 100.0) / 100.0, 20.0)))
+            .factor(x -> x.floatValue() * 0.1f - 1)
+            .colors(min, max)
+            .build();
+
+    private static final NumberBasedGradientProcessor<Double> MSPT_PROCESSOR = NumberBasedGradientProcessor.builder()
+            .type(new TypeToken<Double>(){})
+            .min(0)
+            .max(50)
+            .translator(Component::text)
+            .factor(x -> x.floatValue() * 0.1f / 5)
+            .colors(max, min)
+            .build();
+
+    private static final NumberBasedGradientProcessor<Integer> PING_PROCESSOR = NumberBasedGradientProcessor.<Integer>builder()
+            .type(new TypeToken<Integer>(){})
+            .min(0)
+            .max(200)
+            .translator(Component::text)
+            .factor(x -> x.floatValue() * 0.1f / 20)
+            .colors(max, min)
+            .build();
+
+    private static final NumberBasedGradientProcessor<Integer> IV_PROCESSOR = NumberBasedGradientProcessor.<Integer>builder()
+            .type(new TypeToken<Integer>(){})
+            .min(0)
+            .max(31)
+            .translator(Component::text)
+            .factor(x -> x.floatValue() * 0.1f / 31 * 10)
+            .colors(max, min)
+            .build();
+
+    private static Component formatTps(double tps) {
+        Component isHigh = tps > 20.0 ? Component.text("*") : Component.empty();
+        Component result = TPS_PROCESSOR.process(tps);
+
+        return isHigh.append(result).mergeStyle(result);
+    }
+
+    private static Component formatMilliseconds(double milliseconds) {
+        return MSPT_PROCESSOR.process(milliseconds).append(Component.text("ms"));
     }
 }

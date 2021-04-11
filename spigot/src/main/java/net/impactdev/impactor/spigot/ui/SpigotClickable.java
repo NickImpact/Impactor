@@ -1,6 +1,5 @@
 package net.impactdev.impactor.spigot.ui;
 
-import net.impactdev.impactor.api.gui.Clickable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.entity.Player;
