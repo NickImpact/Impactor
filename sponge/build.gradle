@@ -38,27 +38,19 @@ repositories {
         url 'https://repo.spongepowered.org/repository/sponge-legacy'
     }
     maven { url = 'https://jitpack.io' }
-    maven {
-        name 'drnaylor-minecraft'
-        url 'http://repo.drnaylor.co.uk/artifactory/list/minecraft'
-    }
-    maven {
-        name 'drnaylor'
-        url 'http://repo.drnaylor.co.uk/artifactory/list/quickstart'
-    }
-    maven {
-        name 'Protocol Control'
-        url "https://repo.ichorpowered.com/repository/maven-public"
+    repositories {
+        maven {
+            name = "ImpactDev"
+            url = "https://maven.impactdev.net/repository/development/"
+        }
     }
 }
 
 dependencies {
     compile project(':api')
     compile project(':common')
-    shadow fileTree(dir: 'libs', include: '*.jar')
-    shadow 'org.spongepowered:spongeapi:7.3.0-SNAPSHOT'
-    shadow "com.ichorpowered:protocolcontrol:0.0.2"
-    shadow "co.aikar:acf-sponge:0.5.0-SNAPSHOT"
+    shadow 'org.spongepowered:spongeapi:7.3.0'
+    shadow "com.ichorpowered:protocolcontrol:0.0.3"
     shadow "me.lucko:jar-relocator:1.4"
     shadow('org.spongepowered:mixin:0.8-SNAPSHOT')
 }
