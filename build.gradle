@@ -18,6 +18,7 @@ plugins {
     id 'com.qixalite.spongestart' version '1.6.2'
     id 'maven'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'org.cadixdev.licenser' version '0.6.1'
     id 'net.kyori.blossom' version '1.1.0'
 }
 
@@ -79,6 +80,8 @@ subprojects {
     apply plugin: 'maven'
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: 'net.kyori.blossom'
+    apply plugin: 'org.cadixdev.licenser'
+
 
     group = 'net.impactdev.impactor'
     version = '4.0.0-SNAPSHOT'
@@ -114,6 +117,16 @@ subprojects {
 
     shadowJar {
         exclude "remapped*"
+    }
+
+    license {
+        header = file('../HEADER.txt')
+        ext {
+            name = 'Impactor'
+            url = 'https://github.com/NickImpact/Impactor/'
+            year = 2021
+        }
+        newLine = true
     }
 }
 
