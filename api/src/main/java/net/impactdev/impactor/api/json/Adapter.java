@@ -1,17 +1,25 @@
 package net.impactdev.impactor.api.json;
 
 import com.google.common.collect.Lists;
-import com.google.gson.*;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import lombok.RequiredArgsConstructor;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
 
-@RequiredArgsConstructor
 public abstract class Adapter<E> implements JsonSerializer<E>, JsonDeserializer<E> {
 
 	protected final ImpactorPlugin plugin;
+
+	public Adapter(ImpactorPlugin plugin) {
+		this.plugin = plugin;
+	}
 
 	@Override
 	public E deserialize(JsonElement json, Type type, JsonDeserializationContext ctx) throws JsonParseException {

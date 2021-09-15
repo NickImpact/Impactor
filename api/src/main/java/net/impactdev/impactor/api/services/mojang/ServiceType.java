@@ -1,8 +1,5 @@
 package net.impactdev.impactor.api.services.mojang;
 
-import lombok.Getter;
-import lombok.NonNull;
-
 import java.util.Arrays;
 
 /**
@@ -18,16 +15,14 @@ public enum ServiceType {
 	TEXTURES_MINECRAFT_NET("textures.minecraft.net", "Skins"),
 	MOJANG_COM("mojang.com", "mojang.com");
 
-	@Getter
-	private String path;
-	@Getter private String display;
+	private final String path;
+	private final String display;
 
 	ServiceType(String path, String display) {
 		this.path = path;
 		this.display = display;
 	}
 
-	@NonNull
 	public static ServiceType from(String name) {
 		return Arrays.stream(values()).filter(st -> st.path.equalsIgnoreCase(name)).findAny().get();
 	}
@@ -42,5 +37,13 @@ public enum ServiceType {
 	@Override
 	public String toString() {
 		return name().toLowerCase().replace("_", ".");
+	}
+
+	public String getPath() {
+		return this.path;
+	}
+
+	public String getDisplay() {
+		return this.display;
 	}
 }

@@ -4,18 +4,21 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.gui.InventoryDimensions;
 import net.impactdev.impactor.api.gui.Layout;
-import lombok.RequiredArgsConstructor;
 import net.impactdev.impactor.sponge.ui.icons.SpongeIcon;
 import net.impactdev.impactor.sponge.ui.icons.SpongeIcons;
 
 import java.util.Map;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 public class SpongeLayout implements Layout<SpongeIcon> {
 
 	private final ImmutableMap<Integer, SpongeIcon> elements;
 	private final InventoryDimensions dimension;
+
+	public SpongeLayout(ImmutableMap<Integer, SpongeIcon> elements, InventoryDimensions dimension) {
+		this.elements = elements;
+		this.dimension = dimension;
+	}
 
 	@Override
 	public ImmutableMap<Integer, SpongeIcon> getElements() {

@@ -17,9 +17,4 @@ public interface PlaceholderManager<T, S> {
 
     void populate();
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    default <E> Optional<E> filterSource(Class<E> want, Optional<Object> source) {
-        return source.filter(x -> want.isAssignableFrom(x.getClass())).map(want::cast);
-    }
-
 }

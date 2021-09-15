@@ -26,7 +26,7 @@
 package net.impactdev.impactor.common.event;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.gson.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.event.EventBus;
 import net.impactdev.impactor.api.event.EventSubscription;
 import net.impactdev.impactor.api.event.ImpactorEvent;
@@ -158,6 +158,11 @@ public abstract class AbstractEventBus<P> implements EventBus, AutoCloseable {
         Objects.requireNonNull(eventClass, "eventClass");
         Objects.requireNonNull(handler, "handler");
         return registerSubscription(eventClass, handler, checkPlugin(plugin));
+    }
+
+    @Override
+    public @NonNull <T extends ImpactorEvent> EventSubscription<T> subscribe(@NonNull TypeToken<T> type, Consumer<? extends T> handler) {
+        return null;
     }
 
     private @NonNull <T extends ImpactorEvent> EventSubscription<T> registerSubscription(Class<T> event, Consumer<? super T> handler, Object plugin) {

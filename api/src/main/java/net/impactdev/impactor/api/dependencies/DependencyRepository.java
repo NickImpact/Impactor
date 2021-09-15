@@ -21,10 +21,8 @@ public enum DependencyRepository {
         protected URLConnection openConnection(Dependency dependency) throws IOException {
             URLConnection connection = super.openConnection(dependency);
             connection.setRequestProperty("User-Agent", "impactor");
-
             connection.setConnectTimeout((int) TimeUnit.SECONDS.toMillis(5));
             connection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(10));
-
             return connection;
         }
     },
@@ -38,28 +36,26 @@ public enum DependencyRepository {
         @Override
         protected URLConnection openConnection(Dependency dependency) throws IOException {
             URLConnection connection = super.openConnection(dependency);
-
             connection.setRequestProperty("User-Agent", "impactor");
-
             connection.setConnectTimeout((int) TimeUnit.SECONDS.toMillis(5));
             connection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(10));
-
             return connection;
         }
     },
+
     /**
-     * The official repository for Aikar based products as well as other utilities
+     * The primary ImpactDev repository, with an additional Maven Repo mirror.
+     *
+     * <p>This is used to reduce the load on repo.maven.org</p>
      */
-    AIKAR("https://repo.aikar.co/nexus/content/groups/aikar/", new Tuple<>(-1, "https://repo.aikar.co/nexus/service/local/artifact/maven/redirect?r=aikar&")) {
+    // Please ask me (NickImpact) before using this mirror in your own project.
+    IMPACTDEV_SONATYPE_MIRROR("https://maven.impactdev.net/repository/Sonatype/") {
         @Override
         protected URLConnection openConnection(Dependency dependency) throws IOException {
             URLConnection connection = super.openConnection(dependency);
-
             connection.setRequestProperty("User-Agent", "impactor");
-
             connection.setConnectTimeout((int) TimeUnit.SECONDS.toMillis(5));
             connection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(10));
-
             return connection;
         }
     },

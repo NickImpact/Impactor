@@ -1,9 +1,5 @@
 package net.impactdev.impactor.api.gui;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -24,15 +20,24 @@ public interface Page<T, U, W extends UI, V extends Icon> {
 
 	void apply();
 
-	@Getter
-	@AllArgsConstructor
 	class PageIcon<T> {
-		private T rep;
-		private int slot;
+		private final T rep;
+		private final int slot;
+
+		public PageIcon(T rep, int slot) {
+			this.rep = rep;
+			this.slot = slot;
+		}
+
+		public T getRep() {
+			return this.rep;
+		}
+
+		public int getSlot() {
+			return this.slot;
+		}
 	}
 
-	@Getter
-	@RequiredArgsConstructor
 	enum PageIconType {
 		FIRST("&eFirst Page", (in, total) -> 1),
 		PREV("&ePrevious Page", (in, total) -> in == 1 ? total : in - 1),
@@ -42,5 +47,18 @@ public interface Page<T, U, W extends UI, V extends Icon> {
 
 		private final String title;
 		private final BiFunction<Integer, Integer, Integer> updater;
+
+		PageIconType(String title, BiFunction<Integer, Integer, Integer> updater) {
+			this.title = title;
+			this.updater = updater;
+		}
+
+		public String getTitle() {
+			return this.title;
+		}
+
+		public BiFunction<Integer, Integer, Integer> getUpdater() {
+			return this.updater;
+		}
 	}
 }

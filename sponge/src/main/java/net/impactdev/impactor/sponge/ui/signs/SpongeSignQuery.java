@@ -8,9 +8,9 @@ import net.impactdev.impactor.api.gui.signs.SignQuery;
 import net.impactdev.impactor.api.gui.signs.SignSubmission;
 import net.impactdev.impactor.sponge.listeners.SignListener;
 import net.kyori.adventure.text.TextComponent;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.play.server.SPacketSignEditorOpen;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.play.server.SOpenSignMenuPacket;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
@@ -67,8 +67,8 @@ public class SpongeSignQuery implements SignQuery<TextComponent, ServerPlayer, V
 //        final ChannelProfile profile = Objects.requireNonNull(service.channels().profile(player.getUniqueId()));
 //
 //        try {
-//            final PacketRemapper.Wrapped<SPacketSignEditorOpen> view = service.remapper().wrap(new SPacketSignEditorOpen());
-//            final PacketRemapper.Wrapped<SPacketUpdateTileEntity> update = service.remapper().wrap(new SPacketUpdateTileEntity());
+//            final PacketRemapper.Wrapped<SOpenSignMenuPacket> view = service.remapper().wrap(new SOpenSignMenuPacket());
+//            final PacketRemapper.Wrapped<SUpdateTileEntityPacket> update = service.remapper().wrap(new SUpdateTileEntityPacket());
 //
 //            BlockPos position = new BlockPos(this.position.getX(), this.position.getY(), this.position.getZ());
 //            view.set(BlockPos.class, 0, position);

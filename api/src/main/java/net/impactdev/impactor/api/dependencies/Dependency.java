@@ -51,8 +51,8 @@ public enum Dependency {
 	JAR_RELOCATOR(
 			"me.lucko",
 			"jar-relocator",
-			"1.4",
-			"1RsiF3BiVztjlfTA+svDCuoDSGFuSpTZYHvUK8yBx8I="
+			"1.5",
+			"0D6eM99gKpEYFNDydgnto3Df0ygZGdRVqy5ahtj0oIs="
 	),
 	SLF4J_SIMPLE(
 			"org.slf4j",
@@ -69,30 +69,30 @@ public enum Dependency {
 	H2_DRIVER(
 			"com.h2database",
 			"h2",
-			"1.4.199",
-			"MSWhZ0O8a0z7thq7p4MgPx+2gjCqD9yXiY95b5ml1C4="
+			"1.4.200",
+			"OtmsS2qunNnTrBxEdGXh7QYBm4UbiT3WqNdt222FvKY="
 			// we don't apply relocations to h2 - it gets loaded via
 			// an isolated classloader
 	),
 	HIKARI(
 			"com{}zaxxer",
 			"HikariCP",
-			"3.4.5",
-			"i3MvlHBXDUqEHcHvbIJrWGl4sluoMHEv8fpZ3idd+mE=",
+			"4.0.3",
+			"fAJK7/HBBjV210RTUT+d5kR9jmJNF/jifzCi6XaIxsk=",
 			Relocation.of("hikari", "com{}zaxxer{}hikari")
 	),
 	MARIADB_DRIVER(
 			"org{}mariadb{}jdbc",
 			"mariadb-java-client",
-			"2.6.0",
-			"fgiCp29Z7X38ULAJNsxZ1wFIVT2u3trSx/VCMxTlA6g=",
+			"2.7.4",
+			"8GV3sZ6JszAouWzU8DEkjnYd5+vHEvTvU14mjfdu2yo=",
 			Relocation.of("mariadb", "org{}mariadb{}jdbc")
 	),
 	MYSQL_DRIVER(
 			"mysql",
 			"mysql-connector-java",
-			"5.1.48",
-			"VuJsqqOCH1rkr0T5x09mz4uE6gFRatOAPLsOkEm27Kg=",
+			"8.0.26",
+			"Ph3d1f2814pVKo/JFfy4BOT3+DqHM1WXKjyXoiVW9iw=",
 			Relocation.of("mysql", "com{}mysql")
 	),
 	MONGODB_DRIVER(
@@ -184,67 +184,38 @@ public enum Dependency {
 	KYORI_EXAMINATION(
 			"net{}kyori",
 			"examination-api",
-			"1.0.0",
-			"YkD5iBwKfZrwTxX8p72X7s1glP+51dWfFtla/6WhDZY=",
+			"1.3.0",
+			"ySN//ssFQo9u/4YhYkascM4LR7BMCOp8o1Ag/eV/hJI=",
 			Relocation.of("examination", "net{}kyori{}examination")
 	),
 	KYORI_EXAMINATION_STRING(
 			"net{}kyori",
 			"examination-string",
-			"1.0.0",
-			"BIbWM4Imuof26TxQZQGspF9UjSpGmLwaEw265K76pFk=",
+			"1.3.0",
+			"fQH8JaS7OvDhZiaFRV9FQfv0YmIW6lhG5FXBSR4Va4w=",
 			Relocation.of("examination", "net{}kyori{}examination")
 	),
 	KYORI_TEXT(
 			"net{}kyori",
 			"adventure-api",
-			"4.3.0",
-			"IwJ1wTO/6Pv6uBb2MEuoYnWEzPL6CaxWanks38ePd0A=",
+			"4.9.1",
+			"E5y9joJQ03VGgVBY9vhJZo7gPzbqMUVD0a+EGQ8IWoY=",
 			Relocation.of("adventure", "net{}kyori{}adventure"),
 			Relocation.of("examination", "net{}kyori{}examination")
 	),
 	KYORI_TEXT_SERIALIZER_GSON(
 			"net{}kyori",
 			"adventure-text-serializer-gson",
-			"4.3.0",
-			"TN0xO2U38FO/SxovWNzou5LkVBjak1oUX81+4lDBfQs=",
+			"4.9.1",
+			"nHEvnOtSXRzE/JgUV/A01TuG2U0NKzsJ0UbEvltOir0=",
 			Relocation.of("adventure", "net{}kyori{}adventure")
 	),
 	KYORI_TEXT_SERIALIZER_LEGACY(
 			"net{}kyori",
 			"adventure-text-serializer-legacy",
-			"4.3.0",
-			"9KWVLdlnsHW/t9ezA+TNsmuVHE590NBagFL5luaOAIc=",
+			"4.9.1",
+			"Ko8v50bJEMco8e+zilSJt/PpnAY9+7F+vlUlJPfjSbY=",
 			Relocation.of("adventure", "net{}kyori{}adventure")
-	),
-	KYORI_TEXT_MINIMESSAGE(
-			"net{}kyori",
-			"adventure-text-minimessage",
-			"4.1.0",
-			"9KWVLdlnsHW/t9ezA+TNsmuVHE590NBagFL5luaOAIc=",
-			Relocation.of("adventure", "net{}kyori{}adventure")
-	),
-	ACF_SPONGE(
-			"co{}aikar",
-			"acf-sponge",
-			"0.5.0-SNAPSHOT",
-			"20200704.153520-158",
-			Relocation.of("commands", "co{}aikar{}commands"),
-			Relocation.of("aikar-locales", "co{}aikar{}locales")
-	),
-	PIXELMON_BRIDGE_API(
-			"net{}impactdev",
-			"pixelmonbridge",
-			"1.0.0-SNAPSHOT",
-			"",
-			Relocation.of("pixelmonbridge", "net{}impactdev{}pixelmonbridge")
-	),
-	PIXELMON_BRIDGE_REFORGED(
-			"net{}impactdev{}pixelmonbridge",
-			"reforged",
-			"1.0.0-SNAPSHOT",
-			"",
-			Relocation.of("pixelmonbridge", "net{}impactdev{}pixelmonbridge")
 	),
 	CLASSGRAPH(
 			"io{}github{}classgraph",
@@ -290,12 +261,12 @@ public enum Dependency {
 			Relocation.of("commonspool2", "org{}apache{}commons{}pool2")
 	),
 	COMMONS_POOL_2(
-            "org.apache.commons",
-            "commons-pool2",
-            "2.8.0",
-            "Xvqfu1SlixoSIFpfrFZfaYKr/rD/Rb28MYdI71/To/8=",
-            Relocation.of("commonspool2", "org{}apache{}commons{}pool2")
-    ),
+			"org.apache.commons",
+			"commons-pool2",
+			"2.8.0",
+			"Xvqfu1SlixoSIFpfrFZfaYKr/rD/Rb28MYdI71/To/8=",
+			Relocation.of("commonspool2", "org{}apache{}commons{}pool2")
+	),
 	;
 
 	private final String mavenPath;
@@ -304,7 +275,6 @@ public enum Dependency {
 	private final String version;
 	private final byte[] checksum;
 	private final boolean snapshot;
-	private final String snapshotVersion;
 	private final List<Relocation> relocations;
 
 	private static final String MAVEN_FORMAT = "%s/%s/%s/%s-%s.jar";
@@ -314,11 +284,6 @@ public enum Dependency {
 		this.artifact = artifactID;
 		this.version = version;
 		this.snapshot = this.version.contains("-SNAPSHOT");
-		if(this.snapshot) {
-			this.snapshotVersion = this.version.replace("SNAPSHOT", "") + checksum;
-		} else {
-			this.snapshotVersion = "";
-		}
 		this.checksum = !this.snapshot ? Base64.getDecoder().decode(checksum) : new byte[0];
 		this.relocations = ImmutableList.copyOf(relocations);
 
@@ -327,7 +292,24 @@ public enum Dependency {
 				rewriteEscaping(artifactID),
 				version,
 				rewriteEscaping(artifactID),
-				this.isSnapshot() ? this.snapshotVersion : this.version
+				this.version
+		);
+	}
+
+	Dependency(String group, String artifact, String version, String timestamp, String checksum, Relocation... relocations) {
+		this.group = group;
+		this.artifact = artifact;
+		this.version = version;
+		this.snapshot = this.version.contains("-SNAPSHOT");
+		this.checksum = !this.snapshot ? Base64.getDecoder().decode(checksum) : new byte[0];
+		this.relocations = ImmutableList.copyOf(relocations);
+
+		this.mavenPath = String.format(MAVEN_FORMAT,
+				rewriteEscaping(group).replace(".", "/"),
+				rewriteEscaping(artifact),
+				version,
+				rewriteEscaping(artifact),
+				this.version + "-" + timestamp
 		);
 	}
 

@@ -35,6 +35,7 @@ import net.impactdev.impactor.api.dependencies.classloader.IsolatedClassLoader;
 import net.impactdev.impactor.api.dependencies.classloader.PluginClassLoader;
 import net.impactdev.impactor.api.dependencies.relocation.Relocation;
 import net.impactdev.impactor.api.dependencies.relocation.RelocationHandler;
+import net.impactdev.impactor.api.utilities.PrettyPrinter;
 
 import java.io.File;
 import java.io.IOException;
@@ -132,8 +133,7 @@ public class DependencyManager {
 	}
 
 	public void loadDependencies(Collection<Dependency> dependencies) {
-		CountDownLatch latch = new CountDownLatch(dependencies.size());
-		ExecutorService service = Executors.newFixedThreadPool(
+		final ExecutorService executor = Executors.newFixedThreadPool(
 				Runtime.getRuntime().availableProcessors(),
 				new ThreadFactoryBuilder()
 						.setNameFormat("Impactor Dependency Downloader - #%d")
@@ -141,8 +141,10 @@ public class DependencyManager {
 						.build()
 		);
 
+		PrettyPrinter printer = new PrettyPrinter();
+		CountDownLatch latch = new CountDownLatch(dependencies.size());
 		for(Dependency dependency : dependencies) {
-			service.execute(() -> {
+			executor.execute(() -> {
 				try {
 					this.loadDependency(dependency);
 				} catch (Throwable e) {
@@ -158,6 +160,8 @@ public class DependencyManager {
 			latch.await();
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
+		} finally {
+			executor.shutdown();
 		}
 	}
 

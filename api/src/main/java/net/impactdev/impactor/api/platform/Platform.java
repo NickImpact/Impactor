@@ -1,6 +1,9 @@
 package net.impactdev.impactor.api.platform;
 
-public enum Platform {
-	Spigot,
-	Sponge,
+import net.impactdev.impactor.api.scoreboard.events.PlatformBus;
+
+public interface Platform {
+
+    <L> PlatformBus<L> createPlatformBus();
+
 }

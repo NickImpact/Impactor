@@ -9,6 +9,7 @@ buildscript {
         }
     }
     dependencies {
+        classpath 'com.google.guava:guava:27.1-jre'
         classpath 'org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1'
     }
 }
@@ -16,8 +17,8 @@ buildscript {
 plugins {
     id 'com.qixalite.spongestart' version '1.6.2'
     id 'maven'
-    id 'com.github.johnrengelman.shadow' version '4.0.4'
-    id 'ninja.miserable.blossom' version '1.0.1'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'net.kyori.blossom' version '1.1.0'
 }
 
 apply plugin: 'maven-publish'
@@ -65,8 +66,7 @@ spongestart{
 }
 
 dependencies {
-    shadow "org.projectlombok:lombok:1.18.6"
-    compile group: 'com.zaxxer', name: 'HikariCP', version: '3.3.1'
+    compile group: 'com.zaxxer', name: 'HikariCP', version: '4.0.3'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
@@ -78,7 +78,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
     apply plugin: 'com.github.johnrengelman.shadow'
-    apply plugin: 'ninja.miserable.blossom'
+    apply plugin: 'net.kyori.blossom'
 
     group = 'net.impactdev.impactor'
     version = '4.0.0-SNAPSHOT'
@@ -102,13 +102,12 @@ subprojects {
 
     dependencies {
         compile fileTree(dir: '../libs', include: '*.jar')
-        compileOnly("org.projectlombok:lombok:1.18.4")
         shadow 'com.google.guava:guava:27.1-jre'
         shadow 'com.google.code.gson:gson:2.8.0'
         shadow "co.aikar:acf-core:0.5.0-SNAPSHOT"
-        shadow 'net.kyori:adventure-api:4.7.0'
-        shadow 'net.kyori:adventure-text-serializer-legacy:4.7.0'
-        shadow 'net.kyori:adventure-text-serializer-gson:4.7.0'
+        shadow 'net.kyori:adventure-api:4.8.0'
+        shadow 'net.kyori:adventure-text-serializer-legacy:4.8.0'
+        shadow 'net.kyori:adventure-text-serializer-gson:4.8.0'
         shadow 'net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT'
         testCompile group: 'junit', name: 'junit', version: '4.12'
     }

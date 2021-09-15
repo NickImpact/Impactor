@@ -1,16 +1,18 @@
 package net.impactdev.impactor.bungee.logging;
 
 import net.impactdev.impactor.api.logging.Logger;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.function.Function;
 
-@RequiredArgsConstructor
 public class BungeeLogger implements Logger {
 
 	private final java.util.logging.Logger delegate;
 	private final Function<String, String> preprocessor = in -> in.replaceAll("[&]", "\u00a7");
+
+	public BungeeLogger(java.util.logging.Logger delegate) {
+		this.delegate = delegate;
+	}
 
 	@Override
 	public void noTag(String message) {

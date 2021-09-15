@@ -65,7 +65,7 @@ public class SpongePage<U> implements Page<ServerPlayer, U, SpongeUI, SpongeIcon
 			SpongeIcon icon = SpongeIcon.builder().delegate(item).build();
 			if(!entry.getKey().equals(PageIconType.CURRENT)) {
 				icon.addListener((cause, container, clickType) -> {
-					int capacity = this.contentZone.getX() * this.contentZone.getY();
+					int capacity = this.contentZone.x() * this.contentZone.y();
 					this.page = entry.getKey().getUpdater().apply(this.page, this.contents.isEmpty() ? 1 : contents.size() % capacity == 0 ? contents.size() / capacity : contents.size() / capacity + 1);
 					this.apply();
 					return true;
@@ -104,8 +104,8 @@ public class SpongePage<U> implements Page<ServerPlayer, U, SpongeUI, SpongeIcon
 	}
 
 	private int calculateSlot(int in) {
-		int col = in % this.contentZone.getX() + this.offsets.getX();
-		int row = in / this.contentZone.getX() + this.offsets.getY();
+		int col = in % this.contentZone.x() + this.offsets.y();
+		int row = in / this.contentZone.x() + this.offsets.y();
 
 		return col + (9 * row);
 	}
@@ -115,8 +115,8 @@ public class SpongePage<U> implements Page<ServerPlayer, U, SpongeUI, SpongeIcon
 		Preconditions.checkNotNull(this.applier, "Applier must be set before page definition!");
 		this.contents = contents;
 
-		int columns = Math.max(1, Math.min(9, this.contentZone.getX()));
-		int rows = Math.max(1, Math.min(9, this.contentZone.getY()));
+		int columns = Math.max(1, Math.min(9, this.contentZone.x()));
+		int rows = Math.max(1, Math.min(9, this.contentZone.y()));
 
 		int capacity = columns * rows;
 		int pages = this.contents.isEmpty() ? 1 : contents.size() % capacity == 0 ? contents.size() / capacity : contents.size() / capacity + 1;

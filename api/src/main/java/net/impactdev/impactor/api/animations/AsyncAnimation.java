@@ -1,16 +1,17 @@
 package net.impactdev.impactor.api.animations;
 
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public abstract class AsyncAnimation<T> implements Animation {
 
 	protected final ImpactorPlugin plugin;
 
 	private int frame = 0;
-
 	protected T runner;
+
+	public AsyncAnimation(ImpactorPlugin plugin) {
+		this.plugin = plugin;
+	}
 
 	protected void run(boolean loop) {
 		this.playFrame(frame++);

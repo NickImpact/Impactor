@@ -55,14 +55,24 @@ public class CircularLinkedList<E> {
 
 	public List<E> getFramesNonCircular() {
 		List<E> output = Lists.newArrayList();
-		output.add(this.head.getValue());
+		Node<E> working = this.head;
+		while(working != null) {
+			output.add(working.getValue());
+			working = working.next;
 
-		Node<E> next = this.head.next;
-		while(!Objects.equals(next.getValue(), this.head.getValue())) {
-			output.add(next.getValue());
-			next = next.next;
+			if(Objects.equals(this.head.getValue(), working.getValue())) {
+				break;
+			}
 		}
 
 		return output;
+	}
+
+	public boolean empty() {
+		return this.getFramesNonCircular().isEmpty();
+	}
+
+	public int size() {
+		return this.getFramesNonCircular().size();
 	}
 }

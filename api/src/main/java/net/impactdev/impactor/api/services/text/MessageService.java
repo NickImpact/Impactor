@@ -1,5 +1,6 @@
 package net.impactdev.impactor.api.services.text;
 
+import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.services.Service;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -26,7 +27,7 @@ public interface MessageService<T> extends Service {
 	 * @return The translated message
 	 */
 	default T parse(@NonNull String message) {
-		return this.parse(message, Collections.emptyList());
+		return this.parse(message, PlaceholderSources.empty());
 	}
 
 	/**
@@ -38,7 +39,7 @@ public interface MessageService<T> extends Service {
 	 * @param sources The sources made available via suppliers for any required contextual information
 	 * @return The translated message
 	 */
-	T parse(@NonNull String message, @NonNull List<Supplier<Object>> sources);
+	T parse(@NonNull String message, @NonNull PlaceholderSources sources);
 
 	/**
 	 * Translates a set of input messages with no associated sources. See {@link #parse(String)} to
@@ -48,19 +49,19 @@ public interface MessageService<T> extends Service {
 	 * @return A translated list of messages based on the input
 	 */
 	default List<T> parse(@NonNull List<String> input) {
-		return this.parse(input, Collections.emptyList());
+		return this.parse(input, PlaceholderSources.empty());
 	}
 
 	/**
-	 * Translates a set of input messages with the provided source suppliers. See {@link #parse(String, List)} to
+	 * Translates a set of input messages with the provided source suppliers. See {@link #parse(String, PlaceholderSources)} to
 	 * see how the supplied input will be translated.
 	 *
 	 * @param input
-	 * @param associations
+	 * @param sources
 	 * @return
 	 */
-	default List<T> parse(@NonNull List<String> input, @NonNull List<Supplier<Object>> associations) {
-		return input.stream().map(s -> this.parse(s, associations)).collect(Collectors.toList());
+	default List<T> parse(@NonNull List<String> input, @NonNull PlaceholderSources sources) {
+		return input.stream().map(s -> this.parse(s, sources)).collect(Collectors.toList());
 	}
 
 }

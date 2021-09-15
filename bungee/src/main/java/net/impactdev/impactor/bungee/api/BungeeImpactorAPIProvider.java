@@ -1,6 +1,7 @@
 package net.impactdev.impactor.bungee.api;
 
 import net.impactdev.impactor.api.event.EventBus;
+import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.scheduler.SchedulerAdapter;
 import net.impactdev.impactor.common.api.ImpactorAPIProvider;
 
@@ -10,6 +11,11 @@ public class BungeeImpactorAPIProvider extends ImpactorAPIProvider {
 
     public BungeeImpactorAPIProvider(SchedulerAdapter adapter) {
         this.scheduler = adapter;
+    }
+
+    @Override
+    public Platform getPlatform() {
+        return null;
     }
 
     @Override

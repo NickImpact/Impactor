@@ -8,17 +8,21 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.configuration.Config;
+import net.impactdev.impactor.api.dependencies.Dependency;
+import net.impactdev.impactor.api.dependencies.DependencyManager;
+import net.impactdev.impactor.api.dependencies.classloader.PluginClassLoader;
 import net.impactdev.impactor.api.event.EventBus;
 import net.impactdev.impactor.api.gui.signs.SignQuery;
+import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.api.plugin.components.Depending;
 import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.api.storage.StorageType;
-import net.impactdev.impactor.api.dependencies.Dependency;
-import net.impactdev.impactor.api.dependencies.DependencyManager;
-import net.impactdev.impactor.api.dependencies.classloader.PluginClassLoader;
+import net.impactdev.impactor.api.utilities.PrettyPrinter;
+import net.impactdev.impactor.common.api.ApiRegistrationUtil;
+import net.impactdev.impactor.common.placeholders.PlaceholderSourcesImpl;
 import net.impactdev.impactor.sponge.api.SpongeImpactorAPIProvider;
 import net.impactdev.impactor.sponge.configuration.ConfigKeys;
 import net.impactdev.impactor.sponge.configuration.SpongeConfig;
@@ -26,16 +30,16 @@ import net.impactdev.impactor.sponge.configuration.SpongeConfigAdapter;
 import net.impactdev.impactor.sponge.event.SpongeEventBus;
 import net.impactdev.impactor.sponge.plugin.AbstractSpongePlugin;
 import net.impactdev.impactor.sponge.scheduler.SpongeSchedulerAdapter;
+import net.impactdev.impactor.sponge.scoreboard.ScoreboardModule;
+import net.impactdev.impactor.sponge.scoreboard.ScoreboardTest;
 import net.impactdev.impactor.sponge.services.SpongeMojangServerStatusService;
 import net.impactdev.impactor.sponge.text.SpongeMessageService;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
+import net.impactdev.impactor.sponge.ui.SpongeLayout;
 import net.impactdev.impactor.sponge.ui.SpongePage;
 import net.impactdev.impactor.sponge.ui.icons.SpongeIcon;
 import net.impactdev.impactor.sponge.ui.icons.SpongeIcons;
-import net.impactdev.impactor.sponge.ui.SpongeLayout;
 import net.impactdev.impactor.sponge.ui.signs.SpongeSignQuery;
-import lombok.Getter;
-import net.impactdev.impactor.common.api.ApiRegistrationUtil;
 import net.impactdev.impactor.sponge.util.SpongeClassLoader;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,8 +49,10 @@ import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
 import org.spongepowered.api.event.lifecycle.RegisterRegistryValueEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
@@ -61,12 +67,14 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Ticks;
 import org.spongepowered.math.vector.Vector2i;
 import org.spongepowered.plugin.PluginContainer;
-import org.spongepowered.plugin.jvm.Plugin;
+import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -80,11 +88,10 @@ import java.util.regex.Pattern;
 @Plugin("impactor")
 public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depending {
 
-	@Getter private static SpongeImpactorPlugin instance;
+	private static SpongeImpactorPlugin instance;
 
-	@Getter private SpongeMojangServerStatusService mojangServerStatusService;
+	private SpongeMojangServerStatusService mojangServerStatusService;
 
-	@Getter
 	private final PluginContainer pluginContainer;
 
 	@Inject
@@ -99,6 +106,10 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		ApiRegistrationUtil.register(new SpongeImpactorAPIProvider(new SpongeSchedulerAdapter(this, Sponge.game())));
 	}
 
+	public static SpongeImpactorPlugin getInstance() {
+		return SpongeImpactorPlugin.instance;
+	}
+
 	@Listener(order = Order.FIRST)
 	public void onConstruct(ConstructPluginEvent e) {
 		instance = this;
@@ -106,6 +117,8 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		Impactor.getInstance().getRegistry().register(ImpactorPlugin.class, this);
 		Impactor.getInstance().getRegistry().register(PluginClassLoader.class, new SpongeClassLoader(this));
 		Impactor.getInstance().getRegistry().register(DependencyManager.class, new DependencyManager(this));
+
+		this.getDependencyManager().loadDependencies(Arrays.asList(Dependency.values()));
 
 		this.getPluginLogger().info("Pooling plugin dependencies...");
 		List<Dependency> toLaunch = Lists.newArrayList();
@@ -139,8 +152,11 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		Impactor.getInstance().getRegistry().register(MessageService.class, new SpongeMessageService());
 		Impactor.getInstance().getRegistry().registerBuilderSupplier(SignQuery.SignQueryBuilder.class, SpongeSignQuery.SpongeSignQueryBuilder::new);
 		Impactor.getInstance().getRegistry().register(SpongePlaceholderManager.class, new SpongePlaceholderManager());
+		Impactor.getInstance().getRegistry().registerBuilderSupplier(PlaceholderSources.SourceBuilder.class, PlaceholderSourcesImpl.PlaceholderSourcesBuilderImpl::new);
 		Impactor.getInstance().getRegistry().register(EventBus.class, new SpongeEventBus());
 		((SpongeEventBus)Impactor.getInstance().getEventBus()).enable();
+
+		new ScoreboardModule().initialize();
 	}
 
 	@Listener
@@ -155,72 +171,11 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		//Sponge.getServiceManager().provideUnchecked(ProtocolService.class).events().register(new SignListener());
 	}
 
-	@SuppressWarnings("unchecked")
+	private final ScoreboardTest tester = new ScoreboardTest();
+
 	@Listener
-	public void onPlayerJoin(ServerSideConnectionEvent.Join event) {
-		Impactor.getInstance().getScheduler().asyncLater(() -> {
-			Impactor.getInstance().getScheduler().executeSync(() -> {
-//				ViewableInventory test = ViewableInventory.builder()
-//						.type(ContainerTypes.GENERIC_9X6)
-//						.completeStructure().build();
-//
-//				SpongeLayout layout = SpongeLayout.builder()
-//						.border()
-//						.fill(SpongeIcon.builder()
-//								.delegate(ItemStack.builder().itemType(ItemTypes.DIRT).build())
-//								.listener((cause, container, clickType) -> {
-//									this.getPluginLogger().info("Click detected");
-//									return true;
-//								})
-//								.build()
-//						)
-//						.build();
-//
-//				SpongeUI.builder()
-//						.view(test)
-//						.title(Component.text("Testing").color(NamedTextColor.RED))
-//						.build()
-//						.define(layout)
-//						.open(event.getPlayer());
-
-				SpongePage<Integer> test = SpongePage.builder()
-						.title(Component.text("Page Test").color(NamedTextColor.RED))
-						.viewer(event.player())
-						.view(SpongeLayout.builder().dimension(9, 5).border().dimension(9, 6).slots(SpongeIcons.BORDER, 45, 53).build())
-						.offsets(new Vector2i(1, 1))
-						.contentZone(new Vector2i(7, 3))
-						.currentPage(ItemTypes.PAPER, 49)
-						.nextPage(ItemTypes.ARROW, 50)
-						.previousPage(ItemTypes.ARROW, 48)
-						.build();
-				test.applier(x -> SpongeIcon.builder()
-						.delegate(ItemStack.builder()
-								.itemType(ItemTypes.GOLD_NUGGET)
-								.add(Keys.CUSTOM_NAME, Component.text(x).color(NamedTextColor.YELLOW))
-								.build()
-						)
-						.listener((cause, container, clickType) -> {
-							SpongeImpactorPlugin.getInstance().getPluginLogger().info("" + x);
-							return true;
-						})
-						.build()
-				);
-				test.define(Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47));
-				test.open();
-			});
-		}, 10, TimeUnit.SECONDS);
-
-		AtomicReference<Instant> prior = new AtomicReference<>(Instant.now());
-		Sponge.server().scheduler().submit(Task.builder()
-				.execute(() -> {
-					Instant now = Instant.now();
-					this.getPluginLogger().info("Timestamp: " + now + " - " + Duration.between(prior.get(), now).toMillis() + "ms since last iteration");
-					prior.set(now);
-				})
-				.interval(Ticks.single())
-				.plugin(this.getPluginContainer())
-				.build()
-		);
+	public void onPlayerJoin(ServerSideConnectionEvent.Join event, @First ServerPlayer player) {
+		this.tester.create(player);
 	}
 
 	@Listener
@@ -237,7 +192,7 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 					Matcher matcher = pattern.matcher(parser.formatted());
 					if(matcher.find()) {
 						Optional<PluginContainer> container = Sponge.pluginManager().plugin(matcher.group(1));
-						sorted.put(container.map(c -> c.getMetadata().getName().orElse("Unknown")).orElse("Custom"), parser);
+						sorted.put(container.map(c -> c.metadata().name().orElse("Unknown")).orElse("Custom"), parser);
 					} else {
 						sorted.put("Custom", parser);
 					}
@@ -304,5 +259,13 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 	@Override
 	public List<StorageType> getStorageRequirements() {
 		return Lists.newArrayList();
+	}
+
+	public SpongeMojangServerStatusService getMojangServerStatusService() {
+		return this.mojangServerStatusService;
+	}
+
+	public PluginContainer getPluginContainer() {
+		return this.pluginContainer;
 	}
 }

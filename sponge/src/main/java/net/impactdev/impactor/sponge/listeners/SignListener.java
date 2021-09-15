@@ -7,7 +7,7 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.gui.signs.SignQuery;
 //import net.kyori.event.method.annotation.Subscribe;
 import net.kyori.adventure.text.TextComponent;
-import net.minecraft.network.play.client.CPacketUpdateSign;
+import net.minecraft.network.play.client.CUpdateSignPacket;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -21,7 +21,7 @@ public class SignListener {
     public final static Map<UUID, SignQuery<TextComponent, ServerPlayer, Vector3i>> requests = Maps.newHashMap();
 
 //    @Subscribe
-//    public void onSignUpdate(PacketEvent<CPacketUpdateSign> event) {
+//    public void onSignUpdate(PacketEvent<CUpdateSignPacket> event) {
 //        if(requests.containsKey(event.profile().player())) {
 //            SignQuery<Text, Player> query = requests.remove(event.profile().player());
 //            Impactor.getInstance().getScheduler().executeSync(() -> {

@@ -1,10 +1,5 @@
 package net.impactdev.impactor.api.utilities.lists;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 public class Node<E> {
 
 	private E value;
@@ -14,4 +9,19 @@ public class Node<E> {
 		this.value = value;
 	}
 
+	public E getValue() {
+		return this.value;
+	}
+
+	public Node<E> getNext() {
+		return this.next;
+	}
+
+	public void setValue(E value) {
+		this.value = value;
+	}
+
+	public void setNext(Node<E> next) {
+		this.next = next;
+	}
 }

@@ -2,24 +2,32 @@ package net.impactdev.impactor.sponge.text.placeholders;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gson.reflect.TypeToken;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderManager;
+import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.text.placeholders.provided.Memory;
 import net.impactdev.impactor.sponge.text.processors.gradients.NumberBasedGradientProcessor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.spongepowered.api.Sponge;
 
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.placeholder.PlaceholderContext;
 import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.math.vector.Vector3i;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -54,17 +62,40 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
         this.register(this.create("memory_used", context -> Component.text(Memory.getCurrent())));
         this.register(this.create("memory_allocated", context -> Component.text(Memory.getAllocated())));
         this.register(this.create("player_count", context -> Component.text(Sponge.server().onlinePlayers().size())));
-        this.register(this.create("ping", context -> this.filterSource(ServerPlayer.class, context.associatedObject())
+        this.register(this.create("ping", context -> context.associatedObject()
+                .filter(source -> source instanceof PlaceholderSources)
+                .map(source -> (PlaceholderSources) source)
+                .flatMap(sources -> sources.getSource(ServerPlayer.class))
                 .map(player -> PING_PROCESSOR.process(player.connection().latency()))
                 .orElse(Component.empty())
         ));
-        AtomicInteger step = new AtomicInteger();
-        this.register(this.create("test", context -> {
-            if(step.get() > 200) {
-                step.set(0);
+        this.register(this.create("rainbow", context -> {
+            String[] arguments = context.argumentString().orElse("").split(";");
+            Map<String, String> map = Maps.newHashMap();
+            for(String args : arguments) {
+                String[] split = args.split("=");
+                map.put(split[0], split[1]);
             }
-            return PING_PROCESSOR.process(step.getAndIncrement());
+
+            UUID id = UUID.fromString(map.get("id"));
+            RainbowManager manager = this.gradientManagers.computeIfAbsent(id, x -> new RainbowManager(Integer.parseInt(map.get("start"))));
+
+            return MiniMessage.get().parse("<rainbow:" + manager.step() + ">" + map.get("value") + "</gradient>");
         }));
+        this.register(this.create("coordinates", context -> context.associatedObject()
+                .filter(source -> source instanceof PlaceholderSources)
+                .map(source -> (PlaceholderSources) source)
+                .flatMap(sources -> sources.getSource(ServerPlayer.class))
+                .map(player -> {
+                    Vector3i position = player.blockPosition();
+                    return Component.text(position.x())
+                            .append(Component.text(", "))
+                            .append(Component.text(position.y()))
+                            .append(Component.text(", "))
+                            .append(Component.text(position.z()));
+                })
+                .orElse(Component.text("?, ?, ?"))
+        ));
     }
 
     private PlaceholderMetadata create(String id, Function<PlaceholderContext, Component> parser) {
@@ -87,7 +118,10 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
             .type(new TypeToken<Double>(){})
             .min(0)
             .max(50)
-            .translator(Component::text)
+            .translator(value -> {
+                BigDecimal decimal = BigDecimal.valueOf(value).setScale(3, RoundingMode.HALF_UP);
+                return Component.text(decimal.doubleValue());
+            })
             .factor(x -> x.floatValue() * 0.1f / 5)
             .colors(max, min)
             .build();
@@ -101,15 +135,6 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
             .colors(max, min)
             .build();
 
-    private static final NumberBasedGradientProcessor<Integer> IV_PROCESSOR = NumberBasedGradientProcessor.<Integer>builder()
-            .type(new TypeToken<Integer>(){})
-            .min(0)
-            .max(31)
-            .translator(Component::text)
-            .factor(x -> x.floatValue() * 0.1f / 31 * 10)
-            .colors(max, min)
-            .build();
-
     private static Component formatTps(double tps) {
         Component isHigh = tps > 20.0 ? Component.text("*") : Component.empty();
         Component result = TPS_PROCESSOR.process(tps);
@@ -119,5 +144,21 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
 
     private static Component formatMilliseconds(double milliseconds) {
         return MSPT_PROCESSOR.process(milliseconds).append(Component.text("ms"));
+    }
+
+    private final Map<UUID, RainbowManager> gradientManagers = Maps.newHashMap();
+
+    private static class RainbowManager {
+
+        private int step;
+
+        public RainbowManager(int start) {
+            this.step = start;
+        }
+
+        public int step() {
+            return this.step++;
+        }
+
     }
 }

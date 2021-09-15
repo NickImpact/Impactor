@@ -2,16 +2,18 @@ package net.impactdev.impactor.api.json;
 
 import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import lombok.RequiredArgsConstructor;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 
-@RequiredArgsConstructor
 public class Registry<E> {
 
 	private final ImpactorPlugin plugin;
 	private final Map<String, Class<? extends E>> typings = Maps.newHashMap();
+
+	public Registry(ImpactorPlugin plugin) {
+		this.plugin = plugin;
+	}
 
 	public void register(Class<? extends E> clazz) throws Exception {
 		if(!clazz.isAnnotationPresent(JsonTyping.class)) {

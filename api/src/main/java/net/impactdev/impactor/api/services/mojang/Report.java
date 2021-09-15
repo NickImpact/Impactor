@@ -2,8 +2,6 @@ package net.impactdev.impactor.api.services.mojang;
 
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.utilities.Time;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.List;
 
@@ -19,10 +17,21 @@ public class Report {
 		return this.reports;
 	}
 
-	@Getter
-	@AllArgsConstructor
 	public static class ReportMapping {
-		private Status status;
-		private Time downtime;
+		private final Status status;
+		private final Time downtime;
+
+		public ReportMapping(Status status, Time downtime) {
+			this.status = status;
+			this.downtime = downtime;
+		}
+
+		public Status getStatus() {
+			return this.status;
+		}
+
+		public Time getDowntime() {
+			return this.downtime;
+		}
 	}
 }

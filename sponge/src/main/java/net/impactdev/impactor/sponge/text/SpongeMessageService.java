@@ -10,6 +10,7 @@ import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.kyori.adventure.text.Component;
@@ -50,15 +51,14 @@ public class SpongeMessageService implements MessageService<Component> {
 	}
 
 	@Override
-	public Component parse(@NonNull String message, @NonNull List<Supplier<Object>> associations) {
+	public Component parse(@NonNull String message, @NonNull PlaceholderSources sources) {
 		Preconditions.checkNotNull(message, "Input must not be null");
-		Preconditions.checkNotNull(associations, "Associations must not be null");
+		Preconditions.checkNotNull(sources, "Sources must not be null");
 
 		TextComponent.Builder output = Component.text();
-
 		String reference = message;
-
 		Style style = Style.empty();
+
 		while(!reference.isEmpty()) {
 			final List<Function<Component, Component>> modifiers = Lists.newArrayList();
 
@@ -80,7 +80,7 @@ public class SpongeMessageService implements MessageService<Component> {
 				}
 
 				Optional<PlaceholderParser> parser = this.getParser(placeholder);
-				Component out = parser.isPresent() ? this.parseToken(parser.get(), associations, arguments) : Component.empty();
+				Component out = parser.isPresent() ? this.parseToken(parser.get(), sources, arguments) : Component.empty();
 
 				if(matcher.group(1) != null) {
 					String in = matcher.group(1);
@@ -129,23 +129,15 @@ public class SpongeMessageService implements MessageService<Component> {
 		return output.build();
 	}
 
-	private Component parseToken(PlaceholderParser parser, List<Supplier<Object>> associations, String arguments) {
-		if(associations.isEmpty()) {
-			return parser.parse(PlaceholderContext.builder()
-					.argumentString(arguments)
-					.build());
-		} else {
-			for (Supplier<Object> association : associations) {
-				Component result = parser.parse(PlaceholderContext.builder()
-						.associatedObject(association)
-						.argumentString(arguments)
-						.build()
-				);
+	private Component parseToken(PlaceholderParser parser, PlaceholderSources sources, String arguments) {
+		Component result = parser.parse(PlaceholderContext.builder()
+				.associatedObject(sources)
+				.argumentString(arguments)
+				.build()
+		);
 
-				if (result != Component.empty()) {
-					return result;
-				}
-			}
+		if (result != Component.empty()) {
+			return result;
 		}
 
 		return Component.empty();
@@ -254,5 +246,4 @@ public class SpongeMessageService implements MessageService<Component> {
 
 		return Optional.empty();
 	}
-
 }

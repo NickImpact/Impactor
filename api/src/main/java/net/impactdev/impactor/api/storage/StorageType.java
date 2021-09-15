@@ -1,7 +1,6 @@
 package net.impactdev.impactor.api.storage;
 
 import com.google.common.collect.ImmutableList;
-import lombok.Getter;
 
 import java.util.List;
 
@@ -17,10 +16,8 @@ public enum StorageType {
 	SQLITE("SQLite", "sqlite"),
 	H2("H2", "h2");
 
-	@Getter
 	private final String name;
 
-	@Getter
 	private final List<String> identifiers;
 
 	StorageType(String name, String... identifiers) {
@@ -37,5 +34,13 @@ public enum StorageType {
 			}
 		}
 		return null;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public List<String> getIdentifiers() {
+		return this.identifiers;
 	}
 }

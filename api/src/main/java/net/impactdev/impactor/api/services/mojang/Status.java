@@ -1,12 +1,7 @@
 package net.impactdev.impactor.api.services.mojang;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.Date;
 
-@Getter
-@Setter
 public class Status {
 	private ServiceType type;
 	private ServiceStatus status;
@@ -23,5 +18,37 @@ public class Status {
 
 	public static Status from(ServiceType type, ServiceStatus status, Date check) {
 		return new Status(type, status, check);
+	}
+
+	public ServiceType getType() {
+		return this.type;
+	}
+
+	public ServiceStatus getStatus() {
+		return this.status;
+	}
+
+	public Date getCheck() {
+		return this.check;
+	}
+
+	public Date getDownInstant() {
+		return this.downInstant;
+	}
+
+	public void setType(ServiceType type) {
+		this.type = type;
+	}
+
+	public void setStatus(ServiceStatus status) {
+		this.status = status;
+	}
+
+	public void setCheck(Date check) {
+		this.check = check;
+	}
+
+	public void setDownInstant(Date downInstant) {
+		this.downInstant = downInstant;
 	}
 }

@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.api.event;
 
-import com.google.gson.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.event.listener.ImpactorEventListener;
 import net.impactdev.impactor.api.event.annotations.Param;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -138,6 +138,16 @@ public interface EventBus {
      * @return an event handler instance representing this subscription
      */
     @NonNull <T extends ImpactorEvent> EventSubscription<T> subscribe(Object plugin, @NonNull Class<T> eventClass, @NonNull Consumer<? super T> handler);
+
+    /**
+     *
+     *
+     * @param type
+     * @param handler
+     * @param <T>
+     * @return
+     */
+    @NonNull <T extends ImpactorEvent> EventSubscription<T> subscribe(@NonNull TypeToken<T> type, Consumer<? extends T> handler);
 
     /**
      * Gets a set of all registered handlers for a given event.

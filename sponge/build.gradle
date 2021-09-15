@@ -1,3 +1,6 @@
+import org.spongepowered.gradle.plugin.config.PluginLoaders
+import org.spongepowered.plugin.metadata.model.PluginDependency
+
 buildscript {
     repositories {
         jcenter()
@@ -11,23 +14,52 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
     }
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
-//apply plugin: 'org.spongepowered.gradle.plugin'
+plugins {
+    id 'org.spongepowered.gradle.plugin' version '2.0.0'
+}
+
+apply plugin: 'net.minecraftforge.gradle'
 
 ext {
     sponge = "8.0.0"
 }
 
 minecraft {
-    version = "1.12.2-14.23.5.2768"
-    runDir = "run"
-    mappings = "snapshot_20180324"
-    useDepAts = true
-    makeObfSourceJar = false
+    // The mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   Snapshot are built nightly.
+    // stable_#            Stables are built at the discretion of the MCP team.
+    // Use non-default mappings at your own risk. they may not always work.
+    // Simply re-run your setup task after changing the mappings to update your workspace.
+    mappings channel: 'official', version: '1.16.5'
+}
+
+sponge {
+    apiVersion("8.0.0-SNAPSHOT")
+    license("GNU General Public License v3.0")
+    loader {
+        name(PluginLoaders.JAVA_PLAIN)
+        version("1.0")
+    }
+    plugin("impactor") {
+        displayName("Impactor")
+        entrypoint("net.impactdev.impactor.sponge.SpongeImpactorPlugin")
+        description("Multi-platform utility API")
+        links {
+            source("https://github.com/NickImpact/Impactor")
+            issues("https://github.com/NickImpact/Impactor/issues")
+        }
+        contributor("NickImpact") {
+            description("Lead Developer")
+        }
+        dependency("spongeapi") {
+            loadOrder(PluginDependency.LoadOrder.AFTER)
+            optional(false)
+        }
+    }
 }
 
 repositories {
@@ -54,38 +86,42 @@ repositories {
         url 'http://repo.drnaylor.co.uk/artifactory/list/quickstart'
     }
     maven {
-        name 'Protocol Control'
-        url "https://repo.ichorpowered.com/repository/maven-public"
+        name = "Impact-Dev"
+        url = "https://maven.impactdev.net/repository/development/"
     }
 }
 
 dependencies {
     compile project(':api')
     compile project(':common')
-    shadow fileTree(dir: 'libs', include: '*.jar')
-    shadow 'org.spongepowered:spongeapi:8.0.0-SNAPSHOT'
-    shadow 'org.spongepowered:math:2.0.0-SNAPSHOT'
-//    shadow "com.ichorpowered:protocolcontrol:0.0.2"
-//    shadow "co.aikar:acf-sponge:0.5.0-SNAPSHOT"
-    shadow "me.lucko:jar-relocator:1.4"
+
+    minecraft 'net.minecraftforge:forge:1.16.5-36.0.48'
+
+    shadow 'org.spongepowered:math:2.0.0'
+   // shadow "com.ichorpowered:protocolcontrol:0.0.3"
+    shadow 'me.lucko:jar-relocator:1.5'
     compile("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT") {
         exclude(module: 'adventure-api')
         exclude(module: 'adventure-key')
     }
 }
 
-sourceMainJava.finalizedBy(blossomSourceReplacementJava)
 blossom {
-    blossomSourceReplacementJava.output = file("$buildDir/sources/main/java")
+    blossomSourceReplacementJava.output = file("$buildDir/sources/java")
     replaceToken '@version@', version
 }
 
 shadowJar {
-    dependsOn reobfJar
     archiveName = "Impactor-Sponge-${sponge}-${version}.jar"
 
     exclude 'META-INF/versions/9/module-info.class'
     exclude 'module-info.class'
+
+    dependencies {
+        include(project(':api'))
+        include(project(':common'))
+        include(dependency('net.kyori:adventure-text-minimessage:.*'))
+    }
 
     // Shaded Components
 //    relocate 'com.github.ben-manes', 'com.nickimpact.impactor.relocations.com.github.ben-manes'
@@ -104,33 +140,14 @@ shadowJar {
     relocate 'net.kyori.adventure.text.minimessage', 'net.impactdev.impactor.relocations.minimessage'
     relocate("net.kyori.event", "com.ichorpowered.protocolcontrol.lib.kyori")
 
-//    relocate 'ninja.leaping.configurate', 'com.nickimpact.impactor.relocations.ninja.leaping.configurate'
-//    relocate 'org.yaml', 'com.nickimpact.impactor.relocations.org.yaml'
-//    relocate 'org.checkerframework', 'com.nickimpact.impactor.relocations.org.checkerframework'
-//    relocate 'org.objectweb', 'com.nickimpact.impactor.relocations.objectweb'
-    //relocate 'co.aikar', 'com.nickimpact.impactor.relocations.co.aikar'
-
     // Storage Based Relocations
     relocate ('com.zaxxer.hikari', 'net.impactdev.impactor.relocations.hikari')
     relocate ('org.mariadb.jdbc', 'net.impactdev.impactor.relocations.mariadb')
     relocate ('com.mysql', 'net.impactdev.impactor.relocations.mysql')
-
-    afterEvaluate {
-        from zipTree(reobfJar.jar)
-    }
-}
-
-processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        expand 'pluginVersion': version
-        include 'META-INF/plugins.json'
-    }
 }
 
 reobf {
-    shadowJar {
-        mappingType = 'SEARGE'
-    }
+    shadowJar {}
 }
 
 build.dependsOn reobfShadowJar
