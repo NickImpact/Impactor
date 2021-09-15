@@ -5,7 +5,6 @@ on: [push, pull_request]
 jobs:
   check:
     name: Check License
-    needs: setup
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
