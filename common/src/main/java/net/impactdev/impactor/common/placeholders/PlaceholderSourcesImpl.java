@@ -29,6 +29,7 @@ import com.google.common.collect.Maps;
 import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -49,6 +50,11 @@ public class PlaceholderSourcesImpl implements PlaceholderSources {
     @Override
     public <T> Optional<T> getSource(TypeToken<T> type) {
         return Optional.ofNullable((T) this.sources.get(type).get());
+    }
+
+    @Override
+    public Collection<Supplier<?>> suppliers() {
+        return this.sources.values();
     }
 
     public static class PlaceholderSourcesBuilderImpl implements SourceBuilder {

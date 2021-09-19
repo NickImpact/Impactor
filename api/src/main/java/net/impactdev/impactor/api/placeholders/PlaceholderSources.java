@@ -29,6 +29,8 @@ import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.utilities.Builder;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -41,6 +43,8 @@ public interface PlaceholderSources {
     <T> Optional<T> getSource(Class<T> type);
 
     <T> Optional<T> getSource(TypeToken<T> type);
+
+    Collection<Supplier<?>> suppliers();
 
     static SourceBuilder builder() {
         return Impactor.getInstance().getRegistry().createBuilder(SourceBuilder.class);

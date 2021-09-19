@@ -36,6 +36,10 @@ import java.util.List;
 
 import static net.kyori.adventure.text.format.NamedTextColor.*;
 
+/**
+ * Line identifiers are used for creating custom teams per scoreboard line. They are used to
+ * help with scores and ensuring the right line is receiving updates.
+ */
 public class LineIdentifier {
 
 	private static final CircularLinkedList<NamedTextColor> colors = CircularLinkedList.of(BLACK, DARK_BLUE, DARK_GREEN, DARK_AQUA, DARK_RED, DARK_PURPLE, GOLD, GRAY, DARK_GRAY, BLUE, GREEN, AQUA, RED, LIGHT_PURPLE, YELLOW, WHITE);

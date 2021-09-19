@@ -161,6 +161,13 @@ public class SpongeMessageService implements MessageService<Component> {
 			return result;
 		}
 
+		for(Supplier<?> supplier : sources.suppliers()) {
+			Component attempt = parser.parse(PlaceholderContext.builder().associatedObject(supplier).argumentString(arguments).build());
+			if(attempt != Component.empty()) {
+				return attempt;
+			}
+		}
+
 		return Component.empty();
 	}
 

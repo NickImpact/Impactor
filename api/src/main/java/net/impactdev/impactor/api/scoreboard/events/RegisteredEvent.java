@@ -25,6 +25,9 @@
 
 package net.impactdev.impactor.api.scoreboard.events;
 
+/**
+ * Represents a registration for a particular event bus.
+ */
 public final class RegisteredEvent {
 
     private final Object registration;

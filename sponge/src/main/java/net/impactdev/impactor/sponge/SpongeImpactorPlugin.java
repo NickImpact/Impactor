@@ -45,7 +45,6 @@ import net.impactdev.impactor.api.plugin.components.Depending;
 import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.api.storage.StorageType;
-import net.impactdev.impactor.api.utilities.PrettyPrinter;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
 import net.impactdev.impactor.common.placeholders.PlaceholderSourcesImpl;
 import net.impactdev.impactor.sponge.api.SpongeImpactorAPIProvider;
@@ -56,57 +55,36 @@ import net.impactdev.impactor.sponge.event.SpongeEventBus;
 import net.impactdev.impactor.sponge.plugin.AbstractSpongePlugin;
 import net.impactdev.impactor.sponge.scheduler.SpongeSchedulerAdapter;
 import net.impactdev.impactor.sponge.scoreboard.ScoreboardModule;
-import net.impactdev.impactor.sponge.scoreboard.ScoreboardTest;
 import net.impactdev.impactor.sponge.services.SpongeMojangServerStatusService;
 import net.impactdev.impactor.sponge.text.SpongeMessageService;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
-import net.impactdev.impactor.sponge.ui.SpongeLayout;
-import net.impactdev.impactor.sponge.ui.SpongePage;
-import net.impactdev.impactor.sponge.ui.icons.SpongeIcon;
-import net.impactdev.impactor.sponge.ui.icons.SpongeIcons;
 import net.impactdev.impactor.sponge.ui.signs.SpongeSignQuery;
 import net.impactdev.impactor.sponge.util.SpongeClassLoader;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
-import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
 import org.spongepowered.api.event.lifecycle.RegisterRegistryValueEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
-import org.spongepowered.api.event.network.ServerSideConnectionEvent;
-import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.registry.RegistryTypes;
-import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.util.Ticks;
-import org.spongepowered.math.vector.Vector2i;
 import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -194,13 +172,6 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		}
 
 		//Sponge.getServiceManager().provideUnchecked(ProtocolService.class).events().register(new SignListener());
-	}
-
-	private final ScoreboardTest tester = new ScoreboardTest();
-
-	@Listener
-	public void onPlayerJoin(ServerSideConnectionEvent.Join event, @First ServerPlayer player) {
-		this.tester.create(player);
 	}
 
 	@Listener

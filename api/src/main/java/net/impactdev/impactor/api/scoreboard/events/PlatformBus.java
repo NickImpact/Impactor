@@ -31,6 +31,10 @@ import java.util.Optional;
 
 /**
  * Represents the event bus that coincides with the target platform of the server.
+ *
+ * <p>This is relative to the providing platform type of Impactor. For instance, when using the Sponge
+ * version of Impactor, this bus will be based on the Sponge event bus, regardless of forge being on
+ * the workspace via SpongeForge.
  */
 public abstract class PlatformBus<L> implements Bus<L> {
 

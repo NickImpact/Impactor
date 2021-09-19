@@ -39,7 +39,7 @@ minecraft {
 
 sponge {
     apiVersion("8.0.0-SNAPSHOT")
-    license("GNU General Public License v3.0")
+    license("MIT")
     loader {
         name(PluginLoaders.JAVA_PLAIN)
         version("1.0")

@@ -35,10 +35,18 @@ import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+/**
+ * Represents the bus that handles event registration with the Impactor event bus.
+ */
 public class ImpactorBus implements Bus<ImpactorEvent> {
 
     private static ImpactorBus instance;
 
+    /**
+     * Fetches, or creates a new instance, of the Impactor bus type
+     *
+     * @return The Impactor Bus
+     */
     public static ImpactorBus getOrCreate() {
         return Optional.ofNullable(instance).orElse(instance = new ImpactorBus());
     }

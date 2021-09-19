@@ -33,15 +33,6 @@ compileJava {
     sourceCompatibility = targetCompatibility = "1.8"
 }
 
-ext {
-    spongeapiversion = '7.3'
-    completeversion = "-S${spongeapiversion}-${project.version}"
-}
-
-jar {
-    archiveName = "Impactor${completeversion}.jar"
-}
-
 repositories {
     mavenCentral()
     maven {
@@ -189,14 +180,6 @@ publishing {
             artifactId "velocity"
             version project.version
         }
-
-//        spigot(MavenPublication) {
-//            def project = project(':spigot')
-//            from project.components.java
-//            groupId project.group
-//            artifactId "spigot"
-//            version project.version
-//        }
 
         sponge(MavenPublication) {
             def project = project(':sponge')

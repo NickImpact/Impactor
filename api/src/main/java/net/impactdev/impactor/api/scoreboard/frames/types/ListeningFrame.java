@@ -34,14 +34,25 @@ import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.utilities.Builder;
 
 /**
- * Creates a frame that is unique to the event bus of the particular platform.
+ * Creates a frame that is unique to the event bus of the particular platform. This frame will
+ * only update via the event handler, if specified to update.
  *
- * @param <L>
+ * @param <L> The event represented by this frame
  */
 public interface ListeningFrame<L> extends ScoreboardFrame.UpdatableFrame {
 
+    /**
+     * A {@link TypeToken} that resembles the type of the event for the frame
+     *
+     * @return A {@link TypeToken} based on the event type
+     */
     TypeToken<L> getListenerType();
 
+    /**
+     * Represents the handler being used by this frame for listening to its target event.
+     *
+     * @return A handler for listening to the target event of this frame
+     */
     EventHandler<L> getEventHandler();
 
     interface ListeningFrameBuilder<L> extends Builder<ListeningFrame<L>, ListeningFrameBuilder<L>> {
@@ -51,25 +62,65 @@ public interface ListeningFrame<L> extends ScoreboardFrame.UpdatableFrame {
          * construction of the builder via {@link ScoreboardFrame#listening(TypeToken)}, so you can avoid using
          * this method.
          *
-         * @param event
-         * @param <E>
-         * @return
+         * @param event The event type this frame should represent
+         * @param <E> A reference to the type of event
+         * @return This builder
          */
         <E> ListeningFrameBuilder<E> type(TypeToken<E> event);
 
+        /**
+         * Specifies the bus to be used by this frame
+         *
+         * @param bus The bus
+         * @return This builder
+         */
         ListeningFrameBuilder<L> bus(Bus<? super L> bus);
 
+        /**
+         * Specifies the text that should be translated per update cast by the event handler. This is also
+         * parsed for the first instance should the event take a while to fire.
+         *
+         * @param raw The raw text to be translated per update
+         * @return This builder
+         */
         ListeningFrameBuilder<L> text(String raw);
 
+        /**
+         * Specifies the handler this frame will use to listen to events of its given event typing. This handler
+         * should tell the updatable instance when to update for this frame to work correctly!
+         *
+         * @param handler The event handler
+         * @return This builder
+         */
         ListeningFrameBuilder<L> handler(EventHandler<L> handler);
 
+        /**
+         * Represents a list of sources that placeholders in the raw text will use for replacement
+         *
+         * @param sources The set of sources
+         * @return This builder
+         */
         ListeningFrameBuilder<L> sources(PlaceholderSources sources);
 
     }
 
+    /**
+     * Represents a means of processing an event with the updatable instance the event should update if it
+     * meets its criteria.
+     *
+     * @param <L> The type of event being processed
+     */
     @FunctionalInterface
     interface EventHandler<L> {
 
+        /**
+         * Processes the event with the updatable instance this processor should update when the correct
+         * criteria is met.
+         *
+         * @param updatable The updatable instance to update
+         * @param event The event that was posted to the event bus
+         * @throws RuntimeException If any component of the processor fails
+         */
         void process(Updatable updatable, L event) throws RuntimeException;
 
     }

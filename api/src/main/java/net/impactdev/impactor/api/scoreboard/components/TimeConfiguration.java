@@ -27,6 +27,11 @@ package net.impactdev.impactor.api.scoreboard.components;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Represents a configuration meant for helping with scheduled components of a scoreboard, typically
+ * used by both refreshing and animated line/objective types.
+ *
+ */
 public class TimeConfiguration {
 
     private final boolean ticks;

@@ -33,26 +33,122 @@ import net.impactdev.impactor.api.utilities.Builder;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Represents a scoreboard that appears on the side of a user's screen. This scoreboard is built amongst
+ * a set of {@link ScoreboardLine lines} as well as an {@link ScoreboardObjective objective} (title).
+ * The scoreboard implementations feature non-flicker variants with placeholder parsing support, alongside
+ * full support for hex color codes.
+ *
+ * <p>As a means of efficiency as well as convenience, the objective and each line can have their own
+ * means of updating, as well as how they update. For instance, you can have a line that features
+ * no updating whatsoever, to save resources for ticking a line that otherwise would never change.
+ * Additionally, outside running animations and lines that refresh their contents based on a schedule,
+ * the API allows for updating based on event occurrences. For example, imagine a scoreboard with the
+ * following creation design (excuse formatting, 80 character limits are fun):
+ *
+ * <pre>
+ * ImpactorScoreboard scoreboard = ImpactorScoreboard.builder()
+ *   .objective(ScoreboardObjective.listening()
+ *      .frame(ScoreboardFrame.listening(
+ *             TypeToken.get(ServerSideConnectionEvent.class)
+ *         )
+ *         .text("&e&lImpactDev &7(&b{{impactor:player_count}}&7)")
+ *         .bus(PlatformBus.getOrCreate())
+ *         .handler((updatable, event) -> {
+ *            if(event instanceof ServerSideConnectionEvent.Join
+ *               || event instanceof ServerSideConnectionEvent.Disconnect) {
+ *               Sponge.server().scheduler().submit(Task.builder()
+ *                 .plugin(plugin)
+ *                 .execute(updatable::update)
+ *                 .delay(Ticks.of(1))
+ *                 .build()
+ *               );
+ *            }
+ *         })
+ *         .sources(sources)
+ *         .build()
+ *      )
+ *      .build()
+ *   )
+ * </pre>
+ *
+ * This scoreboard will come with an {@link ScoreboardObjective} that updates its contents for
+ * every instance of both login and disconnect events (Event is based on Sponge). Otherwise, the
+ * title of the scoreboard remains static.
+ */
 public interface ImpactorScoreboard {
 
+    /**
+     * Represents the title of the scoreboard.
+     *
+     * @return The scoreboard's title
+     */
     ScoreboardObjective getTitle();
 
+    /**
+     * Represents the set of lines that a scoreboard will contain.
+     *
+     * <p>NOTE: A scoreboard is limited to 16 lines, excluding the title. These lines are controlled via their
+     * score, set via the respective builder per each type of scoreboard line. If two lines have the same score,
+     * the line specified last will overtake the first.
+     *
+     * @return The scoreboard's lines
+     */
     List<ScoreboardLine> getLines();
 
+    /**
+     * Applies the scoreboard to the user with the following UUID.
+     *
+     * @param user The user that will view this scoreboard
+     */
     void applyFor(UUID user);
 
+    /**
+     * Begins construction of a new scoreboard.
+     *
+     * @return A newly constructed scoreboard builder.
+     */
     static ScoreboardBuilder builder() {
         return Impactor.getInstance().getRegistry().createBuilder(ScoreboardBuilder.class);
     }
 
+    /**
+     * Allows for dynamic building of a scoreboard
+     */
     interface ScoreboardBuilder extends Builder<ImpactorScoreboard, ScoreboardBuilder> {
 
+        /**
+         * Specifies the objective/title of the scoreboard.
+         *
+         * @param objective The objective for the scoreboard
+         * @return This builder
+         */
         ScoreboardBuilder objective(ScoreboardObjective objective);
 
+        /**
+         * Appends a single line to the scoreboard. If its score matches another line
+         * already added to this scoreboard, the earlier line will ultimately
+         * be replaced when constructed.
+         *
+         * @param line The line to append
+         * @return This builder
+         */
         ScoreboardBuilder line(ScoreboardLine line);
 
+        /**
+         * Appends a set of scoreboard lines to the scoreboard.
+         *
+         * @param lines The line set
+         * @return This builder
+         */
         ScoreboardBuilder lines(ScoreboardLine... lines);
 
+        /**
+         * Appends a set of scoreboard lines to the scoreboard.
+         *
+         * @param lines The line set
+         * @return This builder
+         */
         ScoreboardBuilder lines(Iterable<ScoreboardLine> lines);
 
     }
