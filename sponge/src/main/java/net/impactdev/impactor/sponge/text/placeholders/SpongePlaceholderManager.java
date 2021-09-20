@@ -34,6 +34,7 @@ import net.impactdev.impactor.api.placeholders.PlaceholderManager;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.text.placeholders.provided.Memory;
+import net.impactdev.impactor.sponge.text.processors.FadeProcessor;
 import net.impactdev.impactor.sponge.text.processors.gradients.NumberBasedGradientProcessor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -52,8 +53,10 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -95,17 +98,12 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
                 .orElse(Component.empty())
         ));
         this.register(this.create("rainbow", context -> {
-            String[] arguments = context.argumentString().orElse("").split(";");
-            Map<String, String> map = Maps.newHashMap();
-            for(String args : arguments) {
-                String[] split = args.split("=");
-                map.put(split[0], split[1]);
-            }
+            Map<String, String> args = decodeArgs(context.argumentString().orElse(""));
 
-            UUID id = UUID.fromString(map.get("id"));
-            RainbowManager manager = this.gradientManagers.computeIfAbsent(id, x -> new RainbowManager(Integer.parseInt(map.get("start"))));
+            UUID id = UUID.fromString(args.get("id"));
+            RainbowManager manager = this.gradientManagers.computeIfAbsent(id, x -> new RainbowManager(Integer.parseInt(args.get("start"))));
 
-            return MiniMessage.get().parse("<rainbow:" + manager.step() + ">" + map.get("value") + "</gradient>");
+            return MiniMessage.get().parse("<rainbow:" + manager.step() + ">" + args.get("value") + "</gradient>");
         }));
         this.register(this.create("coordinates", context -> context.associatedObject()
                 .filter(source -> source instanceof PlaceholderSources)
@@ -121,6 +119,10 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
                 })
                 .orElse(Component.text("?, ?, ?"))
         ));
+        this.register(this.create("fade", context -> {
+            Map<String, String> args = decodeArgs(context.argumentString().orElse(""));
+            return FADE_PROCESSOR.process(args);
+        }));
     }
 
     private PlaceholderMetadata create(String id, Function<PlaceholderContext, Component> parser) {
@@ -160,6 +162,8 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
             .colors(max, min)
             .build();
 
+    private static final FadeProcessor FADE_PROCESSOR = new FadeProcessor();
+
     private static Component formatTps(double tps) {
         Component isHigh = tps > 20.0 ? Component.text("*") : Component.empty();
         Component result = TPS_PROCESSOR.process(tps);
@@ -169,6 +173,16 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
 
     private static Component formatMilliseconds(double milliseconds) {
         return MSPT_PROCESSOR.process(milliseconds).append(Component.text("ms"));
+    }
+
+    private static Map<String, String> decodeArgs(String in) {
+        String[] arguments = in.split(";");
+        Map<String, String> map = Maps.newHashMap();
+        for(String args : arguments) {
+            String[] split = args.split("=");
+            map.put(split[0], split[1]);
+        }
+        return map;
     }
 
     private final Map<UUID, RainbowManager> gradientManagers = Maps.newHashMap();
@@ -186,4 +200,6 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
         }
 
     }
+
+
 }
