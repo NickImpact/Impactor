@@ -26,6 +26,7 @@
 package net.impactdev.impactor.api.scoreboard.lines.types;
 
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
+import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
 import net.impactdev.impactor.api.scoreboard.frames.types.ListeningFrame;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.utilities.Builder;

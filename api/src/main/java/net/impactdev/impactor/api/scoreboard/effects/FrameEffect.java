@@ -23,35 +23,27 @@
  *
  */
 
-package net.impactdev.impactor.api.scoreboard.lines.types;
+package net.impactdev.impactor.api.scoreboard.effects;
 
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
-import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
-import net.impactdev.impactor.api.scoreboard.components.Updatable;
-import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
-import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 
-import java.util.concurrent.TimeUnit;
+public interface FrameEffect {
 
-public interface RefreshingLine extends ScoreboardLine, Updatable {
+    String getID();
 
-    TimeConfiguration getTimingConfig();
+    Component translate(Component parent);
 
-    interface RefreshingLineBuilder extends LineBuilder<RefreshingLineBuilder>, Builder<RefreshingLine, RefreshingLineBuilder> {
+    default String decode(Component component) {
+        StringBuilder output = new StringBuilder();
+        if(component instanceof TextComponent) {
+            output.append(((TextComponent) component).content());
+            for(Component child : component.children()) {
+                output.append(this.decode(child));
+            }
+        }
 
-        RefreshingLineBuilder text(String raw);
-
-        RefreshingLineBuilder effects(FrameEffect... effect);
-
-        RefreshingLineBuilder rate(long ticks);
-
-        RefreshingLineBuilder rate(long duration, TimeUnit unit);
-
-        RefreshingLineBuilder async();
-
-        RefreshingLineBuilder sources(PlaceholderSources sources);
-
+        return output.toString();
     }
 
 }

@@ -30,6 +30,7 @@ import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scheduler.SchedulerTask;
 import net.impactdev.impactor.api.scoreboard.components.LineIdentifier;
 import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
+import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
 import net.impactdev.impactor.api.scoreboard.lines.types.RefreshingLine;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
@@ -44,6 +45,10 @@ import org.spongepowered.api.scoreboard.Team;
 import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.util.Ticks;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Optional;
+import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -57,6 +62,7 @@ public class SpongeRefreshingLine extends AbstractSpongeSBLine implements Refres
     private final Team team;
     private final Component identifier;
 
+    private final Queue<FrameEffect> effects;
     private final PlaceholderSources sources;
 
     private SchedulerTask updater;
@@ -66,6 +72,7 @@ public class SpongeRefreshingLine extends AbstractSpongeSBLine implements Refres
         this.raw = builder.raw;
         this.timings = builder.timings;
         this.async = builder.async;
+        this.effects = new LinkedList<>(Arrays.asList(builder.effects));
         this.sources = builder.sources;
 
         this.team = Team.builder().name(UUID.randomUUID().toString().substring(0, 16)).build();
@@ -75,7 +82,12 @@ public class SpongeRefreshingLine extends AbstractSpongeSBLine implements Refres
     @Override
     public Component getText() {
         MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
-        return service.parse(this.raw, this.sources);
+        Component result = service.parse(this.raw, this.sources);
+        for(FrameEffect effect : this.effects) {
+            result = effect.translate(result);
+        }
+
+        return result;
     }
 
     @Override
@@ -133,6 +145,7 @@ public class SpongeRefreshingLine extends AbstractSpongeSBLine implements Refres
 
         private int score;
         private String raw;
+        private FrameEffect[] effects = new FrameEffect[0];
         private TimeConfiguration timings;
         private boolean async;
         private PlaceholderSources sources;
@@ -146,6 +159,12 @@ public class SpongeRefreshingLine extends AbstractSpongeSBLine implements Refres
         @Override
         public RefreshingLineBuilder text(String raw) {
             this.raw = raw;
+            return this;
+        }
+
+        @Override
+        public RefreshingLineBuilder effects(FrameEffect... effects) {
+            this.effects = effects;
             return this;
         }
 

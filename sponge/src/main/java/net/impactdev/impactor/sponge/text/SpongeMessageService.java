@@ -138,11 +138,7 @@ public class SpongeMessageService implements MessageService<Component> {
 
 				reference = reference.replaceFirst("[{][{]([\\w-:]+)(\\|(.+))?[}][}]", "");
 			} else {
-				output.append(Component.text()
-						.append(LegacyComponentSerializer.legacyAmpersand().deserialize(reference))
-						.style(style)
-						.build()
-				);
+				output.append(LegacyComponentSerializer.legacyAmpersand().deserialize(reference));
 				break;
 			}
 		}

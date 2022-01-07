@@ -31,6 +31,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import net.impactdev.impactor.api.gui.Page;
+import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.ui.icons.SpongeIcon;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -103,7 +104,9 @@ public class SpongePage<U> implements Page<ServerPlayer, U, SpongeUI, SpongeIcon
 		this.layout = updated.build();
 		ViewableInventory view = ViewableInventory.builder()
 				.type(ContainerTypes.GENERIC_9X6)
-				.completeStructure().build();
+				.completeStructure()
+				.plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+				.build();
 
 		return SpongeUI.builder()
 				.title(this.title)

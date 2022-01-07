@@ -6,7 +6,7 @@ buildscript {
         jcenter()
         maven {
             name = "forge"
-            url = "http://files.minecraftforge.net/maven"
+            url = "https://files.minecraftforge.net/maven"
         }
         maven {
             name = 'sponge'
@@ -98,7 +98,7 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.0.48'
 
     shadow 'org.spongepowered:math:2.0.0'
-   // shadow "com.ichorpowered:protocolcontrol:0.0.3"
+    shadow 'com.github.ben-manes.caffeine:caffeine:2.8.4'
     shadow 'me.lucko:jar-relocator:1.5'
     compile("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT") {
         exclude(module: 'adventure-api')
@@ -144,6 +144,7 @@ shadowJar {
     relocate ('com.zaxxer.hikari', 'net.impactdev.impactor.relocations.hikari')
     relocate ('org.mariadb.jdbc', 'net.impactdev.impactor.relocations.mariadb')
     relocate ('com.mysql', 'net.impactdev.impactor.relocations.mysql')
+    relocate ('com.github.benmanes.caffeine', 'net.impactdev.impactor.relocations.caffeine')
 }
 
 reobf {

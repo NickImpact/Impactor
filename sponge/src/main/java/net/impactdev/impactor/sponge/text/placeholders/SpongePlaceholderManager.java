@@ -29,12 +29,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.reflect.TypeToken;
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderManager;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
-import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.text.placeholders.provided.Memory;
-import net.impactdev.impactor.sponge.text.processors.FadeProcessor;
 import net.impactdev.impactor.sponge.text.processors.gradients.NumberBasedGradientProcessor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -50,13 +47,9 @@ import org.spongepowered.math.vector.Vector3i;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -97,14 +90,6 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
                 .map(player -> PING_PROCESSOR.process(player.connection().latency()))
                 .orElse(Component.empty())
         ));
-        this.register(this.create("rainbow", context -> {
-            Map<String, String> args = decodeArgs(context.argumentString().orElse(""));
-
-            UUID id = UUID.fromString(args.get("id"));
-            RainbowManager manager = this.gradientManagers.computeIfAbsent(id, x -> new RainbowManager(Integer.parseInt(args.get("start"))));
-
-            return MiniMessage.get().parse("<rainbow:" + manager.step() + ">" + args.get("value") + "</gradient>");
-        }));
         this.register(this.create("coordinates", context -> context.associatedObject()
                 .filter(source -> source instanceof PlaceholderSources)
                 .map(source -> (PlaceholderSources) source)
@@ -119,10 +104,6 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
                 })
                 .orElse(Component.text("?, ?, ?"))
         ));
-        this.register(this.create("fade", context -> {
-            Map<String, String> args = decodeArgs(context.argumentString().orElse(""));
-            return FADE_PROCESSOR.process(args);
-        }));
     }
 
     private PlaceholderMetadata create(String id, Function<PlaceholderContext, Component> parser) {
@@ -161,8 +142,6 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
             .factor(x -> x.floatValue() * 0.1f / 20)
             .colors(max, min)
             .build();
-
-    private static final FadeProcessor FADE_PROCESSOR = new FadeProcessor();
 
     private static Component formatTps(double tps) {
         Component isHigh = tps > 20.0 ? Component.text("*") : Component.empty();

@@ -28,24 +28,36 @@ package net.impactdev.impactor.sponge.scoreboard.frames;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
+import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
 import net.impactdev.impactor.api.scoreboard.frames.types.RefreshingFrame;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.kyori.adventure.text.Component;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class SpongeRefreshingFrame implements RefreshingFrame {
 
     private final String raw;
+    private final Queue<FrameEffect> effects;
     private final PlaceholderSources sources;
 
     public SpongeRefreshingFrame(SpongeRefreshingFrameBuilder builder) {
         this.raw = builder.raw;
+        this.effects = new LinkedList<>(Arrays.asList(builder.effects));
         this.sources = builder.sources;
     }
 
     @Override
     public Component getText() {
         MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
-        return service.parse(this.raw, this.sources);
+        Component result = service.parse(this.raw, this.sources);
+        for(FrameEffect effect : this.effects) {
+            result = effect.translate(result);
+        }
+
+        return result;
     }
 
     @Override
@@ -62,11 +74,18 @@ public class SpongeRefreshingFrame implements RefreshingFrame {
     public static class SpongeRefreshingFrameBuilder implements RefreshingFrameBuilder {
 
         private String raw;
+        private FrameEffect[] effects = new FrameEffect[0];
         private PlaceholderSources sources;
 
         @Override
         public RefreshingFrameBuilder raw(String raw) {
             this.raw = raw;
+            return this;
+        }
+
+        @Override
+        public RefreshingFrameBuilder effects(FrameEffect... effects) {
+            this.effects = effects;
             return this;
         }
 

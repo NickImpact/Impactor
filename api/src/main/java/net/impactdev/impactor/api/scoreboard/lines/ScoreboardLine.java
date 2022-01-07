@@ -56,6 +56,10 @@ public interface ScoreboardLine {
      */
     int getScore();
 
+    static ConstantLine empty(int score) {
+        return constant().text(Component.empty()).score(score).build();
+    }
+
     /**
      * Begins construction of a line for a scoreboard that makes no attempt to update the text
      * associated with the line.

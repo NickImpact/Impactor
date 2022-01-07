@@ -28,25 +28,37 @@ package net.impactdev.impactor.sponge.scoreboard.lines.types;
 import com.google.common.base.Preconditions;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
+import net.impactdev.impactor.api.scoreboard.components.LineIdentifier;
 import net.impactdev.impactor.api.scoreboard.lines.types.ConstantLine;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.sponge.scoreboard.lines.AbstractSpongeSBLine;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.scoreboard.Scoreboard;
+import org.spongepowered.api.scoreboard.Team;
 import org.spongepowered.api.scoreboard.objective.Objective;
+
+import java.util.UUID;
 
 public class SpongeConstantLine extends AbstractSpongeSBLine implements ConstantLine {
 
     private final Component text;
 
+    private final Team team;
+    private final Component identifier;
+
     protected SpongeConstantLine(SpongeConstantLineBuilder builder) {
         super(builder.score);
         this.text = builder.text;
+
+        this.team = Team.builder().name(UUID.randomUUID().toString().substring(0, 16)).build();
+        this.team.addMember(this.identifier = LineIdentifier.generate());
     }
 
     public void setup(Scoreboard scoreboard, Objective objective, ServerPlayer viewer) {
-        objective.findOrCreateScore(this.text).setScore(this.score);
+        objective.findOrCreateScore(this.identifier).setScore(this.score);
+        scoreboard.registerTeam(this.team);
+        this.team.setPrefix(this.getText());
     }
 
     @Override
