@@ -1,9 +1,9 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         maven {
             name = "forge"
-            url = "http://files.minecraftforge.net/maven"
+            url = "https://files.minecraftforge.net/maven"
         }
         maven {
             name = 'sponge'
@@ -11,24 +11,25 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 
 ext {
-    sponge = "7.1.5"
+    sponge = "7.3.0"
 }
 
 minecraft {
-    version = "1.12.2-14.23.5.2768"
-    runDir = "run"
-    mappings = "snapshot_20180324"
-    useDepAts = true
-    makeObfSourceJar = false
+    // The mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   Snapshot are built nightly.
+    // stable_#            Stables are built at the discretion of the MCP team.
+    // Use non-default mappings at your own risk. they may not always work.
+    // Simply re-run your setup task after changing the mappings to update your workspace.
+    mappings channel: "stable", version: "39-1.12"
 }
 
 repositories {
@@ -49,15 +50,25 @@ repositories {
 dependencies {
     compile project(':api')
     compile project(':common')
+
+    // Forge
+    minecraft "net.minecraftforge:forge:1.12.2-14.23.5.2855"
+
+    // Sponge
     shadow 'org.spongepowered:spongeapi:7.3.0'
+    annotationProcessor 'org.spongepowered:spongeapi:7.3.0'
+
+    // Mixin
+    shadow 'org.spongepowered:mixin:0.8.5'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    // Misc
     shadow "com.ichorpowered:protocolcontrol:0.0.3"
-    shadow "me.lucko:jar-relocator:1.4"
-    shadow('org.spongepowered:mixin:0.8-SNAPSHOT')
+    shadow "me.lucko:jar-relocator:1.5"
 }
 
-sourceMainJava.finalizedBy(blossomSourceReplacementJava)
 blossom {
-    blossomSourceReplacementJava.output = file("$buildDir/sources/main/java")
+    blossomSourceReplacementJava.output = file("$buildDir/sources/java")
     replaceToken '@version@', version
 }
 
@@ -72,11 +83,12 @@ jar {
 }
 
 shadowJar {
-    dependsOn reobfJar
     archiveName = "Impactor-Sponge-${sponge}-${version}.jar"
 
-    exclude 'META-INF/versions/9/module-info.class'
-    exclude 'module-info.class'
+    dependencies {
+        include project(":api")
+        include project(":common")
+    }
 
     // Shaded Components
 //    relocate 'com.github.ben-manes', 'com.nickimpact.impactor.relocations.com.github.ben-manes'
@@ -105,16 +117,10 @@ shadowJar {
     relocate ('com.zaxxer.hikari', 'net.impactdev.impactor.relocations.hikari')
     relocate ('org.mariadb.jdbc', 'net.impactdev.impactor.relocations.mariadb')
     relocate ('com.mysql', 'net.impactdev.impactor.relocations.mysql')
-
-    afterEvaluate {
-        from zipTree(reobfJar.jar)
-    }
 }
 
 reobf {
-    shadowJar {
-        mappingType = 'SEARGE'
-    }
+    shadowJar {}
 }
 
 mixin {
