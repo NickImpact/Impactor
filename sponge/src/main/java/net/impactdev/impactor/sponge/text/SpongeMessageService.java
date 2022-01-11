@@ -1,7 +1,7 @@
 /*
  * This file is part of Impactor, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2018-2021 NickImpact
+ * Copyright (c) 2018-2022 NickImpact
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -72,9 +72,11 @@ public class SpongeMessageService implements MessageService<Component> {
 	}
 
 	@Override
-	public Component parse(@NonNull String message, @NonNull PlaceholderSources sources) {
+	public Component parse(@NonNull String message, PlaceholderSources sources) {
 		Preconditions.checkNotNull(message, "Input must not be null");
-		Preconditions.checkNotNull(sources, "Sources must not be null");
+		if(sources == null) {
+			sources = PlaceholderSources.empty();
+		}
 
 		TextComponent.Builder output = Component.text();
 		String reference = message;

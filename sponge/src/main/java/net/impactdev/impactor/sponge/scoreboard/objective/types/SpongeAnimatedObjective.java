@@ -1,7 +1,7 @@
 /*
  * This file is part of Impactor, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2018-2021 NickImpact
+ * Copyright (c) 2018-2022 NickImpact
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,11 @@ public class SpongeAnimatedObjective extends AbstractSpongeObjective implements 
     @Override
     public Component getText() {
         return this.frames.getCurrent()
+                .or(() -> {
+                    this.frames.next();
+
+                    return this.frames.getCurrent();
+                })
                 .orElseThrow(() -> new IllegalStateException("No frame available"))
                 .getText();
     }
@@ -82,8 +87,6 @@ public class SpongeAnimatedObjective extends AbstractSpongeObjective implements 
 
     @Override
     public void start() {
-        this.frames.next();
-
         if(this.async) {
             this.frames.getCurrent()
                     .filter(frame -> frame instanceof ScoreboardFrame.UpdatableFrame)

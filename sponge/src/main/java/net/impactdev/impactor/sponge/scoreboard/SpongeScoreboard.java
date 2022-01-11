@@ -1,7 +1,7 @@
 /*
  * This file is part of Impactor, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2018-2021 NickImpact
+ * Copyright (c) 2018-2022 NickImpact
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,8 @@ import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
 import net.impactdev.impactor.sponge.scoreboard.lines.AbstractSpongeSBLine;
 import net.impactdev.impactor.sponge.scoreboard.objective.AbstractSpongeObjective;
+import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeAnimatedObjective;
+import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeRefreshingObjective;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.scoreboard.Scoreboard;
@@ -67,6 +69,19 @@ public class SpongeScoreboard implements ImpactorScoreboard {
     public void applyFor(UUID user) {
         ServerPlayer player = Sponge.server().player(user).orElseThrow(() -> new IllegalArgumentException("No player found with UUID: " + user));
         this.createFor(player);
+    }
+
+    @Override
+    public void shutdown() {
+        if(this.objective instanceof Updatable) {
+            ((Updatable) this.objective).shutdown();
+        }
+
+        for(ScoreboardLine line : this.lines) {
+            if(line instanceof Updatable) {
+                ((Updatable) line).shutdown();
+            }
+        }
     }
 
     public void createFor(ServerPlayer target) {

@@ -1,7 +1,7 @@
 /*
  * This file is part of Impactor, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2018-2021 NickImpact
+ * Copyright (c) 2018-2022 NickImpact
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,13 +29,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.api.dependencies.classloader.IsolatedClassLoader;
-import net.impactdev.impactor.api.dependencies.classloader.PluginClassLoader;
 import net.impactdev.impactor.api.dependencies.relocation.Relocation;
 import net.impactdev.impactor.api.dependencies.relocation.RelocationHandler;
-import net.impactdev.impactor.api.utilities.PrettyPrinter;
 
 import java.io.File;
 import java.io.IOException;
@@ -133,35 +132,13 @@ public class DependencyManager {
 	}
 
 	public void loadDependencies(Collection<Dependency> dependencies) {
-		final ExecutorService executor = Executors.newFixedThreadPool(
-				Runtime.getRuntime().availableProcessors(),
-				new ThreadFactoryBuilder()
-						.setNameFormat("Impactor Dependency Downloader - #%d")
-						.setDaemon(true)
-						.build()
-		);
-
-		PrettyPrinter printer = new PrettyPrinter();
-		CountDownLatch latch = new CountDownLatch(dependencies.size());
 		for(Dependency dependency : dependencies) {
-			executor.execute(() -> {
-				try {
-					this.loadDependency(dependency);
-				} catch (Throwable e) {
-					this.plugin.getPluginLogger().error("Unable to load dependency " + dependency.name());
-					e.printStackTrace();
-				} finally {
-					latch.countDown();
-				}
-			});
-		}
-
-		try {
-			latch.await();
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		} finally {
-			executor.shutdown();
+			try {
+				this.loadDependency(dependency);
+			} catch (Throwable e) {
+				this.plugin.getPluginLogger().error("  * Unable to load dependency " + dependency.name() + "*");
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -170,11 +147,12 @@ public class DependencyManager {
 			return;
 		}
 
+		this.plugin.getPluginLogger().info("Attempting to load dependency: " + dependency);
 		Path file = remapDependency(dependency, downloadDependency(dependency));
 
 		this.loaded.put(dependency, file);
 		if(this.registry.shouldAutoLoad(dependency)) {
-			Impactor.getInstance().getRegistry().get(PluginClassLoader.class).addJarToClasspath(file);
+			Impactor.getInstance().getRegistry().get(ClassPathAppender.class).addJarToClasspath(file);
 		}
 	}
 
@@ -185,8 +163,8 @@ public class DependencyManager {
 			return file;
 		}
 
+		this.plugin.getPluginLogger().info("  Dependency not found, downloading now...");
 		DependencyDownloadException last = null;
-
 		for(DependencyRepository repository : DependencyRepository.values()) {
 			try {
 				repository.download(dependency, file);
@@ -212,7 +190,7 @@ public class DependencyManager {
 			return remapped;
 		}
 
-		this.plugin.getPluginLogger().info("Applying relocations to " + normalFile.getFileName().toString() + "...");
+		this.plugin.getPluginLogger().info("  Applying relocations to " + normalFile.getFileName().toString() + "...");
 		getRelocationHandler().remap(normalFile, remapped, rules);
 		return remapped;
 	}

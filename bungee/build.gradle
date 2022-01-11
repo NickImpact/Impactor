@@ -8,15 +8,15 @@ repositories {
 }
 
 dependencies {
-    compile project(':api')
-    compile project(':common')
+    api project(':api')
+    api project(':common')
     shadow 'net.md-5:bungeecord-api:1.16-R0.4'
     shadow 'com.imaginarycode.minecraft:RedisBungee:0.4'
     shadow 'org.spongepowered:configurate-hocon:4.1.2'
     shadow 'org.spongepowered:configurate-gson:4.1.2'
     shadow 'org.spongepowered:configurate-yaml:4.1.2'
     shadow 'me.lucko:jar-relocator:1.5'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
 shadowJar {
@@ -33,11 +33,8 @@ shadowJar {
     //
     // In other words, we should only attempt to relocate everything but the Subscribe annotation,
     // as Impactor uses it's own version.
-    relocate ('net.kyori.event', 'net.impactdev.impactor.relocations.eventbus') {
-        exclude 'net.kyori.event.method.annotation.Subscribe'
-    }
+    relocate ('net.kyori.event', 'net.impactdev.impactor.relocations.eventbus')
     relocate ('net.kyori.text', 'net.impactdev.impactor.relocations.text')
-    relocate("net.kyori", "com.ichorpowered.protocolcontrol.lib.kyori")
 
     relocate 'ninja.leaping.configurate', 'net.impactdev.impactor.relocations.configurate'
 //    relocate 'org.yaml', 'com.nickimpact.impactor.relocations.org.yaml'
@@ -54,12 +51,12 @@ shadowJar {
 }
 
 processResources {
+    duplicatesStrategy = DuplicatesStrategy.WARN
     from(sourceSets.main.resources.srcDirs) {
         expand 'pluginVersion': project.version
     }
 }
 
 blossom {
-    blossomSourceReplacementJava.output = file("$buildDir/sources/java")
     replaceToken '@version@', version
 }

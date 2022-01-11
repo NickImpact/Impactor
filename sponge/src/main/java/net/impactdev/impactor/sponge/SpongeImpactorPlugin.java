@@ -1,7 +1,7 @@
 /*
  * This file is part of Impactor, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2018-2021 NickImpact
+ * Copyright (c) 2018-2022 NickImpact
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,17 +25,13 @@
 
 package net.impactdev.impactor.sponge;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import com.google.inject.Inject;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.configuration.Config;
 import net.impactdev.impactor.api.dependencies.Dependency;
 import net.impactdev.impactor.api.dependencies.DependencyManager;
-import net.impactdev.impactor.api.dependencies.classloader.PluginClassLoader;
+import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
 import net.impactdev.impactor.api.event.EventBus;
 import net.impactdev.impactor.api.gui.signs.SignQuery;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
@@ -48,6 +44,7 @@ import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
 import net.impactdev.impactor.common.placeholders.PlaceholderSourcesImpl;
 import net.impactdev.impactor.sponge.api.SpongeImpactorAPIProvider;
+import net.impactdev.impactor.sponge.commands.PlaceholdersCommand;
 import net.impactdev.impactor.sponge.configuration.ConfigKeys;
 import net.impactdev.impactor.sponge.configuration.SpongeConfig;
 import net.impactdev.impactor.sponge.configuration.SpongeConfigAdapter;
@@ -59,19 +56,16 @@ import net.impactdev.impactor.sponge.services.SpongeMojangServerStatusService;
 import net.impactdev.impactor.sponge.text.SpongeMessageService;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
 import net.impactdev.impactor.sponge.ui.signs.SpongeSignQuery;
-import net.impactdev.impactor.sponge.util.SpongeClassLoader;
+import net.impactdev.impactor.sponge.util.SpongeClassPathAppender;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.Command;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
-import org.spongepowered.api.event.lifecycle.RegisterRegistryValueEvent;
-import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
-import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
-import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
+import org.spongepowered.api.event.lifecycle.*;
 import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.plugin.PluginContainer;
@@ -79,12 +73,7 @@ import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -118,16 +107,13 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		instance = this;
 
 		Impactor.getInstance().getRegistry().register(ImpactorPlugin.class, this);
-		Impactor.getInstance().getRegistry().register(PluginClassLoader.class, new SpongeClassLoader(this));
+		Impactor.getInstance().getRegistry().register(ClassPathAppender.class, new SpongeClassPathAppender(this));
 		Impactor.getInstance().getRegistry().register(DependencyManager.class, new DependencyManager(this));
-
-		this.getDependencyManager().loadDependencies(Arrays.asList(Dependency.values()));
 
 		this.getPluginLogger().info("Pooling plugin dependencies...");
 		List<Dependency> toLaunch = Lists.newArrayList();
 		for(ImpactorPlugin plugin : PluginRegistry.getAll()) {
-			if(plugin instanceof Depending) {
-				Depending dependable = (Depending) plugin;
+			if(plugin instanceof Depending dependable) {
 
 				for(Dependency dependency : dependable.getAllDependencies()) {
 					if(toLaunch.contains(dependency)) {
@@ -156,10 +142,11 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		Impactor.getInstance().getRegistry().registerBuilderSupplier(SignQuery.SignQueryBuilder.class, SpongeSignQuery.SpongeSignQueryBuilder::new);
 		Impactor.getInstance().getRegistry().register(SpongePlaceholderManager.class, new SpongePlaceholderManager());
 		Impactor.getInstance().getRegistry().registerBuilderSupplier(PlaceholderSources.SourceBuilder.class, PlaceholderSourcesImpl.PlaceholderSourcesBuilderImpl::new);
-		Impactor.getInstance().getRegistry().register(EventBus.class, new SpongeEventBus());
-		((SpongeEventBus)Impactor.getInstance().getEventBus()).enable();
 
 		new ScoreboardModule().initialize();
+
+		Impactor.getInstance().getRegistry().register(EventBus.class, new SpongeEventBus());
+		((SpongeEventBus)Impactor.getInstance().getEventBus()).enable();
 	}
 
 	@Listener
@@ -170,8 +157,11 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 			this.getPluginLogger().info("Enabling Mojang Status Watcher...");
 			mojangServerStatusService = new SpongeMojangServerStatusService();
 		}
+	}
 
-		//Sponge.getServiceManager().provideUnchecked(ProtocolService.class).events().register(new SignListener());
+	@Listener
+	public void whenCommandRegistration(RegisterCommandEvent<Command.Parameterized> event) {
+		event.register(this.getPluginContainer(), new PlaceholdersCommand().create(), "placeholders");
 	}
 
 	@Listener
@@ -226,10 +216,6 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 
 	public Config getConfig() {
 		return this.config;
-	}
-
-	public PluginClassLoader getPluginClassLoader() {
-		return Impactor.getInstance().getRegistry().get(PluginClassLoader.class);
 	}
 
 	public DependencyManager getDependencyManager() {

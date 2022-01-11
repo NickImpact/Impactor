@@ -1,7 +1,7 @@
 /*
  * This file is part of Impactor, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2018-2021 NickImpact
+ * Copyright (c) 2018-2022 NickImpact
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -153,9 +153,9 @@ public enum DependencyRepository {
                         "Actual: " + Base64.getEncoder().encodeToString(hash));
             }
 
-            Impactor.getInstance().getRegistry().get(ImpactorPlugin.class).getPluginLogger().info("Successfully downloaded '" + dependency.getFileName() + ".jar' with matching checksum: " + Base64.getEncoder().encodeToString(hash));
+            Impactor.getInstance().getRegistry().get(ImpactorPlugin.class).getPluginLogger().info("  Successfully downloaded '" + dependency.getFileName() + ".jar' with matching checksum: " + Base64.getEncoder().encodeToString(hash));
         } else {
-            Impactor.getInstance().getRegistry().get(ImpactorPlugin.class).getPluginLogger().info("Successfully downloaded '" + dependency.getFileName() + ".jar'");
+            Impactor.getInstance().getRegistry().get(ImpactorPlugin.class).getPluginLogger().info("  Successfully downloaded '" + dependency.getFileName() + ".jar'");
         }
 
         return bytes;

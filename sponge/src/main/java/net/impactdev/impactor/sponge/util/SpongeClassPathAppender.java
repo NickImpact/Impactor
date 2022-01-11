@@ -1,7 +1,7 @@
 /*
  * This file is part of Impactor, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2018-2021 NickImpact
+ * Copyright (c) 2018-2022 NickImpact
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,20 +25,20 @@
 
 package net.impactdev.impactor.sponge.util;
 
-import net.impactdev.impactor.api.dependencies.classloader.ReflectionClassLoader;
+import net.impactdev.impactor.api.dependencies.classpath.ReflectionClassPathAppender;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 
 import java.lang.reflect.Field;
 import java.net.URLClassLoader;
 
-public class SpongeClassLoader extends ReflectionClassLoader {
+public class SpongeClassPathAppender extends ReflectionClassPathAppender {
 
-    private static URLClassLoader extractClassLoader(Object in) {
-        ClassLoader classLoader = in.getClass().getClassLoader();
+    private static URLClassLoader extractClassLoaderFromBootstrap(ImpactorPlugin bootstrap) {
+        ClassLoader classLoader = bootstrap.getClass().getClassLoader();
 
         // try to cast directly to URLClassLoader in case things change in the future
         if (classLoader instanceof URLClassLoader) {
-            return castToUrlClassLoader(classLoader);
+            return (URLClassLoader) classLoader;
         }
 
         Class<? extends ClassLoader> classLoaderClass = classLoader.getClass();
@@ -51,14 +51,13 @@ public class SpongeClassLoader extends ReflectionClassLoader {
             Field delegatedClassLoaderField = classLoaderClass.getDeclaredField("delegatedClassLoader");
             delegatedClassLoaderField.setAccessible(true);
             Object delegatedClassLoader = delegatedClassLoaderField.get(classLoader);
-            return castToUrlClassLoader(delegatedClassLoader);
+            return (URLClassLoader) delegatedClassLoader;
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public SpongeClassLoader(ImpactorPlugin bootstrap) throws IllegalStateException {
-        super(bootstrap, SpongeClassLoader::extractClassLoader);
+    public SpongeClassPathAppender(ImpactorPlugin bootstrap) throws IllegalStateException {
+        super(extractClassLoaderFromBootstrap(bootstrap));
     }
-
 }

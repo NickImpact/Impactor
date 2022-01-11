@@ -1,7 +1,7 @@
 /*
  * This file is part of Impactor, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2018-2021 NickImpact
+ * Copyright (c) 2018-2022 NickImpact
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -102,6 +102,16 @@ public interface ImpactorScoreboard {
      * @param user The user that will view this scoreboard
      */
     void applyFor(UUID user);
+
+    /**
+     * Disables further updating for a scoreboard, effectively cancelling any running tasks
+     * responsible for updating values for the particular scoreboard.
+     *
+     * The typical time to call this is when the player disconnects from the server, as there's no reason
+     * to continue trying to update a scoreboard when the player no longer exists. However, this can be
+     * called earlier should the need become necessary.
+     */
+    void shutdown();
 
     /**
      * Begins construction of a new scoreboard.

@@ -1,7 +1,7 @@
 /*
  * This file is part of Impactor, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2018-2021 NickImpact
+ * Copyright (c) 2018-2022 NickImpact
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,7 @@ public interface MessageService<T> extends Service {
 	 * @param sources The sources made available via suppliers for any required contextual information
 	 * @return The translated message
 	 */
-	T parse(@NonNull String message, @NonNull PlaceholderSources sources);
+	T parse(@NonNull String message, PlaceholderSources sources);
 
 	/**
 	 * Translates a set of input messages with no associated sources. See {@link #parse(String)} to

@@ -1,7 +1,7 @@
 /*
  * This file is part of Impactor, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2018-2021 NickImpact
+ * Copyright (c) 2018-2022 NickImpact
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,16 +37,19 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.placeholder.PlaceholderContext;
 import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.util.MinecraftDayTime;
 import org.spongepowered.math.vector.Vector3i;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -103,6 +106,37 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
                             .append(Component.text(position.z()));
                 })
                 .orElse(Component.text("?, ?, ?"))
+        ));
+        this.register(this.create("sponge_api", context -> Component.text(Sponge.platform().container(Platform.Component.API).metadata().version().toString())));
+        this.register(this.create("world_day", context -> context.associatedObject()
+                .filter(source -> source instanceof PlaceholderSources)
+                .map(source -> (PlaceholderSources) source)
+                .flatMap(sources -> sources.getSource(ServerPlayer.class))
+                .map(ServerPlayer::world)
+                .map(world -> {
+                    MinecraftDayTime time = world.properties().dayTime();
+                    return Component.text(time.day());
+                })
+                .orElse(Component.text("Failed to parse day..."))
+        ));
+        this.register(this.create("world_time", context -> context.associatedObject()
+                .filter(source -> source instanceof PlaceholderSources)
+                .map(source -> (PlaceholderSources) source)
+                .flatMap(sources -> sources.getSource(ServerPlayer.class))
+                .map(ServerPlayer::world)
+                .map(world -> {
+                    MinecraftDayTime time = world.properties().dayTime();
+                    boolean military = context.argumentString().stream().anyMatch(arg -> arg.equalsIgnoreCase("military"));
+
+                    int hour = time.hour() % (military ? 24 : 12);
+                    int minute = time.minute();
+
+                    String marker = time.hour() < 12 ? "AM" : "PM";
+
+                    DecimalFormat df = new DecimalFormat("00");
+                    return Component.text((hour == 0 ? 12 : hour) + ":" + df.format(minute) + (military ? "" : " " + marker));
+                })
+                .orElse(Component.text("Failed to parse time..."))
         ));
     }
 

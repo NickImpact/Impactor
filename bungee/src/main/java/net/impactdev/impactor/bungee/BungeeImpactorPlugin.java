@@ -1,7 +1,7 @@
 /*
  * This file is part of Impactor, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2018-2021 NickImpact
+ * Copyright (c) 2018-2022 NickImpact
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.Dependency;
+import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
+import net.impactdev.impactor.api.dependencies.classpath.ReflectionClassPathAppender;
 import net.impactdev.impactor.api.event.EventBus;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.plugin.PluginMetadata;
@@ -37,8 +39,6 @@ import net.impactdev.impactor.api.plugin.components.Depending;
 import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
 import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.api.dependencies.DependencyManager;
-import net.impactdev.impactor.api.dependencies.classloader.PluginClassLoader;
-import net.impactdev.impactor.api.dependencies.classloader.ReflectionClassLoader;
 import net.impactdev.impactor.bungee.api.BungeeImpactorAPIProvider;
 import net.impactdev.impactor.bungee.event.BungeeEventBus;
 import net.impactdev.impactor.bungee.plugin.AbstractBungeePlugin;
@@ -66,7 +66,7 @@ public class BungeeImpactorPlugin extends AbstractBungeePlugin implements Depend
 		));
 
 		Impactor.getInstance().getRegistry().register(ImpactorPlugin.class, this);
-		Impactor.getInstance().getRegistry().register(PluginClassLoader.class, new ReflectionClassLoader(this));
+		Impactor.getInstance().getRegistry().register(ClassPathAppender.class, new ReflectionClassPathAppender(this.getClass().getClassLoader()));
 		Impactor.getInstance().getRegistry().register(DependencyManager.class, new DependencyManager(this));
 
 		this.getPluginLogger().info("Pooling plugin dependencies...");

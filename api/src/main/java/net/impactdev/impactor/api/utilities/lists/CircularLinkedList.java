@@ -1,7 +1,7 @@
 /*
  * This file is part of Impactor, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2018-2021 NickImpact
+ * Copyright (c) 2018-2022 NickImpact
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ public class CircularLinkedList<E> {
 	}
 
 	public Optional<E> getCurrent() {
-		return Optional.ofNullable(this.current.getValue());
+		return Optional.ofNullable(this.current).map(Node::getValue);
 	}
 
 	public Optional<E> next() {

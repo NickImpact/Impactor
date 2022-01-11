@@ -1,7 +1,7 @@
 /*
  * This file is part of Impactor, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2018-2021 NickImpact
+ * Copyright (c) 2018-2022 NickImpact
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,15 +23,20 @@
  *
  */
 
-package net.impactdev.impactor.api.dependencies.classloader;
+package net.impactdev.impactor.api.dependencies.classpath;
 
 import java.nio.file.Path;
 
 /**
- * Represents the plugins classloader
+ * An interface which allows access to add URLs to the plugin classpath at runtime.
+ *
+ * This code was designed by LuckPerms, and is accessible here: <a href=https://github.com/LuckPerms/LuckPerms/blob/master/common/src/main/java/me/lucko/luckperms/common/plugin/classpath/ClassPathAppender.java>Github</a>
  */
-public interface PluginClassLoader {
+public interface ClassPathAppender extends AutoCloseable {
 
-	void addJarToClasspath(Path file);
+    void addJarToClasspath(Path file);
+
+    @Override
+    default void close() {}
 
 }

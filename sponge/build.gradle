@@ -3,7 +3,6 @@ import org.spongepowered.plugin.metadata.model.PluginDependency
 
 buildscript {
     repositories {
-        jcenter()
         maven {
             name = "forge"
             url = "https://files.minecraftforge.net/maven"
@@ -14,7 +13,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     }
 }
 
@@ -38,7 +37,7 @@ minecraft {
 }
 
 sponge {
-    apiVersion("8.0.0-SNAPSHOT")
+    apiVersion("8.0.0")
     license("MIT")
     loader {
         name(PluginLoaders.JAVA_PLAIN)
@@ -78,44 +77,32 @@ repositories {
     }
     maven { url = 'https://jitpack.io' }
     maven {
-        name 'drnaylor-minecraft'
-        url 'http://repo.drnaylor.co.uk/artifactory/list/minecraft'
-    }
-    maven {
-        name 'drnaylor'
-        url 'http://repo.drnaylor.co.uk/artifactory/list/quickstart'
-    }
-    maven {
         name = "Impact-Dev"
         url = "https://maven.impactdev.net/repository/development/"
     }
 }
 
 dependencies {
-    compile project(':api')
-    compile project(':common')
+    api project(':api')
+    api project(':common')
 
     minecraft 'net.minecraftforge:forge:1.16.5-36.0.48'
 
     shadow 'org.spongepowered:math:2.0.0'
     shadow 'com.github.ben-manes.caffeine:caffeine:2.8.4'
     shadow 'me.lucko:jar-relocator:1.5'
-    compile("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT") {
+    api("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT") {
         exclude(module: 'adventure-api')
         exclude(module: 'adventure-key')
     }
 }
 
 blossom {
-    blossomSourceReplacementJava.output = file("$buildDir/sources/java")
     replaceToken '@version@', version
 }
 
 shadowJar {
     archiveName = "Impactor-Sponge-${sponge}-${version}.jar"
-
-    exclude 'META-INF/versions/9/module-info.class'
-    exclude 'module-info.class'
 
     dependencies {
         include(project(':api'))
