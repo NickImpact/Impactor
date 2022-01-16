@@ -37,7 +37,7 @@ public interface ConstantLine extends ScoreboardLine {
         return Impactor.getInstance().getRegistry().createBuilder(ConstantLineBuilder.class);
     }
 
-    interface ConstantLineBuilder extends LineBuilder<ConstantLineBuilder>, Builder<ConstantLine, ConstantLineBuilder> {
+    interface ConstantLineBuilder extends Builder<ConstantLine, ConstantLineBuilder> {
 
         ConstantLineBuilder text(String raw, PlaceholderSources sources);
 

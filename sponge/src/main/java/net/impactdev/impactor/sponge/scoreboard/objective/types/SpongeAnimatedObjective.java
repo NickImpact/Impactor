@@ -27,26 +27,31 @@ package net.impactdev.impactor.sponge.scoreboard.objective.types;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.scheduler.SchedulerTask;
+import net.impactdev.impactor.api.scoreboard.components.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
+import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
 import net.impactdev.impactor.api.scoreboard.objective.types.AnimatedObjective;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
+import net.impactdev.impactor.sponge.scoreboard.frames.AbstractSpongeFrame;
 import net.impactdev.impactor.sponge.scoreboard.objective.AbstractSpongeObjective;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Ticks;
 
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class SpongeAnimatedObjective extends AbstractSpongeObjective implements AnimatedObjective {
 
-    private final CircularLinkedList<ScoreboardFrame> frames;
-    private final TimeConfiguration timing;
-    private final int updates;
-    private final boolean async;
+    private CircularLinkedList<ScoreboardFrame> frames;
+    private TimeConfiguration timing;
+    private int updates;
+    private boolean async;
 
     private SchedulerTask updater;
     private int counter;
@@ -148,6 +153,25 @@ public class SpongeAnimatedObjective extends AbstractSpongeObjective implements 
     @Override
     public void shutdown() {
         this.updater.cancel();
+    }
+
+    @Override
+    public void consumeFocus(ServerPlayer focus) {
+        for(ScoreboardFrame frame : this.frames) {
+            ((AbstractSpongeFrame) frame).provideSource(focus.uniqueId());
+        }
+    }
+
+    @Override
+    public ScoreboardObjective copy() {
+        SpongeAnimatedObjective clone = new SpongeAnimatedObjective(new SpongeAnimatedObjectiveBuilder());
+        clone.frames = CircularLinkedList.fromStream(this.frames.getFramesNonCircular()
+                .stream()
+                .map(ScoreboardComponent::copy));
+        clone.timing = this.timing;
+        clone.updates = this.updates;
+        clone.async = this.async;
+        return clone;
     }
 
     public static class SpongeAnimatedObjectiveBuilder implements AnimatedObjectiveBuilder {

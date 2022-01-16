@@ -26,13 +26,14 @@
 package net.impactdev.impactor.api.scoreboard.objective;
 
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.scoreboard.components.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboard.objective.types.AnimatedObjective;
 import net.impactdev.impactor.api.scoreboard.objective.types.ConstantObjective;
 import net.impactdev.impactor.api.scoreboard.objective.types.ListeningObjective;
 import net.impactdev.impactor.api.scoreboard.objective.types.RefreshingObjective;
 import net.kyori.adventure.text.Component;
 
-public interface ScoreboardObjective {
+public interface ScoreboardObjective extends ScoreboardComponent<ScoreboardObjective> {
 
     Component getText();
 

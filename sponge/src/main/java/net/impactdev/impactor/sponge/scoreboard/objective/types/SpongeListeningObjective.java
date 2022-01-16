@@ -27,13 +27,16 @@ package net.impactdev.impactor.sponge.scoreboard.objective.types;
 
 import com.google.common.base.Preconditions;
 import net.impactdev.impactor.api.scoreboard.frames.types.ListeningFrame;
+import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
 import net.impactdev.impactor.api.scoreboard.objective.types.ListeningObjective;
+import net.impactdev.impactor.sponge.scoreboard.frames.AbstractSpongeFrame;
 import net.impactdev.impactor.sponge.scoreboard.objective.AbstractSpongeObjective;
 import net.kyori.adventure.text.Component;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 public class SpongeListeningObjective extends AbstractSpongeObjective implements ListeningObjective {
 
-    private final ListeningFrame<?> frame;
+    private ListeningFrame<?> frame;
 
     private SpongeListeningObjective(SpongeListeningObjectiveBuilder builder) {
         this.frame = builder.frame;
@@ -64,6 +67,18 @@ public class SpongeListeningObjective extends AbstractSpongeObjective implements
         this.frame.shutdown();
     }
 
+    @Override
+    public void consumeFocus(ServerPlayer focus) {
+        ((AbstractSpongeFrame) this.frame).provideSource(focus.uniqueId());
+    }
+
+    @Override
+    public ScoreboardObjective copy() {
+        SpongeListeningObjective clone = new SpongeListeningObjective(new SpongeListeningObjectiveBuilder());
+        clone.frame = this.frame;
+        return clone;
+    }
+
     public static class SpongeListeningObjectiveBuilder implements ListeningObjectiveBuilder {
 
         private ListeningFrame<?> frame;
@@ -76,7 +91,7 @@ public class SpongeListeningObjective extends AbstractSpongeObjective implements
 
         @Override
         public ListeningObjectiveBuilder from(ListeningObjective input) {
-            Preconditions.checkArgument(this.frame instanceof SpongeListeningObjective);
+            Preconditions.checkArgument(input instanceof SpongeListeningObjective);
             this.frame = ((SpongeListeningObjective)input).frame;
 
             return this;

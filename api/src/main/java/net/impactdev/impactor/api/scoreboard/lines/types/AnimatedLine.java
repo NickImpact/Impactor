@@ -28,12 +28,10 @@ package net.impactdev.impactor.api.scoreboard.lines.types;
 import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
-import net.impactdev.impactor.api.scoreboard.frames.types.ConstantFrame;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.utilities.Builder;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -54,8 +52,6 @@ public interface AnimatedLine extends ScoreboardLine, Updatable {
         AnimatedBuilder frame(ScoreboardFrame frame);
 
         AnimatedBuilder frames(Iterable<ScoreboardFrame> frames);
-
-        AnimatedBuilder score(int score);
 
         /**
          * Sets the line to update after a set amount of ticks have elapsed. If this is used in conjunction
@@ -84,7 +80,7 @@ public interface AnimatedLine extends ScoreboardLine, Updatable {
          * @param amount The amount of times to refresh the content.
          * @return The updated builder
          */
-        AnimatedBuilder updates(int amount);
+        AnimatedBuilder iterations(int amount);
 
         AnimatedBuilder async();
 

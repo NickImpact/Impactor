@@ -28,13 +28,14 @@ package net.impactdev.impactor.api.scoreboard.frames;
 
 import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.scoreboard.components.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.frames.types.ListeningFrame;
 import net.impactdev.impactor.api.scoreboard.frames.types.ConstantFrame;
 import net.impactdev.impactor.api.scoreboard.frames.types.RefreshingFrame;
 import net.kyori.adventure.text.Component;
 
-public interface ScoreboardFrame {
+public interface ScoreboardFrame extends ScoreboardComponent<ScoreboardFrame> {
 
     Component getText();
 

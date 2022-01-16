@@ -29,24 +29,36 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
+import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.scoreboard.frames.types.RefreshingFrame;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.kyori.adventure.text.Component;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.UUID;
 
-public class SpongeRefreshingFrame implements RefreshingFrame {
+public class SpongeRefreshingFrame extends AbstractSpongeFrame implements RefreshingFrame {
 
-    private final String raw;
-    private final Queue<FrameEffect> effects;
-    private final PlaceholderSources sources;
+    private String raw;
+    private Queue<FrameEffect> effects;
+    private PlaceholderSources sources;
 
     public SpongeRefreshingFrame(SpongeRefreshingFrameBuilder builder) {
         this.raw = builder.raw;
         this.effects = new LinkedList<>(Arrays.asList(builder.effects));
         this.sources = builder.sources;
+    }
+
+    @Override
+    public void provideSource(UUID target) {
+        this.sources = PlaceholderSources.builder()
+                .from(this.sources)
+                .appendIfAbsent(ServerPlayer.class, () -> Sponge.server().player(target).orElseThrow())
+                .build();
     }
 
     @Override
@@ -71,11 +83,20 @@ public class SpongeRefreshingFrame implements RefreshingFrame {
     @Override
     public void shutdown() {}
 
+    @Override
+    public ScoreboardFrame copy() {
+        SpongeRefreshingFrame frame = new SpongeRefreshingFrame(new SpongeRefreshingFrameBuilder());
+        frame.raw = this.raw;
+        frame.sources = this.sources;
+        frame.effects = this.effects;
+        return null;
+    }
+
     public static class SpongeRefreshingFrameBuilder implements RefreshingFrameBuilder {
 
         private String raw;
         private FrameEffect[] effects = new FrameEffect[0];
-        private PlaceholderSources sources;
+        private PlaceholderSources sources = PlaceholderSources.empty();
 
         @Override
         public RefreshingFrameBuilder raw(String raw) {

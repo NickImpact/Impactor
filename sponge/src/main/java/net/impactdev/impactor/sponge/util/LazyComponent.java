@@ -23,35 +23,30 @@
  *
  */
 
-package net.impactdev.impactor.api.scoreboard.lines.types;
+package net.impactdev.impactor.sponge.util;
 
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
-import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
-import net.impactdev.impactor.api.scoreboard.components.Updatable;
-import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
-import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.kyori.adventure.text.Component;
 
-import java.util.concurrent.TimeUnit;
+import java.util.UUID;
+import java.util.function.Function;
 
-public interface RefreshingLine extends ScoreboardLine, Updatable {
+public final class LazyComponent {
 
-    TimeConfiguration getTimingConfig();
+    private final Function<UUID, Component> supplier;
+    private UUID source;
 
-    interface RefreshingLineBuilder extends Builder<RefreshingLine, RefreshingLineBuilder> {
+    public LazyComponent(Function<UUID, Component> supplier) {
+        this.supplier = supplier;
+    }
 
-        RefreshingLineBuilder text(String raw);
+    public LazyComponent provide(UUID source) {
+        LazyComponent sourced = new LazyComponent(this.supplier);
+        sourced.source = source;
+        return sourced;
+    }
 
-        RefreshingLineBuilder effects(FrameEffect... effect);
-
-        RefreshingLineBuilder rate(long ticks);
-
-        RefreshingLineBuilder rate(long duration, TimeUnit unit);
-
-        RefreshingLineBuilder async();
-
-        RefreshingLineBuilder sources(PlaceholderSources sources);
-
+    public Component resolve() {
+        return this.supplier.apply(this.source);
     }
 
 }

@@ -28,83 +28,74 @@ package net.impactdev.impactor.sponge.scoreboard.lines.types;
 import com.google.common.base.Preconditions;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
-import net.impactdev.impactor.api.scoreboard.components.LineIdentifier;
+import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboard.lines.types.ConstantLine;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.sponge.scoreboard.lines.AbstractSpongeSBLine;
+import net.impactdev.impactor.sponge.scoreboard.util.SourceResolvers;
+import net.impactdev.impactor.sponge.util.LazyComponent;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.scoreboard.Scoreboard;
-import org.spongepowered.api.scoreboard.Team;
-import org.spongepowered.api.scoreboard.objective.Objective;
-
-import java.util.UUID;
 
 public class SpongeConstantLine extends AbstractSpongeSBLine implements ConstantLine {
 
-    private final Component text;
-
-    private final Team team;
-    private final Component identifier;
+    private LazyComponent supplier;
 
     protected SpongeConstantLine(SpongeConstantLineBuilder builder) {
-        super(builder.score);
-        this.text = builder.text;
-
-        this.team = Team.builder().name(UUID.randomUUID().toString().substring(0, 16)).build();
-        this.team.addMember(this.identifier = LineIdentifier.generate());
+        this.supplier = builder.supplier;
     }
 
-    public void setup(Scoreboard scoreboard, Objective objective, ServerPlayer viewer) {
-        objective.findOrCreateScore(this.identifier).setScore(this.score);
-        scoreboard.registerTeam(this.team);
-        this.team.setPrefix(this.getText());
+    @Override
+    public void setup(Scoreboard scoreboard, ServerPlayer target) {
+        scoreboard.registerTeam(this.getTeam());
+        this.supplier = this.supplier.provide(target.uniqueId());
+        this.getTeam().setPrefix(this.getText());
     }
 
     @Override
     public Component getText() {
-        return this.text;
-    }
-
-    @Override
-    public int getScore() {
-        return this.score;
+        return this.supplier.resolve();
     }
 
     public static SpongeConstantLineBuilder builder() {
         return new SpongeConstantLineBuilder();
     }
 
+    @Override
+    public ScoreboardLine copy() {
+        SpongeConstantLine clone = new SpongeConstantLine(new SpongeConstantLineBuilder());
+        clone.supplier = this.supplier;
+        return clone;
+    }
+
     public static class SpongeConstantLineBuilder implements ConstantLineBuilder {
 
-        private Component text;
-        private int score;
+        private LazyComponent supplier;
 
         @Override
         public ConstantLineBuilder text(String raw, PlaceholderSources sources) {
             MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
-            this.text = service.parse(raw, sources);
+            this.supplier = new LazyComponent(fallback -> service.parse(
+                    raw,
+                    PlaceholderSources.builder()
+                            .from(sources)
+                            .appendIfAbsent(ServerPlayer.class, SourceResolvers.PLAYER.apply(fallback))
+                            .build()
+            ));
             return this;
         }
 
         @Override
         public ConstantLineBuilder text(Component text) {
-            this.text = text;
-            return this;
-        }
-
-        @Override
-        public ConstantLineBuilder score(int score) {
-            this.score = score;
+            this.supplier = new LazyComponent(fallback -> text);
             return this;
         }
 
         @Override
         public ConstantLineBuilder from(ConstantLine input) {
             Preconditions.checkArgument(input instanceof SpongeConstantLine);
-            this.text = input.getText();
-            this.score = input.getScore();
-
+            this.supplier = ((SpongeConstantLine) input).supplier;
             return this;
         }
 

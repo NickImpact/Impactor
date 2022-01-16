@@ -33,6 +33,8 @@ import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.utilities.Builder;
 
+import java.util.UUID;
+
 /**
  * Creates a frame that is unique to the event bus of the particular platform. This frame will
  * only update via the event handler, if specified to update.
@@ -59,7 +61,7 @@ public interface ListeningFrame<L> extends ScoreboardFrame.UpdatableFrame {
 
         /**
          * Sets the frame to listen against events of the following type. This is normally set during
-         * construction of the builder via {@link ScoreboardFrame#listening(TypeToken)}, so you can avoid using
+         * construction of the builder via {@link ScoreboardFrame#listening(TypeToken, Class)}, so you can avoid using
          * this method.
          *
          * @param event The event type this frame should represent
@@ -118,10 +120,11 @@ public interface ListeningFrame<L> extends ScoreboardFrame.UpdatableFrame {
          * criteria is met.
          *
          * @param updatable The updatable instance to update
+         * @param assignee The player assigned to the scoreboard this line is listening to
          * @param event The event that was posted to the event bus
          * @throws RuntimeException If any component of the processor fails
          */
-        void process(Updatable updatable, L event) throws RuntimeException;
+        void process(Updatable updatable, UUID assignee, L event) throws RuntimeException;
 
     }
 

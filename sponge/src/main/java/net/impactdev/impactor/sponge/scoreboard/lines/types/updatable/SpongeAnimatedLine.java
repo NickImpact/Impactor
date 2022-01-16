@@ -29,11 +29,16 @@ import com.google.common.base.Preconditions;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.scheduler.SchedulerTask;
 import net.impactdev.impactor.api.scoreboard.components.LineIdentifier;
+import net.impactdev.impactor.api.scoreboard.components.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
+import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboard.lines.types.AnimatedLine;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
+import net.impactdev.impactor.sponge.scoreboard.frames.AbstractSpongeFrame;
+import net.impactdev.impactor.sponge.scoreboard.frames.SpongeListeningFrame;
+import net.impactdev.impactor.sponge.scoreboard.frames.SpongeRefreshingFrame;
 import net.impactdev.impactor.sponge.scoreboard.lines.AbstractSpongeSBLine;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
@@ -50,35 +55,28 @@ import java.util.concurrent.TimeUnit;
 
 public class SpongeAnimatedLine extends AbstractSpongeSBLine implements AnimatedLine {
 
-    private final CircularLinkedList<ScoreboardFrame> frames;
-    private final TimeConfiguration timing;
-    private final int updates;
-    private final boolean async;
-
-    private final Team team;
-    private final Component identifier;
+    private CircularLinkedList<ScoreboardFrame> frames;
+    private TimeConfiguration timing;
+    private int updates;
+    private boolean async;
 
     private SchedulerTask updater;
     private int counter;
 
     private SpongeAnimatedLine(SpongeAnimatedBuilder builder) {
-        super(builder.score);
         this.frames = builder.frames;
         this.timing = builder.timing;
         this.updates = builder.updates;
         this.async = builder.async;
-
-        this.team = Team.builder().name(UUID.randomUUID().toString().substring(0, 16)).build();
-        this.team.addMember(this.identifier = LineIdentifier.generate());
     }
 
     @Override
-    public void setup(Scoreboard scoreboard, Objective objective, ServerPlayer target) {
-        objective.findOrCreateScore(this.identifier).setScore(this.getScore());
-        scoreboard.registerTeam(this.team);
-        this.team.setPrefix(this.getText());
-
+    public void setup(Scoreboard scoreboard, ServerPlayer target) {
+        super.setup(scoreboard, target);
         this.frames.next();
+        for(ScoreboardFrame frame : this.frames) {
+            ((AbstractSpongeFrame) frame).provideSource(target.uniqueId());
+        }
     }
 
     @Override
@@ -139,7 +137,7 @@ public class SpongeAnimatedLine extends AbstractSpongeSBLine implements Animated
         this.counter++;
         this.frames.getCurrent()
                 .filter(ScoreboardFrame::shouldUpdateOnTick)
-                .ifPresent(frame -> this.team.setPrefix(this.getText()));
+                .ifPresent(frame -> this.getTeam().setPrefix(this.getText()));
     }
 
     @Override
@@ -160,11 +158,6 @@ public class SpongeAnimatedLine extends AbstractSpongeSBLine implements Animated
     }
 
     @Override
-    public int getScore() {
-        return this.score;
-    }
-
-    @Override
     public TimeConfiguration getTimingConfig() {
         return this.timing;
     }
@@ -176,6 +169,18 @@ public class SpongeAnimatedLine extends AbstractSpongeSBLine implements Animated
 
     public static SpongeAnimatedBuilder builder() {
         return new SpongeAnimatedBuilder();
+    }
+
+    @Override
+    public ScoreboardLine copy() {
+        SpongeAnimatedLine clone = new SpongeAnimatedLine(new SpongeAnimatedBuilder());
+        clone.frames = CircularLinkedList.fromStream(this.frames.getFramesNonCircular()
+                .stream()
+                .map(ScoreboardComponent::copy));
+        clone.timing = this.timing;
+        clone.updates = this.updates;
+        clone.async = this.async;
+        return clone;
     }
 
     public static class SpongeAnimatedBuilder implements AnimatedLine.AnimatedBuilder {
@@ -201,12 +206,6 @@ public class SpongeAnimatedLine extends AbstractSpongeSBLine implements Animated
         }
 
         @Override
-        public AnimatedBuilder score(int score) {
-            this.score = score;
-            return this;
-        }
-
-        @Override
         public AnimatedBuilder interval(long ticks) {
             this.timing = TimeConfiguration.ofTicks(ticks);
             return this;
@@ -219,7 +218,7 @@ public class SpongeAnimatedLine extends AbstractSpongeSBLine implements Animated
         }
 
         @Override
-        public AnimatedBuilder updates(int amount) {
+        public AnimatedBuilder iterations(int amount) {
             this.updates = amount;
             return this;
         }

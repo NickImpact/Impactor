@@ -26,12 +26,15 @@
 package net.impactdev.impactor.api.utilities.lists;
 
 import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-public class CircularLinkedList<E> {
+public class CircularLinkedList<E> implements Iterable<E> {
 	private Node<E> head;
 	private Node<E> tail;
 
@@ -99,5 +102,17 @@ public class CircularLinkedList<E> {
 
 	public int size() {
 		return this.getFramesNonCircular().size();
+	}
+
+	@NotNull
+	@Override
+	public Iterator<E> iterator() {
+		return this.getFramesNonCircular().iterator();
+	}
+
+	public static <E> CircularLinkedList<E> fromStream(Stream<E> stream) {
+		CircularLinkedList<E> result = new CircularLinkedList<>();
+		stream.forEach(result::append);
+		return result;
 	}
 }

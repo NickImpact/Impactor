@@ -23,35 +23,18 @@
  *
  */
 
-package net.impactdev.impactor.api.scoreboard.lines.types;
+package net.impactdev.impactor.api.scoreboard.components;
 
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
-import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
-import net.impactdev.impactor.api.scoreboard.components.Updatable;
-import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
-import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
-import net.impactdev.impactor.api.utilities.Builder;
+public interface ScoreboardComponent<E> {
 
-import java.util.concurrent.TimeUnit;
-
-public interface RefreshingLine extends ScoreboardLine, Updatable {
-
-    TimeConfiguration getTimingConfig();
-
-    interface RefreshingLineBuilder extends Builder<RefreshingLine, RefreshingLineBuilder> {
-
-        RefreshingLineBuilder text(String raw);
-
-        RefreshingLineBuilder effects(FrameEffect... effect);
-
-        RefreshingLineBuilder rate(long ticks);
-
-        RefreshingLineBuilder rate(long duration, TimeUnit unit);
-
-        RefreshingLineBuilder async();
-
-        RefreshingLineBuilder sources(PlaceholderSources sources);
-
-    }
+    /**
+     * Clones this particular instance such that it directly models the current version.
+     * This need not carry over running parameters, but should simply construct a new object
+     * which is identically equal to this version.
+     *
+     * @return A newly constructed object representing this component which is identially equal
+     * to the provider of the clone
+     */
+    E copy();
 
 }

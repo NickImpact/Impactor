@@ -23,35 +23,11 @@
  *
  */
 
-package net.impactdev.impactor.api.scoreboard.lines.types;
+package net.impactdev.impactor.api.utilities.functional;
 
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
-import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
-import net.impactdev.impactor.api.scoreboard.components.Updatable;
-import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
-import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
-import net.impactdev.impactor.api.utilities.Builder;
+@FunctionalInterface
+public interface TriFunction<A, B, C, R> {
 
-import java.util.concurrent.TimeUnit;
-
-public interface RefreshingLine extends ScoreboardLine, Updatable {
-
-    TimeConfiguration getTimingConfig();
-
-    interface RefreshingLineBuilder extends Builder<RefreshingLine, RefreshingLineBuilder> {
-
-        RefreshingLineBuilder text(String raw);
-
-        RefreshingLineBuilder effects(FrameEffect... effect);
-
-        RefreshingLineBuilder rate(long ticks);
-
-        RefreshingLineBuilder rate(long duration, TimeUnit unit);
-
-        RefreshingLineBuilder async();
-
-        RefreshingLineBuilder sources(PlaceholderSources sources);
-
-    }
+    R process(A a, B b, C c);
 
 }

@@ -56,6 +56,8 @@ public interface PlaceholderSources {
 
         <T> SourceBuilder append(TypeToken<T> type, Supplier<T> supplier);
 
+        <T> SourceBuilder appendIfAbsent(Class<T> type, Supplier<T> supplier);
+
     }
 
 }

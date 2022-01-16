@@ -28,44 +28,69 @@ package net.impactdev.impactor.sponge.scoreboard.objective.types;
 import com.google.common.base.Preconditions;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
+import net.impactdev.impactor.api.scoreboard.lines.types.ConstantLine;
+import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
 import net.impactdev.impactor.api.scoreboard.objective.types.ConstantObjective;
 import net.impactdev.impactor.api.services.text.MessageService;
+import net.impactdev.impactor.sponge.scoreboard.objective.AbstractSpongeObjective;
+import net.impactdev.impactor.sponge.scoreboard.util.SourceResolvers;
+import net.impactdev.impactor.sponge.util.LazyComponent;
 import net.kyori.adventure.text.Component;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
-public class SpongeConstantObjective implements ConstantObjective {
+public class SpongeConstantObjective extends AbstractSpongeObjective implements ConstantObjective {
 
-    private final Component text;
+    private LazyComponent supplier;
 
     private SpongeConstantObjective(SpongeConstantObjectiveBuilder builder) {
-        this.text = builder.text;
+        this.supplier = builder.supplier;
     }
 
     @Override
     public Component getText() {
-        return this.text;
+        return this.supplier.resolve();
+    }
+
+    @Override
+    public void consumeFocus(ServerPlayer focus) {
+        this.supplier = this.supplier.provide(focus.uniqueId());
+    }
+
+    @Override
+    public ScoreboardObjective copy() {
+        SpongeConstantObjective clone = new SpongeConstantObjective(new SpongeConstantObjectiveBuilder());
+        clone.supplier = this.supplier;
+        return clone;
     }
 
     public static class SpongeConstantObjectiveBuilder implements ConstantObjectiveBuilder {
 
-        private Component text;
+        private LazyComponent supplier;
 
         @Override
         public SpongeConstantObjectiveBuilder raw(String raw, PlaceholderSources sources) {
             MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
-            this.text = service.parse(raw, sources);
+            this.supplier = new LazyComponent(fallback -> service.parse(
+                    raw,
+                    PlaceholderSources.builder()
+                            .from(sources)
+                            .appendIfAbsent(ServerPlayer.class, SourceResolvers.PLAYER.apply(fallback))
+                            .build()
+            ));
             return this;
         }
 
         @Override
         public SpongeConstantObjectiveBuilder text(Component text) {
-            this.text = text;
+            this.supplier = new LazyComponent(fallback -> text);
             return this;
         }
 
         @Override
         public ConstantObjectiveBuilder from(ConstantObjective input) {
             Preconditions.checkArgument(input instanceof SpongeConstantObjective);
-            this.text = input.getText();
+            this.supplier = ((SpongeConstantObjective) input).supplier;
             return this;
         }
 

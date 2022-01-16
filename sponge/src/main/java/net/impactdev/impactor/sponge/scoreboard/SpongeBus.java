@@ -30,13 +30,16 @@ import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.events.PlatformBus;
 import net.impactdev.impactor.api.scoreboard.events.RegisteredEvent;
 import net.impactdev.impactor.api.scoreboard.frames.types.ListeningFrame;
+import net.impactdev.impactor.api.utilities.functional.TriFunction;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.EventListenerRegistration;
 import org.spongepowered.api.event.Order;
 
+import java.util.UUID;
 import java.util.function.BiFunction;
 
 public class SpongeBus extends PlatformBus<Event> {
@@ -47,9 +50,9 @@ public class SpongeBus extends PlatformBus<Event> {
     }
 
     @Override
-    public <E extends Event> BiFunction<Updatable, ListeningFrame.EventHandler<E>, RegisteredEvent> getRegisterHandler(TypeToken<E> type) {
-        return (line, handler) -> {
-            EventListener<E> listener = event -> handler.process(line, event);
+    public <E extends Event> TriFunction<Updatable, UUID, ListeningFrame.EventHandler<E>, RegisteredEvent> getRegisterHandler(TypeToken<E> type) {
+        return (line, assignee, handler) -> {
+            EventListener<E> listener = event -> handler.process(line, assignee, event);
             Sponge.eventManager().registerListener(EventListenerRegistration.builder(type)
                     .listener(listener)
                     .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())

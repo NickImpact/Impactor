@@ -23,35 +23,12 @@
  *
  */
 
-package net.impactdev.impactor.api.scoreboard.lines.types;
+package net.impactdev.impactor.sponge.scoreboard.frames;
 
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
-import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
-import net.impactdev.impactor.api.scoreboard.components.Updatable;
-import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
-import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
-import net.impactdev.impactor.api.utilities.Builder;
+import java.util.UUID;
 
-import java.util.concurrent.TimeUnit;
+public abstract class AbstractSpongeFrame {
 
-public interface RefreshingLine extends ScoreboardLine, Updatable {
-
-    TimeConfiguration getTimingConfig();
-
-    interface RefreshingLineBuilder extends Builder<RefreshingLine, RefreshingLineBuilder> {
-
-        RefreshingLineBuilder text(String raw);
-
-        RefreshingLineBuilder effects(FrameEffect... effect);
-
-        RefreshingLineBuilder rate(long ticks);
-
-        RefreshingLineBuilder rate(long duration, TimeUnit unit);
-
-        RefreshingLineBuilder async();
-
-        RefreshingLineBuilder sources(PlaceholderSources sources);
-
-    }
+    public abstract void provideSource(UUID uuid);
 
 }

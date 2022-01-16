@@ -31,19 +31,25 @@ import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.events.Bus;
 import net.impactdev.impactor.api.scoreboard.events.RegisteredEvent;
+import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.scoreboard.frames.types.ListeningFrame;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.kyori.adventure.text.Component;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
-public class SpongeListeningFrame<L> implements ListeningFrame<L> {
+import java.util.UUID;
 
-    private final String raw;
-    private final Bus<? super L> bus;
-    private final TypeToken<L> type;
-    private final EventHandler<L> handler;
-    private final PlaceholderSources sources;
+public class SpongeListeningFrame<L> extends AbstractSpongeFrame implements ListeningFrame<L> {
+
+    private String raw;
+    private Bus<? super L> bus;
+    private TypeToken<L> type;
+    private EventHandler<L> handler;
+    private PlaceholderSources sources;
 
     private transient RegisteredEvent registration;
+    private transient UUID source;
 
     public SpongeListeningFrame(SpongeListeningFrameBuilder<L> builder) {
         this.raw = builder.raw;
@@ -66,7 +72,7 @@ public class SpongeListeningFrame<L> implements ListeningFrame<L> {
 
     @Override
     public void initialize(Updatable parent) {
-        this.registration = this.bus.getRegisterHandler(this.type).apply(parent, this.handler);
+        this.registration = this.bus.getRegisterHandler(this.type).process(parent, this.source, this.handler);
     }
 
     @Override
@@ -84,13 +90,33 @@ public class SpongeListeningFrame<L> implements ListeningFrame<L> {
         return this.handler;
     }
 
+    @Override
+    public void provideSource(UUID uuid) {
+        this.source = uuid;
+        this.sources = PlaceholderSources.builder()
+                .from(this.sources)
+                .appendIfAbsent(ServerPlayer.class, () -> Sponge.server().player(uuid).orElseThrow())
+                .build();
+    }
+
+    @Override
+    public ScoreboardFrame copy() {
+        SpongeListeningFrame<L> clone = new SpongeListeningFrame<>(new SpongeListeningFrameBuilder<>());
+        clone.raw = this.raw;
+        clone.bus = this.bus;
+        clone.type = this.type;
+        clone.handler = this.handler;
+        clone.sources = this.sources;
+        return clone;
+    }
+
     public static class SpongeListeningFrameBuilder<L> implements ListeningFrameBuilder<L> {
 
         private TypeToken<L> type;
         private Bus<? super L> bus;
         private String raw;
         private EventHandler<L> handler;
-        private PlaceholderSources sources;
+        private PlaceholderSources sources = PlaceholderSources.empty();
 
         public SpongeListeningFrameBuilder() {}
 

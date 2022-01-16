@@ -30,16 +30,23 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.scoreboard.criteria.Criteria;
 import org.spongepowered.api.scoreboard.objective.Objective;
 
+import java.util.UUID;
+
 public abstract class AbstractSpongeObjective implements ScoreboardObjective {
 
     private Objective delegate;
 
-    public Objective create(ServerPlayer player) {
-        return this.delegate = Objective.builder()
-                .criterion(Criteria.DUMMY)
-                .name("O-" + player.uniqueId().toString().substring(0, 14))
-                .displayName(this.getText())
-                .build();
+    public abstract void consumeFocus(ServerPlayer focus);
+
+    public Objective resolve() {
+        if(this.delegate == null) {
+            return this.delegate = Objective.builder()
+                    .criterion(Criteria.DUMMY)
+                    .name("O-" + UUID.randomUUID().toString().substring(0, 14))
+                    .displayName(this.getText())
+                    .build();
+        }
+        return this.delegate;
     }
 
     protected Objective getDelegate() {

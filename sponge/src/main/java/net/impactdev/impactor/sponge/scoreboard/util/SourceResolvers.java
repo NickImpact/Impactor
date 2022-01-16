@@ -23,35 +23,17 @@
  *
  */
 
-package net.impactdev.impactor.api.scoreboard.lines.types;
+package net.impactdev.impactor.sponge.scoreboard.util;
 
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
-import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
-import net.impactdev.impactor.api.scoreboard.components.Updatable;
-import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
-import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
-import net.impactdev.impactor.api.utilities.Builder;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
-import java.util.concurrent.TimeUnit;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-public interface RefreshingLine extends ScoreboardLine, Updatable {
+public class SourceResolvers {
 
-    TimeConfiguration getTimingConfig();
-
-    interface RefreshingLineBuilder extends Builder<RefreshingLine, RefreshingLineBuilder> {
-
-        RefreshingLineBuilder text(String raw);
-
-        RefreshingLineBuilder effects(FrameEffect... effect);
-
-        RefreshingLineBuilder rate(long ticks);
-
-        RefreshingLineBuilder rate(long duration, TimeUnit unit);
-
-        RefreshingLineBuilder async();
-
-        RefreshingLineBuilder sources(PlaceholderSources sources);
-
-    }
+    public static final Function<UUID, Supplier<ServerPlayer>> PLAYER = id -> () -> Sponge.server().player(id).orElseThrow();
 
 }

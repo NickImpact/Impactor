@@ -85,6 +85,7 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
         this.register(this.create("mspt", context -> formatMilliseconds(Sponge.server().averageTickTime())));
         this.register(this.create("memory_used", context -> Component.text(Memory.getCurrent())));
         this.register(this.create("memory_allocated", context -> Component.text(Memory.getAllocated())));
+        this.register(this.create("memory_total", context -> Component.text(Memory.getMax())));
         this.register(this.create("player_count", context -> Component.text(Sponge.server().onlinePlayers().size())));
         this.register(this.create("ping", context -> context.associatedObject()
                 .filter(source -> source instanceof PlaceholderSources)

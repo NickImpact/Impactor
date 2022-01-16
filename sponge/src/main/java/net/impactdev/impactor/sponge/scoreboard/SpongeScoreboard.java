@@ -28,31 +28,58 @@ package net.impactdev.impactor.sponge.scoreboard;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.scoreboard.ImpactorScoreboard;
+import net.impactdev.impactor.api.scoreboard.components.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
+import net.impactdev.impactor.api.utilities.mappings.Tuple;
+import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.scoreboard.lines.AbstractSpongeSBLine;
 import net.impactdev.impactor.sponge.scoreboard.objective.AbstractSpongeObjective;
-import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeAnimatedObjective;
-import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeRefreshingObjective;
+import net.kyori.adventure.util.TriState;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlots;
 import org.spongepowered.api.scoreboard.objective.Objective;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
-public class SpongeScoreboard implements ImpactorScoreboard {
+public class SpongeScoreboard implements ImpactorScoreboard<ServerPlayer> {
 
     private final AbstractSpongeObjective objective;
     private final List<ScoreboardLine> lines;
 
+    private final UUID source;
+    private Scoreboard delegate;
+    private TriState visibility;
+
     public SpongeScoreboard(SpongeScoreboardBuilder builder) {
         this.objective = (AbstractSpongeObjective) builder.objective;
         this.lines = builder.lines;
+        this.delegate = null;
+        this.source = null;
+        this.visibility = TriState.NOT_SET;
+    }
+
+    private SpongeScoreboard(SpongeScoreboardBuilder builder, @NonNull UUID source) {
+        Preconditions.checkNotNull(source);
+
+        this.objective = (AbstractSpongeObjective) builder.objective;
+        this.lines = builder.lines;
+        this.source = source;
+        this.visibility = TriState.FALSE;
+        this.objective.consumeFocus(this.player().get());
+        this.create();
+    }
+
+    private Supplier<ServerPlayer> player() {
+        return () -> Sponge.server().player(this.source).orElseThrow();
     }
 
     @Override
@@ -66,9 +93,47 @@ public class SpongeScoreboard implements ImpactorScoreboard {
     }
 
     @Override
-    public void applyFor(UUID user) {
-        ServerPlayer player = Sponge.server().player(user).orElseThrow(() -> new IllegalArgumentException("No player found with UUID: " + user));
-        this.createFor(player);
+    public ImpactorScoreboard<ServerPlayer> assignTo(ServerPlayer user) {
+        return new SpongeScoreboardBuilder().from(this).build(user);
+    }
+
+    @Override
+    public boolean show() {
+        Preconditions.checkNotNull(this.source);
+        Preconditions.checkNotNull(this.delegate);
+        if(this.visibility == TriState.FALSE) {
+            this.player().get().setScoreboard(this.delegate);
+            this.start();
+            this.visibility = TriState.TRUE;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hide() {
+        Preconditions.checkNotNull(this.source);
+        Preconditions.checkNotNull(this.delegate);
+        if(this.visibility == TriState.TRUE) {
+            this.player().get().setScoreboard(Sponge.server().serverScoreboard().get());
+            this.shutdown();
+            this.visibility = TriState.FALSE;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void start() {
+        if(this.objective instanceof Updatable) {
+            ((Updatable) this.objective).start();
+        }
+
+        for(ScoreboardLine line : this.lines) {
+            if(line instanceof Updatable) {
+                ((Updatable) line).start();
+            }
+        }
     }
 
     @Override
@@ -84,76 +149,83 @@ public class SpongeScoreboard implements ImpactorScoreboard {
         }
     }
 
-    public void createFor(ServerPlayer target) {
-        Scoreboard scoreboard = Scoreboard.builder().build();
-        Objective objective = this.objective.create(target);
-        scoreboard.addObjective(objective);
-        scoreboard.updateDisplaySlot(objective, DisplaySlots.SIDEBAR);
+    public void create() {
+        Preconditions.checkNotNull(this.source);
 
-        if(this.objective instanceof Updatable) {
-            ((Updatable) this.objective).start();
-        }
+        this.delegate = Scoreboard.builder().build();
+        Objective objective = this.objective.resolve();
+        this.delegate.addObjective(objective);
+        this.delegate.updateDisplaySlot(objective, DisplaySlots.SIDEBAR);
 
-        for(ScoreboardLine line : this.lines) {
-            ((AbstractSpongeSBLine) line).setup(scoreboard, objective, target);
-
-            if(line instanceof Updatable) {
-                ((Updatable) line).start();
-            }
-        }
-
-        target.setScoreboard(scoreboard);
+        this.lines.stream().map(l -> (AbstractSpongeSBLine) l).forEach(l -> l.setup(this.delegate, this.player().get()));
     }
 
     public static SpongeScoreboardBuilder builder() {
         return new SpongeScoreboardBuilder();
     }
 
-    public static class SpongeScoreboardBuilder implements ScoreboardBuilder {
+    public static class SpongeScoreboardBuilder implements ScoreboardBuilder<ServerPlayer> {
 
         private ScoreboardObjective objective;
         private List<ScoreboardLine> lines = Lists.newArrayList();
 
         @Override
-        public SpongeScoreboardBuilder objective(ScoreboardObjective objective) {
+        public LinesComponentBuilder<ServerPlayer> objective(ScoreboardObjective objective) {
+            Preconditions.checkNotNull(objective);
             Preconditions.checkArgument(objective instanceof AbstractSpongeObjective);
             this.objective = objective;
-            return this;
+            return new SpongeLineComponentBuilder(this);
         }
 
         @Override
-        public SpongeScoreboardBuilder line(ScoreboardLine line) {
-            this.lines.add(line);
+        public SpongeScoreboardBuilder from(ImpactorScoreboard<ServerPlayer> input) {
+            this.objective = input.getTitle().copy();
+            this.lines = input.getLines().stream()
+                    .map(line -> new Tuple<>(line, line.copy()))
+                    .map(pair -> ((AbstractSpongeSBLine) pair.getSecond()).assignScore(((AbstractSpongeObjective) this.objective).resolve(), pair.getFirst().getScore()))
+                    .toList();
             return this;
         }
 
-        @Override
-        public ScoreboardBuilder lines(ScoreboardLine... lines) {
-            this.lines.addAll(Arrays.asList(lines));
-            return this;
-        }
+        private SpongeScoreboard build(ServerPlayer delegate) {
+            Preconditions.checkNotNull(this.objective);
+            Preconditions.checkNotNull(delegate);
 
-        @Override
-        public ScoreboardBuilder lines(Iterable<ScoreboardLine> lines) {
-            for(ScoreboardLine line : lines) {
-                this.lines.add(line);
-            }
-
-            return this;
-        }
-
-        @Override
-        public SpongeScoreboardBuilder from(ImpactorScoreboard input) {
-            this.objective = input.getTitle();
-            this.lines = input.getLines();
-            return this;
+            return new SpongeScoreboard(this, delegate.uniqueId());
         }
 
         @Override
         public SpongeScoreboard build() {
             Preconditions.checkNotNull(this.objective);
-
             return new SpongeScoreboard(this);
+        }
+    }
+
+    public static class SpongeLineComponentBuilder implements ImpactorScoreboard.LinesComponentBuilder<ServerPlayer> {
+
+        private final SpongeScoreboardBuilder parent;
+        private final List<ScoreboardLine> lines = Lists.newArrayList();
+
+        public SpongeLineComponentBuilder(SpongeScoreboardBuilder parent) {
+            this.parent = parent;
+        }
+
+        @Override
+        public LinesComponentBuilder<ServerPlayer> line(ScoreboardLine line, int score) {
+            this.lines.add(((AbstractSpongeSBLine) line).assignScore(((AbstractSpongeObjective)this.parent.objective).resolve(), score));
+            return this;
+        }
+
+        @Override
+        public LinesComponentBuilder<ServerPlayer> lines(Map<ScoreboardLine, Integer> lines) {
+            lines.forEach(this::line);
+            return this;
+        }
+
+        @Override
+        public ScoreboardBuilder<ServerPlayer> complete() {
+            this.parent.lines = this.lines;
+            return this.parent;
         }
     }
 

@@ -73,6 +73,12 @@ public class PlaceholderSourcesImpl implements PlaceholderSources {
         }
 
         @Override
+        public <T> SourceBuilder appendIfAbsent(Class<T> type, Supplier<T> supplier) {
+            this.sources.putIfAbsent(TypeToken.get(type), supplier);
+            return this;
+        }
+
+        @Override
         public SourceBuilder from(PlaceholderSources input) {
             this.sources.putAll(((PlaceholderSourcesImpl) input).sources);
             return this;

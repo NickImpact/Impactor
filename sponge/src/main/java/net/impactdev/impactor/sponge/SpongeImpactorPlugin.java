@@ -39,6 +39,9 @@ import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.api.plugin.components.Depending;
 import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
+import net.impactdev.impactor.api.scoreboard.ImpactorScoreboard;
+import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
+import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
@@ -56,6 +59,7 @@ import net.impactdev.impactor.sponge.services.SpongeMojangServerStatusService;
 import net.impactdev.impactor.sponge.text.SpongeMessageService;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
 import net.impactdev.impactor.sponge.ui.signs.SpongeSignQuery;
+import net.impactdev.impactor.sponge.util.ScoreboardTesting;
 import net.impactdev.impactor.sponge.util.SpongeClassPathAppender;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.ResourceKey;
@@ -63,9 +67,11 @@ import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.lifecycle.*;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.plugin.PluginContainer;
@@ -166,6 +172,8 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 
 	@Listener
 	public void onServerStart(StartedEngineEvent<Server> event) {
+		Sponge.eventManager().registerListeners(this.getPluginContainer(), new ScoreboardTesting());
+
 		ImmutableList<PlaceholderParser> parsers = Impactor.getInstance().getRegistry().get(SpongePlaceholderManager.class).getAllPlatformParsers();
 		this.getPluginLogger().info("&eAvailable Placeholders:");
 		Multimap<String, ResourceKey> sorted = ArrayListMultimap.create();

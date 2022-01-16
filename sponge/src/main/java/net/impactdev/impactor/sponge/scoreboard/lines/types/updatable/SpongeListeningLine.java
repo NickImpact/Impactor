@@ -25,31 +25,21 @@
 
 package net.impactdev.impactor.sponge.scoreboard.lines.types.updatable;
 
-import net.impactdev.impactor.api.scoreboard.components.LineIdentifier;
 import net.impactdev.impactor.api.scoreboard.frames.types.ListeningFrame;
+import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboard.lines.types.ListeningLine;
+import net.impactdev.impactor.sponge.scoreboard.frames.SpongeListeningFrame;
 import net.impactdev.impactor.sponge.scoreboard.lines.AbstractSpongeSBLine;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.scoreboard.Scoreboard;
-import org.spongepowered.api.scoreboard.Team;
-import org.spongepowered.api.scoreboard.objective.Objective;
-
-import java.util.UUID;
 
 public class SpongeListeningLine extends AbstractSpongeSBLine implements ListeningLine {
 
-    private final ListeningFrame<?> frame;
-
-    private final Team team;
-    private final Component identifier;
+    private ListeningFrame<?> frame;
 
     public SpongeListeningLine(SpongeListeningLineBuilder builder) {
-        super(builder.score);
         this.frame = builder.frame;
-
-        this.team = Team.builder().name(UUID.randomUUID().toString().substring(0, 16)).build();
-        this.team.addMember(this.identifier = LineIdentifier.generate());
     }
 
     @Override
@@ -64,7 +54,7 @@ public class SpongeListeningLine extends AbstractSpongeSBLine implements Listeni
 
     @Override
     public void update() {
-        this.team.setPrefix(this.getText());
+        this.getTeam().setPrefix(this.getText());
     }
 
     @Override
@@ -78,22 +68,22 @@ public class SpongeListeningLine extends AbstractSpongeSBLine implements Listeni
     }
 
     @Override
-    public void setup(Scoreboard scoreboard, Objective objective, ServerPlayer target) {
-        objective.findOrCreateScore(this.identifier).setScore(this.getScore());
-        scoreboard.registerTeam(this.team);
-        this.team.setPrefix(this.getText());
+    public void setup(Scoreboard scoreboard, ServerPlayer target) {
+        scoreboard.registerTeam(this.getTeam());
+        ((SpongeListeningFrame<?>) this.frame).provideSource(target.uniqueId());
+        this.getTeam().setPrefix(this.getText());
+    }
+
+    @Override
+    public ScoreboardLine copy() {
+        SpongeListeningLine clone = new SpongeListeningLine(new SpongeListeningLineBuilder());
+        clone.frame = (ListeningFrame<?>) this.frame.copy();
+        return clone;
     }
 
     public static class SpongeListeningLineBuilder implements ListeningBuilder {
 
-        private int score;
         private ListeningFrame<?> frame;
-
-        @Override
-        public ListeningBuilder score(int score) {
-            this.score = score;
-            return this;
-        }
 
         @Override
         public ListeningBuilder content(ListeningFrame<?> frame) {
@@ -103,7 +93,6 @@ public class SpongeListeningLine extends AbstractSpongeSBLine implements Listeni
 
         @Override
         public ListeningBuilder from(ListeningLine input) {
-            this.score = input.getScore();
             this.frame = ((SpongeListeningLine) input).frame;
             return this;
         }

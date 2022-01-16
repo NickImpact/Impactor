@@ -31,6 +31,7 @@ import net.impactdev.impactor.api.scheduler.SchedulerTask;
 import net.impactdev.impactor.api.scoreboard.components.LineIdentifier;
 import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
 import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
+import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboard.lines.types.RefreshingLine;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
@@ -54,29 +55,30 @@ import java.util.concurrent.TimeUnit;
 
 public class SpongeRefreshingLine extends AbstractSpongeSBLine implements RefreshingLine {
 
-    private final String raw;
-    private final TimeConfiguration timings;
-
-    private final boolean async;
-
-    private final Team team;
-    private final Component identifier;
-
-    private final Queue<FrameEffect> effects;
-    private final PlaceholderSources sources;
+    private String raw;
+    private TimeConfiguration timings;
+    private boolean async;
+    private Queue<FrameEffect> effects;
 
     private SchedulerTask updater;
+    private PlaceholderSources sources;
 
     public SpongeRefreshingLine(SpongeRefreshingLineBuilder builder) {
-        super(builder.score);
         this.raw = builder.raw;
         this.timings = builder.timings;
         this.async = builder.async;
-        this.effects = new LinkedList<>(Arrays.asList(builder.effects));
         this.sources = builder.sources;
+        this.effects = new LinkedList<>(Arrays.asList(builder.effects));
+    }
 
-        this.team = Team.builder().name(UUID.randomUUID().toString().substring(0, 16)).build();
-        this.team.addMember(this.identifier = LineIdentifier.generate());
+    @Override
+    public void setup(Scoreboard scoreboard, ServerPlayer target) {
+        scoreboard.registerTeam(this.getTeam());
+        this.sources = PlaceholderSources.builder()
+                .from(this.sources)
+                .appendIfAbsent(ServerPlayer.class, () -> Sponge.server().player(target.uniqueId()).orElseThrow())
+                .build();
+        this.getTeam().setPrefix(this.getText());
     }
 
     @Override
@@ -93,13 +95,6 @@ public class SpongeRefreshingLine extends AbstractSpongeSBLine implements Refres
     @Override
     public TimeConfiguration getTimingConfig() {
         return this.timings;
-    }
-
-    @Override
-    public void setup(Scoreboard scoreboard, Objective objective, ServerPlayer target) {
-        objective.findOrCreateScore(this.identifier).setScore(this.getScore());
-        scoreboard.registerTeam(this.team);
-        this.team.setPrefix(this.getText());
     }
 
     @Override
@@ -133,7 +128,7 @@ public class SpongeRefreshingLine extends AbstractSpongeSBLine implements Refres
 
     @Override
     public void update() {
-        this.team.setPrefix(this.getText());
+        this.getTeam().setPrefix(this.getText());
     }
 
     @Override
@@ -141,20 +136,24 @@ public class SpongeRefreshingLine extends AbstractSpongeSBLine implements Refres
         this.updater.cancel();
     }
 
+    @Override
+    public ScoreboardLine copy() {
+        SpongeRefreshingLine clone = new SpongeRefreshingLine(new SpongeRefreshingLineBuilder());
+        clone.raw = this.raw;
+        clone.sources = this.sources;
+        clone.timings = this.timings;
+        clone.async = this.async;
+        clone.effects = this.effects;
+        return clone;
+    }
+
     public static class SpongeRefreshingLineBuilder implements RefreshingLineBuilder {
 
-        private int score;
         private String raw;
         private FrameEffect[] effects = new FrameEffect[0];
         private TimeConfiguration timings;
         private boolean async;
-        private PlaceholderSources sources;
-
-        @Override
-        public RefreshingLineBuilder score(int score) {
-            this.score = score;
-            return this;
-        }
+        private PlaceholderSources sources = PlaceholderSources.empty();
 
         @Override
         public RefreshingLineBuilder text(String raw) {

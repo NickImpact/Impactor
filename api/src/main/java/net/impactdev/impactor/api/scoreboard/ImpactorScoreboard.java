@@ -31,7 +31,7 @@ import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
 import net.impactdev.impactor.api.utilities.Builder;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 /**
  * Represents a scoreboard that appears on the side of a user's screen. This scoreboard is built amongst
@@ -75,8 +75,10 @@ import java.util.UUID;
  * This scoreboard will come with an {@link ScoreboardObjective} that updates its contents for
  * every instance of both login and disconnect events (Event is based on Sponge). Otherwise, the
  * title of the scoreboard remains static.
+ *
+ * @param <P> The type of player represented by the platform
  */
-public interface ImpactorScoreboard {
+public interface ImpactorScoreboard<P> {
 
     /**
      * Represents the title of the scoreboard.
@@ -97,11 +99,34 @@ public interface ImpactorScoreboard {
     List<ScoreboardLine> getLines();
 
     /**
-     * Applies the scoreboard to the user with the following UUID.
+     * Applies the scoreboard to the user with the following UUID. This user will be the focus of
+     * contextual placeholders that expect an active player for resolution.
      *
-     * @param user The user that will view this scoreboard
+     * @param player The user this scoreboard will be assigned to.
+     * @return A clone of the current scoreboard, with the relative player assignment
      */
-    void applyFor(UUID user);
+    ImpactorScoreboard<P> assignTo(P player);
+
+    /**
+     * Attempts to display the scoreboard to the player.
+     *
+     * @return <code>true</code> if successfully shown, <code>false</code> if the scoreboard is already
+     * being shown or failed to be shown
+     */
+    boolean show();
+
+    /**
+     * Attempts to hide the scoreboard to the player.
+     *
+     * @return <code>true</code> if successfully hidden, <code>false</code> if the scoreboard is already
+     * being hidden or failed to be hidden
+     */
+    boolean hide();
+
+    /**
+     * Enables animations to begin running for the scoreboard.
+     */
+    void start();
 
     /**
      * Disables further updating for a scoreboard, effectively cancelling any running tasks
@@ -118,14 +143,14 @@ public interface ImpactorScoreboard {
      *
      * @return A newly constructed scoreboard builder.
      */
-    static ScoreboardBuilder builder() {
+    static <P> ScoreboardBuilder<P> builder() {
         return Impactor.getInstance().getRegistry().createBuilder(ScoreboardBuilder.class);
     }
 
     /**
      * Allows for dynamic building of a scoreboard
      */
-    interface ScoreboardBuilder extends Builder<ImpactorScoreboard, ScoreboardBuilder> {
+    interface ScoreboardBuilder<P> extends Builder<ImpactorScoreboard<P>, ScoreboardBuilder<P>> {
 
         /**
          * Specifies the objective/title of the scoreboard.
@@ -133,7 +158,11 @@ public interface ImpactorScoreboard {
          * @param objective The objective for the scoreboard
          * @return This builder
          */
-        ScoreboardBuilder objective(ScoreboardObjective objective);
+        LinesComponentBuilder<P> objective(ScoreboardObjective objective);
+
+    }
+
+    interface LinesComponentBuilder<P> {
 
         /**
          * Appends a single line to the scoreboard. If its score matches another line
@@ -141,9 +170,10 @@ public interface ImpactorScoreboard {
          * be replaced when constructed.
          *
          * @param line The line to append
+         * @param score The score to assign to the line
          * @return This builder
          */
-        ScoreboardBuilder line(ScoreboardLine line);
+        LinesComponentBuilder<P> line(ScoreboardLine line, int score);
 
         /**
          * Appends a set of scoreboard lines to the scoreboard.
@@ -151,15 +181,9 @@ public interface ImpactorScoreboard {
          * @param lines The line set
          * @return This builder
          */
-        ScoreboardBuilder lines(ScoreboardLine... lines);
+        LinesComponentBuilder<P> lines(Map<ScoreboardLine, Integer> lines);
 
-        /**
-         * Appends a set of scoreboard lines to the scoreboard.
-         *
-         * @param lines The line set
-         * @return This builder
-         */
-        ScoreboardBuilder lines(Iterable<ScoreboardLine> lines);
+        ScoreboardBuilder<P> complete();
 
     }
 

@@ -29,12 +29,15 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scheduler.SchedulerTask;
 import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
+import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
 import net.impactdev.impactor.api.scoreboard.objective.types.RefreshingObjective;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.scoreboard.objective.AbstractSpongeObjective;
+import net.impactdev.impactor.sponge.scoreboard.util.SourceResolvers;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Ticks;
@@ -43,10 +46,10 @@ import java.util.concurrent.TimeUnit;
 
 public class SpongeRefreshingObjective extends AbstractSpongeObjective implements RefreshingObjective {
 
-    private final String raw;
-    private final TimeConfiguration timings;
-    private final boolean async;
-    private final PlaceholderSources sources;
+    private String raw;
+    private TimeConfiguration timings;
+    private boolean async;
+    private PlaceholderSources sources;
 
     private SchedulerTask updater;
 
@@ -107,12 +110,30 @@ public class SpongeRefreshingObjective extends AbstractSpongeObjective implement
         this.updater.cancel();
     }
 
+    @Override
+    public void consumeFocus(ServerPlayer focus) {
+        this.sources = PlaceholderSources.builder()
+                .from(this.sources)
+                .appendIfAbsent(ServerPlayer.class, SourceResolvers.PLAYER.apply(focus.uniqueId()))
+                .build();
+    }
+
+    @Override
+    public ScoreboardObjective copy() {
+        SpongeRefreshingObjective clone = new SpongeRefreshingObjective(new SpongeRefreshingObjectiveBuilder());
+        clone.raw = this.raw;
+        clone.sources = this.sources;
+        clone.timings = this.timings;
+        clone.async = this.async;
+        return clone;
+    }
+
     public static class SpongeRefreshingObjectiveBuilder implements RefreshingObjectiveBuilder {
 
         private String raw;
         private TimeConfiguration timings;
         private boolean async;
-        private PlaceholderSources sources;
+        private PlaceholderSources sources = PlaceholderSources.empty();
 
         @Override
         public SpongeRefreshingObjectiveBuilder text(String raw) {

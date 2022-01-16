@@ -27,21 +27,30 @@ package net.impactdev.impactor.sponge.scoreboard.frames;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
+import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.scoreboard.frames.types.ConstantFrame;
+import net.impactdev.impactor.api.scoreboard.lines.types.ConstantLine;
 import net.impactdev.impactor.api.services.text.MessageService;
+import net.impactdev.impactor.sponge.scoreboard.lines.types.SpongeConstantLine;
+import net.impactdev.impactor.sponge.scoreboard.util.SourceResolvers;
+import net.impactdev.impactor.sponge.util.LazyComponent;
 import net.kyori.adventure.text.Component;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
-public class SpongeConstantFrame implements ConstantFrame {
+import java.util.UUID;
 
-    private final Component text;
+public class SpongeConstantFrame extends AbstractSpongeFrame implements ConstantFrame {
+
+    private LazyComponent supplier;
 
     public SpongeConstantFrame(SpongeConstantFrameBuilder builder) {
-        this.text = builder.text;
+        this.supplier = builder.supplier;
     }
 
     @Override
     public Component getText() {
-        return this.text;
+        return this.supplier.resolve();
     }
 
     @Override
@@ -49,26 +58,44 @@ public class SpongeConstantFrame implements ConstantFrame {
         return false;
     }
 
+    @Override
+    public void provideSource(UUID uuid) {
+        this.supplier = this.supplier.provide(uuid);
+    }
+
+    @Override
+    public ScoreboardFrame copy() {
+        SpongeConstantFrame frame = new SpongeConstantFrame(new SpongeConstantFrameBuilder());
+        frame.supplier = this.supplier;
+        return frame;
+    }
+
     public static class SpongeConstantFrameBuilder implements ConstantFrameBuilder {
 
-        private Component text;
+        private LazyComponent supplier;
 
         @Override
-        public ConstantFrameBuilder raw(String raw, PlaceholderSources sources) {
+        public SpongeConstantFrameBuilder raw(String raw, PlaceholderSources sources) {
             MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
-            this.text = service.parse(raw, sources);
+            this.supplier = new LazyComponent(fallback -> service.parse(
+                    raw,
+                    PlaceholderSources.builder()
+                            .from(sources)
+                            .appendIfAbsent(ServerPlayer.class, SourceResolvers.PLAYER.apply(fallback))
+                            .build()
+            ));
             return this;
         }
 
         @Override
-        public ConstantFrameBuilder text(Component text) {
-            this.text = text;
+        public SpongeConstantFrameBuilder text(Component text) {
+            this.supplier = new LazyComponent(fallback -> text);
             return this;
         }
 
         @Override
         public ConstantFrameBuilder from(ConstantFrame input) {
-            this.text = ((SpongeConstantFrame) input).text;
+            this.supplier = ((SpongeConstantFrame) input).supplier;
             return this;
         }
 

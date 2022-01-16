@@ -35,7 +35,7 @@ public interface ListeningLine extends ScoreboardLine, Updatable {
 
     ListeningFrame.EventHandler<?> getEventHandler();
 
-    interface ListeningBuilder extends LineBuilder<ListeningBuilder>, Builder<ListeningLine, ListeningBuilder> {
+    interface ListeningBuilder extends Builder<ListeningLine, ListeningBuilder> {
 
         ListeningBuilder content(ListeningFrame<?> frame);
 

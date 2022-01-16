@@ -31,8 +31,10 @@ import net.impactdev.impactor.api.event.ImpactorEvent;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.frames.types.ListeningFrame;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
+import net.impactdev.impactor.api.utilities.functional.TriFunction;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiFunction;
 
 /**
@@ -48,7 +50,11 @@ public class ImpactorBus implements Bus<ImpactorEvent> {
      * @return The Impactor Bus
      */
     public static ImpactorBus getOrCreate() {
-        return Optional.ofNullable(instance).orElse(instance = new ImpactorBus());
+        return Optional.ofNullable(instance).orElseGet(() -> {
+            ImpactorBus result = new ImpactorBus();
+            instance = result;
+            return result;
+        });
     }
 
     @Override
@@ -57,8 +63,8 @@ public class ImpactorBus implements Bus<ImpactorEvent> {
     }
 
     @Override
-    public <E extends ImpactorEvent> BiFunction<Updatable, ListeningFrame.EventHandler<E>, RegisteredEvent> getRegisterHandler(TypeToken<E> type) {
-        return (line, handler) -> new RegisteredEvent(Impactor.getInstance().getEventBus().subscribe(type, event -> handler.process(line, event)));
+    public <E extends ImpactorEvent> TriFunction<Updatable, UUID, ListeningFrame.EventHandler<E>, RegisteredEvent> getRegisterHandler(TypeToken<E> type) {
+        return (line, assignee, handler) -> new RegisteredEvent(Impactor.getInstance().getEventBus().subscribe(type, event -> handler.process(line, assignee, event)));
     }
 
     @Override
