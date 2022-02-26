@@ -40,7 +40,7 @@ public class SpongeMojangServerStatusService extends MojangServerStatusService {
 			try {
 				this.checker.fetch();
 			} catch (Exception e) {
-				SpongeImpactorPlugin.getInstance().getPluginLogger().warn("Failed to read Mojang Server Status with reason (" + e.getMessage() + ")");
+				SpongeImpactorPlugin.getInstance().getPluginLogger().warn("Services", "Failed to read Mojang Server Status with reason (" + e.getMessage() + ")");
 			}
 		}, 30, TimeUnit.SECONDS);
 	}

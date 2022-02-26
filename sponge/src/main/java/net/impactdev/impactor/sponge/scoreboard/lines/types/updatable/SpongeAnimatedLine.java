@@ -28,7 +28,6 @@ package net.impactdev.impactor.sponge.scoreboard.lines.types.updatable;
 import com.google.common.base.Preconditions;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.scheduler.SchedulerTask;
-import net.impactdev.impactor.api.scoreboard.components.LineIdentifier;
 import net.impactdev.impactor.api.scoreboard.components.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
@@ -37,8 +36,6 @@ import net.impactdev.impactor.api.scoreboard.lines.types.AnimatedLine;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.scoreboard.frames.AbstractSpongeFrame;
-import net.impactdev.impactor.sponge.scoreboard.frames.SpongeListeningFrame;
-import net.impactdev.impactor.sponge.scoreboard.frames.SpongeRefreshingFrame;
 import net.impactdev.impactor.sponge.scoreboard.lines.AbstractSpongeSBLine;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
@@ -46,18 +43,16 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.scoreboard.Scoreboard;
-import org.spongepowered.api.scoreboard.Team;
-import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.util.Ticks;
 
-import java.util.UUID;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 public class SpongeAnimatedLine extends AbstractSpongeSBLine implements AnimatedLine {
 
     private CircularLinkedList<ScoreboardFrame> frames;
     private TimeConfiguration timing;
-    private int updates;
+    private int iterations;
     private boolean async;
 
     private SchedulerTask updater;
@@ -66,7 +61,7 @@ public class SpongeAnimatedLine extends AbstractSpongeSBLine implements Animated
     private SpongeAnimatedLine(SpongeAnimatedBuilder builder) {
         this.frames = builder.frames;
         this.timing = builder.timing;
-        this.updates = builder.updates;
+        this.iterations = builder.updates;
         this.async = builder.async;
     }
 
@@ -120,7 +115,7 @@ public class SpongeAnimatedLine extends AbstractSpongeSBLine implements Animated
     @Override
     public void update() {
         if(this.frames.size() > 1) {
-            if(this.updates > 0 && this.updates == this.counter) {
+            if(this.iterations > 0 && this.iterations == this.counter) {
                 this.frames.getCurrent()
                         .filter(frame -> frame instanceof ScoreboardFrame.UpdatableFrame)
                         .map(frame -> (ScoreboardFrame.UpdatableFrame) frame)
@@ -163,8 +158,8 @@ public class SpongeAnimatedLine extends AbstractSpongeSBLine implements Animated
     }
 
     @Override
-    public int getUpdateAmount() {
-        return this.updates;
+    public int getIterationCount() {
+        return this.iterations;
     }
 
     public static SpongeAnimatedBuilder builder() {
@@ -178,7 +173,7 @@ public class SpongeAnimatedLine extends AbstractSpongeSBLine implements Animated
                 .stream()
                 .map(ScoreboardComponent::copy));
         clone.timing = this.timing;
-        clone.updates = this.updates;
+        clone.iterations = this.iterations;
         clone.async = this.async;
         return clone;
     }
@@ -198,7 +193,7 @@ public class SpongeAnimatedLine extends AbstractSpongeSBLine implements Animated
         }
 
         @Override
-        public AnimatedBuilder frames(Iterable<ScoreboardFrame> frames) {
+        public AnimatedBuilder frames(Collection<ScoreboardFrame> frames) {
             for(ScoreboardFrame frame : frames) {
                 this.frames.append(frame);
             }

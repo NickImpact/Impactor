@@ -37,8 +37,6 @@ import net.impactdev.impactor.api.plugin.components.Reloadable;
  * be used to identify the plugin. Additionally, a plugin is expected to provide the logger it is using,
  * as well as any configs, commands, and listeners it has registered such that they can be reloaded
  * should the plugin implement the {@link Reloadable Reloadable} component.
- *
- *
  */
 public interface ImpactorPlugin {
 

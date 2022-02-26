@@ -36,9 +36,9 @@ public class AbstractVelocityPlugin implements ImpactorPlugin {
     private final PluginMetadata metadata;
     private final Logger logger;
 
-    public AbstractVelocityPlugin(PluginMetadata metadata) {
+    public AbstractVelocityPlugin(PluginMetadata metadata, org.slf4j.Logger delegate) {
         this.metadata = metadata;
-        this.logger = new VelocityLogger(this);
+        this.logger = new VelocityLogger(this, delegate);
 
         PluginRegistry.register(this);
     }

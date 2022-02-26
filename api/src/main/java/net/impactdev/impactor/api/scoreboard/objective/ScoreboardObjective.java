@@ -33,22 +33,62 @@ import net.impactdev.impactor.api.scoreboard.objective.types.ListeningObjective;
 import net.impactdev.impactor.api.scoreboard.objective.types.RefreshingObjective;
 import net.kyori.adventure.text.Component;
 
+/**
+ * Represents the objective of a Scoreboard. Effectively, for display-based scoreboards,
+ * this objective acts as the title to the scoreboard. Impactor provides 4 different types of
+ * objectives, which all provide different means of updating. The following types available are:
+ * <ul>
+ *     <li>{@link ConstantObjective Constant}</li>
+ *     <li>{@link RefreshingObjective Refreshing}</li>
+ *     <li>{@link ListeningObjective Listening}</li>
+ *     <li>{@link AnimatedObjective Animated}</li>
+ * </ul>
+ *
+ * In order to create any particular instance of these, you'll want to go through
+ * this class. So, {@link ScoreboardObjective#constant()} will construct a builder
+ * specific to creating a constant based objective.
+ */
 public interface ScoreboardObjective extends ScoreboardComponent<ScoreboardObjective> {
 
+    /**
+     * Gets the component representing the text for the objective.
+     *
+     * @return The current text for the objective type
+     */
     Component getText();
 
+    /**
+     * Creates an objective builder that'll be used to configure a constant objective.
+     *
+     * @return A builder representing a constant objective
+     */
     static ConstantObjective.ConstantObjectiveBuilder constant() {
         return Impactor.getInstance().getRegistry().createBuilder(ConstantObjective.ConstantObjectiveBuilder.class);
     }
 
+    /**
+     * Creates an objective builder that'll be used to configure a refreshing objective.
+     *
+     * @return A builder representing a refreshing objective
+     */
     static RefreshingObjective.RefreshingObjectiveBuilder refreshing() {
         return Impactor.getInstance().getRegistry().createBuilder(RefreshingObjective.RefreshingObjectiveBuilder.class);
     }
 
+    /**
+     * Creates an objective builder that'll be used to configure a listening objective.
+     *
+     * @return A builder representing a listening objective
+     */
     static ListeningObjective.ListeningObjectiveBuilder listening() {
         return Impactor.getInstance().getRegistry().createBuilder(ListeningObjective.ListeningObjectiveBuilder.class);
     }
 
+    /**
+     * Creates an objective builder that'll be used to configure an animated objective.
+     *
+     * @return A builder representing an animated objective
+     */
     static AnimatedObjective.AnimatedObjectiveBuilder animated() {
         return Impactor.getInstance().getRegistry().createBuilder(AnimatedObjective.AnimatedObjectiveBuilder.class);
     }

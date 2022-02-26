@@ -26,75 +26,85 @@
 package net.impactdev.impactor.bungee.logging;
 
 import net.impactdev.impactor.api.logging.Logger;
+import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+import net.impactdev.impactor.bungee.BungeeImpactorPlugin;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class BungeeLogger implements Logger {
 
-	private final java.util.logging.Logger delegate;
-	private final Function<String, String> preprocessor = in -> in.replaceAll("[&]", "\u00a7");
+    private final ImpactorPlugin plugin;
+    private final java.util.logging.Logger delegate;
+    private final Function<String, String> colorizer = in -> in.replaceAll("[&]", "\u00a7");
+    private final BiFunction<String, String, String> preprocessor = (marker, input) -> "[" + marker + "] " + input;
 
-	public BungeeLogger(java.util.logging.Logger delegate) {
-		this.delegate = delegate;
-	}
+    public BungeeLogger(ImpactorPlugin plugin, java.util.logging.Logger delegate) {
+        this.plugin = plugin;
+        this.delegate = delegate;
+    }
 
-	@Override
-	public void noTag(String message) {
-		this.info(message);
-	}
+    @Override
+    public void info(String marker, String line) {
+        this.delegate.info(this.colorizer.apply(this.preprocessor.apply(marker, line)));
+    }
 
-	@Override
-	public void noTag(List<String> message) {
-		this.info(message);
-	}
+    @Override
+    public void info(String marker, Collection<String> lines) {
+        lines.forEach(l -> this.info(marker, l));
+    }
 
-	@Override
-	public void info(String message) {
-		this.delegate.info(this.preprocessor.apply(message));
-	}
+    @Override
+    public void info(String marker, Supplier<String> supplier) {
+        this.info(marker, supplier.get());
+    }
 
-	@Override
-	public void info(List<String> message) {
-		for(String s : message) {
-			this.info(s);
-		}
-	}
+    @Override
+    public void warn(String marker, String line) {
+        this.delegate.warning(this.colorizer.apply(this.preprocessor.apply(marker, line)));
+    }
 
-	@Override
-	public void warn(String message) {
-		this.delegate.warning(this.preprocessor.apply(message));
-	}
+    @Override
+    public void warn(String marker, Collection<String> lines) {
+        lines.forEach(l -> this.warn(marker, l));
+    }
 
-	@Override
-	public void warn(List<String> message) {
-		for(String s : message) {
-			this.warn(s);
-		}
-	}
+    @Override
+    public void warn(String marker, Supplier<String> supplier) {
+        this.warn(marker, supplier.get());
+    }
 
-	@Override
-	public void error(String message) {
-		this.delegate.severe(this.preprocessor.apply(message));
-	}
+    @Override
+    public void error(String marker, String line) {
+        this.delegate.severe(this.colorizer.apply(this.preprocessor.apply(marker, line)));
+    }
 
-	@Override
-	public void error(List<String> message) {
-		for(String s : message) {
-			this.error(s);
-		}
-	}
+    @Override
+    public void error(String marker, Collection<String> lines) {
+        lines.forEach(l -> this.error(marker, l));
+    }
 
-	@Override
-	public void debug(String message) {
-		this.delegate.info(this.preprocessor.apply("&3DEBUG &7\u00bb " + message));
-	}
+    @Override
+    public void error(String marker, Supplier<String> supplier) {
+        this.error(marker, supplier.get());
+    }
 
-	@Override
-	public void debug(List<String> message) {
-		for(String s : message) {
-			this.debug(s);
-		}
-	}
+    @Override
+    public void debug(String marker, String line) {
+        if(this.plugin.inDebugMode()) {
+            this.delegate.info(this.colorizer.apply(this.preprocessor.apply("Debug - " + marker, line)));
+        }
+    }
 
+    @Override
+    public void debug(String marker, Collection<String> lines) {
+        lines.forEach(l -> this.debug(marker, l));
+    }
+
+    @Override
+    public void debug(String marker, Supplier<String> supplier) {
+        this.debug(marker, supplier.get());
+    }
 }

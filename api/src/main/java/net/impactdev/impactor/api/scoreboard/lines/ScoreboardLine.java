@@ -30,6 +30,7 @@ import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.components.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.exceptions.ScoreAlreadySetException;
+import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.scoreboard.lines.types.AnimatedLine;
 import net.impactdev.impactor.api.scoreboard.lines.types.ListeningLine;
 import net.impactdev.impactor.api.scoreboard.lines.types.RefreshingLine;
@@ -79,18 +80,32 @@ public interface ScoreboardLine extends ScoreboardComponent<ScoreboardLine> {
 
     /**
      * Begins construction of a line that refreshes its contents over a set amount of time. Unlike an
-     * animated line, this type of line only has one particular frame
+     * animated line, this type of line only has one particular frame.
      *
-     * @return
+     * @return A builder for a line that will refresh its text over an interval rate
      */
     static RefreshingLine.RefreshingLineBuilder refreshing() {
         return Impactor.getInstance().getRegistry().createBuilder(RefreshingLine.RefreshingLineBuilder.class);
     }
 
+    /**
+     * Begins construction of a line that has openings for multiple layers. In other words,
+     * the line can feature a singular frame, or multiple types of frames that are cycled through
+     * during its lifetime.
+     *
+     * @return A builder for a line that will cycle through a series of {@link ScoreboardFrame ScoreboardFrames}.
+     */
     static AnimatedLine.AnimatedBuilder animated() {
         return Impactor.getInstance().getRegistry().createBuilder(AnimatedLine.AnimatedBuilder.class);
     }
 
+    /**
+     * Begins construction of a line that only updates based on an event handler's result. This allows for fine-tuned
+     * updating of lines that are based on placeholders that might only update after an event rather than a
+     * predictable rate. An example of this would be a player's rank via a permissions service.
+     *
+     * @return A builder for a line that listens to a particular event in order to update
+     */
     static ListeningLine.ListeningBuilder listening() {
         return Impactor.getInstance().getRegistry().createBuilder(ListeningLine.ListeningBuilder.class);
     }

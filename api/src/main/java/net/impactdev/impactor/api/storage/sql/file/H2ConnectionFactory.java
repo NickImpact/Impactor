@@ -25,9 +25,11 @@
 
 package net.impactdev.impactor.api.storage.sql.file;
 
+import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.Dependency;
 import net.impactdev.impactor.api.dependencies.DependencyManager;
+import net.impactdev.impactor.api.dependencies.ProvidedDependencies;
 import net.impactdev.impactor.api.dependencies.classloader.IsolatedClassLoader;
 
 import java.lang.reflect.InvocationTargetException;
@@ -48,7 +50,7 @@ public class H2ConnectionFactory extends FlatfileConnectionFactory {
     public H2ConnectionFactory(Path file) {
         super(file);
 
-        IsolatedClassLoader classLoader = Impactor.getInstance().getRegistry().get(DependencyManager.class).obtainClassLoaderWith(EnumSet.of(Dependency.H2_DRIVER));
+        IsolatedClassLoader classLoader = Impactor.getInstance().getRegistry().get(DependencyManager.class).obtainClassLoaderWith(Lists.newArrayList(ProvidedDependencies.H2));
         try {
             Class<?> driverClass = classLoader.loadClass("org.h2.Driver");
             Method loadMethod = driverClass.getMethod("load");

@@ -64,7 +64,11 @@ public class ImpactorBus implements Bus<ImpactorEvent> {
 
     @Override
     public <E extends ImpactorEvent> TriFunction<Updatable, UUID, ListeningFrame.EventHandler<E>, RegisteredEvent> getRegisterHandler(TypeToken<E> type) {
-        return (line, assignee, handler) -> new RegisteredEvent(Impactor.getInstance().getEventBus().subscribe(type, event -> handler.process(line, assignee, event)));
+        return (line, assignee, handler) -> new RegisteredEvent(Impactor.getInstance().getEventBus().subscribe(type, event -> {
+            if(handler.process(line, assignee, event)) {
+                line.update();
+            }
+        }));
     }
 
     @Override

@@ -25,9 +25,6 @@
 
 package net.impactdev.impactor.api.dependencies.classpath;
 
-import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-
 import java.net.MalformedURLException;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
@@ -53,7 +50,6 @@ public class ReflectionClassPathAppender implements ClassPathAppender {
     @Override
     public void addJarToClasspath(Path file) {
         try {
-            Impactor.getInstance().getRegistry().get(ImpactorPlugin.class).getPluginLogger().info("  Adding to classpath: " + file);
             this.classLoaderAccess.addURL(file.toUri().toURL());
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);

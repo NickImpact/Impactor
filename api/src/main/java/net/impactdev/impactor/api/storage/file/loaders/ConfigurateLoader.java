@@ -25,8 +25,9 @@
 
 package net.impactdev.impactor.api.storage.file.loaders;
 
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
+
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.loader.ConfigurationLoader;
 
 import java.nio.file.Path;
 

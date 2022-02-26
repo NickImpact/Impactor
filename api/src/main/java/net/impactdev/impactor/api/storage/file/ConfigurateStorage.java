@@ -131,7 +131,7 @@ public class ConfigurateStorage {
 
     // used to report i/o exceptions which took place in a specific file
     private RuntimeException reportException(String file, Exception ex) throws RuntimeException {
-        this.plugin.getPluginLogger().warn("Exception thrown whilst performing i/o: " + file);
+        this.plugin.getPluginLogger().warn("Storage", "Exception thrown whilst performing i/o: " + file);
         ex.printStackTrace();
         throw Throwables.propagate(ex);
     }

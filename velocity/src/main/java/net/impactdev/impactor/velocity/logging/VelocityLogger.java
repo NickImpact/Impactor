@@ -25,100 +25,84 @@
 
 package net.impactdev.impactor.velocity.logging;
 
+import net.impactdev.impactor.api.logging.Logger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.velocity.VelocityImpactorBootstrap;
-import net.kyori.adventure.audience.MessageType;
-import net.kyori.adventure.identity.Identity;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
-public class VelocityLogger implements net.impactdev.impactor.api.logging.Logger {
+public class VelocityLogger implements Logger {
 
     private final ImpactorPlugin plugin;
+    private final org.slf4j.Logger delegate;
+    private final Map<String, Marker> markers = new HashMap<>();
 
-    public VelocityLogger(ImpactorPlugin plugin) {
+    public VelocityLogger(ImpactorPlugin plugin, org.slf4j.Logger delegate) {
         this.plugin = plugin;
+        this.delegate = delegate;
     }
 
     @Override
-    public void noTag(String message) {
-        VelocityImpactorBootstrap.getInstance().getProxy().getConsoleCommandSource().sendMessage(
-                Identity.nil(),
-                LegacyComponentSerializer.legacyAmpersand().deserialize(message),
-                MessageType.SYSTEM
-        );
+    public void info(String marker, String line) {
+        this.delegate.info(MarkerFactory.getMarker(marker), line);
     }
 
     @Override
-    public void noTag(List<String> message) {
-        message.forEach(this::noTag);
+    public void info(String marker, Collection<String> lines) {
+        lines.forEach(line -> this.info(marker, line));
     }
 
     @Override
-    public void info(String message) {
-        String actual = plugin.getMetadata().getName() + " &7\u00bb " + message;
-
-        VelocityImpactorBootstrap.getInstance().getProxy().getConsoleCommandSource().sendMessage(
-                Identity.nil(),
-                LegacyComponentSerializer.legacyAmpersand().deserialize(actual),
-                MessageType.SYSTEM
-        );
+    public void info(String marker, Supplier<String> supplier) {
+        this.info(marker, supplier.get());
     }
 
     @Override
-    public void info(List<String> message) {
-        message.forEach(this::info);
-    }
-
-
-    @Override
-    public void warn(String message) {
-        String actual = plugin.getMetadata().getName() + " &7(&6Warning&7) " + message;
-
-        VelocityImpactorBootstrap.getInstance().getProxy().getConsoleCommandSource().sendMessage(
-                Identity.nil(),
-                LegacyComponentSerializer.legacyAmpersand().deserialize(actual),
-                MessageType.SYSTEM
-        );
+    public void warn(String marker, String line) {
+        this.delegate.warn(MarkerFactory.getMarker(marker), line);
     }
 
     @Override
-    public void warn(List<String> message) {
-        message.forEach(this::warn);
+    public void warn(String marker, Collection<String> lines) {
+        lines.forEach(line -> this.warn(marker, line));
     }
 
     @Override
-    public void error(String message) {
-        String actual = plugin.getMetadata().getName() + " &7(&cError&7) " + message;
-
-        VelocityImpactorBootstrap.getInstance().getProxy().getConsoleCommandSource().sendMessage(
-                Identity.nil(),
-                LegacyComponentSerializer.legacyAmpersand().deserialize(actual),
-                MessageType.SYSTEM
-        );
+    public void warn(String marker, Supplier<String> supplier) {
+        this.warn(marker, supplier.get());
     }
 
     @Override
-    public void error(List<String> message) {
-        message.forEach(this::error);
+    public void error(String marker, String line) {
+        this.delegate.error(MarkerFactory.getMarker(marker), line);
     }
 
     @Override
-    public void debug(String message) {
-        String actual = plugin.getMetadata().getName() + " &7(&bDebug&7) " + message;
-
-        VelocityImpactorBootstrap.getInstance().getProxy().getConsoleCommandSource().sendMessage(
-                Identity.nil(),
-                LegacyComponentSerializer.legacyAmpersand().deserialize(actual),
-                MessageType.SYSTEM
-        );
+    public void error(String marker, Collection<String> lines) {
+        lines.forEach(line -> this.error(marker, line));
     }
 
-    public void debug(List<String> message) {
-        if(this.plugin.inDebugMode()) {
-            message.forEach(this::debug);
-        }
+    @Override
+    public void error(String marker, Supplier<String> supplier) {
+        this.error(marker, supplier.get());
     }
 
+    @Override
+    public void debug(String marker, String line) {
+        this.delegate.debug(MarkerFactory.getMarker(marker), line);
+    }
+
+    @Override
+    public void debug(String marker, Collection<String> lines) {
+        lines.forEach(line -> this.debug(marker, line));
+    }
+
+    @Override
+    public void debug(String marker, Supplier<String> supplier) {
+        this.debug(marker, supplier.get());
+    }
 }

@@ -39,18 +39,6 @@ public interface Registry {
 
     <T extends Builder<?, ?>> T createBuilder(Class<T> type);
 
-    class Provider<T> {
-
-        private final T instance;
-
-        public Provider(T instance) {
-            this.instance = instance;
-        }
-
-        public T getInstance() {
-            return instance;
-        }
-
-    }
+    record Provider<T>(T instance) {}
 
 }

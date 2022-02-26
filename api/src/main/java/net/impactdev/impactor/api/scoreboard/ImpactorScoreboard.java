@@ -26,6 +26,8 @@
 package net.impactdev.impactor.api.scoreboard;
 
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.placeholders.PlaceholderSources;
+import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
 import net.impactdev.impactor.api.utilities.Builder;
@@ -46,37 +48,68 @@ import java.util.Map;
  * the API allows for updating based on event occurrences. For example, imagine a scoreboard with the
  * following creation design (excuse formatting, 80 character limits are fun):
  *
- * <pre>
- * ImpactorScoreboard scoreboard = ImpactorScoreboard.builder()
- *   .objective(ScoreboardObjective.listening()
- *      .frame(ScoreboardFrame.listening(
- *             TypeToken.get(ServerSideConnectionEvent.class)
- *         )
- *         .text("&e&lImpactDev &7(&b{{impactor:player_count}}&7)")
- *         .bus(PlatformBus.getOrCreate())
- *         .handler((updatable, event) -> {
- *            if(event instanceof ServerSideConnectionEvent.Join
- *               || event instanceof ServerSideConnectionEvent.Disconnect) {
- *               Sponge.server().scheduler().submit(Task.builder()
- *                 .plugin(plugin)
- *                 .execute(updatable::update)
- *                 .delay(Ticks.of(1))
- *                 .build()
- *               );
- *            }
- *         })
- *         .sources(sources)
- *         .build()
- *      )
- *      .build()
- *   )
- * </pre>
+ * <p>
+ * <h2>Creating a Scoreboard</h2>
+ * To create a scoreboard, you'll want to look at {@link ScoreboardLine}, {@link ScoreboardObjective},
+ * and {@link ScoreboardFrame}. These three components provide the means of accessing the many types of
+ * line components provided by the Impactor API. This rule of thumb only applies to using the Impactor
+ * specific providers. Third-party providers can be constructed as valid components where fit.
  *
- * This scoreboard will come with an {@link ScoreboardObjective} that updates its contents for
- * every instance of both login and disconnect events (Event is based on Sponge). Otherwise, the
- * title of the scoreboard remains static.
+ * <p>Below, you can find an example for how to create a scoreboard with this API:
+ * <pre>
+ * private final ImpactorScoreboard&lt;ServerPlayer> scoreboard = ImpactorScoreboard.&lt;ServerPlayer>builder()
+ *             .objective(ScoreboardObjective.constant()
+ *                  .text(Component.text("Impactor Scoreboard Demo")
+ *                      .color(TextColor.color(255, 215, 0))
+ *                  )
+ *                  .build()
+ *              )
+ *             .line(ScoreboardLine.refreshing()
+ *                  .text(StringUtils.repeat("\u25A0", 30))
+ *                  .rate(1)
+ *                  .effects(RGBFadeEffect.builder()
+ *                      .frames(90)
+ *                      .step(3)
+ *                      .start(0)
+ *                      .build()
+ *                  )
+ *                  .async()
+ *                  .build(), 15
+ *             )
+ *             .build()
+ * </pre>
+ * The following code will create a scoreboard with an objective title, which remains static throughout
+ * the scoreboard's lifetime, with the text: Impactor Scoreboard Demo, with a Yellow Gold color. Then,
+ * the only line of this example demonstrates a line which refreshes asynchronously, at a rate of 1 tick,
+ * with a line that is simply a set of 30 squares. These squares are then run through an RGB fade effect
+ * which runs through the visible color spectrum, with each square being a unique color in the set. The
+ * line will also be assigned a score of 15, per the integer specified as the second argument to line().
+ *
+ * <p>Note that the scoreboard is generic, and that's to allow for specification of the type of player that
+ * this scoreboard can be assigned to for a particular platform. In this case, the example makes use of
+ * ServerPlayer, provided by Sponge API 8.
+ *
+ * <p>
+ * <h2>Assigning a Scoreboard to a Player</h2>
+ * To assign a scoreboard to a particular player, you'll want to make use of {@link #assignTo(Object)},
+ * where the provided object is the instance of the player that will be viewing that scoreboard.
+ *
+ * <p>Once assigned, that scoreboard, unless otherwise specified, will be reflective upon them for player
+ * specific placeholders. Additionally, this will produce a copy of this scoreboard, so it's expected
+ * the user of the API will track scoreboard instances via some form of cache, whether that be just a
+ * maintained {@link Map}, or even a cache from Caffeine.
+ *
+ * <p>
+ * <h2>Placeholder Parsing</h2>
+ * Most components of the scoreboard API allows for placeholder sources to be provided for possible
+ * placeholder parsing. These sources are provided through the {@link PlaceholderSources} interface,
+ * which allows for binding a class type with a supplier for the actual object. For all components,
+ * the scoreboard will attempt to provide a source representing the viewing player, as long as no
+ * currently provided player is already available for that line. So, you can have a line on a scoreboard
+ * focus on a player other than the viewer themselves.
  *
  * @param <P> The type of player represented by the platform
+ * @since 4.0.0
  */
 public interface ImpactorScoreboard<P> {
 
@@ -148,7 +181,14 @@ public interface ImpactorScoreboard<P> {
     }
 
     /**
-     * Allows for dynamic building of a scoreboard
+     * Allows for dynamic building of a scoreboard. This builder is responsible for providing the
+     * objective of the scoreboard, then delegating to a sub-builder to specify lines. While a build
+     * method is provided by this builder, it is expected to throw an UnsupportedOperationException
+     * due to the fact that a Scoreboard will require AT LEAST one line to be visible to any
+     * assigned player. Therefore, any use of build() from this builder should be delegated to
+     * {@link LinesComponentBuilder#build()} via the configuration of the objective.
+     *
+     * @param <P> The type of player represented by the platform
      */
     interface ScoreboardBuilder<P> extends Builder<ImpactorScoreboard<P>, ScoreboardBuilder<P>> {
 
@@ -162,7 +202,12 @@ public interface ImpactorScoreboard<P> {
 
     }
 
-    interface LinesComponentBuilder<P> {
+    /**
+     *
+     *
+     * @param <P> The type of player represented by the platform
+     */
+    interface LinesComponentBuilder<P> extends Builder<ImpactorScoreboard<P>, LinesComponentBuilder<P>> {
 
         /**
          * Appends a single line to the scoreboard. If its score matches another line
@@ -182,8 +227,6 @@ public interface ImpactorScoreboard<P> {
          * @return This builder
          */
         LinesComponentBuilder<P> lines(Map<ScoreboardLine, Integer> lines);
-
-        ScoreboardBuilder<P> complete();
 
     }
 

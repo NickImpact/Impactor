@@ -26,8 +26,10 @@
 package net.impactdev.impactor.api.dependencies.relocation;
 
 
+import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.dependencies.Dependency;
 import net.impactdev.impactor.api.dependencies.DependencyManager;
+import net.impactdev.impactor.api.dependencies.ProvidedDependencies;
 import net.impactdev.impactor.api.dependencies.classloader.IsolatedClassLoader;
 
 import java.io.File;
@@ -41,10 +43,18 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Handles class runtime relocation of packages in downloaded dependencies
+ * Handles class runtime relocation of packages in downloaded dependencies.
+ *
+ * Imported from LuckPerms
  */
 public class RelocationHandler {
-	public static final Set<Dependency> DEPENDENCIES = EnumSet.of(Dependency.ASM, Dependency.ASM_COMMONS, Dependency.JAR_RELOCATOR);
+
+	public static final Set<Dependency> DEPENDENCIES = Sets.newHashSet(
+			ProvidedDependencies.ASM,
+			ProvidedDependencies.ASM_COMMONS,
+			ProvidedDependencies.JAR_RELOCATOR
+	);
+
 	private static final String JAR_RELOCATOR_CLASS = "me.lucko.jarrelocator.JarRelocator";
 	private static final String JAR_RELOCATOR_RUN_METHOD = "run";
 

@@ -36,12 +36,16 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public enum DependencyRepository {
 
-    IMPACTDEV("https://maven.impactdev.net/repository/development/", new Tuple<>(3, "https://maven.impactdev.net/service/rest/v1/search/assets/download?repository=development&")) {
+    IMPACTDEV("https://maven.impactdev.net/repository/development/", new Tuple<>(2, "https://maven.impactdev.net/service/rest/v1/search/assets/download?repository=development&")) {
         @Override
         protected URLConnection openConnection(Dependency dependency) throws IOException {
             URLConnection connection = super.openConnection(dependency);
@@ -104,17 +108,17 @@ public enum DependencyRepository {
     }
 
     protected URLConnection openConnection(Dependency dependency) throws IOException {
-        if(dependency.isSnapshot() && this.snapshots != null && this.snapshots.getFirst() > 0) {
+        if(dependency.snapshot() && this.snapshots != null && this.snapshots.getFirst() > 0) {
             URL url;
             if(this.snapshots.getFirst() == 2) {
                 url = new URL(String.format(
                         "%sg=%s&a=%s&v=LATEST",
                         this.snapshots.getSecond(),
-                        dependency.getGroup(),
-                        dependency.getArtifact()
+                        dependency.group(),
+                        dependency.artifact()
                 ));
             } else {
-                url = new URL(String.format("%sgroup=%s&name=%s&sort=version", this.snapshots.getSecond(), dependency.getGroup(), dependency.getArtifact()));
+                url = new URL(String.format("%sgroup=%s&name=%s&sort=version", this.snapshots.getSecond(), dependency.group(), dependency.artifact()));
             }
             return url.openConnection();
         } else {
@@ -141,23 +145,21 @@ public enum DependencyRepository {
 
     public byte[] download(Dependency dependency) throws DependencyDownloadException {
         byte[] bytes = downloadRaw(dependency);
-
-        if(!dependency.isSnapshot()) {
-            // compute a hash for the downloaded file
-            byte[] hash = Dependency.createDigest().digest(bytes);
-
-            // ensure the hash matches the expected checksum
-            if (!dependency.checksumMatches(hash)) {
-                throw new DependencyDownloadException("Downloaded file had an invalid hash. " +
-                        "Expected: " + Base64.getEncoder().encodeToString(dependency.getChecksum()) + " " +
-                        "Actual: " + Base64.getEncoder().encodeToString(hash));
+        Optional<byte[]> checksum = dependency.checksum();
+        if(checksum.isPresent()) {
+            try {
+                byte[] hash = MessageDigest.getInstance("SHA-256").digest(bytes);
+                if(!Arrays.equals(checksum.get(), hash)) {
+                    throw new DependencyDownloadException("Mismatched checksum. " +
+                            "Expected: " + Base64.getEncoder().encodeToString(checksum.get()) + " " +
+                            "Actual: " + Base64.getEncoder().encodeToString(hash));
+                }
+            } catch (NoSuchAlgorithmException e) {
+                throw new DependencyDownloadException("Failed to decode file hash", e);
             }
-
-            Impactor.getInstance().getRegistry().get(ImpactorPlugin.class).getPluginLogger().info("  Successfully downloaded '" + dependency.getFileName() + ".jar' with matching checksum: " + Base64.getEncoder().encodeToString(hash));
-        } else {
-            Impactor.getInstance().getRegistry().get(ImpactorPlugin.class).getPluginLogger().info("  Successfully downloaded '" + dependency.getFileName() + ".jar'");
         }
 
+        Impactor.getInstance().getRegistry().get(ImpactorPlugin.class).getPluginLogger().info("Dependencies", "Successfully downloaded '" + dependency.getFileName() + ".jar'");
         return bytes;
     }
 

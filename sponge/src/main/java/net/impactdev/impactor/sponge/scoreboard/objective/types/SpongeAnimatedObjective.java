@@ -43,6 +43,7 @@ import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Ticks;
 
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -86,7 +87,7 @@ public class SpongeAnimatedObjective extends AbstractSpongeObjective implements 
     }
 
     @Override
-    public int getUpdateAmount() {
+    public int getIterationCount() {
         return this.updates;
     }
 
@@ -188,7 +189,7 @@ public class SpongeAnimatedObjective extends AbstractSpongeObjective implements 
         }
 
         @Override
-        public SpongeAnimatedObjectiveBuilder frames(Iterable<ScoreboardFrame> frames) {
+        public SpongeAnimatedObjectiveBuilder frames(Collection<ScoreboardFrame> frames) {
             for(ScoreboardFrame frame : frames) {
                 this.frames.append(frame);
             }
@@ -208,7 +209,7 @@ public class SpongeAnimatedObjective extends AbstractSpongeObjective implements 
         }
 
         @Override
-        public SpongeAnimatedObjectiveBuilder updates(int amount) {
+        public SpongeAnimatedObjectiveBuilder iterations(int amount) {
             this.updates = amount;
             return this;
         }

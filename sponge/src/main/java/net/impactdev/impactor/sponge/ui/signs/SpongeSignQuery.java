@@ -29,24 +29,13 @@ package net.impactdev.impactor.sponge.ui.signs;
 //import com.ichorpowered.protocolcontrol.packet.PacketDirection;
 //import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
 //import com.ichorpowered.protocolcontrol.service.ProtocolService;
-import net.impactdev.impactor.api.gui.signs.SignQuery;
-import net.impactdev.impactor.api.gui.signs.SignSubmission;
-import net.impactdev.impactor.sponge.listeners.SignListener;
+import net.impactdev.impactor.api.ui.signs.SignQuery;
+import net.impactdev.impactor.api.ui.signs.SignSubmission;
 import net.kyori.adventure.text.TextComponent;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.play.server.SOpenSignMenuPacket;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.util.math.BlockPos;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.IntStream;
 
 public class SpongeSignQuery implements SignQuery<TextComponent, ServerPlayer, Vector3i> {
 

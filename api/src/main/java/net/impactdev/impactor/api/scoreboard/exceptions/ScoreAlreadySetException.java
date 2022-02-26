@@ -25,4 +25,7 @@
 
 package net.impactdev.impactor.api.scoreboard.exceptions;
 
+/**
+ * Indicates that a score for a line is already set, and that the score should not be updated again.
+ */
 public class ScoreAlreadySetException extends RuntimeException {}

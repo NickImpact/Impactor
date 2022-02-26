@@ -27,11 +27,16 @@ package net.impactdev.impactor.api.dependencies.relocation;
 
 import java.util.Objects;
 
+/**
+ * Represents a relocation pattern that should be applied to a package scheme within a jar.
+ *
+ * Imported from LuckPerms
+ */
 public final class Relocation {
 	public static final String RELOCATION_PREFIX = "net.impactdev.impactor.relocations.";
 
-	public static Relocation of(String id, String pattern) {
-		return new Relocation(pattern.replace("{}", "."), RELOCATION_PREFIX + id);
+	public static Relocation of(String pattern, String replacement) {
+		return new Relocation(pattern.replace("{}", "."), RELOCATION_PREFIX + replacement);
 	}
 
 	private final String pattern;

@@ -31,6 +31,7 @@ import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.Dependency;
 import net.impactdev.impactor.api.dependencies.DependencyManager;
+import net.impactdev.impactor.api.dependencies.ProvidedDependencies;
 import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
 import net.impactdev.impactor.api.dependencies.classpath.ReflectionClassPathAppender;
 import net.impactdev.impactor.api.event.EventBus;
@@ -55,12 +56,12 @@ public class VelocityImpactorPlugin extends AbstractVelocityPlugin implements De
 
     private final VelocityImpactorBootstrap bootstrap;
 
-    public VelocityImpactorPlugin(VelocityImpactorBootstrap bootstrap) {
+    public VelocityImpactorPlugin(VelocityImpactorBootstrap bootstrap, org.slf4j.Logger logger) {
         super(PluginMetadata.builder()
                 .id("impactor")
                 .name("Impactor")
                 .version("@version@")
-                .build());
+                .build(), logger);
         this.bootstrap = bootstrap;
 
         instance = this;
@@ -73,7 +74,7 @@ public class VelocityImpactorPlugin extends AbstractVelocityPlugin implements De
         Impactor.getInstance().getRegistry().register(ClassPathAppender.class, new ReflectionClassPathAppender(this.getClass().getClassLoader()));
         Impactor.getInstance().getRegistry().register(DependencyManager.class, new DependencyManager(this));
 
-        this.getPluginLogger().info("Pooling plugin dependencies...");
+        this.getPluginLogger().info("Startup", "Pooling plugin dependencies...");
         List<Dependency> toLaunch = Lists.newArrayList();
         for(ImpactorPlugin plugin : PluginRegistry.getAll()) {
             if(plugin instanceof Depending) {
@@ -97,9 +98,15 @@ public class VelocityImpactorPlugin extends AbstractVelocityPlugin implements De
             }
         }
 
-        this.getPluginLogger().info("Dependencies found, setting these up now...");
-        this.getPluginLogger().info("Initializing default dependencies...");
-        this.getDependencyManager().loadDependencies(EnumSet.of(Dependency.CONFIGURATE_CORE, Dependency.CONFIGURATE_HOCON, Dependency.HOCON_CONFIG, Dependency.CONFIGURATE_GSON, Dependency.CONFIGURATE_YAML));
+        this.getPluginLogger().info("Startup", "Dependencies found, setting these up now...");
+        this.getPluginLogger().info("Startup", "Initializing default dependencies...");
+        this.getDependencyManager().loadDependencies(Lists.newArrayList(
+                ProvidedDependencies.CONFIGURATE_CORE,
+                ProvidedDependencies.CONFIGURATE_HOCON,
+                ProvidedDependencies.TYPESAFE_CONFIG,
+                ProvidedDependencies.CONFIGURATE_GSON,
+                ProvidedDependencies.CONFIGURATE_YAML
+        ));
         this.getDependencyManager().loadDependencies(new HashSet<>(toLaunch));
 
         Impactor.getInstance().getRegistry().register(EventBus.class, new VelocityEventBus(this.bootstrap));
@@ -121,11 +128,12 @@ public class VelocityImpactorPlugin extends AbstractVelocityPlugin implements De
     @Override
     public List<Dependency> getAllDependencies() {
         return ImmutableList.copyOf(Lists.newArrayList(
-                Dependency.KYORI_EVENT,
-                Dependency.KYORI_EVENT_METHOD,
-                Dependency.KYORI_EVENT_METHOD_ASM,
-                Dependency.BYTEBUDDY,
-                Dependency.OBJECT_WEB
+                ProvidedDependencies.KYORI_EVENT_API,
+                ProvidedDependencies.KYORI_EVENT_METHOD,
+                ProvidedDependencies.KYORI_EVENT_METHOD_ASM,
+                ProvidedDependencies.BYTEBUDDY,
+                ProvidedDependencies.ASM,
+                ProvidedDependencies.ASM_COMMONS
         ));
     }
 

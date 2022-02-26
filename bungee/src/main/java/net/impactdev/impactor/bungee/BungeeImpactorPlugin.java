@@ -30,6 +30,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.Dependency;
+import net.impactdev.impactor.api.dependencies.ProvidedDependencies;
 import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
 import net.impactdev.impactor.api.dependencies.classpath.ReflectionClassPathAppender;
 import net.impactdev.impactor.api.event.EventBus;
@@ -48,12 +49,13 @@ import net.impactdev.impactor.common.api.ApiRegistrationUtil;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class BungeeImpactorPlugin extends AbstractBungeePlugin implements Depending {
 
 	private final BungeeImpactorBootstrap bootstrap;
 
-	public BungeeImpactorPlugin(BungeeImpactorBootstrap bootstrap, java.util.logging.Logger logger) {
+	public BungeeImpactorPlugin(BungeeImpactorBootstrap bootstrap, Logger logger) {
 		super(PluginMetadata.builder().id("impactor").name("Impactor").version("@version@").build(), logger);
 		this.bootstrap = bootstrap;
 	}
@@ -69,7 +71,7 @@ public class BungeeImpactorPlugin extends AbstractBungeePlugin implements Depend
 		Impactor.getInstance().getRegistry().register(ClassPathAppender.class, new ReflectionClassPathAppender(this.getClass().getClassLoader()));
 		Impactor.getInstance().getRegistry().register(DependencyManager.class, new DependencyManager(this));
 
-		this.getPluginLogger().info("Pooling plugin dependencies...");
+		this.getPluginLogger().info("Startup", "Pooling plugin dependencies...");
 		List<Dependency> toLaunch = Lists.newArrayList();
 		for(ImpactorPlugin plugin : PluginRegistry.getAll()) {
 			if(plugin instanceof Depending) {
@@ -93,9 +95,15 @@ public class BungeeImpactorPlugin extends AbstractBungeePlugin implements Depend
 			}
 		}
 
-		this.getPluginLogger().info("Dependencies found, setting these up now...");
-		this.getPluginLogger().info("Initializing default dependencies...");
-		this.getDependencyManager().loadDependencies(EnumSet.of(Dependency.CONFIGURATE_CORE, Dependency.CONFIGURATE_HOCON, Dependency.HOCON_CONFIG, Dependency.CONFIGURATE_GSON, Dependency.CONFIGURATE_YAML));
+		this.getPluginLogger().info("Startup", "Dependencies found, setting these up now...");
+		this.getPluginLogger().info("Startup", "Initializing default dependencies...");
+		this.getDependencyManager().loadDependencies(Lists.newArrayList(
+				ProvidedDependencies.CONFIGURATE_CORE,
+				ProvidedDependencies.CONFIGURATE_HOCON,
+				ProvidedDependencies.TYPESAFE_CONFIG,
+				ProvidedDependencies.CONFIGURATE_GSON,
+				ProvidedDependencies.CONFIGURATE_YAML
+		));
 		this.getDependencyManager().loadDependencies(new HashSet<>(toLaunch));
 
 		Impactor.getInstance().getRegistry().register(EventBus.class, new BungeeEventBus(this.bootstrap));
@@ -108,16 +116,22 @@ public class BungeeImpactorPlugin extends AbstractBungeePlugin implements Depend
 	@Override
 	public List<Dependency> getAllDependencies() {
 		return ImmutableList.copyOf(Lists.newArrayList(
-				Dependency.KYORI_EVENT,
-				Dependency.KYORI_EVENT_METHOD,
-				Dependency.KYORI_EVENT_METHOD_ASM,
-				Dependency.BYTEBUDDY,
-				Dependency.OBJECT_WEB
+				ProvidedDependencies.KYORI_EVENT_API,
+				ProvidedDependencies.KYORI_EVENT_METHOD,
+				ProvidedDependencies.KYORI_EVENT_METHOD_ASM,
+				ProvidedDependencies.BYTEBUDDY,
+				ProvidedDependencies.ASM,
+				ProvidedDependencies.ASM_COMMONS
 		));
 	}
 
 	@Override
 	public List<StorageType> getStorageRequirements() {
 		return Lists.newArrayList();
+	}
+
+	@Override
+	public boolean inDebugMode() {
+		return super.inDebugMode();
 	}
 }

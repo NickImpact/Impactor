@@ -25,6 +25,11 @@
 
 package net.impactdev.impactor.api.utilities;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * A builder follows the concepts of the typical Builder design.
  *
@@ -36,5 +41,14 @@ public interface Builder<T, B> {
     B from(T input);
 
     T build();
+
+    /**
+     * Indicates a builder method that is required to be set by the end user. If the builder
+     * does not invoke a required method, it is expected that {@link #build()} will invoke an
+     * exception.
+     */
+    @Retention(RetentionPolicy.SOURCE)
+    @Target(ElementType.METHOD)
+    @interface Required {}
 
 }

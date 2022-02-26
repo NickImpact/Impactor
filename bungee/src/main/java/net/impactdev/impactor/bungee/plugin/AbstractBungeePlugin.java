@@ -34,11 +34,11 @@ import net.impactdev.impactor.bungee.logging.BungeeLogger;
 public abstract class AbstractBungeePlugin implements ImpactorPlugin {
 
     private final PluginMetadata metadata;
-    private final Logger pluginLogger;
+    private final Logger logger;
 
-    public AbstractBungeePlugin(PluginMetadata metadata, java.util.logging.Logger logger) {
+    public AbstractBungeePlugin(PluginMetadata metadata, java.util.logging.Logger delegate) {
         this.metadata = metadata;
-        this.pluginLogger = new BungeeLogger(logger);
+        this.logger = new BungeeLogger(this, delegate);
 
         PluginRegistry.register(this);
     }
@@ -50,7 +50,8 @@ public abstract class AbstractBungeePlugin implements ImpactorPlugin {
 
     @Override
     public Logger getPluginLogger() {
-        return this.pluginLogger;
+        return this.logger;
     }
+
 
 }

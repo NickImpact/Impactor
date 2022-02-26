@@ -65,7 +65,7 @@ public class DependencyManager {
 	private final Path cacheDirectory;
 
 	/** A map of dependencies which have already been loaded */
-	private final EnumMap<Dependency, Path> loaded = new EnumMap<>(Dependency.class);
+	private final Map<Dependency, Path> loaded = new HashMap<>();
 	/** A map of isolated classloaders which have been created */
 	private final Map<ImmutableSet<Dependency>, IsolatedClassLoader> loaders = new HashMap<>();
 	/** Cached relocation handler instance */
@@ -100,7 +100,7 @@ public class DependencyManager {
 
 		for (Dependency dependency : dependencies) {
 			if (!this.loaded.containsKey(dependency)) {
-				throw new IllegalStateException("Dependency " + dependency + " is not loaded.");
+				throw new IllegalStateException("Dependency " + dependency.name() + " is not loaded.");
 			}
 		}
 
@@ -136,7 +136,7 @@ public class DependencyManager {
 			try {
 				this.loadDependency(dependency);
 			} catch (Throwable e) {
-				this.plugin.getPluginLogger().error("  * Unable to load dependency " + dependency.name() + "*");
+				this.plugin.getPluginLogger().error("Dependencies", "Unable to load dependency " + dependency.name());
 				e.printStackTrace();
 			}
 		}
@@ -147,7 +147,7 @@ public class DependencyManager {
 			return;
 		}
 
-		this.plugin.getPluginLogger().info("Attempting to load dependency: " + dependency);
+		this.plugin.getPluginLogger().info("Dependencies", "Loading dependency: " + dependency.name());
 		Path file = remapDependency(dependency, downloadDependency(dependency));
 
 		this.loaded.put(dependency, file);
@@ -163,7 +163,6 @@ public class DependencyManager {
 			return file;
 		}
 
-		this.plugin.getPluginLogger().info("  Dependency not found, downloading now...");
 		DependencyDownloadException last = null;
 		for(DependencyRepository repository : DependencyRepository.values()) {
 			try {
@@ -178,7 +177,7 @@ public class DependencyManager {
 	}
 
 	private Path remapDependency(Dependency dependency, Path normalFile) throws Exception {
-		List<Relocation> rules = Lists.newArrayList(dependency.getRelocations());
+		List<Relocation> rules = Lists.newArrayList(dependency.relocations());
 
 		if(rules.isEmpty()) {
 			return normalFile;
@@ -190,8 +189,7 @@ public class DependencyManager {
 			return remapped;
 		}
 
-		this.plugin.getPluginLogger().info("  Applying relocations to " + normalFile.getFileName().toString() + "...");
-		getRelocationHandler().remap(normalFile, remapped, rules);
+		this.getRelocationHandler().remap(normalFile, remapped, rules);
 		return remapped;
 	}
 

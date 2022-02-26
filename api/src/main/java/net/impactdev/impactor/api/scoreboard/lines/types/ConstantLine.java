@@ -25,22 +25,49 @@
 
 package net.impactdev.impactor.api.scoreboard.lines.types;
 
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.utilities.Builder;
 import net.kyori.adventure.text.Component;
 
+/**
+ * Represents a line on a scoreboard that makes no attempt to ever update. This line uses a component
+ * that is either available at construction, or parsed when a player is assigned to the line.
+ */
 public interface ConstantLine extends ScoreboardLine {
-
-    static ConstantLineBuilder builder() {
-        return Impactor.getInstance().getRegistry().createBuilder(ConstantLineBuilder.class);
-    }
 
     interface ConstantLineBuilder extends Builder<ConstantLine, ConstantLineBuilder> {
 
+        /**
+         * Creates a line that is lazily constructed, using raw input as its constant text
+         * that is parsed once and only once upon player assignment.
+         *
+         * @param raw The text to parse when assigned to a player
+         * @return The builder
+         */
+        default ConstantLineBuilder text(String raw) {
+            return this.text(raw, PlaceholderSources.empty());
+        }
+
+        /**
+         * Creates a line that is lazily constructed, using raw input as its constant text
+         * that is parsed once and only once upon player assignment. The additional
+         * sources parameter allows for placeholder parsing outside of just the viewing player,
+         * should another source for a placeholder be necessary.
+         *
+         * @param raw The text to parse when assigned to a player
+         * @param sources A set of sources that can aid in placeholder parsing.
+         * @return The builder
+         */
         ConstantLineBuilder text(String raw, PlaceholderSources sources);
 
+        /**
+         * Creates a line that will do no parsing at all, but rather use the already generated
+         * component as its viewable text.
+         *
+         * @param text The text the line should display
+         * @return The builder
+         */
         ConstantLineBuilder text(Component text);
 
     }

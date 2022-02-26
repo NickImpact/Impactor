@@ -51,10 +51,10 @@ public abstract class Adapter<E> implements JsonSerializer<E>, JsonDeserializer<
 		try {
 			return ctx.deserialize(json, Objects.requireNonNull(this.getRegistry().get(json.getAsJsonObject().get("type").getAsString().toLowerCase())));
 		} catch (Exception e) {
-			plugin.getPluginLogger().error(Lists.newArrayList(
+			plugin.getPluginLogger().error("JSON", Lists.newArrayList(
 				"Unable to parse JSON data, an error will be listed below:"
 			));
-			plugin.getPluginLogger().error("Unparsable JSON: \n" + json.toString());
+			plugin.getPluginLogger().error("JSON", "Unparsable JSON: \n" + json.toString());
 			e.printStackTrace();
 			throw new JsonParseException(e.getMessage());
 		}

@@ -41,10 +41,10 @@ public class VelocityImpactorBootstrap {
     private final ProxyServer server;
 
     @Inject
-    public VelocityImpactorBootstrap(ProxyServer server) {
+    public VelocityImpactorBootstrap(ProxyServer server, org.slf4j.Logger logger) {
         instance = this;
         this.server = server;
-        this.plugin = new VelocityImpactorPlugin(this);
+        this.plugin = new VelocityImpactorPlugin(this, logger);
     }
 
     @Subscribe

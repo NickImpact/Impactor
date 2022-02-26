@@ -49,7 +49,7 @@ public final class ImpactorRegistry implements Registry {
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> type) {
         Preconditions.checkArgument(bindings.containsKey(type), "Could not locate a matching registration for type: " + type.getCanonicalName());
-        return (T) bindings.get(type).getInstance();
+        return (T) bindings.get(type).instance();
     }
 
     @Override

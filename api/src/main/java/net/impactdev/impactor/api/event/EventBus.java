@@ -140,12 +140,16 @@ public interface EventBus {
     @NonNull <T extends ImpactorEvent> EventSubscription<T> subscribe(Object plugin, @NonNull Class<T> eventClass, @NonNull Consumer<? super T> handler);
 
     /**
+     * Registers a new subscription to an event with the specified {@link TypeToken}.
      *
+     * <p>The returned {@link EventSubscription} instance encapsulates the subscription state. It has
+     * methods which can be used to terminate the subscription, or view stats about the nature of
+     * the subscription.</p>
      *
-     * @param type
-     * @param handler
-     * @param <T>
-     * @return
+     * @param type The type token representing the event
+     * @param handler The event handler
+     * @param <T> The event class typing
+     * @return an event handler instance representing this subscription
      */
     @NonNull <T extends ImpactorEvent> EventSubscription<T> subscribe(@NonNull TypeToken<T> type, Consumer<? extends T> handler);
 

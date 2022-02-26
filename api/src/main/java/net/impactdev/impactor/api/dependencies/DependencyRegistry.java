@@ -27,22 +27,24 @@ package net.impactdev.impactor.api.dependencies;
 
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.storage.StorageType;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 public class DependencyRegistry {
 
 	private static final ListMultimap<StorageType, Dependency> STORAGE_DEPENDENCIES = ImmutableListMultimap.<StorageType, Dependency>builder()
-			.putAll(StorageType.YAML, Dependency.CONFIGURATE_CORE, Dependency.CONFIGURATE_YAML)
-			.putAll(StorageType.JSON, Dependency.CONFIGURATE_CORE, Dependency.CONFIGURATE_GSON)
-			.putAll(StorageType.HOCON, Dependency.HOCON_CONFIG, Dependency.CONFIGURATE_CORE, Dependency.CONFIGURATE_HOCON)
-			.putAll(StorageType.MONGODB, Dependency.MONGODB_DRIVER)
-			.putAll(StorageType.MARIADB, Dependency.MARIADB_DRIVER, Dependency.SLF4J_API, Dependency.SLF4J_SIMPLE, Dependency.HIKARI)
-			.putAll(StorageType.MYSQL, Dependency.MYSQL_DRIVER, Dependency.SLF4J_API, Dependency.SLF4J_SIMPLE, Dependency.HIKARI)
-			.putAll(StorageType.H2, Dependency.H2_DRIVER)
+			.putAll(StorageType.YAML, ProvidedDependencies.CONFIGURATE_CORE, ProvidedDependencies.CONFIGURATE_YAML)
+			.putAll(StorageType.JSON, ProvidedDependencies.CONFIGURATE_CORE, ProvidedDependencies.CONFIGURATE_GSON)
+			.putAll(StorageType.HOCON, ProvidedDependencies.TYPESAFE_CONFIG, ProvidedDependencies.CONFIGURATE_CORE, ProvidedDependencies.CONFIGURATE_HOCON)
+			.putAll(StorageType.MONGODB, ProvidedDependencies.MONGODB)
+			.putAll(StorageType.MARIADB, ProvidedDependencies.MARIADB, ProvidedDependencies.SLF4J_API, ProvidedDependencies.SLF4J_SIMPLE, ProvidedDependencies.HIKARI)
+			.putAll(StorageType.MYSQL, ProvidedDependencies.MYSQL, ProvidedDependencies.SLF4J_API, ProvidedDependencies.SLF4J_SIMPLE, ProvidedDependencies.HIKARI)
+			.putAll(StorageType.H2, ProvidedDependencies.H2)
 			.build();
 
 	public Set<Dependency> resolveStorageDependencies(Collection<StorageType> storageTypes) {
@@ -52,9 +54,9 @@ public class DependencyRegistry {
 		}
 
 		// don't load slf4j if it's already present
-		if ((dependencies.contains(Dependency.SLF4J_API) || dependencies.contains(Dependency.SLF4J_SIMPLE)) && slf4jPresent()) {
-			dependencies.remove(Dependency.SLF4J_API);
-			dependencies.remove(Dependency.SLF4J_SIMPLE);
+		if ((dependencies.contains(ProvidedDependencies.SLF4J_API) || dependencies.contains(ProvidedDependencies.SLF4J_SIMPLE)) && slf4jPresent()) {
+			dependencies.remove(ProvidedDependencies.SLF4J_API);
+			dependencies.remove(ProvidedDependencies.SLF4J_SIMPLE);
 		}
 
 		return dependencies;
@@ -74,17 +76,13 @@ public class DependencyRegistry {
 	}
 
 	public boolean shouldAutoLoad(Dependency dependency) {
-		switch (dependency) {
-			// all used within 'isolated' classloaders, and are therefore not
-			// relocated.
-			case ASM:
-			case ASM_COMMONS:
-			case JAR_RELOCATOR:
-			case H2_DRIVER:
-				return false;
-			default:
-				return true;
-		}
+		List<Dependency> list = Lists.newArrayList(
+				ProvidedDependencies.ASM,
+				ProvidedDependencies.ASM_COMMONS,
+				ProvidedDependencies.JAR_RELOCATOR,
+				ProvidedDependencies.H2
+		);
+		return !list.contains(dependency);
 	}
 
 }

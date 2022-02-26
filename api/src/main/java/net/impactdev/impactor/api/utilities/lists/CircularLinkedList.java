@@ -50,6 +50,7 @@ public class CircularLinkedList<E> implements Iterable<E> {
 		return list;
 	}
 
+	@SuppressWarnings("UnusedAssignment")
 	public void append(E value) {
 		Node<E> node = new Node<>(value);
 
@@ -81,6 +82,24 @@ public class CircularLinkedList<E> implements Iterable<E> {
 		return Optional.ofNullable(this.current.getValue());
 	}
 
+	public E nextOrThrow() {
+		if(this.current == null) {
+			this.current = this.head;
+		} else {
+			if(this.current == this.tail) {
+				this.current = this.head;
+			} else {
+				this.current = this.current.next;
+			}
+		}
+
+		if(this.current == null) {
+			throw new IllegalStateException("No available element");
+		}
+
+		return this.current.getValue();
+	}
+
 	public List<E> getFramesNonCircular() {
 		List<E> output = Lists.newArrayList();
 		Node<E> working = this.head;
@@ -102,6 +121,19 @@ public class CircularLinkedList<E> implements Iterable<E> {
 
 	public int size() {
 		return this.getFramesNonCircular().size();
+	}
+
+	public E at(int index) throws IndexOutOfBoundsException {
+		if(index >= this.size() || index < 0) {
+			throw new IndexOutOfBoundsException(index);
+		}
+
+		Node<E> node = this.head;
+		for(int i = 0; i < index; i++) {
+			node = node.next;
+		}
+
+		return node.getValue();
 	}
 
 	@NotNull

@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.sponge.scoreboard;
 
-import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.modules.Module;
 import net.impactdev.impactor.api.registry.Registry;
 import net.impactdev.impactor.api.scoreboard.ImpactorScoreboard;
 import net.impactdev.impactor.api.scoreboard.frames.types.ConstantFrame;
@@ -51,11 +51,9 @@ import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeConstantOb
 import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeListeningObjective;
 import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeRefreshingObjective;
 
-public class ScoreboardModule {
+public class ScoreboardModule implements Module {
 
-    public void initialize() {
-        Registry registry = Impactor.getInstance().getRegistry();
-
+    public void initialize(Registry registry) {
         // General Scoreboard
         registry.registerBuilderSupplier(ImpactorScoreboard.ScoreboardBuilder.class, SpongeScoreboard.SpongeScoreboardBuilder::new);
 

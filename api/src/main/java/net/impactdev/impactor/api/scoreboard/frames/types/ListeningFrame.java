@@ -61,7 +61,7 @@ public interface ListeningFrame<L> extends ScoreboardFrame.UpdatableFrame {
 
         /**
          * Sets the frame to listen against events of the following type. This is normally set during
-         * construction of the builder via {@link ScoreboardFrame#listening(TypeToken, Class)}, so you can avoid using
+         * construction of the builder via {@link ScoreboardFrame#listening(TypeToken)}, so you can avoid using
          * this method.
          *
          * @param event The event type this frame should represent
@@ -122,9 +122,10 @@ public interface ListeningFrame<L> extends ScoreboardFrame.UpdatableFrame {
          * @param updatable The updatable instance to update
          * @param assignee The player assigned to the scoreboard this line is listening to
          * @param event The event that was posted to the event bus
+         * @return <code>true</code> if the line should update, false otherwise
          * @throws RuntimeException If any component of the processor fails
          */
-        void process(Updatable updatable, UUID assignee, L event) throws RuntimeException;
+        boolean process(Updatable updatable, UUID assignee, L event) throws RuntimeException;
 
     }
 

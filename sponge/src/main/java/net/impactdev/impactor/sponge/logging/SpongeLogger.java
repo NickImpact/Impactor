@@ -33,125 +33,90 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 import org.spongepowered.api.Sponge;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 public class SpongeLogger implements Logger {
 
-    private final ImpactorPlugin plugin;
-    private final org.apache.logging.log4j.Logger fallback;
+    private final org.apache.logging.log4j.Logger delegate;
+    private final Map<String, Marker> markers = new HashMap<>();
 
-    public SpongeLogger(ImpactorPlugin plugin, org.apache.logging.log4j.Logger fallback) {
-        this.plugin = plugin;
-        this.fallback = fallback;
+    public SpongeLogger(org.apache.logging.log4j.Logger delegate) {
+        this.delegate = delegate;
     }
 
     @Override
-    public void noTag(String message) {
-        if (Sponge.isServerAvailable()) {
-            Sponge.server().sendMessage(Identity.nil(), this.toText(message), MessageType.SYSTEM);
-        } else {
-            fallback.info(message);
-        }
+    public void info(String marker, String line) {
+        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        this.delegate.info(m, line);
     }
 
     @Override
-    public void noTag(List<String> message) {
-        message.forEach(this::noTag);
+    public void info(String marker, Collection<String> lines) {
+        lines.forEach(line -> this.info(marker, line));
     }
 
     @Override
-    public void info(String message) {
-        if (Sponge.isServerAvailable()) {
-            Sponge.game().systemSubject().sendMessage(
-                    Identity.nil(),
-                    Component.text(plugin.getMetadata().getName()).color(NamedTextColor.YELLOW)
-                            .append(Component.text(" \u00bb ").color(NamedTextColor.GRAY))
-                            .append(this.toText(message)),
-                    MessageType.CHAT
-            );
-        } else {
-            fallback.info(message);
-        }
+    public void info(String marker, Supplier<String> supplier) {
+        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        this.delegate.info(m, supplier);
     }
 
     @Override
-    public void info(List<String> message) {
-        message.forEach(this::info);
+    public void warn(String marker, String line) {
+        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        this.delegate.warn(m, line);
     }
 
     @Override
-    public void warn(String message) {
-        if (Sponge.isServerAvailable()) {
-            Sponge.game().systemSubject().sendMessage(
-                    Identity.nil(),
-                    Component.text(plugin.getMetadata().getName()).color(NamedTextColor.YELLOW)
-                            .append(Component.text("(").color(NamedTextColor.GRAY))
-                            .append(Component.text("Warning").color(NamedTextColor.GOLD))
-                            .append(Component.text(")").color(NamedTextColor.GRAY))
-                            .append(this.toText(message)),
-                    MessageType.CHAT
-            );
-        } else {
-            fallback.warn(message);
-        }
+    public void warn(String marker, Collection<String> lines) {
+        lines.forEach(line -> this.warn(marker, line));
     }
 
     @Override
-    public void warn(List<String> message) {
-        message.forEach(this::warn);
+    public void warn(String marker, Supplier<String> supplier) {
+        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        this.delegate.warn(m, supplier);
     }
 
     @Override
-    public void error(String message) {
-        if (Sponge.isServerAvailable()) {
-            Sponge.game().systemSubject().sendMessage(
-                    Identity.nil(),
-                    Component.text(plugin.getMetadata().getName()).color(NamedTextColor.YELLOW)
-                            .append(Component.text("(").color(NamedTextColor.GRAY))
-                            .append(Component.text("Error").color(NamedTextColor.RED))
-                            .append(Component.text(")").color(NamedTextColor.GRAY))
-                            .append(this.toText(message)),
-                    MessageType.CHAT
-            );
-        } else {
-            fallback.warn(message);
-        }
+    public void error(String marker, String line) {
+        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        this.delegate.error(m, line);
     }
 
     @Override
-    public void error(List<String> message) {
-        message.forEach(this::error);
+    public void error(String marker, Collection<String> lines) {
+        lines.forEach(line -> this.error(marker, line));
     }
 
     @Override
-    public void debug(String message) {
-        if (this.plugin.inDebugMode()) {
-            if (Sponge.isServerAvailable()) {
-                Sponge.game().systemSubject().sendMessage(
-                        Identity.nil(),
-                        Component.text(plugin.getMetadata().getName()).color(NamedTextColor.YELLOW)
-                                .append(Component.text("(").color(NamedTextColor.GRAY))
-                                .append(Component.text("Debug").color(NamedTextColor.AQUA))
-                                .append(Component.text(")").color(NamedTextColor.GRAY))
-                                .append(this.toText(message)),
-                        MessageType.CHAT
-                );
-            } else {
-                fallback.warn(message);
-            }
-        }
+    public void error(String marker, Supplier<String> supplier) {
+        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        this.delegate.error(m, supplier);
     }
 
     @Override
-    public void debug(List<String> message) {
-        if (this.plugin.inDebugMode()) {
-            message.forEach(this::debug);
-        }
+    public void debug(String marker, String line) {
+        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        this.delegate.debug(m, line);
     }
 
-    private TextComponent toText(String message) {
-        return LegacyComponentSerializer.legacyAmpersand().deserialize(message);
+    @Override
+    public void debug(String marker, Collection<String> lines) {
+        lines.forEach(line -> this.debug(marker, line));
+    }
+
+    @Override
+    public void debug(String marker, Supplier<String> supplier) {
+        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        this.delegate.debug(m, supplier);
     }
 }

@@ -25,16 +25,11 @@
 
 package net.impactdev.impactor.sponge.listeners;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 //import com.ichorpowered.protocolcontrol.event.PacketEvent;
-import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.gui.signs.SignQuery;
+import net.impactdev.impactor.api.ui.signs.SignQuery;
 //import net.kyori.event.method.annotation.Subscribe;
 import net.kyori.adventure.text.TextComponent;
-import net.minecraft.network.play.client.CUpdateSignPacket;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.math.vector.Vector3i;
 

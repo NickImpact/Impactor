@@ -27,7 +27,6 @@ package net.impactdev.impactor.bungee.configuration;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.configuration.ConfigurationAdapter;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;

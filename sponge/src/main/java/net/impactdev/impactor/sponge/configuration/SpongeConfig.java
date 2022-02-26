@@ -27,8 +27,8 @@ package net.impactdev.impactor.sponge.configuration;
 
 import net.impactdev.impactor.api.configuration.Config;
 import net.impactdev.impactor.api.configuration.ConfigKey;
-import net.impactdev.impactor.api.configuration.ConfigKeyHolder;
 import net.impactdev.impactor.api.configuration.ConfigurationAdapter;
+import net.impactdev.impactor.api.configuration.holder.KeyLoader;
 import net.impactdev.impactor.api.configuration.keys.EnduringKey;
 
 public class SpongeConfig implements Config {
@@ -42,11 +42,11 @@ public class SpongeConfig implements Config {
 	private Object[] values = null;
 
 	private final ConfigurationAdapter adapter;
-	private final ConfigKeyHolder holder;
+	private final KeyLoader loader;
 
-	public SpongeConfig(ConfigurationAdapter adapter, ConfigKeyHolder holder) {
+	public SpongeConfig(ConfigurationAdapter adapter, Object provider) {
 		this.adapter = adapter;
-		this.holder = holder;
+		this.loader = new KeyLoader(provider);
 		load();
 	}
 
@@ -63,11 +63,11 @@ public class SpongeConfig implements Config {
 
 		// if values are null, must be loading for the first time
 		if (this.values == null) {
-			this.values = new Object[holder.getSize()];
+			this.values = new Object[this.loader.size()];
 			reload = false;
 		}
 
-		for (ConfigKey<?> key : holder.getKeys().values()) {
+		for (ConfigKey<?> key : this.loader.keys()) {
 			// don't reload enduring keys.
 			if (reload && key instanceof EnduringKey) {
 				continue;

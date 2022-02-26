@@ -1,39 +1,21 @@
 import org.spongepowered.gradle.plugin.config.PluginLoaders
 import org.spongepowered.plugin.metadata.model.PluginDependency
 
-buildscript {
-    repositories {
-        maven {
-            name = "forge"
-            url = "https://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = 'sponge'
-            url = 'https://repo.spongepowered.org/maven'
-        }
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-    }
-}
-
 plugins {
     id 'org.spongepowered.gradle.plugin' version '2.0.0'
+    id 'org.spongepowered.gradle.vanilla' version '0.2'
 }
-
-apply plugin: 'net.minecraftforge.gradle'
 
 ext {
     sponge = "8.0.0"
 }
 
 minecraft {
-    // The mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   Snapshot are built nightly.
-    // stable_#            Stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'official', version: '1.16.5'
+    version("1.16.5")
+    runs {
+        //server()
+        client()
+    }
 }
 
 sponge {
@@ -71,10 +53,6 @@ repositories {
         name 'Sponge Releases'
         url 'https://repo.spongepowered.org/repository/maven-releases'
     }
-    maven {
-        name 'Sponge Legacy Repository'
-        url 'https://repo.spongepowered.org/repository/sponge-legacy'
-    }
     maven { url = 'https://jitpack.io' }
     maven {
         name = "Impact-Dev"
@@ -86,15 +64,11 @@ dependencies {
     api project(':api')
     api project(':common')
 
-    minecraft 'net.minecraftforge:forge:1.16.5-36.0.48'
+    compileOnly fileTree(dir: 'libs', include: '*.jar')
 
     shadow 'org.spongepowered:math:2.0.0'
     shadow 'com.github.ben-manes.caffeine:caffeine:2.8.4'
     shadow 'me.lucko:jar-relocator:1.5'
-    api("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT") {
-        exclude(module: 'adventure-api')
-        exclude(module: 'adventure-key')
-    }
 }
 
 blossom {
@@ -134,8 +108,4 @@ shadowJar {
     relocate ('com.github.benmanes.caffeine', 'net.impactdev.impactor.relocations.caffeine')
 }
 
-reobf {
-    shadowJar {}
-}
-
-build.dependsOn reobfShadowJar
+build.dependsOn shadowJar

@@ -25,9 +25,9 @@
 
 package net.impactdev.impactor.api.storage.file.loaders;
 
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.gson.GsonConfigurationLoader;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.gson.GsonConfigurationLoader;
+import org.spongepowered.configurate.loader.ConfigurationLoader;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -37,9 +37,9 @@ public class JsonLoader implements ConfigurateLoader {
     @Override
     public ConfigurationLoader<? extends ConfigurationNode> loader(Path path) {
         return GsonConfigurationLoader.builder()
-                .setIndent(2)
-                .setSource(() -> Files.newBufferedReader(path, StandardCharsets.UTF_8))
-                .setSink(() -> Files.newBufferedWriter(path, StandardCharsets.UTF_8))
+                .indent(2)
+                .source(() -> Files.newBufferedReader(path, StandardCharsets.UTF_8))
+                .sink(() -> Files.newBufferedWriter(path, StandardCharsets.UTF_8))
                 .build();
     }
 }

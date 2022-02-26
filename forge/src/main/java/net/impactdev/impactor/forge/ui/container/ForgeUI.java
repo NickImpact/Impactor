@@ -1,0 +1,142 @@
+/*
+ * This file is part of Impactor, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) 2018-2022 NickImpact
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
+
+package net.impactdev.impactor.forge.ui.container;
+
+import ca.landonjw.gooeylibs2.api.UIManager;
+import ca.landonjw.gooeylibs2.api.page.GooeyPage;
+import ca.landonjw.gooeylibs2.api.template.Template;
+import ca.landonjw.gooeylibs2.api.template.types.ChestTemplate;
+import net.impactdev.impactor.api.ui.ImpactorUI;
+import net.impactdev.impactor.api.ui.icons.Icon;
+import net.impactdev.impactor.api.ui.layouts.Layout;
+import net.impactdev.impactor.forge.adventure.RelocationTranslator;
+import net.impactdev.impactor.forge.ui.container.icons.ForgeIcon;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
+
+public class ForgeUI implements ImpactorUI<ServerPlayerEntity> {
+
+    private final Key namespace;
+    private final Component title;
+    private final Layout layout;
+    private final boolean readonly;
+
+    private final Template template;
+    private final GooeyPage page;
+
+    private ForgeUI(ForgeUIBuilder builder) {
+        this.namespace = builder.key;
+        this.title = builder.title;
+        this.layout = builder.layout;
+        this.readonly = builder.readonly;
+        this.template = this.create();
+
+        this.page = GooeyPage.builder()
+                .template(this.template)
+                .title(RelocationTranslator.relocated(this.title))
+                .build();
+    }
+
+    @Override
+    public Key namespace() {
+        return this.namespace;
+    }
+
+    @Override
+    public Layout layout() {
+        return this.layout;
+    }
+
+    @Override
+    public void set(@Nullable Icon<?> icon, int slot) {
+        if(icon == null) {
+            this.page.getTemplate().getSlot(slot).set(ItemStack.EMPTY);
+        } else {
+            this.page.getTemplate().getSlot(slot).set(((ForgeIcon) icon).getDelegate().getDisplay());
+        }
+    }
+
+    @Override
+    public boolean open(ServerPlayerEntity viewer) {
+        UIManager.openUIForcefully(viewer, GooeyPage.builder().template(this.template).build());
+        return false;
+    }
+
+    private ChestTemplate create() {
+        ChestTemplate.Builder builder = ChestTemplate.builder(this.layout.dimensions().rows());
+        this.layout.elements().forEach((slot, icon) -> {
+            ForgeIcon actual = (ForgeIcon) icon;
+            builder.set(slot, actual.getDelegate());
+        });
+
+        return builder.build();
+    }
+
+    public static class ForgeUIBuilder implements UIBuilder<ServerPlayerEntity> {
+
+        private Key key;
+        private Component title;
+        private Layout layout;
+        private boolean readonly = true;
+
+        @Override
+        public UIBuilder<ServerPlayerEntity> provider(Key key) {
+            this.key = key;
+            return this;
+        }
+
+        @Override
+        public UIBuilder<ServerPlayerEntity> title(Component title) {
+            this.title = title;
+            return this;
+        }
+
+        @Override
+        public UIBuilder<ServerPlayerEntity> layout(Layout layout) {
+            this.layout = layout;
+            return this;
+        }
+
+        @Override
+        public UIBuilder<ServerPlayerEntity> readonly(boolean state) {
+            this.readonly = state;
+            return this;
+        }
+
+        @Override
+        public UIBuilder<ServerPlayerEntity> from(ImpactorUI<ServerPlayerEntity> input) {
+            return this;
+        }
+
+        @Override
+        public ImpactorUI<ServerPlayerEntity> build() {
+            return new ForgeUI(this);
+        }
+    }
+}

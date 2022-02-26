@@ -28,7 +28,6 @@ package net.impactdev.impactor.sponge.scoreboard;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.scoreboard.ImpactorScoreboard;
-import net.impactdev.impactor.api.scoreboard.components.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
@@ -40,6 +39,9 @@ import net.kyori.adventure.util.TriState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.EventListenerRegistration;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlots;
 import org.spongepowered.api.scoreboard.objective.Objective;
@@ -48,7 +50,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class SpongeScoreboard implements ImpactorScoreboard<ServerPlayer> {
 
@@ -59,8 +60,8 @@ public class SpongeScoreboard implements ImpactorScoreboard<ServerPlayer> {
     private Scoreboard delegate;
     private TriState visibility;
 
-    public SpongeScoreboard(SpongeScoreboardBuilder builder) {
-        this.objective = (AbstractSpongeObjective) builder.objective;
+    public SpongeScoreboard(SpongeLineComponentBuilder builder) {
+        this.objective = (AbstractSpongeObjective) builder.parent.objective;
         this.lines = builder.lines;
         this.delegate = null;
         this.source = null;
@@ -76,6 +77,18 @@ public class SpongeScoreboard implements ImpactorScoreboard<ServerPlayer> {
         this.visibility = TriState.FALSE;
         this.objective.consumeFocus(this.player().get());
         this.create();
+
+        Sponge.eventManager().registerListener(
+                EventListenerRegistration.builder(ServerSideConnectionEvent.Disconnect.class)
+                        .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                        .order(Order.FIRST)
+                        .listener(disconnect -> {
+                            if(this.source.equals(disconnect.player().uniqueId())) {
+                                this.hide();
+                            }
+                        })
+                        .build()
+        );
     }
 
     private Supplier<ServerPlayer> player() {
@@ -196,8 +209,7 @@ public class SpongeScoreboard implements ImpactorScoreboard<ServerPlayer> {
 
         @Override
         public SpongeScoreboard build() {
-            Preconditions.checkNotNull(this.objective);
-            return new SpongeScoreboard(this);
+            throw new UnsupportedOperationException("Cannot build from this builder! Valid via an objective configuration");
         }
     }
 
@@ -223,10 +235,17 @@ public class SpongeScoreboard implements ImpactorScoreboard<ServerPlayer> {
         }
 
         @Override
-        public ScoreboardBuilder<ServerPlayer> complete() {
-            this.parent.lines = this.lines;
-            return this.parent;
+        public LinesComponentBuilder<ServerPlayer> from(ImpactorScoreboard<ServerPlayer> input) {
+            return this;
         }
+
+        @Override
+        public SpongeScoreboard build() {
+            Preconditions.checkNotNull(this.parent.objective);
+            Preconditions.checkArgument(!this.lines.isEmpty(), "Scoreboard with no lines");
+            return new SpongeScoreboard(this);
+        }
+
     }
 
 }

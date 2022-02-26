@@ -3,7 +3,7 @@ include (
         'api',
         'common',
         'bungee',
-//        'spigot',
+        'forge',
         'sponge',
         'velocity'
 )

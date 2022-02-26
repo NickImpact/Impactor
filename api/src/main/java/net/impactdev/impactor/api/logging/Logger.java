@@ -25,28 +25,24 @@
 
 package net.impactdev.impactor.api.logging;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.function.Supplier;
 
 public interface Logger {
 
-	void noTag(String message);
+    void info(String marker, String line);
+    void info(String marker, Collection<String> lines);
+    void info(String marker, Supplier<String> supplier);
 
-	void noTag(List<String> message);
+    void warn(String marker, String line);
+    void warn(String marker, Collection<String> lines);
+    void warn(String marker, Supplier<String> supplier);
 
-	void info(String message);
+    void error(String marker, String line);
+    void error(String marker, Collection<String> lines);
+    void error(String marker, Supplier<String> supplier);
 
-	void info(List<String> message);
-
-	void warn(String message);
-
-	void warn(List<String> message);
-
-	void error(String message);
-
-	void error(List<String> message);
-
-	void debug(String message);
-
-	void debug(List<String> message);
-
+    void debug(String marker, String line);
+    void debug(String marker, Collection<String> lines);
+    void debug(String marker, Supplier<String> supplier);
 }

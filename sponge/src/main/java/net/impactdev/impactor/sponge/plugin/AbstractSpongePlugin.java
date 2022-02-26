@@ -38,7 +38,7 @@ public abstract class AbstractSpongePlugin implements ImpactorPlugin {
 
     public AbstractSpongePlugin(PluginMetadata metadata, org.apache.logging.log4j.Logger fallback) {
         this.metadata = metadata;
-        this.pluginLogger = new SpongeLogger(this, fallback);
+        this.pluginLogger = new SpongeLogger(fallback);
 
         PluginRegistry.register(this);
     }

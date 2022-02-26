@@ -31,12 +31,33 @@ import net.impactdev.impactor.api.scoreboard.frames.types.ListeningFrame;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.utilities.Builder;
 
+/**
+ * A listening line is a line capable of updating its viewable text based on the execution of an
+ * event. The line is composed of an event handler, which is registered to its provided event bus
+ * at time of initialization. This is processed through the child {@link ListeningFrame}, which
+ * holds the information such as the event processor, its bus, the text to parse, and any
+ * additional sources outside of the viewing player.
+ */
 public interface ListeningLine extends ScoreboardLine, Updatable {
 
+    /**
+     * Represents the event handler assigned to the frame of this line. This is simply
+     * provided for convenience should it be necessary to be fetched.
+     *
+     * @return The event handler for the line
+     */
     ListeningFrame.EventHandler<?> getEventHandler();
 
     interface ListeningBuilder extends Builder<ListeningLine, ListeningBuilder> {
 
+        /**
+         * Attaches a listening frame that will belong to the line. This will control the viewable
+         * text of the line, and how exactly the line will update when its required condition
+         * is met.
+         *
+         * @param frame The frame to associate with the listening line
+         * @return The builder
+         */
         ListeningBuilder content(ListeningFrame<?> frame);
 
     }
