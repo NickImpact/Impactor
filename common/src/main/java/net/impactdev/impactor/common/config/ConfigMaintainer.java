@@ -23,37 +23,45 @@
  *
  */
 
-package net.impactdev.impactor.velocity.config;
+package net.impactdev.impactor.common.config;
 
 import net.impactdev.impactor.api.configuration.Config;
 import net.impactdev.impactor.api.configuration.ConfigKey;
-import net.impactdev.impactor.api.configuration.ConfigKeyHolder;
 import net.impactdev.impactor.api.configuration.ConfigurationAdapter;
+import net.impactdev.impactor.api.configuration.keys.BaseConfigKey;
 import net.impactdev.impactor.api.configuration.keys.EnduringKey;
+import net.impactdev.impactor.api.configuration.loader.KeyLoader;
+import net.impactdev.impactor.api.configuration.loader.KeyProvider;
 
-public class VelocityConfig implements Config {
+import java.nio.file.Path;
+import java.util.NoSuchElementException;
+
+public class ConfigMaintainer implements Config {
 
     /**
      * The configurations loaded values.
      *
      * <p>The value corresponding to each key is stored at the index defined
-     * by {@link ConfigKey#ordinal()}.</p>
+     * by {@link ConfigKey.ParentContext#ordinal()}.</p>
      */
     private Object[] values = null;
 
     private final ConfigurationAdapter adapter;
-    private final ConfigKeyHolder holder;
+    private final KeyLoader loader;
 
-    public VelocityConfig(ConfigurationAdapter adapter, ConfigKeyHolder holder) {
-        this.adapter = adapter;
-        this.holder = holder;
-        load();
+    public ConfigMaintainer(Path path, boolean supply, @KeyProvider Class<?> provider) {
+        this.adapter = new ConfigAdapter(path, supply);
+        this.loader = new KeyLoader(provider);
+        this.load();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T get(ConfigKey<T> key) {
-        return (T) this.values[key.ordinal()];
+        if(!key.context().parent().equals(this)) {
+            throw new NoSuchElementException("Key does not belong to given configuration");
+        }
+        return (T) this.values[key.context().ordinal()];
     }
 
     @Override
@@ -63,26 +71,64 @@ public class VelocityConfig implements Config {
 
         // if values are null, must be loading for the first time
         if (this.values == null) {
-            this.values = new Object[holder.getSize()];
+            this.values = new Object[loader.size()];
             reload = false;
         }
 
-        for (ConfigKey<?> key : holder.getKeys().values()) {
+        for (ConfigKey<?> key : loader.keys()) {
             // don't reload enduring keys.
             if (reload && key instanceof EnduringKey) {
                 continue;
             }
 
+            BaseConfigKey<?> base = (BaseConfigKey<?>) key;
+            ((BaseConfigKey.ParentContextBase) key.context()).parent(this);
+
             // load the value for the key
             Object value = key.get(this.adapter);
-            this.values[key.ordinal()] = value;
+            this.values[key.context().ordinal()] = value;
         }
     }
 
     @Override
     public void reload() {
         this.adapter.reload();
-        load();
+        this.load();
+    }
+
+    public static class ConfigMaintainerBuilder implements ConfigBuilder {
+
+        private Class<?> provider;
+        private Path path;
+        private boolean supply;
+
+        @Override
+        public ConfigBuilder provider(Class<?> provider) {
+            this.provider = provider;
+            return this;
+        }
+
+        @Override
+        public ConfigBuilder path(Path path) {
+            this.path = path;
+            return this;
+        }
+
+        @Override
+        public ConfigBuilder supply(boolean supply) {
+            this.supply = supply;
+            return this;
+        }
+
+        @Override
+        public ConfigBuilder from(Config input) {
+            return this;
+        }
+
+        @Override
+        public Config build() {
+            return new ConfigMaintainer(this.path, this.supply, this.provider);
+        }
     }
 
 }

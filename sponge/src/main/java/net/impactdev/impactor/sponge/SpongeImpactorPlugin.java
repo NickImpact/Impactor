@@ -33,13 +33,8 @@ import net.impactdev.impactor.api.dependencies.Dependency;
 import net.impactdev.impactor.api.dependencies.DependencyManager;
 import net.impactdev.impactor.api.dependencies.ProvidedDependencies;
 import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
-import net.impactdev.impactor.api.dependencies.relocation.Relocation;
 import net.impactdev.impactor.api.event.EventBus;
 import net.impactdev.impactor.api.registry.Registry;
-import net.impactdev.impactor.api.ui.ImpactorUI;
-import net.impactdev.impactor.api.ui.icons.Icon;
-import net.impactdev.impactor.api.ui.layouts.Layout;
-import net.impactdev.impactor.api.ui.pagination.Pagination;
 import net.impactdev.impactor.api.ui.signs.SignQuery;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
@@ -49,14 +44,12 @@ import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
+import net.impactdev.impactor.common.config.ConfigMaintainer;
 import net.impactdev.impactor.common.dependencies.DependencyContainer;
 import net.impactdev.impactor.common.placeholders.PlaceholderSourcesImpl;
-import net.impactdev.impactor.common.ui.LayoutImpl;
 import net.impactdev.impactor.sponge.api.SpongeImpactorAPIProvider;
 import net.impactdev.impactor.sponge.commands.PlaceholdersCommand;
-import net.impactdev.impactor.sponge.configuration.ConfigKeys;
-import net.impactdev.impactor.sponge.configuration.SpongeConfig;
-import net.impactdev.impactor.sponge.configuration.SpongeConfigAdapter;
+import net.impactdev.impactor.common.config.ConfigKeys;
 import net.impactdev.impactor.sponge.event.SpongeEventBus;
 import net.impactdev.impactor.sponge.plugin.AbstractSpongePlugin;
 import net.impactdev.impactor.sponge.scheduler.SpongeSchedulerAdapter;
@@ -65,9 +58,6 @@ import net.impactdev.impactor.sponge.services.SpongeMojangServerStatusService;
 import net.impactdev.impactor.sponge.text.SpongeMessageService;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
 import net.impactdev.impactor.sponge.ui.UIModule;
-import net.impactdev.impactor.sponge.ui.containers.SpongeUI;
-import net.impactdev.impactor.sponge.ui.containers.icons.SpongeIcon;
-import net.impactdev.impactor.sponge.ui.containers.SpongePagination;
 import net.impactdev.impactor.sponge.ui.signs.SpongeSignQuery;
 import net.impactdev.impactor.sponge.util.SpongeClassPathAppender;
 import org.apache.logging.log4j.Logger;
@@ -84,7 +74,6 @@ import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -119,6 +108,7 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 
 		Registry registry = Impactor.getInstance().getRegistry();
 		Impactor.getInstance().getRegistry().register(ImpactorPlugin.class, this);
+		Impactor.getInstance().getRegistry().registerBuilderSupplier(Config.ConfigBuilder.class, ConfigMaintainer.ConfigMaintainerBuilder::new);
 		Impactor.getInstance().getRegistry().register(ClassPathAppender.class, new SpongeClassPathAppender(this));
 		registry.registerBuilderSupplier(Dependency.DependencyBuilder.class, DependencyContainer.DependencyContainerBuilder::new);
 		Impactor.getInstance().getRegistry().register(DependencyManager.class, new DependencyManager(this));
@@ -171,7 +161,11 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 
 	@Listener
 	public void onInit(StartingEngineEvent<Server> e) {
-		this.config = new SpongeConfig(new SpongeConfigAdapter(this, new File(configDir.toFile(), "settings.conf")), new ConfigKeys());
+		this.config = Config.builder()
+				.path(this.configDir.resolve("settings.conf"))
+				.supply(false)
+				.provider(ConfigKeys.class)
+				.build();
 
 		if(this.config.get(ConfigKeys.USE_MOJANG_STATUS_FETCHER)) {
 			this.getPluginLogger().info("Startup", "Enabling Mojang Status Watcher...");

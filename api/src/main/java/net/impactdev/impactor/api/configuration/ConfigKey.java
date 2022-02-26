@@ -33,11 +33,12 @@ package net.impactdev.impactor.api.configuration;
 public interface ConfigKey<T> {
 
 	/**
-	 * Gets the ordinal position of the key as it's declared
+	 * Provides context regarding the key. This is the ordinal position of the key in the config,
+	 * as well as the config it actually belongs to.
 	 *
-	 * @return the position
+	 * @return The context regarding the key
 	 */
-	int ordinal();
+	ParentContext context();
 
 	/**
 	 * Resolves and returns the value mapped to this key using the given config instance.
@@ -49,5 +50,23 @@ public interface ConfigKey<T> {
 	 * @return the value mapped to this key
 	 */
 	T get(ConfigurationAdapter adapter);
+
+	interface ParentContext {
+
+		/**
+		 * Indicates the config that maintains this key.
+		 *
+		 * @return The parent of the key
+		 */
+		Config parent();
+
+		/**
+		 * Gets the ordinal position of the key as it's declared
+		 *
+		 * @return the position
+		 */
+		int ordinal();
+
+	}
 
 }

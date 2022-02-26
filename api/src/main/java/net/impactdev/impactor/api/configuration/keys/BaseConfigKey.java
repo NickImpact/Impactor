@@ -25,14 +25,40 @@
 
 package net.impactdev.impactor.api.configuration.keys;
 
+import net.impactdev.impactor.api.configuration.Config;
 import net.impactdev.impactor.api.configuration.ConfigKey;
 
 public abstract class BaseConfigKey<T> implements ConfigKey<T> {
 
-	public int ordinal = -1;
+	private final ParentContext context = new ParentContextBase();
 
 	@Override
-	public int ordinal() {
-		return this.ordinal;
+	public ParentContext context() {
+		return this.context;
 	}
+
+	public static class ParentContextBase implements ParentContext {
+
+		private Config config;
+		private int ordinal = -1;
+
+		@Override
+		public Config parent() {
+			return this.config;
+		}
+
+		public void parent(Config parent) {
+			this.config = parent;
+		}
+
+		@Override
+		public int ordinal() {
+			return this.ordinal;
+		}
+
+		public void ordinal(int ordinal) {
+			this.ordinal = ordinal;
+		}
+	}
+
 }

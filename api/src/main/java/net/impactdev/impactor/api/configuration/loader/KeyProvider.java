@@ -23,13 +23,13 @@
  *
  */
 
-package net.impactdev.impactor.api.configuration;
+package net.impactdev.impactor.api.configuration.loader;
 
-import java.util.Map;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface ConfigKeyHolder {
-
-	Map<String, ConfigKey<?>> getKeys();
-
-	int getSize();
-}
+@Target({ElementType.TYPE, ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface KeyProvider {}

@@ -25,11 +25,76 @@
 
 package net.impactdev.impactor.api.configuration;
 
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.configuration.keys.EnduringKey;
+import net.impactdev.impactor.api.configuration.loader.KeyProvider;
+import net.impactdev.impactor.api.utilities.Builder;
+
+import java.nio.file.Path;
+
 public interface Config {
 
-	void reload();
+	/**
+	 * Fetches a value from the config using the following key.
+	 *
+	 * @param key The key used to reference the configurable value
+	 * @param <T> The type this key will resolve to when evaluated
+	 * @return The evaluated configuration
+	 * @throws java.util.NoSuchElementException If the key is not present in the config
+	 */
+	<T> T get(ConfigKey<T> key);
 
+	/**
+	 * Runs the actual loading of configurable values. In retrospect, this simply caches the
+	 * config with the current values associated with the config.
+	 */
 	void load();
 
-	<T> T get(ConfigKey<T> key);
+	/**
+	 * Refreshes the currently cached values with the values now set in the config file. This
+	 * only reloads keys not wrapped with {@link EnduringKey EnduringKeys}. Enduring keys
+	 * are keys that should never be reloaded, and will be effectively final at the time
+	 * of server launch/first configuration load.
+	 */
+	void reload();
+
+	static ConfigBuilder builder() {
+		return Impactor.getInstance().getRegistry().createBuilder(ConfigBuilder.class);
+	}
+
+	interface ConfigBuilder extends Builder<Config, ConfigBuilder> {
+
+		/**
+		 * The class that will provide the config keys. This class must be marked
+		 * with {@link KeyProvider} for the config to accept the class as a config
+		 * key provider. Classes not annotated with this annotation will enforce
+		 * an exception at invocation.
+		 *
+		 * @param provider The class providing config keys
+		 * @return This builder, reflecting the given provider
+		 * @throws IllegalArgumentException If the class provided is not annotated with
+		 * {@link KeyProvider}
+		 */
+		ConfigBuilder provider(@KeyProvider Class<?> provider);
+
+		/**
+		 * Indicates the path that the config lives at.
+		 *
+		 * @param path The path to the config file
+		 * @return This builder, reflecting the given path
+		 */
+		ConfigBuilder path(Path path);
+
+		/**
+		 * Indicates whether the config will write values not present in the actual file of the config
+		 * if they are not present. By default, this will be turned off due to the issue of comments being
+		 * whipped from the file during any write action. This issue should be resolved in later versions,
+		 * and as such, this option is considered soft-deprecated pending a fix.
+		 *
+		 * @param supply <code>true</code> to write values if not present, <code>false</code> otherwise
+		 * @return This builder, reflecting the supplier state
+		 */
+		ConfigBuilder supply(boolean supply);
+
+	}
 }
