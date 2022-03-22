@@ -48,6 +48,7 @@ import org.spongepowered.api.util.Ticks;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
@@ -76,7 +77,7 @@ public class SpongeRefreshingLine extends AbstractSpongeSBLine implements Refres
         scoreboard.registerTeam(this.getTeam());
         this.sources = PlaceholderSources.builder()
                 .from(this.sources)
-                .appendIfAbsent(ServerPlayer.class, () -> Sponge.server().player(target.uniqueId()).orElseThrow())
+                .appendIfAbsent(ServerPlayer.class, () -> Sponge.server().player(target.uniqueId()).orElseThrow(NoSuchElementException::new))
                 .build();
         this.getTeam().setPrefix(this.getText());
     }

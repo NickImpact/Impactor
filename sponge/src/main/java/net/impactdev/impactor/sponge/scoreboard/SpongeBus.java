@@ -25,7 +25,6 @@
 
 package net.impactdev.impactor.sponge.scoreboard;
 
-import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.events.PlatformBus;
 import net.impactdev.impactor.api.scoreboard.events.RegisteredEvent;
@@ -48,7 +47,7 @@ public class SpongeBus extends PlatformBus<Event> {
     }
 
     @Override
-    public <E extends Event> TriFunction<Updatable, UUID, ListeningFrame.EventHandler<E>, RegisteredEvent> getRegisterHandler(TypeToken<E> type) {
+    public <E extends Event> TriFunction<Updatable, UUID, ListeningFrame.EventHandler<E>, RegisteredEvent> getRegisterHandler(Class<E> type) {
         return (line, assignee, handler) -> {
             EventListener<E> listener = event -> {
                 if(handler.process(line, assignee, event)) {

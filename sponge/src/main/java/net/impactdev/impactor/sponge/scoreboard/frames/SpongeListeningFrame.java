@@ -25,7 +25,6 @@
 
 package net.impactdev.impactor.sponge.scoreboard.frames;
 
-import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
@@ -38,13 +37,14 @@ import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class SpongeListeningFrame<L> extends AbstractSpongeFrame implements ListeningFrame<L> {
 
     private String raw;
     private Bus<? super L> bus;
-    private TypeToken<L> type;
+    private Class<L> type;
     private EventHandler<L> handler;
     private PlaceholderSources sources;
 
@@ -81,7 +81,7 @@ public class SpongeListeningFrame<L> extends AbstractSpongeFrame implements List
     }
 
     @Override
-    public TypeToken<L> getListenerType() {
+    public Class<L> getListenerType() {
         return this.type;
     }
 
@@ -95,7 +95,7 @@ public class SpongeListeningFrame<L> extends AbstractSpongeFrame implements List
         this.source = uuid;
         this.sources = PlaceholderSources.builder()
                 .from(this.sources)
-                .appendIfAbsent(ServerPlayer.class, () -> Sponge.server().player(uuid).orElseThrow())
+                .appendIfAbsent(ServerPlayer.class, () -> Sponge.server().player(uuid).orElseThrow(NoSuchElementException::new))
                 .build();
     }
 
@@ -112,7 +112,7 @@ public class SpongeListeningFrame<L> extends AbstractSpongeFrame implements List
 
     public static class SpongeListeningFrameBuilder<L> implements ListeningFrameBuilder<L> {
 
-        private TypeToken<L> type;
+        private Class<L> type;
         private Bus<? super L> bus;
         private String raw;
         private EventHandler<L> handler;
@@ -120,12 +120,12 @@ public class SpongeListeningFrame<L> extends AbstractSpongeFrame implements List
 
         public SpongeListeningFrameBuilder() {}
 
-        private SpongeListeningFrameBuilder(TypeToken<L> type) {
+        private SpongeListeningFrameBuilder(Class<L> type) {
             this.type = type;
         }
 
         @Override
-        public <E> ListeningFrameBuilder<E> type(TypeToken<E> event) {
+        public <E> ListeningFrameBuilder<E> type(Class<E> event) {
             return new SpongeListeningFrameBuilder<>(event);
         }
 

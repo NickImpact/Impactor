@@ -60,13 +60,13 @@ shadowJar {
             include(project(':api'))
             include(project(':common'))
             include(dependency('net.kyori:.*:.*'))
-            include(dependency('com.github.landonjw:GooeyLibs:.*'))
+            //include(dependency('ca.landonjw:GooeyLibs:.*'))
         }
     }
 
-    minimize {
-        exclude ('ca/landonjw/gooeylibs2/GooeyLibs.class')
-    }
+//    minimize {
+//        exclude ('ca/landonjw/gooeylibs2/GooeyLibs.class')
+//    }
 
     relocate('net.kyori', 'net.impactdev.impactor.relocations.kyori')
     relocate("ca.landonjw.gooeylibs2", "net.impactdev.impactor.relocations.landonjw.gooeylibs2") {
@@ -74,6 +74,12 @@ shadowJar {
     }
 }
 
+reobf {
+    shadowJar {}
+}
+
 test {
     useJUnitPlatform()
 }
+
+build.dependsOn reobfShadowJar

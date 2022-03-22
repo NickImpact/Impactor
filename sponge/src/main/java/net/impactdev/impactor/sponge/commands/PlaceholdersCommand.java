@@ -25,14 +25,19 @@
 
 package net.impactdev.impactor.sponge.commands;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.services.text.MessageService;
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.CommandCompletion;
@@ -41,8 +46,26 @@ import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.plugin.PluginContainer;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class PlaceholdersCommand {
 
@@ -73,6 +96,27 @@ public class PlaceholdersCommand {
                     return options;
                 })
                 .build();
+
+        Parameter.Value<String> plugin = Parameter.string()
+                .key("key")
+                .optional()
+                .usage(key -> "The name of the plugin/key providing the placeholder")
+                .completer((context, current) -> {
+                    List<CommandCompletion> options = Lists.newArrayList();
+                    String token = current.toLowerCase();
+
+                    Impactor.getInstance().getRegistry()
+                            .get(SpongePlaceholderManager.class)
+                            .getAllPlatformParsers()
+                            .stream()
+                            .map(parser -> parser.key(RegistryTypes.PLACEHOLDER_PARSER))
+                            .filter(key -> key.namespace().startsWith(token))
+                            .forEach(key -> options.add(CommandCompletion.of(key.namespace())));
+
+                    return options;
+                })
+                .build();
+
         return Command.builder()
                 .addChild(Command.builder()
                         .addParameter(placeholder)
@@ -80,8 +124,8 @@ public class PlaceholdersCommand {
                         .executor(context -> {
                             CommandCause cause = context.cause();
                             ServerPlayer target = context.one(player)
-                                    .or(() -> cause.first(ServerPlayer.class))
-                                    .orElseThrow(() -> new CommandException(Component.text("Can only query against a player!")));
+                                    .orElse(cause.first(ServerPlayer.class)
+                                            .orElseThrow(() -> new CommandException(Component.text("Can only query against a player!"))));
 
                             MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
                             ResourceKey in = context.requireOne(placeholder);
@@ -96,6 +140,75 @@ public class PlaceholdersCommand {
                         })
                         .build(), "query"
                 )
+                .addChild(Command.builder()
+                        .addParameter(plugin)
+                        .executor(context -> {
+                            Optional<String> namespace = context.one(plugin);
+                            Multimap<String, ResourceKey> keys = Impactor.getInstance().getRegistry()
+                                    .get(SpongePlaceholderManager.class)
+                                    .getAllPlatformParsers()
+                                    .stream()
+                                    .map(parser -> parser.key(RegistryTypes.PLACEHOLDER_PARSER))
+                                    .filter(key -> namespace.map(n -> key.namespace().equals(n)).orElse(true))
+                                    .collect(this.toMultimap(
+                                            key -> this.fromResourceKey(key).flatMap(pc -> pc.metadata().name()).orElse("Custom"),
+                                            key -> key,
+                                            ArrayListMultimap::create
+                                    ));
+
+                            Path target = SpongeImpactorPlugin.getInstance().getConfigDir().resolve("placeholders").resolve("placeholders.out");
+                            try {
+                                if(!target.toFile().exists()) {
+                                    Files.createDirectories(target.getParent());
+                                    Files.createFile(target);
+                                }
+
+                                try (PrintStream stream = new PrintStream(target.toFile())){
+                                    PrettyPrinter printer = new PrettyPrinter(80);
+                                    printer.title("Registered Placeholders");
+
+                                    keys.keySet().stream().sorted((s1, s2) -> {
+                                        if (s1.equals("Custom")) {
+                                            return 1;
+                                        }
+                                        else if (s2.equals("Custom")) {
+                                            return -1;
+                                        }
+                                        else {
+                                            return s1.compareTo(s2);
+                                        }
+                                    }).forEach(key -> {
+                                        printer.add(key);
+                                        for (ResourceKey parser : keys.get(key)) {
+                                            printer.add(parser.formatted(), 2);
+                                        }
+                                    });
+                                    printer.print(stream);
+                                }
+                                context.cause().audience().sendMessage(Component.text("Successfully wrote placeholder information to "
+                                        + SpongeImpactorPlugin.getInstance().getConfigDir().getParent().getParent().relativize(target)));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                            return CommandResult.success();
+                        })
+                        .build(), "list"
+                )
                 .build();
+    }
+
+    private Optional<PluginContainer> fromResourceKey(ResourceKey input) {
+        return Sponge.pluginManager().plugin(input.namespace());
+    }
+
+    private <T, K, U, M extends Multimap<K, U>>
+        Collector<T, ?, M> toMultimap(Function<? super T, ? extends K> keyMapper,
+                                      Function<? super T, ? extends U> valueMapper,
+                                      Supplier<M> mapFactory) {
+
+        BiConsumer<M, T> accumulator = (map, element) -> map.put(keyMapper.apply(element), valueMapper.apply(element));
+        BinaryOperator<M> combiner = (left, right) -> { left.putAll(right); return left; };
+        return Collector.of(mapFactory, accumulator, combiner);
     }
 }

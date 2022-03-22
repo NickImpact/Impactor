@@ -41,12 +41,11 @@ import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
 import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.api.dependencies.DependencyManager;
 import net.impactdev.impactor.bungee.api.BungeeImpactorAPIProvider;
-import net.impactdev.impactor.bungee.event.BungeeEventBus;
 import net.impactdev.impactor.bungee.plugin.AbstractBungeePlugin;
 import net.impactdev.impactor.bungee.scheduler.BungeeSchedulerAdapter;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
+import net.impactdev.impactor.common.event.ImpactorEventBus;
 
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
@@ -85,7 +84,7 @@ public class BungeeImpactorPlugin extends AbstractBungeePlugin implements Depend
 					toLaunch.add(dependency);
 				}
 
-				for(Dependency storage : this.getDependencyManager().getRegistry().resolveStorageDependencies(Sets.newHashSet(dependable.getStorageRequirements()))) {
+				for(Dependency storage : this.getDependencyManager().registry().resolveStorageDependencies(Sets.newHashSet(dependable.getStorageRequirements()))) {
 					if(toLaunch.contains(storage)) {
 						continue;
 					}
@@ -106,7 +105,7 @@ public class BungeeImpactorPlugin extends AbstractBungeePlugin implements Depend
 		));
 		this.getDependencyManager().loadDependencies(new HashSet<>(toLaunch));
 
-		Impactor.getInstance().getRegistry().register(EventBus.class, new BungeeEventBus(this.bootstrap));
+		Impactor.getInstance().getRegistry().register(EventBus.class, new ImpactorEventBus());
 	}
 
 	public DependencyManager getDependencyManager() {
@@ -131,7 +130,17 @@ public class BungeeImpactorPlugin extends AbstractBungeePlugin implements Depend
 	}
 
 	@Override
-	public boolean inDebugMode() {
-		return super.inDebugMode();
+	public void construct() {
+
+	}
+
+	@Override
+	public void enable() {
+
+	}
+
+	@Override
+	public void disable() {
+
 	}
 }

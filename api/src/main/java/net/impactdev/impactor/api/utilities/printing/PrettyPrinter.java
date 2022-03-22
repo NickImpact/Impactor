@@ -34,6 +34,7 @@ import com.google.gson.JsonElement;
 import net.impactdev.impactor.api.json.factory.JElement;
 import net.impactdev.impactor.api.logging.Logger;
 import net.impactdev.impactor.api.utilities.functional.TriConsumer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -52,14 +53,23 @@ import java.util.regex.Pattern;
  */
 public class PrettyPrinter {
 
-    private static final ImmutableMap<Level, TriConsumer<Logger, String, String>> LOGGER_LEVEL =
+    private static final ImmutableMap<Level, BiConsumer<Logger, String>> UNMARKED_LOGGER_LEVEL =
+            ImmutableMap.<Level, BiConsumer<Logger, String>>builder()
+                    .put(Level.INFO, Logger::info)
+                    .put(Level.WARNING, Logger::warn)
+                    .put(Level.ERROR, Logger::error)
+                    .put(Level.DEBUG, Logger::debug)
+                    .build();
+    private static final BiConsumer<Logger, String> DEFAULT_UNMARKED_LOGGER = Logger::info;
+
+    private static final ImmutableMap<Level, TriConsumer<Logger, String, String>> MARKED_LOGGER_LEVEL =
             ImmutableMap.<Level, TriConsumer<Logger, String, String>>builder()
                     .put(Level.INFO, Logger::info)
                     .put(Level.WARNING, Logger::warn)
                     .put(Level.ERROR, Logger::error)
                     .put(Level.DEBUG, Logger::debug)
                     .build();
-    private static final TriConsumer<Logger, String, String> DEFAULT_LOGGER = Logger::info;
+    private static final TriConsumer<Logger, String, String> DEFAULT_MARKED_LOGGER = Logger::info;
 
     public enum Level {
         INFO,
@@ -906,7 +916,7 @@ public class PrettyPrinter {
      * @param map Map with entries to add
      * @return fluent
      */
-    public PrettyPrinter newline(Map<?, ?> map) {
+    public PrettyPrinter add(Map<?, ?> map) {
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             String key = entry.getKey() == null ? "null" : entry.getKey().toString();
             this.kv(key, entry.getValue());
@@ -993,6 +1003,10 @@ public class PrettyPrinter {
         }
     }
 
+    public PrettyPrinter log(Logger logger, Level level) {
+        return this.log(logger, level, null);
+    }
+
     /**
      * Write this printer to the specified logger at {@link Level#INFO}
      *
@@ -1024,15 +1038,25 @@ public class PrettyPrinter {
         return this;
     }
 
-    private void logSpecial(Logger logger, Level level, String marker, ISpecialEntry line) {
-        LOGGER_LEVEL.getOrDefault(level, DEFAULT_LOGGER).accept(logger, marker,
-                String.format("/*%s*/", line.toString()));
+    private void logSpecial(Logger logger, Level level, @Nullable String marker, ISpecialEntry line) {
+        if(marker == null) {
+            UNMARKED_LOGGER_LEVEL.getOrDefault(level, DEFAULT_UNMARKED_LOGGER).accept(logger,
+                    String.format("/*%s*/", line.toString()));
+        } else {
+            MARKED_LOGGER_LEVEL.getOrDefault(level, DEFAULT_MARKED_LOGGER).accept(logger, marker,
+                    String.format("/*%s*/", line.toString()));
+        }
     }
 
-    private void logString(Logger logger, Level level, String marker, String line) {
+    private void logString(Logger logger, Level level, @Nullable String marker, String line) {
         if (line != null) {
-            LOGGER_LEVEL.getOrDefault(level, DEFAULT_LOGGER).accept(logger, marker,
-                    String.format("/* %-" + this.width + "s */", line));
+            if(marker != null) {
+                MARKED_LOGGER_LEVEL.getOrDefault(level, DEFAULT_MARKED_LOGGER).accept(logger, marker,
+                        String.format("/* %-" + this.width + "s */", line));
+            } else {
+                UNMARKED_LOGGER_LEVEL.getOrDefault(level, DEFAULT_UNMARKED_LOGGER).accept(logger,
+                        String.format("/* %-" + this.width + "s */", line));
+            }
         }
     }
 

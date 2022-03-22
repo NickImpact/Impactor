@@ -49,7 +49,7 @@ public interface ScoreboardFrame extends ScoreboardComponent<ScoreboardFrame> {
         return Impactor.getInstance().getRegistry().createBuilder(RefreshingFrame.RefreshingFrameBuilder.class);
     }
 
-    static <L> ListeningFrame.ListeningFrameBuilder<L> listening(TypeToken<L> type) {
+    static <L> ListeningFrame.ListeningFrameBuilder<L> listening(Class<L> type) {
         return Impactor.getInstance().getRegistry().createBuilder(ListeningFrame.ListeningFrameBuilder.class).type(type);
     }
 

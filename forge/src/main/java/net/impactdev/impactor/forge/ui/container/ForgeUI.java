@@ -29,9 +29,14 @@ import ca.landonjw.gooeylibs2.api.UIManager;
 import ca.landonjw.gooeylibs2.api.page.GooeyPage;
 import ca.landonjw.gooeylibs2.api.template.Template;
 import ca.landonjw.gooeylibs2.api.template.types.ChestTemplate;
+import ca.landonjw.gooeylibs2.implementation.GooeyContainer;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
 import net.impactdev.impactor.api.ui.ImpactorUI;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.ui.layouts.Layout;
+import net.impactdev.impactor.forge.ForgeImpactorPlugin;
 import net.impactdev.impactor.forge.adventure.RelocationTranslator;
 import net.impactdev.impactor.forge.ui.container.icons.ForgeIcon;
 import net.kyori.adventure.key.Key;
@@ -40,7 +45,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-public class ForgeUI implements ImpactorUI<ServerPlayerEntity> {
+public class ForgeUI implements ImpactorUI {
 
     private final Key namespace;
     private final Component title;
@@ -83,13 +88,26 @@ public class ForgeUI implements ImpactorUI<ServerPlayerEntity> {
     }
 
     @Override
-    public boolean open(ServerPlayerEntity viewer) {
-        UIManager.openUIForcefully(viewer, GooeyPage.builder().template(this.template).build());
-        return false;
+    public void open(PlatformPlayer viewer) {
+        PlatformPlayerManager<ServerPlayerEntity> manager = (PlatformPlayerManager<ServerPlayerEntity>) Impactor.getInstance().getPlatform().playerManager();
+        ServerPlayerEntity player = manager.translate(viewer).orElseThrow(() -> new IllegalStateException("Player not available or found"));
+        UIManager.openUIForcefully(player, this.page);
+    }
+
+    @Override
+    public void close(PlatformPlayer viewer) {
+        PlatformPlayerManager<ServerPlayerEntity> manager = (PlatformPlayerManager<ServerPlayerEntity>) Impactor.getInstance().getPlatform().playerManager();
+        ServerPlayerEntity player = manager.translate(viewer).orElseThrow(() -> new IllegalStateException("Player not available or found"));
+        if(player.containerMenu instanceof GooeyContainer) {
+            GooeyContainer container = (GooeyContainer) player.containerMenu;
+            if(container.getPage().equals(this.page)) {
+                player.closeContainer();
+            }
+        }
     }
 
     private ChestTemplate create() {
-        ChestTemplate.Builder builder = ChestTemplate.builder(this.layout.dimensions().rows());
+        ChestTemplate.Builder builder = ChestTemplate.builder(this.layout.dimensions().y());
         this.layout.elements().forEach((slot, icon) -> {
             ForgeIcon actual = (ForgeIcon) icon;
             builder.set(slot, actual.getDelegate());
@@ -98,7 +116,7 @@ public class ForgeUI implements ImpactorUI<ServerPlayerEntity> {
         return builder.build();
     }
 
-    public static class ForgeUIBuilder implements UIBuilder<ServerPlayerEntity> {
+    public static class ForgeUIBuilder implements UIBuilder {
 
         private Key key;
         private Component title;
@@ -106,36 +124,36 @@ public class ForgeUI implements ImpactorUI<ServerPlayerEntity> {
         private boolean readonly = true;
 
         @Override
-        public UIBuilder<ServerPlayerEntity> provider(Key key) {
+        public UIBuilder provider(Key key) {
             this.key = key;
             return this;
         }
 
         @Override
-        public UIBuilder<ServerPlayerEntity> title(Component title) {
+        public UIBuilder title(Component title) {
             this.title = title;
             return this;
         }
 
         @Override
-        public UIBuilder<ServerPlayerEntity> layout(Layout layout) {
+        public UIBuilder layout(Layout layout) {
             this.layout = layout;
             return this;
         }
 
         @Override
-        public UIBuilder<ServerPlayerEntity> readonly(boolean state) {
+        public UIBuilder readonly(boolean state) {
             this.readonly = state;
             return this;
         }
 
         @Override
-        public UIBuilder<ServerPlayerEntity> from(ImpactorUI<ServerPlayerEntity> input) {
+        public UIBuilder from(ImpactorUI input) {
             return this;
         }
 
         @Override
-        public ImpactorUI<ServerPlayerEntity> build() {
+        public ImpactorUI build() {
             return new ForgeUI(this);
         }
     }

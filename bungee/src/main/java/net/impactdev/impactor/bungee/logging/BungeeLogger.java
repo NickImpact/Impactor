@@ -47,6 +47,21 @@ public class BungeeLogger implements Logger {
     }
 
     @Override
+    public void info(String line) {
+        this.delegate.info(this.colorizer.apply(line));
+    }
+
+    @Override
+    public void info(Collection<String> lines) {
+        lines.forEach(this::info);
+    }
+
+    @Override
+    public void info(Supplier<String> supplier) {
+        this.info(supplier.get());
+    }
+
+    @Override
     public void info(String marker, String line) {
         this.delegate.info(this.colorizer.apply(this.preprocessor.apply(marker, line)));
     }
@@ -59,6 +74,21 @@ public class BungeeLogger implements Logger {
     @Override
     public void info(String marker, Supplier<String> supplier) {
         this.info(marker, supplier.get());
+    }
+
+    @Override
+    public void warn(String line) {
+        this.delegate.warning(this.colorizer.apply(line));
+    }
+
+    @Override
+    public void warn(Collection<String> lines) {
+        lines.forEach(this::info);
+    }
+
+    @Override
+    public void warn(Supplier<String> supplier) {
+        this.warn(supplier.get());
     }
 
     @Override
@@ -77,6 +107,21 @@ public class BungeeLogger implements Logger {
     }
 
     @Override
+    public void error(String line) {
+        this.delegate.severe(this.colorizer.apply(line));
+    }
+
+    @Override
+    public void error(Collection<String> lines) {
+        lines.forEach(this::info);
+    }
+
+    @Override
+    public void error(Supplier<String> supplier) {
+        this.warn(supplier.get());
+    }
+
+    @Override
     public void error(String marker, String line) {
         this.delegate.severe(this.colorizer.apply(this.preprocessor.apply(marker, line)));
     }
@@ -91,11 +136,23 @@ public class BungeeLogger implements Logger {
         this.error(marker, supplier.get());
     }
 
+    public void debug(String line) {
+        this.delegate.info(this.colorizer.apply("Debug - " + line));
+    }
+
+    @Override
+    public void debug(Collection<String> lines) {
+        lines.forEach(this::debug);
+    }
+
+    @Override
+    public void debug(Supplier<String> supplier) {
+        this.debug(supplier.get());
+    }
+
     @Override
     public void debug(String marker, String line) {
-        if(this.plugin.inDebugMode()) {
-            this.delegate.info(this.colorizer.apply(this.preprocessor.apply("Debug - " + marker, line)));
-        }
+        this.delegate.info(this.colorizer.apply(this.preprocessor.apply("Debug - " + marker, line)));
     }
 
     @Override

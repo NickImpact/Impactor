@@ -27,9 +27,9 @@ package net.impactdev.impactor.api.ui.layouts;
 
 import com.google.common.collect.ImmutableMap;
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.ui.components.Dimensions;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.utilities.Builder;
+import org.spongepowered.math.vector.Vector2i;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -40,7 +40,7 @@ public interface Layout {
 
 	Optional<Icon<?>> icon(int slot);
 
-	Dimensions dimensions();
+	Vector2i dimensions();
 
 	static LayoutBuilder builder() {
 		return Impactor.getInstance().getRegistry().createBuilder(LayoutBuilder.class);

@@ -67,12 +67,7 @@ public class SpongeAnimatedObjective extends AbstractSpongeObjective implements 
     @Override
     public Component getText() {
         return this.frames.getCurrent()
-                .or(() -> {
-                    this.frames.next();
-
-                    return this.frames.getCurrent();
-                })
-                .orElseThrow(() -> new IllegalStateException("No frame available"))
+                .orElse(this.frames.next().orElseThrow(() -> new IllegalStateException("No frame available")))
                 .getText();
     }
 

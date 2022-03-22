@@ -26,7 +26,7 @@
 package net.impactdev.impactor.api.ui.pagination;
 
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.ui.components.Dimensions;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.components.UIComponent;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.ui.layouts.Layout;
@@ -35,10 +35,9 @@ import net.impactdev.impactor.api.ui.pagination.updaters.PageUpdaterType;
 import net.impactdev.impactor.api.utilities.Builder;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.util.TriState;
+import org.spongepowered.math.vector.Vector2i;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -52,32 +51,81 @@ import java.util.List;
  */
 public interface Pagination {
 
-    Key namespace();
+    /**
+     * Represents the provider of this pagination through a {@link Key}. This Key is meant to help
+     * identify the provider of a pagination in the event an error occurs during processing
+     * of the view.
+     *
+     * @return A {@link Key} representing the provider of the pagination
+     */
+    Key provider();
 
-    boolean open();
+    /**
+     * Opens the view for the configured viewer, closing any currently opened view the player
+     * might be viewing.
+     */
+    void open();
 
-    boolean close();
+    /**
+     * Closes the view for the configured viewer, only if the view they have open, if one at all,
+     * is this view. Otherwise, this call will result in a no-op.
+     */
+    void close();
 
+    /**
+     * Specifies the layout used to create this view.
+     *
+     * @return The layout of the view
+     */
     Layout layout();
 
+    /**
+     * Sets the page of this section to the target page.
+     *
+     * @param target The target page to view for this section
+     */
     void page(int target);
 
-    void set(@Nullable Icon<?> icon, int slot);
+    /**
+     * Attempts to place the icon in the following slot location. If the intended slot exists inside
+     * the pagination zone, the action will be rejected, and a return value of <code>false</code> will be
+     * given to indicate such.
+     *
+     * @param icon The icon to place at the target slot position
+     * @param slot The slot inside the view that should be modified
+     * @return <code>true</code> if the action was accepted, <code>false</code> if rejected
+     */
+    boolean set(@Nullable Icon<?> icon, int slot);
 
+    /**
+     * Represents the list of pages that this pagination is composed of.
+     *
+     * @return The circularly linked list of pages
+     */
     CircularLinkedList<Page<?>> pages();
 
-    default int calculateTargetSlot(int target, Dimensions zone, Dimensions offsets) {
-        int x = target % zone.columns() + offsets.columns();
-        int y = target / zone.columns() + offsets.rows();
+    /**
+     * Calculates the location an icon should be placed based on the target index,
+     * alongside the content zone with grid and its offsets. Note that the target is not
+     * the slot, but rather the index from 0.
+     *
+     * @param target The index of the content being placed into the pagination
+     * @param zone The grid size for the pagination zone
+     * @param offsets The offsets of the pagination zone
+     * @return The calculated slot position in the pagination zone
+     */
+    default int calculateTargetSlot(int target, Vector2i zone, Vector2i offsets) {
+        int x = target % zone.y() + offsets.x();
+        int y = target / zone.y() + offsets.x();
 
         return x + (9 * y);
     }
 
-    static <P> PaginationBuilder<P> builder(Class<P> typing) {
-        return (PaginationBuilder<P>) Impactor.getInstance().getRegistry().createBuilder(PaginationBuilder.class);
+    static PaginationBuilder builder() {
+        return Impactor.getInstance().getRegistry().createBuilder(PaginationBuilder.class);
     }
 
-    interface PaginationBuilder<P> extends UIComponent<PaginationBuilder<P>>, Builder<Pagination, PaginationBuilder<P>> {
+    interface PaginationBuilder extends UIComponent<PaginationBuilder>, Builder<Pagination, PaginationBuilder> {
 
         /**
          * Sets the key referencing the provider of this pagination. This key provides both a namespace
@@ -88,7 +136,7 @@ public interface Pagination {
          * @return The updated builder
          */
         @Required
-        PaginationBuilder<P> provider(Key key);
+        PaginationBuilder provider(Key key);
 
         /**
          * Sets the viewer of the pagination. This will control who is capable of controlling and viewing
@@ -98,7 +146,7 @@ public interface Pagination {
          * @return The updated builder
          */
         @Required
-        PaginationBuilder<P> viewer(P viewer);
+        PaginationBuilder viewer(PlatformPlayer viewer);
 
         /**
          * Sets the contents of the pagination to the following icons. If the list of icons is more
@@ -108,13 +156,13 @@ public interface Pagination {
          * @param icons The icons to associate with the pagination
          * @return The updated builder
          */
-        PaginationBuilder<P> contents(List<Icon<?>> icons);
+        PaginationBuilder contents(List<Icon<?>> icons);
 
         /**
          * Indicates the section that a page will draw its contents in. If this section overlaps with the layout,
          * the content zone will override the affected slots of the layout. This will draw the content zone in the
          * top left corner of the interface. If you wish to move this section around, consider using
-         * {@link #zone(Dimensions, Dimensions)} instead.
+         * {@link #zone(Vector2i, Vector2i)} instead.
          *
          * If the given dimensions cannot fit within the viewable interface, an {@link IllegalArgumentException}
          * will be invoked to identify the issue.
@@ -122,8 +170,8 @@ public interface Pagination {
          * @param dimensions The dimensions for the location where icons should be drawn in the pagination view.
          * @return The updated builder
          */
-        default PaginationBuilder<P> zone(Dimensions dimensions) {
-            return this.zone(dimensions, Dimensions.ZERO);
+        default PaginationBuilder zone(Vector2i dimensions) {
+            return this.zone(dimensions, Vector2i.ZERO);
         }
 
         /**
@@ -137,7 +185,7 @@ public interface Pagination {
          * @param offset An offset that adjusts the placement of the content zone
          * @return The updated builder
          */
-        PaginationBuilder<P> zone(Dimensions dimensions, @Nullable Dimensions offset);
+        PaginationBuilder zone(Vector2i dimensions, @Nullable Vector2i offset);
 
         /**
          * Supplies an icon that controls interactions among pages within the pagination. These buttons act
@@ -148,13 +196,13 @@ public interface Pagination {
          *
          * <p>To allow for dynamic parsing of components, these icons are compatible with {@link MiniMessage} parsing
          * mechanics, so you can control the actual language output of each option. Additionally, a placeholder with
-         * the following tag &lt;target-page> will be available for all parsable components so your text can be
+         * the following tag &lt;target-page&gt; will be available for all parsable components so your text can be
          * dynamically styled and complete with parsed placeholders.
          *
          * @param updater The updater that will be used for the inventory interaction
          * @return The updated builder
          */
-        PaginationBuilder<P> updater(PageUpdater updater);
+        PaginationBuilder updater(PageUpdater updater);
 
         /**
          * Indicates whether any {@link PageUpdater PageUpdaters} with typings of {@link PageUpdaterType#PREVIOUS}
@@ -178,9 +226,8 @@ public interface Pagination {
          *
          * @param state The state to apply to updaters and how they appear and act within the Pagination
          * @return The updated builder
-         *
          */
-        PaginationBuilder<P> updaterStyle(TriState state);
+        PaginationBuilder style(TriState state);
 
     }
 

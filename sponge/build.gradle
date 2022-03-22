@@ -66,7 +66,6 @@ dependencies {
 
     compileOnly fileTree(dir: 'libs', include: '*.jar')
 
-    shadow 'org.spongepowered:math:2.0.0'
     shadow 'com.github.ben-manes.caffeine:caffeine:2.8.4'
     shadow 'me.lucko:jar-relocator:1.5'
 }

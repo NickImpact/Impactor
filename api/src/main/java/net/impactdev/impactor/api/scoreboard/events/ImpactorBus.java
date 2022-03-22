@@ -25,17 +25,15 @@
 
 package net.impactdev.impactor.api.scoreboard.events;
 
-import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.event.ImpactorEvent;
+import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.frames.types.ListeningFrame;
-import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.utilities.functional.TriFunction;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiFunction;
 
 /**
  * Represents the bus that handles event registration with the Impactor event bus.
@@ -63,12 +61,15 @@ public class ImpactorBus implements Bus<ImpactorEvent> {
     }
 
     @Override
-    public <E extends ImpactorEvent> TriFunction<Updatable, UUID, ListeningFrame.EventHandler<E>, RegisteredEvent> getRegisterHandler(TypeToken<E> type) {
-        return (line, assignee, handler) -> new RegisteredEvent(Impactor.getInstance().getEventBus().subscribe(type, event -> {
-            if(handler.process(line, assignee, event)) {
-                line.update();
-            }
-        }));
+    public <E extends ImpactorEvent> TriFunction<Updatable, UUID, ListeningFrame.EventHandler<E>, RegisteredEvent> getRegisterHandler(Class<E> type) {
+        return (line, assignee, handler) -> new RegisteredEvent(Impactor.getInstance().getEventBus().subscribe(
+                ImpactorPlugin.IMPACTOR,
+                type,
+                event -> {
+                    if(handler.process(line, assignee, event)) {
+                        line.update();
+                    }
+                }));
     }
 
     @Override

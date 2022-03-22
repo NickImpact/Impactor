@@ -55,14 +55,65 @@ public final class ProvidedDependencies {
             .build();
 
     // Kyori Products
+    public static final Dependency KYORI_EXAMINATION = Dependency.builder()
+            .name("Kyori Examination")
+            .group("net{}kyori")
+            .artifact("examination-api")
+            .version("1.3.0")
+            .checksum("ySN//ssFQo9u/4YhYkascM4LR7BMCOp8o1Ag/eV/hJI=")
+            .relocation(Relocation.of("net{}kyori", "kyori"))
+            .build();
+    public static final Dependency KYORI_EXAMINATION_STRINGS = Dependency.builder()
+            .name("Kyori Examination Strings")
+            .group("net{}kyori")
+            .artifact("examination-string")
+            .version("1.3.0")
+            .checksum("fQH8JaS7OvDhZiaFRV9FQfv0YmIW6lhG5FXBSR4Va4w=")
+            .relocation(Relocation.of("net{}kyori", "kyori"))
+            .with(KYORI_EXAMINATION)
+            .build();
+    public static final Dependency KYORI_KEYS = Dependency.builder()
+            .name("Kyori - Keys")
+            .group("net{}kyori")
+            .artifact("adventure-key")
+            .version("4.10.1")
+            .relocation(Relocation.of("net{}kyori", "kyori"))
+            .with(KYORI_EXAMINATION, KYORI_EXAMINATION_STRINGS)
+            .build();
     public static final Dependency ADVENTURE = Dependency.builder()
             .name("Adventure")
             .group("net{}kyori")
             .artifact("adventure-api")
-            .version("4.9.3")
-            .checksum("IwJ1wTO/6Pv6uBb2MEuoYnWEzPL6CaxWanks38ePd0A=")
-            .relocation(Relocation.of("net{}kyori{}adventure", "adventure"))
+            .version("4.10.1")
+            .checksum("N6scpKvvKMGUhKIYojadJLbsnA4zgESeO2+WPGtGjcg=")
+            .relocation(Relocation.of("net{}kyori", "kyori"))
+            .with(KYORI_EXAMINATION, KYORI_EXAMINATION_STRINGS)
             .build();
+    public static final Dependency ADVENTURE_LEGACY_SERIALIZER = Dependency.builder()
+            .name("Kyori - Adventure Legacy Serializer")
+            .group("net{}kyori")
+            .artifact("adventure-text-serializer-legacy")
+            .version("4.10.1")
+            .relocation(Relocation.of("net{}kyori", "kyori"))
+            .with(ADVENTURE)
+            .build();
+    public static final Dependency ADVENTURE_GSON_SERIALIZER = Dependency.builder()
+            .name("Kyori - Adventure GSON Serializer")
+            .group("net{}kyori")
+            .artifact("adventure-text-serializer-gson")
+            .version("4.10.1")
+            .relocation(Relocation.of("net{}kyori", "kyori"))
+            .with(ADVENTURE)
+            .build();
+    public static final Dependency ADVENTURE_MINIMESSAGE = Dependency.builder()
+            .name("Kyori - Adventure MiniMessage")
+            .group("net{}kyori")
+            .artifact("adventure-text-minimessage")
+            .version("4.10.1")
+            .relocation(Relocation.of("net{}kyori", "kyori"))
+            .with(ADVENTURE, KYORI_KEYS)
+            .build();
+
     public static final Dependency KYORI_EVENT_API = Dependency.builder()
             .name("Kyori Event API")
             .group("net{}kyori")
@@ -87,22 +138,7 @@ public final class ProvidedDependencies {
             .checksum("GnH7tbzQkrqklOGfK2nKNIoorpYXBHMabUdvoEGH8kk=")
             .relocation(Relocation.of("net{}kyori{}event", "eventbus"))
             .build();
-    public static final Dependency KYORI_EXAMINATION = Dependency.builder()
-            .name("Kyori Examination")
-            .group("net{}kyori")
-            .artifact("examination-api")
-            .version("1.3.0")
-            .checksum("YkD5iBwKfZrwTxX8p72X7s1glP+51dWfFtla/6WhDZY=")
-            .relocation(Relocation.of("net{}kyori{}examination", "examination"))
-            .build();
-    public static final Dependency KYORI_EXAMINATION_STRINGS = Dependency.builder()
-            .name("Kyori Examination Strings")
-            .group("net{}kyori")
-            .artifact("examination-string")
-            .version("1.3.0")
-            .checksum("BIbWM4Imuof26TxQZQGspF9UjSpGmLwaEw265K76pFk=")
-            .relocation(Relocation.of("net{}kyori{}examination", "examination"))
-            .build();
+
 
     // Configurate
     public static final Dependency CONFIGURATE_CORE = Dependency.builder()
@@ -192,6 +228,13 @@ public final class ProvidedDependencies {
             .version("1.0.3")
             .checksum("3qIBAx92YOvMdgQTZdeNdLm/s2+uxw0+oNz8UD09xnQ=")
             .relocation(Relocation.of("com.flowpowered.math", "flowmath"))
+            .build();
+    public static final Dependency SPONGE_MATH = Dependency.builder()
+            .name("SpongePowered Math")
+            .group("org.spongepowered")
+            .artifact("math")
+            .version("2.0.1")
+            .checksum("T5SBxcKJtCF1dzARPWlVQn+1qqqGdYA86EPhMiuhnUM=")
             .build();
     public static final Dependency SLF4J_API = Dependency.builder()
             .name("SLF4J API")

@@ -25,8 +25,7 @@
 
 package net.impactdev.impactor.api.event;
 
-import com.google.gson.reflect.TypeToken;
-import net.impactdev.impactor.api.event.annotations.Param;
+import net.kyori.event.ReifiedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -35,17 +34,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface ImpactorEvent {
 
     /**
-     * Gets the type of the event.
+     * Represents an Impactor-based event that is also generically bound.
      *
-     * @return the type of the event
+     * @param <T>
      */
-    @NonNull Class<? extends ImpactorEvent> getEventType();
-
-    interface Generic<T> extends ImpactorEvent {
-
-        @Param(-2)
-        @NonNull TypeToken<T> type();
-
-    }
+    interface Generic<T> extends ImpactorEvent, ReifiedEvent<T> {}
 
 }

@@ -93,6 +93,6 @@ public class ClickContext {
      * @throws NoSuchElementException If no value actually exists for the required typing.
      */
     public <T> T require(Class<T> type) throws NoSuchElementException {
-        return this.request(type).orElseThrow();
+        return this.request(type).orElseThrow(() -> new NoSuchElementException("Missing Type: " + type.getSimpleName()));
     }
 }

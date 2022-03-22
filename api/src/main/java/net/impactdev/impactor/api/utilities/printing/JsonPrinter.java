@@ -28,20 +28,51 @@ package net.impactdev.impactor.api.utilities.printing;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 
+import java.util.Objects;
+
 /**
  * Print a formatted representation of the specified {@link JsonElement} as a pretty
  * printed JSON output.
  *
- * @param json The element to print
  */
-public record JsonPrinter(JsonElement json) implements PrettyPrinter.IPrettyPrintable {
+public final class JsonPrinter implements PrettyPrinter.IPrettyPrintable {
+    private final JsonElement json;
+
+    /**
+     * @param json The element to print
+     */
+    public JsonPrinter(JsonElement json) {this.json = json;}
 
     @Override
     public void print(PrettyPrinter printer) {
         String raw = new GsonBuilder().setPrettyPrinting().create().toJson(this.json);
-        for(String line : raw.split("\n")) {
+        for (String line : raw.split("\n")) {
             printer.add(line);
         }
     }
+
+    public JsonElement json() {
+        return json;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        JsonPrinter that = (JsonPrinter) obj;
+        return Objects.equals(this.json, that.json);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(json);
+    }
+
+    @Override
+    public String toString() {
+        return "JsonPrinter[" +
+                "json=" + json + ']';
+    }
+
 
 }

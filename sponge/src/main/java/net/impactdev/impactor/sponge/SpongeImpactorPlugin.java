@@ -35,6 +35,22 @@ import net.impactdev.impactor.api.dependencies.ProvidedDependencies;
 import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
 import net.impactdev.impactor.api.event.EventBus;
 import net.impactdev.impactor.api.registry.Registry;
+import net.impactdev.impactor.api.scoreboard.ImpactorScoreboard;
+import net.impactdev.impactor.api.scoreboard.frames.types.ConstantFrame;
+import net.impactdev.impactor.api.scoreboard.frames.types.ListeningFrame;
+import net.impactdev.impactor.api.scoreboard.frames.types.RefreshingFrame;
+import net.impactdev.impactor.api.scoreboard.lines.types.AnimatedLine;
+import net.impactdev.impactor.api.scoreboard.lines.types.ConstantLine;
+import net.impactdev.impactor.api.scoreboard.lines.types.ListeningLine;
+import net.impactdev.impactor.api.scoreboard.lines.types.RefreshingLine;
+import net.impactdev.impactor.api.scoreboard.objective.types.AnimatedObjective;
+import net.impactdev.impactor.api.scoreboard.objective.types.ConstantObjective;
+import net.impactdev.impactor.api.scoreboard.objective.types.ListeningObjective;
+import net.impactdev.impactor.api.scoreboard.objective.types.RefreshingObjective;
+import net.impactdev.impactor.api.ui.ImpactorUI;
+import net.impactdev.impactor.api.ui.icons.Icon;
+import net.impactdev.impactor.api.ui.layouts.Layout;
+import net.impactdev.impactor.api.ui.pagination.Pagination;
 import net.impactdev.impactor.api.ui.signs.SignQuery;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
@@ -46,18 +62,30 @@ import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
 import net.impactdev.impactor.common.config.ConfigMaintainer;
 import net.impactdev.impactor.common.dependencies.DependencyContainer;
+import net.impactdev.impactor.common.event.ImpactorEventBus;
 import net.impactdev.impactor.common.placeholders.PlaceholderSourcesImpl;
+import net.impactdev.impactor.common.ui.LayoutImpl;
 import net.impactdev.impactor.sponge.api.SpongeImpactorAPIProvider;
 import net.impactdev.impactor.sponge.commands.PlaceholdersCommand;
-import net.impactdev.impactor.common.config.ConfigKeys;
-import net.impactdev.impactor.sponge.event.SpongeEventBus;
 import net.impactdev.impactor.sponge.plugin.AbstractSpongePlugin;
 import net.impactdev.impactor.sponge.scheduler.SpongeSchedulerAdapter;
-import net.impactdev.impactor.sponge.scoreboard.ScoreboardModule;
-import net.impactdev.impactor.sponge.services.SpongeMojangServerStatusService;
+import net.impactdev.impactor.sponge.scoreboard.SpongeScoreboard;
+import net.impactdev.impactor.sponge.scoreboard.frames.SpongeConstantFrame;
+import net.impactdev.impactor.sponge.scoreboard.frames.SpongeListeningFrame;
+import net.impactdev.impactor.sponge.scoreboard.frames.SpongeRefreshingFrame;
+import net.impactdev.impactor.sponge.scoreboard.lines.types.SpongeConstantLine;
+import net.impactdev.impactor.sponge.scoreboard.lines.types.updatable.SpongeAnimatedLine;
+import net.impactdev.impactor.sponge.scoreboard.lines.types.updatable.SpongeListeningLine;
+import net.impactdev.impactor.sponge.scoreboard.lines.types.updatable.SpongeRefreshingLine;
+import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeAnimatedObjective;
+import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeConstantObjective;
+import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeListeningObjective;
+import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeRefreshingObjective;
 import net.impactdev.impactor.sponge.text.SpongeMessageService;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
-import net.impactdev.impactor.sponge.ui.UIModule;
+import net.impactdev.impactor.sponge.ui.containers.SpongePagination;
+import net.impactdev.impactor.sponge.ui.containers.SpongeUI;
+import net.impactdev.impactor.sponge.ui.containers.icons.SpongeIcon;
 import net.impactdev.impactor.sponge.ui.signs.SpongeSignQuery;
 import net.impactdev.impactor.sponge.util.SpongeClassPathAppender;
 import org.apache.logging.log4j.Logger;
@@ -81,9 +109,6 @@ import java.util.*;
 public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depending {
 
 	private static SpongeImpactorPlugin instance;
-
-	private SpongeMojangServerStatusService mojangServerStatusService;
-
 	private final PluginContainer pluginContainer;
 
 	@Inject
@@ -107,17 +132,17 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		instance = this;
 
 		Registry registry = Impactor.getInstance().getRegistry();
-		Impactor.getInstance().getRegistry().register(ImpactorPlugin.class, this);
-		Impactor.getInstance().getRegistry().registerBuilderSupplier(Config.ConfigBuilder.class, ConfigMaintainer.ConfigMaintainerBuilder::new);
-		Impactor.getInstance().getRegistry().register(ClassPathAppender.class, new SpongeClassPathAppender(this));
+		registry.register(ImpactorPlugin.class, this);
+		registry.registerBuilderSupplier(Config.ConfigBuilder.class, ConfigMaintainer.ConfigMaintainerBuilder::new);
+		registry.register(ClassPathAppender.class, new SpongeClassPathAppender(this));
 		registry.registerBuilderSupplier(Dependency.DependencyBuilder.class, DependencyContainer.DependencyContainerBuilder::new);
-		Impactor.getInstance().getRegistry().register(DependencyManager.class, new DependencyManager(this));
+		registry.register(DependencyManager.class, new DependencyManager(this));
 
 		this.getPluginLogger().info("Startup", "Pooling plugin dependencies...");
 		List<Dependency> toLaunch = Lists.newArrayList();
 		for(ImpactorPlugin plugin : PluginRegistry.getAll()) {
-			if(plugin instanceof Depending dependable) {
-
+			if(plugin instanceof Depending) {
+				Depending dependable = (Depending) plugin;
 				for(Dependency dependency : dependable.getAllDependencies()) {
 					if(toLaunch.contains(dependency)) {
 						continue;
@@ -126,7 +151,7 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 					toLaunch.add(dependency);
 				}
 
-				for(Dependency storage : this.getDependencyManager().getRegistry().resolveStorageDependencies(Sets.newHashSet(dependable.getStorageRequirements()))) {
+				for(Dependency storage : this.getDependencyManager().registry().resolveStorageDependencies(Sets.newHashSet(dependable.getStorageRequirements()))) {
 					if(toLaunch.contains(storage)) {
 						continue;
 					}
@@ -152,25 +177,32 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		Impactor.getInstance().getRegistry().register(SpongePlaceholderManager.class, new SpongePlaceholderManager());
 		Impactor.getInstance().getRegistry().registerBuilderSupplier(PlaceholderSources.SourceBuilder.class, PlaceholderSourcesImpl.PlaceholderSourcesBuilderImpl::new);
 
-		new UIModule().initialize(registry);
-		new ScoreboardModule().initialize(registry);
+		registry.registerBuilderSupplier(Icon.IconBuilder.class, SpongeIcon.SpongeIconBuilder::new);
+		registry.registerBuilderSupplier(Layout.LayoutBuilder.class, LayoutImpl.LayoutImplBuilder::new);
+		registry.registerBuilderSupplier(Pagination.PaginationBuilder.class, SpongePagination.SpongePaginationBuilder::new);
+		registry.registerBuilderSupplier(ImpactorUI.UIBuilder.class, SpongeUI.SpongeUIBuilder::new);
 
-		Impactor.getInstance().getRegistry().register(EventBus.class, new SpongeEventBus());
-		((SpongeEventBus)Impactor.getInstance().getEventBus()).enable();
-	}
+		// Scoreboard Registration
+		registry.registerBuilderSupplier(ImpactorScoreboard.ScoreboardBuilder.class, SpongeScoreboard.SpongeScoreboardBuilder::new);
 
-	@Listener
-	public void onInit(StartingEngineEvent<Server> e) {
-		this.config = Config.builder()
-				.path(this.configDir.resolve("settings.conf"))
-				.supply(false)
-				.provider(ConfigKeys.class)
-				.build();
+		// Objectives
+		registry.registerBuilderSupplier(ConstantObjective.ConstantObjectiveBuilder.class, SpongeConstantObjective.SpongeConstantObjectiveBuilder::new);
+		registry.registerBuilderSupplier(RefreshingObjective.RefreshingObjectiveBuilder.class, SpongeRefreshingObjective.SpongeRefreshingObjectiveBuilder::new);
+		registry.registerBuilderSupplier(ListeningObjective.ListeningObjectiveBuilder.class, SpongeListeningObjective.SpongeListeningObjectiveBuilder::new);
+		registry.registerBuilderSupplier(AnimatedObjective.AnimatedObjectiveBuilder.class, SpongeAnimatedObjective.SpongeAnimatedObjectiveBuilder::new);
 
-		if(this.config.get(ConfigKeys.USE_MOJANG_STATUS_FETCHER)) {
-			this.getPluginLogger().info("Startup", "Enabling Mojang Status Watcher...");
-			mojangServerStatusService = new SpongeMojangServerStatusService();
-		}
+		// Lines
+		registry.registerBuilderSupplier(ConstantLine.ConstantLineBuilder.class, SpongeConstantLine.SpongeConstantLineBuilder::new);
+		registry.registerBuilderSupplier(RefreshingLine.RefreshingLineBuilder.class, SpongeRefreshingLine.SpongeRefreshingLineBuilder::new);
+		registry.registerBuilderSupplier(AnimatedLine.AnimatedBuilder.class, SpongeAnimatedLine.SpongeAnimatedBuilder::new);
+		registry.registerBuilderSupplier(ListeningLine.ListeningBuilder.class, SpongeListeningLine.SpongeListeningLineBuilder::new);
+
+		// Frames
+		registry.registerBuilderSupplier(ConstantFrame.ConstantFrameBuilder.class, SpongeConstantFrame.SpongeConstantFrameBuilder::new);
+		registry.registerBuilderSupplier(RefreshingFrame.RefreshingFrameBuilder.class, SpongeRefreshingFrame.SpongeRefreshingFrameBuilder::new);
+		registry.registerBuilderSupplier(ListeningFrame.ListeningFrameBuilder.class, SpongeListeningFrame.SpongeListeningFrameBuilder::new);
+		Impactor.getInstance().getRegistry().register(EventBus.class, new ImpactorEventBus());
+		((ImpactorEventBus) Impactor.getInstance().getEventBus()).enable();
 	}
 
 	@Listener
@@ -198,25 +230,12 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 //					}
 //				});
 //
-//		sorted.keySet().stream().sorted((s1, s2) -> {
-//			if(s1.equals("Custom")) {
-//				return 1;
-//			} else if(s2.equals("Custom")) {
-//				return -1;
-//			} else {
-//				return s1.compareTo(s2);
-//			}
-//		}).forEach(key -> {
-//			this.getPluginLogger().info("&3" + key);
-//			for(ResourceKey parser : sorted.get(key)) {
-//				this.getPluginLogger().info("&a- " + parser.formatted());
-//			}
-//		});
+
 //	}
 
 	@Listener
 	public void onShutdown(StoppingEngineEvent<Server> event) {
-		((SpongeEventBus)Impactor.getInstance().getEventBus()).disable();
+		((ImpactorEventBus)Impactor.getInstance().getEventBus()).disable();
 	}
 
 	@Listener
@@ -226,6 +245,10 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		new SpongePlaceholderManager().getAllInternalParsers().forEach(metadata -> {
 			placeholderParserRegistryStep.register(ResourceKey.of(this.pluginContainer, metadata.getToken()), metadata.getParser());
 		});
+	}
+
+	public Path getConfigDir() {
+		return this.configDir;
 	}
 
 	public Config getConfig() {
@@ -252,11 +275,22 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		return Lists.newArrayList();
 	}
 
-	public SpongeMojangServerStatusService getMojangServerStatusService() {
-		return this.mojangServerStatusService;
-	}
-
 	public PluginContainer getPluginContainer() {
 		return this.pluginContainer;
+	}
+
+	@Override
+	public void construct() {
+
+	}
+
+	@Override
+	public void enable() {
+
+	}
+
+	@Override
+	public void disable() {
+
 	}
 }

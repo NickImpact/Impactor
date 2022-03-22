@@ -43,9 +43,28 @@ public class ForgeLogger implements Logger {
         this.delegate = delegate;
     }
 
+    private Marker get(String marker) {
+        return this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+    }
+
+    @Override
+    public void info(String line) {
+        this.delegate.info(line);
+    }
+
+    @Override
+    public void info(Collection<String> lines) {
+        lines.forEach(this::info);
+    }
+
+    @Override
+    public void info(Supplier<String> supplier) {
+        this.info(supplier.get());
+    }
+
     @Override
     public void info(String marker, String line) {
-        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        Marker m = this.get(marker);
         this.delegate.info(m, line);
     }
 
@@ -56,13 +75,28 @@ public class ForgeLogger implements Logger {
 
     @Override
     public void info(String marker, Supplier<String> supplier) {
-        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        Marker m = this.get(marker);
         this.delegate.info(m, supplier);
     }
 
     @Override
+    public void warn(String line) {
+        this.delegate.warn(line);
+    }
+
+    @Override
+    public void warn(Collection<String> lines) {
+        lines.forEach(this::warn);
+    }
+
+    @Override
+    public void warn(Supplier<String> supplier) {
+        this.warn(supplier.get());
+    }
+
+    @Override
     public void warn(String marker, String line) {
-        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        Marker m = this.get(marker);
         this.delegate.warn(m, line);
     }
 
@@ -73,13 +107,28 @@ public class ForgeLogger implements Logger {
 
     @Override
     public void warn(String marker, Supplier<String> supplier) {
-        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        Marker m = this.get(marker);
         this.delegate.warn(m, supplier);
     }
 
     @Override
+    public void error(String line) {
+        this.delegate.error(line);
+    }
+
+    @Override
+    public void error(Collection<String> lines) {
+        lines.forEach(this::error);
+    }
+
+    @Override
+    public void error(Supplier<String> supplier) {
+        this.error(supplier.get());
+    }
+
+    @Override
     public void error(String marker, String line) {
-        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        Marker m = this.get(marker);
         this.delegate.error(m, line);
     }
 
@@ -90,13 +139,28 @@ public class ForgeLogger implements Logger {
 
     @Override
     public void error(String marker, Supplier<String> supplier) {
-        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        Marker m = this.get(marker);
         this.delegate.error(m, supplier);
     }
 
     @Override
+    public void debug(String line) {
+        this.delegate.debug(line);
+    }
+
+    @Override
+    public void debug(Collection<String> lines) {
+        lines.forEach(this::debug);
+    }
+
+    @Override
+    public void debug(Supplier<String> supplier) {
+        this.debug(supplier.get());
+    }
+
+    @Override
     public void debug(String marker, String line) {
-        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        Marker m = this.get(marker);
         this.delegate.debug(m, line);
     }
 
@@ -107,7 +171,7 @@ public class ForgeLogger implements Logger {
 
     @Override
     public void debug(String marker, Supplier<String> supplier) {
-        Marker m = this.markers.computeIfAbsent(marker, MarkerManager::getMarker);
+        Marker m = this.get(marker);
         this.delegate.debug(m, supplier);
     }
 }

@@ -25,8 +25,9 @@
 
 package net.impactdev.impactor.api.math;
 
-import com.flowpowered.math.TrigMath;
-import com.flowpowered.math.vector.Vector3d;
+
+import org.spongepowered.math.TrigMath;
+import org.spongepowered.math.vector.Vector3d;
 
 public class VectorMath {
 
@@ -43,9 +44,9 @@ public class VectorMath {
 		double y, z, cos, sin;
 		cos = Math.cos(angle);
 		sin = Math.sin(angle);
-		y = v.getY() * cos - v.getZ() * sin;
-		z = v.getY() * sin + v.getZ() * cos;
-		return Vector3d.from(v.getX(), y, z);
+		y = v.y() * cos - v.z() * sin;
+		z = v.y() * sin + v.z() * cos;
+		return Vector3d.from(v.x(), y, z);
 	}
 
 	/**
@@ -59,9 +60,9 @@ public class VectorMath {
 		double x, z, cos, sin;
 		cos = Math.cos(angle);
 		sin = Math.sin(angle);
-		x = v.getX() * cos + v.getZ() * sin;
-		z = v.getX() * -sin + v.getZ() * cos;
-		return Vector3d.from(x, v.getY(), z);
+		x = v.x() * cos + v.z() * sin;
+		z = v.x() * -sin + v.z() * cos;
+		return Vector3d.from(x, v.y(), z);
 	}
 
 	/**
@@ -75,9 +76,9 @@ public class VectorMath {
 		double x, y, cos, sin;
 		cos = Math.cos(angle);
 		sin = Math.sin(angle);
-		x = v.getX() * cos - v.getY() * sin;
-		y = v.getX() * sin + v.getY() * cos;
-		return Vector3d.from(x, y, v.getZ());
+		x = v.x() * cos - v.y() * sin;
+		y = v.x() * sin + v.y() * cos;
+		return Vector3d.from(x, y, v.z());
 
 	}
 
@@ -104,7 +105,7 @@ public class VectorMath {
 		return Vector3d.from(cos(radians) * radius, 0, -sin(radians) * radius);
 	}
 
-	public static Vector3d[] getLine(Vector3d start, Vector3d end, int points) {
+	public static Vector3d[] line(Vector3d start, Vector3d end, int points) {
 		Vector3d[] result = new Vector3d[points];
 		Vector3d link = end.sub(start);
 
@@ -113,7 +114,7 @@ public class VectorMath {
 		link = link.normalize();
 		link = link.mul(ratio);
 
-		result[0] = new Vector3d(start.add(link));
+		result[0] = start.add(link);
 		for(int i = 1; i < points; i++) {
 			result[i] = result[i - 1].add(link);
 		}

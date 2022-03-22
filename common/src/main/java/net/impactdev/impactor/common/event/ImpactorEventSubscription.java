@@ -27,9 +27,9 @@ package net.impactdev.impactor.common.event;
 
 import net.impactdev.impactor.api.event.EventSubscription;
 import net.impactdev.impactor.api.event.ImpactorEvent;
+import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.kyori.event.EventSubscriber;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -37,7 +37,9 @@ import java.util.function.Consumer;
 public class ImpactorEventSubscription<T extends ImpactorEvent> implements EventSubscription<T>, EventSubscriber<T> {
 
     /** The event bus which created this handler */
-    private final AbstractEventBus<?> eventBus;
+    private final ImpactorEventBus eventBus;
+
+    private final PluginMetadata metadata;
 
     /** The event's class type */
     private final Class<T> eventClass;
@@ -45,20 +47,17 @@ public class ImpactorEventSubscription<T extends ImpactorEvent> implements Event
     /** The delegate event handler */
     private final Consumer<? super T> consumer;
 
-    /** The plugin which owns this handler */
-    private final @Nullable Object plugin;
-
     private final AtomicBoolean active = new AtomicBoolean(true);
 
-    public ImpactorEventSubscription(AbstractEventBus<?> eventBus, Class<T> eventClass, Consumer<? super T> consumer, @Nullable Object plugin) {
+    public ImpactorEventSubscription(ImpactorEventBus eventBus, PluginMetadata metadata, Class<T> eventClass, Consumer<? super T> consumer) {
         this.eventBus = eventBus;
+        this.metadata = metadata;
         this.eventClass = eventClass;
         this.consumer = consumer;
-        this.plugin = plugin;
     }
 
     @Override
-    public boolean isActive() {
+    public boolean active() {
         return this.active.get();
     }
 
@@ -72,27 +71,23 @@ public class ImpactorEventSubscription<T extends ImpactorEvent> implements Event
     }
 
     @Override
-    public @NonNull Class<T> getEventClass() {
+    public @NonNull Class<T> eventClass() {
         return this.eventClass;
     }
 
     @Override
-    public @NonNull Consumer<? super T> getHandler() {
+    public @NonNull PluginMetadata metadata() {
+        return this.metadata;
+    }
+
+    @Override
+    public @NonNull Consumer<? super T> handler() {
         return this.consumer;
     }
 
     @Override
     public void invoke(@NonNull T event) throws Throwable {
-        try {
-            this.consumer.accept(event);
-        } catch (Throwable t) {
-            //this.eventBus
-            t.printStackTrace();
-        }
-    }
-
-    public @Nullable Object getPlugin() {
-        return this.plugin;
+        this.consumer.accept(event);
     }
 
 }

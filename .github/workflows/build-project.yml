@@ -12,7 +12,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
-          java-version: '16'
+          java-version: '8'
           cache: 'gradle'
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
@@ -38,7 +38,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
-          java-version: '16'
+          java-version: '8'
           cache: 'gradle'
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1

@@ -29,7 +29,8 @@ import net.impactdev.impactor.api.event.EventBus;
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.scheduler.SchedulerAdapter;
 import net.impactdev.impactor.common.api.ImpactorAPIProvider;
-import net.impactdev.impactor.sponge.SpongePlatform;
+import net.impactdev.impactor.sponge.platform.SpongePlatform;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 public class SpongeImpactorAPIProvider extends ImpactorAPIProvider {
 
@@ -40,7 +41,7 @@ public class SpongeImpactorAPIProvider extends ImpactorAPIProvider {
     }
 
     @Override
-    public Platform getPlatform() {
+    public Platform<ServerPlayer> getPlatform() {
         return new SpongePlatform();
     }
 

@@ -125,7 +125,7 @@ public class CircularLinkedList<E> implements Iterable<E> {
 
 	public E at(int index) throws IndexOutOfBoundsException {
 		if(index >= this.size() || index < 0) {
-			throw new IndexOutOfBoundsException(index);
+			throw new IndexOutOfBoundsException("" + index);
 		}
 
 		Node<E> node = this.head;

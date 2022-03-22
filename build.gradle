@@ -64,7 +64,7 @@ subprojects {
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(16)
+            languageVersion = JavaLanguageVersion.of(8)
         }
 
         withSourcesJar()
@@ -86,9 +86,9 @@ subprojects {
     }
 
     dependencies {
+        // Google
         shadow 'com.google.guava:guava:27.1-jre'
         shadow 'com.google.code.gson:gson:2.8.0'
-        shadow 'org.reflections:reflections:0.10.2'
 
         // Configurate
         shadow 'org.spongepowered:configurate-core:4.1.2'
@@ -96,10 +96,25 @@ subprojects {
         shadow 'org.spongepowered:configurate-hocon:4.1.2'
         shadow 'org.spongepowered:configurate-yaml:4.1.2'
 
-        shadow 'net.kyori:adventure-api:4.9.3'
-        shadow 'net.kyori:adventure-text-serializer-legacy:4.9.3'
-        shadow 'net.kyori:adventure-text-serializer-gson:4.9.3'
-        api 'net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT'
+        // Adventure
+        shadow 'net.kyori:adventure-api:4.10.1'
+        shadow 'net.kyori:adventure-text-serializer-legacy:4.10.1'
+        shadow 'net.kyori:adventure-text-serializer-gson:4.10.1'
+        shadow 'net.kyori:adventure-text-minimessage:4.10.1'
+
+        // Events
+        shadow 'net.kyori:event-api:3.0.0'
+        shadow 'net.kyori:event-method:3.0.0'
+        shadow 'net.kyori:event-method-asm:3.0.0'
+
+        // Netty
+        shadow 'io.netty:netty-all:4.1.25.Final'
+
+        // Misc
+        shadow 'org.reflections:reflections:0.10.2'
+        shadow group: 'org.spongepowered', name: 'math', version: '2.0.1'
+
+        // Testing
         testImplementation group: 'junit', name: 'junit', version: '4.12'
     }
 
@@ -116,6 +131,8 @@ subprojects {
         }
         newLine = true
     }
+
+    compileJava.dependsOn(updateLicenses)
 }
 
 task copyJars(type: Copy) {

@@ -25,12 +25,10 @@
 
 package net.impactdev.impactor.api.scoreboard.frames.types;
 
-import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.events.Bus;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
-import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.utilities.Builder;
 
 import java.util.UUID;
@@ -44,11 +42,11 @@ import java.util.UUID;
 public interface ListeningFrame<L> extends ScoreboardFrame.UpdatableFrame {
 
     /**
-     * A {@link TypeToken} that resembles the type of the event for the frame
+     * A {@link Class} that resembles the type of the event for the frame
      *
-     * @return A {@link TypeToken} based on the event type
+     * @return A {@link Class} based on the event type
      */
-    TypeToken<L> getListenerType();
+    Class<L> getListenerType();
 
     /**
      * Represents the handler being used by this frame for listening to its target event.
@@ -61,14 +59,14 @@ public interface ListeningFrame<L> extends ScoreboardFrame.UpdatableFrame {
 
         /**
          * Sets the frame to listen against events of the following type. This is normally set during
-         * construction of the builder via {@link ScoreboardFrame#listening(TypeToken)}, so you can avoid using
+         * construction of the builder via {@link ScoreboardFrame#listening(Class)}, so you can avoid using
          * this method.
          *
          * @param event The event type this frame should represent
          * @param <E> A reference to the type of event
          * @return This builder
          */
-        <E> ListeningFrameBuilder<E> type(TypeToken<E> event);
+        <E> ListeningFrameBuilder<E> type(Class<E> event);
 
         /**
          * Specifies the bus to be used by this frame

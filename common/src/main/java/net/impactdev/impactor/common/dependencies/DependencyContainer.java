@@ -39,6 +39,7 @@ public class DependencyContainer implements Dependency {
     private final String version;
     @Nullable private final byte[] checksum;
     private final Set<Relocation> relocations;
+    private final Set<Dependency> bundled;
 
     public DependencyContainer(DependencyContainerBuilder builder) {
         this.name = builder.name;
@@ -47,6 +48,7 @@ public class DependencyContainer implements Dependency {
         this.version = builder.version;
         this.checksum = builder.checksum != null ? Base64.getDecoder().decode(builder.checksum) : null;
         this.relocations = builder.relocations;
+        this.bundled = builder.bundled;
     }
 
     @Override
@@ -80,7 +82,7 @@ public class DependencyContainer implements Dependency {
 
     @Override
     public String getFileName() {
-        return this.name().toLowerCase().replace("_", "-").replace(" ", "-") + "-" + this.version();
+        return this.artifact + "-" + this.version();
     }
 
     @Override
@@ -97,6 +99,11 @@ public class DependencyContainer implements Dependency {
     @Override
     public boolean snapshot() {
         return this.version.contains("-SNAPSHOT");
+    }
+
+    @Override
+    public Set<Dependency> bundled() {
+        return this.bundled;
     }
 
     @Override
@@ -124,6 +131,7 @@ public class DependencyContainer implements Dependency {
         private String version;
         private String checksum;
         private final Set<Relocation> relocations = new LinkedHashSet<>();
+        private final Set<Dependency> bundled = new HashSet<>();
 
         @Override
         public DependencyBuilder name(String name) {
@@ -158,6 +166,18 @@ public class DependencyContainer implements Dependency {
 
         public DependencyBuilder relocations(Relocation... relocations) {
             this.relocations.addAll(Arrays.asList(relocations));
+            return this;
+        }
+
+        @Override
+        public DependencyBuilder with(Dependency dependency) {
+            this.bundled.add(dependency);
+            return this;
+        }
+
+        @Override
+        public DependencyBuilder with(Dependency... dependencies) {
+            this.bundled.addAll(Arrays.asList(dependencies));
             return this;
         }
 

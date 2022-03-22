@@ -28,7 +28,10 @@ package net.impactdev.impactor.bungee.api;
 import net.impactdev.impactor.api.event.EventBus;
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.scheduler.SchedulerAdapter;
+import net.impactdev.impactor.bungee.platform.BungeePlatform;
 import net.impactdev.impactor.common.api.ImpactorAPIProvider;
+import net.md_5.bungee.api.connection.ConnectedPlayer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class BungeeImpactorAPIProvider extends ImpactorAPIProvider {
 
@@ -40,7 +43,7 @@ public class BungeeImpactorAPIProvider extends ImpactorAPIProvider {
 
     @Override
     public Platform getPlatform() {
-        return null;
+        return new BungeePlatform();
     }
 
     @Override

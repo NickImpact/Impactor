@@ -38,6 +38,7 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.UUID;
 
@@ -57,7 +58,7 @@ public class SpongeRefreshingFrame extends AbstractSpongeFrame implements Refres
     public void provideSource(UUID target) {
         this.sources = PlaceholderSources.builder()
                 .from(this.sources)
-                .appendIfAbsent(ServerPlayer.class, () -> Sponge.server().player(target).orElseThrow())
+                .appendIfAbsent(ServerPlayer.class, () -> Sponge.server().player(target).orElseThrow(NoSuchElementException::new))
                 .build();
     }
 

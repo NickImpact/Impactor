@@ -27,9 +27,12 @@ package net.impactdev.impactor.api.dependencies;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.common.io.ByteStreams;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
+import net.impactdev.impactor.api.dependencies.repositories.DependencyRepository;
+import net.impactdev.impactor.api.dependencies.repositories.ProvidedRepositories;
+import net.impactdev.impactor.api.logging.Logger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.api.dependencies.classloader.IsolatedClassLoader;
@@ -38,19 +41,25 @@ import net.impactdev.impactor.api.dependencies.relocation.RelocationHandler;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Responsible for loading runtime dependencies.
@@ -61,8 +70,13 @@ public class DependencyManager {
 	private final ImpactorPlugin plugin;
 	/** A registry containing plugin specific behavior for dependencies */
 	private final DependencyRegistry registry;
-	/** THe path where library jars are cached */
+	/** The path where library jars are cached */
 	private final Path cacheDirectory;
+
+	/** A set of repositories the manager will query for dependencies */
+	private final Set<DependencyRepository> repositories = new TreeSet<>(new DependencyRepository.DependencyComparator());
+
+	private final DependencyDownloader downloader = new DependencyDownloader();
 
 	/** A map of dependencies which have already been loaded */
 	private final Map<Dependency, Path> loaded = new HashMap<>();
@@ -82,6 +96,10 @@ public class DependencyManager {
 				throw new RuntimeException("Failed to create libs directory", e);
 			}
 		}
+
+		for(ProvidedRepositories repository : ProvidedRepositories.values()) {
+			this.repository(repository);
+		}
 	}
 
 	private synchronized RelocationHandler getRelocationHandler() {
@@ -91,7 +109,15 @@ public class DependencyManager {
 		return this.relocationHandler;
 	}
 
-	public DependencyRegistry getRegistry() {
+	public Set<DependencyRepository> repositories() {
+		return this.repositories;
+	}
+
+	public void repository(DependencyRepository repository) {
+		this.repositories.add(repository);
+	}
+
+	public DependencyRegistry registry() {
 		return this.registry;
 	}
 
@@ -149,7 +175,14 @@ public class DependencyManager {
 
 		this.plugin.getPluginLogger().info("Dependencies", "Loading dependency: " + dependency.name());
 		Path file = remapDependency(dependency, downloadDependency(dependency));
+		this.load(dependency, file);
 
+		for(Dependency bundled : dependency.bundled()) {
+			this.loadDependency(bundled);
+		}
+	}
+
+	private void load(Dependency dependency, Path file) {
 		this.loaded.put(dependency, file);
 		if(this.registry.shouldAutoLoad(dependency)) {
 			Impactor.getInstance().getRegistry().get(ClassPathAppender.class).addJarToClasspath(file);
@@ -164,9 +197,9 @@ public class DependencyManager {
 		}
 
 		DependencyDownloadException last = null;
-		for(DependencyRepository repository : DependencyRepository.values()) {
+		for(DependencyRepository repository : this.repositories) {
 			try {
-				repository.download(dependency, file);
+				this.downloader.download(repository, dependency, file);
 				return file;
 			} catch (DependencyDownloadException e) {
 				last = e;
@@ -184,13 +217,80 @@ public class DependencyManager {
 		}
 
 		Path remapped = this.cacheDirectory.resolve(dependency.getFileName() + "-remapped.jar");
-
 		if(Files.exists(remapped)) {
 			return remapped;
 		}
 
 		this.getRelocationHandler().remap(normalFile, remapped, rules);
 		return remapped;
+	}
+
+	public static class DependencyDownloader {
+
+		public void download(DependencyRepository repository, Dependency dependency, Path file) throws DependencyDownloadException {
+			try {
+				Files.write(file, download(repository, dependency));
+			} catch (IOException e) {
+				throw new DependencyDownloadException(e);
+			}
+		}
+
+		private URLConnection openConnection(DependencyRepository resository, Dependency dependency) throws IOException {
+			URLConnection connection;
+			if(dependency.snapshot() && resository.snapshots().isPresent()) {
+				URL url = resository.snapshots().get().resolve(dependency);
+				connection = url.openConnection();
+			} else {
+				URL dependencyURL = new URL(resository.releases() + dependency.getMavenPath());
+				connection = dependencyURL.openConnection();
+			}
+
+			connection.setRequestProperty("User-Agent", "impactor");
+			connection.setConnectTimeout((int) TimeUnit.SECONDS.toMillis(5));
+			connection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(10));
+			return connection;
+		}
+
+		private byte[] downloadRaw(DependencyRepository repository, Dependency dependency) throws DependencyDownloadException {
+			try {
+				URLConnection connection = this.openConnection(repository, dependency);
+				try(InputStream in = connection.getInputStream()) {
+					byte[] bytes = ByteStreams.toByteArray(in);
+					if(bytes.length == 0) {
+						throw new Exception("empty stream");
+					}
+
+					return bytes;
+				}
+			} catch (Exception e) {
+				throw new DependencyDownloadException(e);
+			}
+		}
+
+		private byte[] download(DependencyRepository repository, Dependency dependency) throws DependencyDownloadException {
+			Logger logger = Impactor.getInstance().getRegistry().get(ImpactorPlugin.class).getPluginLogger();
+
+			byte[] bytes = downloadRaw(repository, dependency);
+			Optional<byte[]> checksum = dependency.checksum();
+			try {
+				byte[] hash = MessageDigest.getInstance("SHA-256").digest(bytes);
+				logger.debug("Dependencies", "Checksum = " + Base64.getEncoder().encodeToString(hash));
+
+				if(checksum.isPresent()) {
+					if (!Arrays.equals(checksum.get(), hash)) {
+						throw new DependencyDownloadException("Mismatched checksum for " + dependency.name() +
+								". Expected: " + Base64.getEncoder().encodeToString(checksum.get()) + " " +
+								"Actual: " + Base64.getEncoder().encodeToString(hash));
+					}
+				}
+			} catch (NoSuchAlgorithmException e) {
+				throw new DependencyDownloadException("Failed to decode file hash", e);
+			}
+
+			logger.info("Dependencies", "Successfully downloaded dependency '" + dependency.name() + "'");
+			return bytes;
+		}
+
 	}
 
 }

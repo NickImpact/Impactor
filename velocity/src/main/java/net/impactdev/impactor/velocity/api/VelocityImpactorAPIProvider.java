@@ -25,10 +25,12 @@
 
 package net.impactdev.impactor.velocity.api;
 
+import com.velocitypowered.api.proxy.Player;
 import net.impactdev.impactor.api.event.EventBus;
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.scheduler.SchedulerAdapter;
 import net.impactdev.impactor.common.api.ImpactorAPIProvider;
+import net.impactdev.impactor.velocity.platform.VelocityPlatform;
 
 public class VelocityImpactorAPIProvider extends ImpactorAPIProvider {
 
@@ -39,8 +41,8 @@ public class VelocityImpactorAPIProvider extends ImpactorAPIProvider {
     }
 
     @Override
-    public Platform getPlatform() {
-        return null;
+    public Platform<Player> getPlatform() {
+        return new VelocityPlatform();
     }
 
     @Override

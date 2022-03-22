@@ -48,8 +48,10 @@ import org.spongepowered.api.scoreboard.objective.Objective;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class SpongeScoreboard implements ImpactorScoreboard<ServerPlayer> {
 
@@ -92,7 +94,7 @@ public class SpongeScoreboard implements ImpactorScoreboard<ServerPlayer> {
     }
 
     private Supplier<ServerPlayer> player() {
-        return () -> Sponge.server().player(this.source).orElseThrow();
+        return () -> Sponge.server().player(this.source).orElseThrow(NoSuchElementException::new);
     }
 
     @Override
@@ -196,7 +198,7 @@ public class SpongeScoreboard implements ImpactorScoreboard<ServerPlayer> {
             this.lines = input.getLines().stream()
                     .map(line -> new Tuple<>(line, line.copy()))
                     .map(pair -> ((AbstractSpongeSBLine) pair.getSecond()).assignScore(((AbstractSpongeObjective) this.objective).resolve(), pair.getFirst().getScore()))
-                    .toList();
+                    .collect(Collectors.toList());
             return this;
         }
 

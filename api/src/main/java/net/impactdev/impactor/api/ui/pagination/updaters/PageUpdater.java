@@ -28,12 +28,12 @@ package net.impactdev.impactor.api.ui.pagination.updaters;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.Template;
-//import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-//import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class PageUpdater {
 
@@ -80,8 +80,7 @@ public abstract class PageUpdater {
 
     public static class Mini extends PageUpdater {
 
-        //private static final MiniMessage mini = MiniMessage.miniMessage();
-        private static final MiniMessage mini = MiniMessage.get();
+        private static final MiniMessage mini = MiniMessage.miniMessage();
 
         private final String title;
         private final List<String> lore;
@@ -94,19 +93,17 @@ public abstract class PageUpdater {
 
         @Override
         public Component title(int target) {
-//            TagResolver template = Placeholder.parsed("target-page", "" + target);
-            Template template = Template.of("target-page", "" + target);
-            return mini.parse(this.title, template);
+            TagResolver template = Placeholder.parsed("target-page", "" + target);
+            return mini.deserialize(this.title, template);
         }
 
         @Override
         public List<Component> lore(int target) {
-//            TagResolver template = Placeholder.parsed("target-page", "" + target);
-            Template template = Template.of("target-page", "" + target);
+            TagResolver template = Placeholder.parsed("target-page", "" + target);
             return this.lore
                     .stream()
-                    .map(line -> mini.parse(line, template))
-                    .toList();
+                    .map(line -> mini.deserialize(line, template))
+                    .collect(Collectors.toList());
         }
     }
 

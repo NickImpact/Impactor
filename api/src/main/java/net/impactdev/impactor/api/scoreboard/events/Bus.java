@@ -25,14 +25,11 @@
 
 package net.impactdev.impactor.api.scoreboard.events;
 
-import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.frames.types.ListeningFrame;
-import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.utilities.functional.TriFunction;
 
 import java.util.UUID;
-import java.util.function.BiFunction;
 
 /**
  * Represents a bus responsible for handling the event processes of a particular line/objective on a scoreboard.
@@ -60,7 +57,7 @@ public interface Bus<L> {
      * @return A function that returns a {@link RegisteredEvent} given an updatable scoreboard instance alongside
      * an event handler as parameters.
      */
-    <E extends L> TriFunction<Updatable, UUID, ListeningFrame.EventHandler<E>, RegisteredEvent> getRegisterHandler(TypeToken<E> type);
+    <E extends L> TriFunction<Updatable, UUID, ListeningFrame.EventHandler<E>, RegisteredEvent> getRegisterHandler(Class<E> type);
 
     /**
      * Stops any currently registered event given via the event registration from being listened on further.

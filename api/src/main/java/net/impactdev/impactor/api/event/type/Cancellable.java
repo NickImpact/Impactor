@@ -25,14 +25,12 @@
 
 package net.impactdev.impactor.api.event.type;
 
-import net.impactdev.impactor.api.event.annotations.Param;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public interface Cancellable {
 
-    @Param(-1)
     @NonNull AtomicBoolean cancellationState();
 
     default boolean isCancelled() {

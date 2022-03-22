@@ -37,7 +37,7 @@ public interface Impactor {
         return ImpactorServiceProvider.get();
     }
 
-    Platform getPlatform();
+    Platform<?> getPlatform();
 
     Registry getRegistry();
 

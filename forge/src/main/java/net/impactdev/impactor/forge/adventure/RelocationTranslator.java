@@ -27,6 +27,9 @@ package net.impactdev.impactor.forge.adventure;
 
 import net.impactdev.impactor.forge.adventure.serializer.RelocationSerializer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.ComponentSerializer;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.minecraft.util.text.ITextComponent;
 
 public class RelocationTranslator {
 
@@ -38,6 +41,10 @@ public class RelocationTranslator {
 
     public static ca.landonjw.gooeylibs2.relocations.kyori.adventure.text.Component relocated(Component component) {
         return serializer.serialize(component);
+    }
+
+    public static Component adventure(ITextComponent component) {
+        return GsonComponentSerializer.gson().deserialize(ITextComponent.Serializer.toJson(component));
     }
 
 }

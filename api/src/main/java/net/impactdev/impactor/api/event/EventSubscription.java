@@ -25,6 +25,7 @@
 
 package net.impactdev.impactor.api.event;
 
+import net.impactdev.impactor.api.plugin.PluginMetadata;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.function.Consumer;
@@ -41,25 +42,26 @@ public interface EventSubscription<T extends ImpactorEvent> extends AutoCloseabl
      *
      * @return the event class
      */
-    @NonNull Class<T> getEventClass();
+    @NonNull Class<T> eventClass();
+
+    /**
+     * The plugin providing the subscription.
+     *
+     * @return The plugin providing the subscription
+     */
+    @NonNull PluginMetadata metadata();
 
     /**
      * Returns true if this handler is active
      *
      * @return true if this handler is still active
      */
-    boolean isActive();
-
-    /**
-     * Unregisters this handler from the event bus.
-     */
-    @Override
-    void close();
+    boolean active();
 
     /**
      * Gets the event consumer responsible for handling the event
      *
      * @return the event consumer
      */
-    @NonNull Consumer<? super T> getHandler();
+    @NonNull Consumer<? super T> handler();
 }

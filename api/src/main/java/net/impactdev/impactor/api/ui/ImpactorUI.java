@@ -26,6 +26,7 @@
 package net.impactdev.impactor.api.ui;
 
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.components.UIComponent;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.ui.layouts.Layout;
@@ -39,9 +40,8 @@ import javax.annotation.Nullable;
  * UI. By nature, this API assumes both a shared interface perspective with the allowance of a unique
  * perspective based on the implementation.
  *
- * @param <P> The platform specific instance of a player capable of viewing the UI
  */
-public interface ImpactorUI<P> {
+public interface ImpactorUI {
 
 	/**
 	 * Represents the key of the plugin providing this UI. This is meant to help identify a particular UI
@@ -72,15 +72,22 @@ public interface ImpactorUI<P> {
 	 * Opens the view for the specified player.
 	 *
 	 * @param viewer The player who should view the inventory
-	 * @return <code>true</code> if the inventory was opened and available, <code>false</code> otherwise
 	 */
-	boolean open(P viewer);
+	void open(PlatformPlayer viewer);
 
-	static <P> UIBuilder<P> builder(Class<P> typing) {
-		return (UIBuilder<P>) Impactor.getInstance().getRegistry().createBuilder(UIBuilder.class);
+	/**
+	 * Closes the view of the inventory, only if the viewer's open inventory is this inventory.
+	 * If the view they currently have open is not this view, then this call is ignored
+	 *
+	 * @param viewer The player who should have this view closed if they have it open
+	 */
+	void close(PlatformPlayer viewer);
+
+	static UIBuilder builder() {
+		return Impactor.getInstance().getRegistry().createBuilder(UIBuilder.class);
 	}
 
-	interface UIBuilder<P> extends UIComponent<UIBuilder<P>>, Builder<ImpactorUI<P>, UIBuilder<P>> {
+	interface UIBuilder extends UIComponent<UIBuilder>, Builder<ImpactorUI, UIBuilder> {
 
 		/**
 		 * Sets the key referencing the provider of this pagination. This key provides both a namespace
@@ -91,7 +98,7 @@ public interface ImpactorUI<P> {
 		 * @return The updated builder
 		 */
 		@Required
-		UIBuilder<P> provider(Key key);
+		UIBuilder provider(Key key);
 
 	}
 

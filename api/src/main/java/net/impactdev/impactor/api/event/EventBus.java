@@ -25,9 +25,8 @@
 
 package net.impactdev.impactor.api.event;
 
-import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.event.listener.ImpactorEventListener;
-import net.impactdev.impactor.api.event.annotations.Param;
+import net.impactdev.impactor.api.plugin.PluginMetadata;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Set;
@@ -43,67 +42,25 @@ public interface EventBus {
     /**
      * Posts an event to the event bus with the given arguments.
      *
-     * <p>Supplied arguments should be in the order they are specified by the event's use of
-     * {@link Param}. The only argument that does not need to be supplied is the boolean
-     * value for the state of a cancellable event. If an event is cancellable, it'll insert
-     * a false state indicating that the event is not cancelled.</p>
-     *
      * @param event The type of event you wish to post
-     * @param args The arguments that will be used to populate the event
      * @param <T> The type of the event
      */
-    <T extends ImpactorEvent> boolean post(Class<T> event, Object... args);
-
-    /**
-     * Posts an event to the event bus with the given arguments.
-     *
-     * <p>Supplied arguments should be in the order they are specified by the event's use of
-     * {@link Param}. The only argument that does not need to be supplied is the boolean
-     * value for the state of a cancellable event. If an event is cancellable, it'll insert
-     * a false state indicating that the event is not cancelled.</p>
-     *
-     * <p>This type of post expects a generic event type. This is meant to allow for dynamic events
-     * in which a generic typing for the event can make work easier.</p>
-     *
-     * @param event The type of event you wish to post
-     * @param args The arguments that will be used to populate the event
-     * @param <T> The type of the event
-     */
-    <V, T extends ImpactorEvent.Generic<?>> boolean post(Class<T> event, TypeToken<V> generic, Object... args);
+    <T extends ImpactorEvent> boolean post(T event);
 
     /**
      * Posts an event to the event bus asynchronously with the given arguments.
      *
-     * <p>Supplied arguments should be in the order they are specified by the event's use of
-     * {@link Param}. Note: A cancellable event can not be fired async.</p>
-     *
      * @param event The type of event you wish to post
-     * @param args The arguments that will be used to populate the event
      * @param <T> The type of the event
      */
-    <T extends ImpactorEvent> void postAsync(Class<T> event, Object... args);
-
-    /**
-     * Posts an event to the event bus asynchronously with the given arguments.
-     *
-     * <p>Supplied arguments should be in the order they are specified by the event's use of
-     * {@link Param}. Note: A cancellable event can not be fired async.</p>
-     *
-     * <p>This type of post expects a generic event type. This is meant to allow for dynamic events
-     * in which a generic typing for the event can make work easier.</p>
-     *
-     * @param event The type of event you wish to post
-     * @param args The arguments that will be used to populate the event
-     * @param <T> The type of the event
-     */
-    <V, T extends ImpactorEvent.Generic<?>> void postAsync(Class<T> event, TypeToken<V> generic, Object... args);
+    <T extends ImpactorEvent> void postAsync(T event);
 
     /**
      * Delegates the process of subscribing to events to the listener passed to this call.
      *
      * @param listener The instance that'll subscribe to Impactor based events
      */
-    void subscribe(@NonNull ImpactorEventListener listener);
+    void subscribe(@NonNull PluginMetadata metadata, @NonNull ImpactorEventListener listener);
 
     /**
      * Registers a new subscription to the given event.
@@ -112,46 +69,20 @@ public interface EventBus {
      * methods which can be used to terminate the subscription, or view stats about the nature of
      * the subscription.</p>
      *
+     * @param metadata   the plugin providing the listener
      * @param eventClass the event class
      * @param handler    the event handler
      * @param <T>        the event class
      * @return an event handler instance representing this subscription
      */
-    @NonNull <T extends ImpactorEvent> EventSubscription<T> subscribe(@NonNull Class<T> eventClass, @NonNull Consumer<? super T> handler);
+    @NonNull <T extends ImpactorEvent> EventSubscription<T> subscribe(@NonNull PluginMetadata metadata, @NonNull Class<T> eventClass, @NonNull Consumer<? super T> handler);
 
     /**
-     * Registers a new subscription to the given event.
+     * Indicates if the event bus has any events registered at all.
      *
-     * <p>The returned {@link EventSubscription} instance encapsulates the subscription state. It has
-     * methods which can be used to terminate the subscription, or view stats about the nature of
-     * the subscription.</p>
-     *
-     * <p>Unlike {@link #subscribe(Class, Consumer)}, this method accepts an additional parameter
-     * for {@code plugin}. This object must be a "plugin" instance on the platform, and is used to
-     * automatically {@link EventSubscription#close() unregister} the subscription when the
-     * corresponding plugin is disabled.</p>
-     *
-     * @param <T>        the event class
-     * @param plugin     a plugin instance to bind the subscription to.
-     * @param eventClass the event class
-     * @param handler    the event handler
-     * @return an event handler instance representing this subscription
+     * @return <code>true</code> if any subscriptions exist, <code>false</code> otherwise
      */
-    @NonNull <T extends ImpactorEvent> EventSubscription<T> subscribe(Object plugin, @NonNull Class<T> eventClass, @NonNull Consumer<? super T> handler);
-
-    /**
-     * Registers a new subscription to an event with the specified {@link TypeToken}.
-     *
-     * <p>The returned {@link EventSubscription} instance encapsulates the subscription state. It has
-     * methods which can be used to terminate the subscription, or view stats about the nature of
-     * the subscription.</p>
-     *
-     * @param type The type token representing the event
-     * @param handler The event handler
-     * @param <T> The event class typing
-     * @return an event handler instance representing this subscription
-     */
-    @NonNull <T extends ImpactorEvent> EventSubscription<T> subscribe(@NonNull TypeToken<T> type, Consumer<? extends T> handler);
+    boolean hasSubscriptions();
 
     /**
      * Gets a set of all registered handlers for a given event.

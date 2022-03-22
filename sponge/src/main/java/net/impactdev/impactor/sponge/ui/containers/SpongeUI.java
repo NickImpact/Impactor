@@ -25,6 +25,9 @@
 
 package net.impactdev.impactor.sponge.ui.containers;
 
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
 import net.impactdev.impactor.api.ui.ImpactorUI;
 import net.impactdev.impactor.api.ui.icons.ClickContext;
 import net.impactdev.impactor.api.ui.icons.Icon;
@@ -50,7 +53,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class SpongeUI implements ImpactorUI<ServerPlayer> {
+public class SpongeUI implements ImpactorUI {
 
     private final Key namespace;
     private final Component title;
@@ -63,7 +66,7 @@ public class SpongeUI implements ImpactorUI<ServerPlayer> {
         this.layout = builder.layout;
 
         this.view = InventoryMenu.of(ViewableInventory.builder()
-                .type(SizeMapping.from(this.layout.dimensions().rows()).reference())
+                .type(SizeMapping.from(this.layout.dimensions().x()).reference())
                 .completeStructure()
                 .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
                 .identity(UUID.randomUUID())
@@ -136,11 +139,22 @@ public class SpongeUI implements ImpactorUI<ServerPlayer> {
     }
 
     @Override
-    public boolean open(ServerPlayer viewer) {
-        return this.view.open(viewer).isPresent();
+    public void open(PlatformPlayer viewer) {
+        PlatformPlayerManager<ServerPlayer> manager = (PlatformPlayerManager<ServerPlayer>) Impactor.getInstance().getPlatform().playerManager();
+        ServerPlayer player = manager.translate(viewer).orElseThrow(() -> new IllegalStateException("Player not available or found"));
+        this.view.open(player);
     }
 
-    public static class SpongeUIBuilder implements UIBuilder<ServerPlayer> {
+    @Override
+    public void close(PlatformPlayer viewer) {
+        PlatformPlayerManager<ServerPlayer> manager = (PlatformPlayerManager<ServerPlayer>) Impactor.getInstance().getPlatform().playerManager();
+        ServerPlayer player = manager.translate(viewer).orElseThrow(() -> new IllegalStateException("Player not available or found"));
+        if(player.isViewingInventory() && player.openInventory().filter(container -> container.containsInventory(this.view.inventory())).isPresent()) {
+            player.closeInventory();
+        }
+    }
+
+    public static class SpongeUIBuilder implements UIBuilder {
 
         private Key namespace;
         private Component title;
@@ -148,36 +162,36 @@ public class SpongeUI implements ImpactorUI<ServerPlayer> {
         private boolean readonly = true;
 
         @Override
-        public UIBuilder<ServerPlayer> provider(Key key) {
+        public UIBuilder provider(Key key) {
             this.namespace = key;
             return this;
         }
 
         @Override
-        public UIBuilder<ServerPlayer> title(Component title) {
+        public UIBuilder title(Component title) {
             this.title = title;
             return this;
         }
 
         @Override
-        public UIBuilder<ServerPlayer> layout(Layout layout) {
+        public UIBuilder layout(Layout layout) {
             this.layout = layout;
             return this;
         }
 
         @Override
-        public UIBuilder<ServerPlayer> readonly(boolean state) {
+        public UIBuilder readonly(boolean state) {
             this.readonly = state;
             return this;
         }
 
         @Override
-        public UIBuilder<ServerPlayer> from(ImpactorUI<ServerPlayer> input) {
+        public UIBuilder from(ImpactorUI input) {
             return this;
         }
 
         @Override
-        public ImpactorUI<ServerPlayer> build() {
+        public ImpactorUI build() {
             return new SpongeUI(this);
         }
 

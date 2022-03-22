@@ -25,9 +25,12 @@
 
 package net.impactdev.impactor.api.platform;
 
+import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
 import net.impactdev.impactor.api.scoreboard.events.PlatformBus;
 
-public interface Platform {
+public interface Platform<P> {
+
+    PlatformPlayerManager<P> playerManager();
 
     <L> PlatformBus<L> createPlatformBus();
 

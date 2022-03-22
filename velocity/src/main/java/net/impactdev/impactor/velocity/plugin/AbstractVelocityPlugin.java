@@ -52,4 +52,19 @@ public class AbstractVelocityPlugin implements ImpactorPlugin {
     public Logger getPluginLogger() {
         return this.logger;
     }
+
+    @Override
+    public void construct() {
+
+    }
+
+    @Override
+    public void enable() {
+
+    }
+
+    @Override
+    public void disable() {
+
+    }
 }

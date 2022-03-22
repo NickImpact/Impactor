@@ -30,18 +30,30 @@ import java.util.function.Supplier;
 
 public interface Logger {
 
+    void info(String line);
+    void info(Collection<String> lines);
+    void info(Supplier<String> supplier);
     void info(String marker, String line);
     void info(String marker, Collection<String> lines);
     void info(String marker, Supplier<String> supplier);
 
+    void warn(String line);
+    void warn(Collection<String> lines);
+    void warn(Supplier<String> supplier);
     void warn(String marker, String line);
     void warn(String marker, Collection<String> lines);
     void warn(String marker, Supplier<String> supplier);
 
+    void error(String line);
+    void error(Collection<String> lines);
+    void error(Supplier<String> supplier);
     void error(String marker, String line);
     void error(String marker, Collection<String> lines);
     void error(String marker, Supplier<String> supplier);
 
+    void debug(String line);
+    void debug(Collection<String> lines);
+    void debug(Supplier<String> supplier);
     void debug(String marker, String line);
     void debug(String marker, Collection<String> lines);
     void debug(String marker, Supplier<String> supplier);

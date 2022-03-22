@@ -46,9 +46,29 @@ public class VelocityLogger implements Logger {
         this.delegate = delegate;
     }
 
+    private Marker get(String marker) {
+        return this.markers.computeIfAbsent(marker, MarkerFactory::getMarker);
+    }
+
+    @Override
+    public void info(String line) {
+        this.delegate.info(line);
+    }
+
+    @Override
+    public void info(Collection<String> lines) {
+        lines.forEach(this::info);
+    }
+
+    @Override
+    public void info(Supplier<String> supplier) {
+        this.info(supplier.get());
+    }
+
     @Override
     public void info(String marker, String line) {
-        this.delegate.info(MarkerFactory.getMarker(marker), line);
+        Marker m = this.get(marker);
+        this.delegate.info(m, line);
     }
 
     @Override
@@ -62,8 +82,24 @@ public class VelocityLogger implements Logger {
     }
 
     @Override
+    public void warn(String line) {
+        this.delegate.warn(line);
+    }
+
+    @Override
+    public void warn(Collection<String> lines) {
+        lines.forEach(this::warn);
+    }
+
+    @Override
+    public void warn(Supplier<String> supplier) {
+        this.warn(supplier.get());
+    }
+
+    @Override
     public void warn(String marker, String line) {
-        this.delegate.warn(MarkerFactory.getMarker(marker), line);
+        Marker m = this.get(marker);
+        this.delegate.warn(m, line);
     }
 
     @Override
@@ -77,8 +113,24 @@ public class VelocityLogger implements Logger {
     }
 
     @Override
+    public void error(String line) {
+        this.delegate.error(line);
+    }
+
+    @Override
+    public void error(Collection<String> lines) {
+        lines.forEach(this::error);
+    }
+
+    @Override
+    public void error(Supplier<String> supplier) {
+        this.error(supplier.get());
+    }
+
+    @Override
     public void error(String marker, String line) {
-        this.delegate.error(MarkerFactory.getMarker(marker), line);
+        Marker m = this.get(marker);
+        this.delegate.error(m, line);
     }
 
     @Override
@@ -92,8 +144,24 @@ public class VelocityLogger implements Logger {
     }
 
     @Override
+    public void debug(String line) {
+        this.delegate.debug(line);
+    }
+
+    @Override
+    public void debug(Collection<String> lines) {
+        lines.forEach(this::debug);
+    }
+
+    @Override
+    public void debug(Supplier<String> supplier) {
+        this.debug(supplier.get());
+    }
+
+    @Override
     public void debug(String marker, String line) {
-        this.delegate.debug(MarkerFactory.getMarker(marker), line);
+        Marker m = this.get(marker);
+        this.delegate.debug(m, line);
     }
 
     @Override

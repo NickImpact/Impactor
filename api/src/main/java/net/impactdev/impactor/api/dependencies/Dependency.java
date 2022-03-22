@@ -28,14 +28,37 @@ package net.impactdev.impactor.api.dependencies;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.relocation.Relocation;
 import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
+/**
+ * A dependency is a runtime downloadable instance that Impactor can fetch and apply to the classpath
+ * at runtime, without a user needing to download the tool. A dependency downloaded by Impactor will
+ * be downloaded to the server root folder, under a folder tree of ./impactor/libs/. Once downloaded,
+ * the dependency will then be injected into the classpath of the running server. Note that this method
+ * will not work for plugins, as those are expected to be in the mods/plugins folders respectfully. This
+ * system is meant as a means to replace shading, allowing for shaded content to exist outside the plugin
+ * jar.
+ *
+ * Each dependency is expected to exist on a compatible maven repository.
+ */
 public interface Dependency {
 
+    /**
+     * Represents the name of the actual dependency. This is really a display name
+     * for the dependency, and is used purely for reference in dependency loading logging.
+     *
+     * @return The display name of a dependency
+     */
     String name();
 
+    /**
+     *
+     *
+     * @return
+     */
     String group();
 
     String artifact();
@@ -53,6 +76,16 @@ public interface Dependency {
     String getMavenPath();
 
     boolean snapshot();
+
+    /**
+     * Represents an additional set of dependencies that are bundled with this dependency.
+     * For instance, the Adventure API requires the Examination library, but that library must
+     * be downloaded separately. That dependency can then indicate that additional dependencies should
+     * be downloaded for it.
+     *
+     * @return A unique set of additional dependencies that should be bundled with this dependency.
+     */
+    Set<Dependency> bundled();
 
     static DependencyBuilder builder() {
         return Impactor.getInstance().getRegistry().createBuilder(DependencyBuilder.class);
@@ -73,6 +106,10 @@ public interface Dependency {
         DependencyBuilder relocation(Relocation relocation);
 
         DependencyBuilder relocations(Relocation... relocations);
+
+        DependencyBuilder with(Dependency dependency);
+
+        DependencyBuilder with(Dependency... dependencies);
     }
 
 }

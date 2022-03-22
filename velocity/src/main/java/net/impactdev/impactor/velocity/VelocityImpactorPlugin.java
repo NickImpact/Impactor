@@ -41,12 +41,11 @@ import net.impactdev.impactor.api.plugin.components.Depending;
 import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
 import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
+import net.impactdev.impactor.common.event.ImpactorEventBus;
 import net.impactdev.impactor.velocity.api.VelocityImpactorAPIProvider;
-import net.impactdev.impactor.velocity.event.VelocityEventBus;
 import net.impactdev.impactor.velocity.plugin.AbstractVelocityPlugin;
 import net.impactdev.impactor.velocity.scheduler.VelocitySchedulerAdapter;
 
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
@@ -88,7 +87,7 @@ public class VelocityImpactorPlugin extends AbstractVelocityPlugin implements De
                     toLaunch.add(dependency);
                 }
 
-                for(Dependency storage : this.getDependencyManager().getRegistry().resolveStorageDependencies(Sets.newHashSet(dependable.getStorageRequirements()))) {
+                for(Dependency storage : this.getDependencyManager().registry().resolveStorageDependencies(Sets.newHashSet(dependable.getStorageRequirements()))) {
                     if(toLaunch.contains(storage)) {
                         continue;
                     }
@@ -109,8 +108,7 @@ public class VelocityImpactorPlugin extends AbstractVelocityPlugin implements De
         ));
         this.getDependencyManager().loadDependencies(new HashSet<>(toLaunch));
 
-        Impactor.getInstance().getRegistry().register(EventBus.class, new VelocityEventBus(this.bootstrap));
-
+        Impactor.getInstance().getRegistry().register(EventBus.class, new ImpactorEventBus());
     }
 
     public static VelocityImpactorPlugin getInstance() {

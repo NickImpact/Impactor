@@ -28,9 +28,9 @@ package net.impactdev.impactor.common.ui;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import net.impactdev.impactor.api.ui.components.Dimensions;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.ui.layouts.Layout;
+import org.spongepowered.math.vector.Vector2i;
 
 import java.util.Map;
 import java.util.Optional;
@@ -39,11 +39,11 @@ import java.util.function.Consumer;
 public class LayoutImpl implements Layout {
 
     private final Map<Integer, Icon<?>> slots;
-    private final Dimensions dimensions;
+    private final Vector2i dimensions;
 
     private LayoutImpl(LayoutImplBuilder builder) {
         this.slots = builder.icons;
-        this.dimensions = new Dimensions(9, builder.rows);
+        this.dimensions = new Vector2i(9, builder.rows);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class LayoutImpl implements Layout {
     }
 
     @Override
-    public Dimensions dimensions() {
+    public Vector2i dimensions() {
         return this.dimensions;
     }
 

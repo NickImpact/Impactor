@@ -25,24 +25,18 @@
 
 package net.impactdev.impactor.api.dependencies;
 
-/**
- * Exception thrown if a dependency cannot be downloaded.
- */
 public class DependencyDownloadException extends Exception {
-
-    public DependencyDownloadException() {
-
-    }
 
     public DependencyDownloadException(String message) {
         super(message);
     }
 
-    public DependencyDownloadException(String message, Throwable cause) {
-        super(message, cause);
+    public DependencyDownloadException(Throwable e) {
+        super(e);
     }
 
-    public DependencyDownloadException(Throwable cause) {
-        super(cause);
+    public DependencyDownloadException(String message, Throwable e) {
+        super(message, e);
     }
+
 }

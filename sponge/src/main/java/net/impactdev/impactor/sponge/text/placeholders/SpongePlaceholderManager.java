@@ -128,7 +128,7 @@ public class SpongePlaceholderManager implements PlaceholderManager<PlaceholderM
                 .map(ServerPlayer::world)
                 .map(world -> {
                     MinecraftDayTime time = world.properties().dayTime();
-                    boolean military = context.argumentString().stream().anyMatch(arg -> arg.equalsIgnoreCase("military"));
+                    boolean military = context.argumentString().filter(arg -> arg.equalsIgnoreCase("military")).isPresent();
 
                     int hour = time.hour() % (military ? 24 : 12);
                     int minute = time.minute();

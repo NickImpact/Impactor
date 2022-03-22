@@ -61,6 +61,7 @@ public class ConfigMaintainer implements Config {
         if(!key.context().parent().equals(this)) {
             throw new NoSuchElementException("Key does not belong to given configuration");
         }
+
         return (T) this.values[key.context().ordinal()];
     }
 
@@ -81,8 +82,9 @@ public class ConfigMaintainer implements Config {
                 continue;
             }
 
-            BaseConfigKey<?> base = (BaseConfigKey<?>) key;
-            ((BaseConfigKey.ParentContextBase) key.context()).parent(this);
+            if(!reload) {
+                ((BaseConfigKey.ParentContextBase) key.context()).parent(this);
+            }
 
             // load the value for the key
             Object value = key.get(this.adapter);

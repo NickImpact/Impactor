@@ -57,7 +57,7 @@ import java.util.Map;
  *
  * <p>Below, you can find an example for how to create a scoreboard with this API:
  * <pre>
- * private final ImpactorScoreboard&lt;ServerPlayer> scoreboard = ImpactorScoreboard.&lt;ServerPlayer>builder()
+ * private final ImpactorScoreboard&lt;ServerPlayer&gt; scoreboard = ImpactorScoreboard.&lt;ServerPlayer&gt;builder()
  *             .objective(ScoreboardObjective.constant()
  *                  .text(Component.text("Impactor Scoreboard Demo")
  *                      .color(TextColor.color(255, 215, 0))

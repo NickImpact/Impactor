@@ -27,7 +27,9 @@ package net.impactdev.impactor.sponge.ui.containers;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import net.impactdev.impactor.api.ui.components.Dimensions;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
 import net.impactdev.impactor.api.ui.icons.ClickContext;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.ui.layouts.Layout;
@@ -59,6 +61,7 @@ import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.registry.RegistryEntry;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.math.vector.Vector2i;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -67,11 +70,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SpongePagination implements Pagination {
 
     private final Key namespace;
-    private final ServerPlayer viewer;
+    private final PlatformPlayer viewer;
     private final Component title;
     private final Layout layout;
-    private final Dimensions zone;
-    private final Dimensions offsets;
+    private final Vector2i zone;
+    private final Vector2i offsets;
     private final CircularLinkedList<Page<?>> pages;
     private final List<PageUpdater> updaters;
     private final TriState updaterStyle;
@@ -100,7 +103,7 @@ public class SpongePagination implements Pagination {
             try {
                 ServerPlayer source = cause.first(ServerPlayer.class)
                         .orElseThrow(() -> new IllegalStateException("Click action without player cause"));
-                if(!source.uniqueId().equals(this.viewer.uniqueId())) {
+                if(!source.uniqueId().equals(this.viewer.uuid())) {
                     throw new IllegalStateException(String.format(
                             "Click source (%s) does not match viewer",
                             source.uniqueId()
@@ -137,8 +140,8 @@ public class SpongePagination implements Pagination {
                 printer.kv("Click Type", clickType.key(RegistryTypes.CLICK_TYPE));
                 printer.newline();
                 printer.add("Viewer:");
-                printer.kv("UUID", this.viewer.uniqueId());
-                printer.kv("Name", this.viewer.name());
+                printer.kv("UUID", this.viewer.uuid());
+                printer.kv("Name", ComponentManipulator.flatten(this.viewer.name()));
                 printer.newline();
                 printer.hr();
                 printer.newline();
@@ -151,20 +154,26 @@ public class SpongePagination implements Pagination {
     }
 
     @Override
-    public Key namespace() {
+    public Key provider() {
         return this.namespace;
     }
 
     @Override
-    public boolean open() {
+    public void open() {
         this.page(1);
-        this.view.open(this.viewer);
-        return true;
+
+        PlatformPlayerManager<ServerPlayer> manager = (PlatformPlayerManager<ServerPlayer>) Impactor.getInstance().getPlatform().playerManager();
+        ServerPlayer player = manager.translate(this.viewer).orElseThrow(() -> new IllegalStateException("Player not available or found"));
+        this.view.open(player);
     }
 
     @Override
-    public boolean close() {
-        return this.viewer.closeInventory();
+    public void close() {
+        PlatformPlayerManager<ServerPlayer> manager = (PlatformPlayerManager<ServerPlayer>) Impactor.getInstance().getPlatform().playerManager();
+        ServerPlayer player = manager.translate(viewer).orElseThrow(() -> new IllegalStateException("Player not available or found"));
+        if(player.isViewingInventory() && player.openInventory().filter(container -> container.containsInventory(this.view.inventory())).isPresent()) {
+            player.closeInventory();
+        }
     }
 
     @Override
@@ -180,13 +189,19 @@ public class SpongePagination implements Pagination {
     }
 
     @Override
-    public void set(@Nullable Icon<?> icon, int slot) {
+    public boolean set(@Nullable Icon<?> icon, int slot) {
+        if(this.within(slot)) {
+            return false;
+        }
+
         if(icon == null) {
             this.view.inventory().set(slot, ItemStack.empty());
         } else {
             Icon<ItemStack> translated = (Icon<ItemStack>) icon;
             this.view.inventory().set(slot, translated.display());
         }
+
+        return true;
     }
 
     @Override
@@ -196,7 +211,7 @@ public class SpongePagination implements Pagination {
 
     private CircularLinkedList<Page<?>> draftPages(List<Icon<?>> icons) {
         CircularLinkedList<Page<?>> result = CircularLinkedList.of();
-        int max = this.zone.columns() * this.zone.rows();
+        int max = this.zone.y() * this.zone.x();
         int size = icons.size() / max + 1;
 
         int slot = 0;
@@ -222,7 +237,7 @@ public class SpongePagination implements Pagination {
 
         if(result.empty()) {
             ViewableInventory view = ViewableInventory.builder()
-                    .type(SizeMapping.from(this.layout.dimensions().rows()).reference())
+                    .type(SizeMapping.from(this.layout.dimensions().x()).reference())
                     .completeStructure()
                     .identity(UUID.randomUUID())
                     .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
@@ -237,7 +252,7 @@ public class SpongePagination implements Pagination {
 
     private void constructPage(CircularLinkedList<Page<?>> result, int size, Map<Integer, Icon<?>> working) {
         ViewableInventory view = ViewableInventory.builder()
-                .type(SizeMapping.from(this.layout.dimensions().rows()).reference())
+                .type(SizeMapping.from(this.layout.dimensions().x()).reference())
                 .completeStructure()
                 .identity(UUID.randomUUID())
                 .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
@@ -248,7 +263,27 @@ public class SpongePagination implements Pagination {
         result.append(page);
     }
 
-    public record SpongePage(ViewableInventory view, Map<Integer, Icon<?>> icons) implements Page<ViewableInventory> {
+    private boolean within(int slot) {
+        int x = slot % 9;
+        int y = slot / 9;
+
+        int mx = this.zone.x() + this.offsets.x();
+        int my = this.zone.y() + this.offsets.y();
+        if(x >= this.offsets.x() && x <= mx) {
+            return y >= this.offsets.y() && y <= my;
+        }
+
+        return false;
+    }
+
+    public static final class SpongePage implements Page<ViewableInventory> {
+        private final ViewableInventory view;
+        private final Map<Integer, Icon<?>> icons;
+
+        public SpongePage(ViewableInventory view, Map<Integer, Icon<?>> icons) {
+            this.view = view;
+            this.icons = icons;
+        }
 
         public void draw(Pagination parent, Layout layout, List<PageUpdater> updaters, int page, int maxPages) {
             layout.elements().forEach((slot, icon) -> {
@@ -258,17 +293,19 @@ public class SpongePagination implements Pagination {
 
             updaters.forEach(updater -> {
                 SpongePagination translated = (SpongePagination) parent;
-                switch(updater.type()) {
-                    case PREVIOUS, FIRST -> {
-                        if(page == 1 && translated.updaterStyle == TriState.FALSE) {
+                switch (updater.type()) {
+                    case PREVIOUS:
+                    case FIRST:
+                        if (page == 1 && translated.updaterStyle == TriState.FALSE) {
                             return;
                         }
-                    }
-                    case NEXT, LAST -> {
-                        if(page == maxPages && translated.updaterStyle == TriState.FALSE) {
+                        break;
+                    case NEXT:
+                    case LAST:
+                        if (page == maxPages && translated.updaterStyle == TriState.FALSE) {
                             return;
                         }
-                    }
+                        break;
                 }
 
                 int target = updater.type().translate(page, maxPages);
@@ -287,8 +324,8 @@ public class SpongePagination implements Pagination {
                 Icon<ItemStack> icon = Icon.builder(ItemStack.class)
                         .display(display)
                         .listener(processor -> {
-                            if(!updater.type().equals(PageUpdaterType.CURRENT)) {
-                                if(target == page) {
+                            if (!updater.type().equals(PageUpdaterType.CURRENT)) {
+                                if (target == page) {
                                     return false;
                                 }
 
@@ -305,17 +342,43 @@ public class SpongePagination implements Pagination {
             icons.forEach((slot, icon) -> view.set(slot, ((SpongeIcon) icon).display()));
         }
 
+        public ViewableInventory view() {return view;}
+
+        public Map<Integer, Icon<?>> icons() {return icons;}
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            SpongePage that = (SpongePage) obj;
+            return Objects.equals(this.view, that.view) &&
+                    Objects.equals(this.icons, that.icons);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(view, icons);
+        }
+
+        @Override
+        public String toString() {
+            return "SpongePage[" +
+                    "view=" + view + ", " +
+                    "icons=" + icons + ']';
+        }
+
+
     }
 
-    public static class SpongePaginationBuilder implements PaginationBuilder<ServerPlayer> {
+    public static class SpongePaginationBuilder implements PaginationBuilder {
 
         private Key key;
-        private ServerPlayer viewer;
+        private PlatformPlayer viewer;
         private boolean readonly = true;
         private Component title;
         private Layout layout;
-        private Dimensions zone;
-        private Dimensions offsets;
+        private Vector2i zone;
+        private Vector2i offsets;
 
         private List<Icon<?>> contents;
         private final List<PageUpdater> updaters = Lists.newArrayList();
@@ -323,67 +386,67 @@ public class SpongePagination implements Pagination {
 
         @Override
         @Required
-        public PaginationBuilder<ServerPlayer> provider(Key key) {
+        public PaginationBuilder provider(Key key) {
             this.key = key;
             return this;
         }
 
         @Override
-        public PaginationBuilder<ServerPlayer> viewer(ServerPlayer viewer) {
+        public PaginationBuilder viewer(PlatformPlayer viewer) {
             this.viewer = viewer;
             return this;
         }
 
         @Override
-        public PaginationBuilder<ServerPlayer> readonly(boolean state) {
+        public PaginationBuilder readonly(boolean state) {
             this.readonly = state;
             return this;
         }
 
         @Override
-        public PaginationBuilder<ServerPlayer> title(Component title) {
+        public PaginationBuilder title(Component title) {
             this.title = title;
             return this;
         }
 
         @Override
-        public PaginationBuilder<ServerPlayer> contents(List<Icon<?>> icons) {
+        public PaginationBuilder contents(List<Icon<?>> icons) {
             this.contents = icons;
             return this;
         }
 
         @Override
-        public PaginationBuilder<ServerPlayer> zone(Dimensions dimensions) {
-            return this.zone(dimensions, Dimensions.ZERO);
+        public PaginationBuilder zone(Vector2i dimensions) {
+            return this.zone(dimensions, Vector2i.ZERO);
         }
 
         @Override
-        public PaginationBuilder<ServerPlayer> zone(Dimensions dimensions, @Nullable Dimensions offset) {
+        public PaginationBuilder zone(Vector2i dimensions, @Nullable Vector2i offset) {
             this.zone = dimensions;
             this.offsets = offset;
             return this;
         }
 
         @Override
-        public PaginationBuilder<ServerPlayer> layout(Layout layout) {
+        public PaginationBuilder layout(Layout layout) {
             this.layout = layout;
             return this;
         }
 
         @Override
-        public PaginationBuilder<ServerPlayer> updater(PageUpdater updater) {
+        public PaginationBuilder updater(PageUpdater updater) {
             this.updaters.add(updater);
             return this;
         }
 
         @Override
-        public PaginationBuilder<ServerPlayer> updaterStyle(TriState state) {
+        public PaginationBuilder style(TriState state) {
             this.updaterStyle = state;
             return this;
         }
 
         @Override
-        public PaginationBuilder<ServerPlayer> from(Pagination input) {
+        public PaginationBuilder from(Pagination input) {
             return this;
         }
 

@@ -28,12 +28,13 @@ package net.impactdev.impactor.sponge.scoreboard.util;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class SourceResolvers {
 
-    public static final Function<UUID, Supplier<ServerPlayer>> PLAYER = id -> () -> Sponge.server().player(id).orElseThrow();
+    public static final Function<UUID, Supplier<ServerPlayer>> PLAYER = id -> () -> Sponge.server().player(id).orElseThrow(NoSuchElementException::new);
 
 }

@@ -26,11 +26,8 @@
 package net.impactdev.impactor.api.storage.file;
 
 import com.google.common.base.Throwables;
-import net.impactdev.impactor.api.plugin.components.Configurable;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.api.plugin.components.Tasking;
 import net.impactdev.impactor.api.storage.file.loaders.ConfigurateLoader;
-
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -68,30 +65,30 @@ public class ConfigurateStorage {
     }
 
     public void init() throws Exception {
-        if(this.plugin instanceof Configurable && this.plugin instanceof Tasking) {
-            this.dataDir = ((Configurable) this.plugin).getConfigDir().resolve(this.dataDirName);
-            this.createDirectoriesIfNotExists(this.dataDir);
-
-            FileWatcher watcher = new FileWatcher(dataDir);
-//            this.userWatcher = watcher.getWatcher(this.userDir);
-//            this.userWatcher.addListener(path -> {
-//            String s = path.getFileName().toString();
+//        if(this.plugin instanceof Configurable && this.plugin instanceof Tasking) {
+//            this.dataDir = ((Configurable) this.plugin).getConfigDir().resolve(this.dataDirName);
+//            this.createDirectoriesIfNotExists(this.dataDir);
 //
-//            if (!s.endsWith(this.extension)) {
-//                return;
-//            }
-//
-//            String user = s.substring(0, s.length() - this.extension.length());
-//            UUID uuid;
-//            try {
-//                uuid = UUID.fromString(user);
-//            } catch (Exception e) {
-//                return;
-//            }
-//            });
-        } else {
-            throw new Exception("Plugin must inherit the configurable and tasking interfaces...");
-        }
+//            FileWatcher watcher = new FileWatcher(dataDir);
+////            this.userWatcher = watcher.getWatcher(this.userDir);
+////            this.userWatcher.addListener(path -> {
+////            String s = path.getFileName().toString();
+////
+////            if (!s.endsWith(this.extension)) {
+////                return;
+////            }
+////
+////            String user = s.substring(0, s.length() - this.extension.length());
+////            UUID uuid;
+////            try {
+////                uuid = UUID.fromString(user);
+////            } catch (Exception e) {
+////                return;
+////            }
+////            });
+//        } else {
+//            throw new Exception("Plugin must inherit the configurable and tasking interfaces...");
+//        }
     }
 
 //    private ConfigurationNode readFile(String name) throws IOException {
