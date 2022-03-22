@@ -43,6 +43,7 @@ public final class ProvidedDependencies {
             .artifact("asm-commons")
             .version("9.2")
             .checksum("vkzlMTiiOLtSLNeBz5Hzulzi9sqT7GLUahYqEnIl4KY=")
+            .with(ASM)
             .build();
 
     // Lucko Jar Relocator - Used for Relocations
@@ -52,6 +53,7 @@ public final class ProvidedDependencies {
             .artifact("jar-relocator")
             .version("1.5")
             .checksum("0D6eM99gKpEYFNDydgnto3Df0ygZGdRVqy5ahtj0oIs=")
+            .with(ASM, ASM_COMMONS)
             .build();
 
     // Kyori Products
@@ -77,6 +79,7 @@ public final class ProvidedDependencies {
             .group("net{}kyori")
             .artifact("adventure-key")
             .version("4.10.1")
+            .checksum("n63jKNnvcuSm4+oNbU0dm5QT5nUHEH1PKLMCPLoKeuI=")
             .relocation(Relocation.of("net{}kyori", "kyori"))
             .with(KYORI_EXAMINATION, KYORI_EXAMINATION_STRINGS)
             .build();
@@ -102,6 +105,7 @@ public final class ProvidedDependencies {
             .group("net{}kyori")
             .artifact("adventure-text-serializer-gson")
             .version("4.10.1")
+            .checksum("NYm9teyDMtXqoMel3gWMapmiG3+Jhudwj9BlKAb1siI=")
             .relocation(Relocation.of("net{}kyori", "kyori"))
             .with(ADVENTURE)
             .build();

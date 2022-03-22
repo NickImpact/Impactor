@@ -49,12 +49,6 @@ import java.util.Set;
  */
 public class RelocationHandler {
 
-	public static final Set<Dependency> DEPENDENCIES = Sets.newHashSet(
-			ProvidedDependencies.ASM,
-			ProvidedDependencies.ASM_COMMONS,
-			ProvidedDependencies.JAR_RELOCATOR
-	);
-
 	private static final String JAR_RELOCATOR_CLASS = "me.lucko.jarrelocator.JarRelocator";
 	private static final String JAR_RELOCATOR_RUN_METHOD = "run";
 
@@ -63,10 +57,8 @@ public class RelocationHandler {
 
 	public RelocationHandler(DependencyManager dependencyManager) {
 		try {
-			// download the required dependencies for remapping
-			dependencyManager.loadDependencies(DEPENDENCIES);
 			// get a classloader containing the required dependencies as sources
-			IsolatedClassLoader classLoader = dependencyManager.obtainClassLoaderWith(DEPENDENCIES);
+			IsolatedClassLoader classLoader = dependencyManager.obtainClassLoaderWith(ProvidedDependencies.JAR_RELOCATOR);
 
 			// load the relocator class
 			Class<?> jarRelocatorClass = classLoader.loadClass(JAR_RELOCATOR_CLASS);

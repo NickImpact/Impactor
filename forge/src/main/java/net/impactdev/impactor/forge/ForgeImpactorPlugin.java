@@ -103,6 +103,7 @@ public class ForgeImpactorPlugin implements ImpactorPlugin, Depending {
 
         DependencyManager manager = new DependencyManager(this);
         registry.register(DependencyManager.class, manager);
+        manager.loadDependencies(ProvidedDependencies.JAR_RELOCATOR);
         manager.loadDependencies(this.getAllDependencies());
 
         registry.registerBuilderSupplier(Icon.IconBuilder.class, ForgeIcon.ForgeIconBuilder::new);
@@ -133,6 +134,7 @@ public class ForgeImpactorPlugin implements ImpactorPlugin, Depending {
                         .group("ca{}landonjw")
                         .artifact("GooeyLibs")
                         .version("1.16.5-2.3.0")
+                        .checksum("0sBRBZ3W4ezFRB3COytWJQwl/88Atw4MP0D7YVLOr4o=")
                         .relocation(Relocation.of("ca{}landonjw", "landonjw"))
                         .build(),
                 ProvidedDependencies.SPONGE_MATH

@@ -27,6 +27,7 @@ package net.impactdev.impactor.api.dependencies;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
@@ -53,6 +54,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -121,8 +123,26 @@ public class DependencyManager {
 		return this.registry;
 	}
 
+	public IsolatedClassLoader obtainClassLoaderWith(Dependency dependency) {
+		return this.obtainClassLoaderWith(this.flattenBundle(dependency), true);
+	}
+
 	public IsolatedClassLoader obtainClassLoaderWith(Collection<Dependency> dependencies) {
-		ImmutableSet<Dependency> set = ImmutableSet.copyOf(dependencies);
+		return this.obtainClassLoaderWith(dependencies, false);
+	}
+
+	private IsolatedClassLoader obtainClassLoaderWith(Collection<Dependency> dependencies, boolean flattened) {
+		ImmutableSet<Dependency> set;
+		if(flattened) {
+			set = ImmutableSet.copyOf(dependencies);
+		} else {
+			Set<Dependency> results = new HashSet<>();
+			for(Dependency dependency : dependencies) {
+				this.flattenBundle$recursive(dependency, results);
+			}
+
+			set = ImmutableSet.copyOf(results);
+		}
 
 		for (Dependency dependency : dependencies) {
 			if (!this.loaded.containsKey(dependency)) {
@@ -166,6 +186,10 @@ public class DependencyManager {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void loadDependencies(Dependency... dependencies) {
+		this.loadDependencies(Arrays.asList(dependencies));
 	}
 
 	private void loadDependency(Dependency dependency) throws Exception {
@@ -223,6 +247,19 @@ public class DependencyManager {
 
 		this.getRelocationHandler().remap(normalFile, remapped, rules);
 		return remapped;
+	}
+
+	private Set<Dependency> flattenBundle(Dependency dependency) {
+		return this.flattenBundle$recursive(dependency, new HashSet<>());
+	}
+
+	private Set<Dependency> flattenBundle$recursive(Dependency dependency, Set<Dependency> set) {
+		set.add(dependency);
+		for(Dependency bundled : dependency.bundled()) {
+			this.flattenBundle$recursive(bundled, set);
+		}
+
+		return set;
 	}
 
 	public static class DependencyDownloader {

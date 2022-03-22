@@ -163,6 +163,7 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 
 		this.getPluginLogger().info("Startup", "Dependencies found, setting these up now...");
 		this.getPluginLogger().info("Startup", "Initializing default dependencies...");
+		this.getDependencyManager().loadDependencies(ProvidedDependencies.JAR_RELOCATOR);
 		this.getDependencyManager().loadDependencies(Lists.newArrayList(
 				ProvidedDependencies.CONFIGURATE_CORE,
 				ProvidedDependencies.CONFIGURATE_HOCON,
