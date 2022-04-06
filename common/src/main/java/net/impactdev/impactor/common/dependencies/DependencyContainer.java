@@ -28,7 +28,6 @@ package net.impactdev.impactor.common.dependencies;
 import net.impactdev.impactor.api.dependencies.Dependency;
 import net.impactdev.impactor.api.dependencies.relocation.Relocation;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 public class DependencyContainer implements Dependency {
@@ -37,7 +36,7 @@ public class DependencyContainer implements Dependency {
     private final String group;
     private final String artifact;
     private final String version;
-    @Nullable private final byte[] checksum;
+    private final byte[] checksum;
     private final Set<Relocation> relocations;
     private final Set<Dependency> bundled;
 

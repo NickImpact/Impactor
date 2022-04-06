@@ -35,8 +35,8 @@ import net.kyori.event.ReifiedEvent;
 import net.kyori.event.method.EventExecutor;
 import net.kyori.event.method.MethodScanner;
 import net.kyori.event.method.MethodSubscriptionAdapter;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -50,28 +50,28 @@ public class ImpactorMethodSubscriptionAdapter implements MethodSubscriptionAdap
     private final EventExecutor.Factory<ImpactorEvent, ImpactorEventListener> factory;
     private final MethodScanner<ImpactorEventListener> scanner;
 
-    public ImpactorMethodSubscriptionAdapter(final @NonNull EventBus<ImpactorEvent> bus, final EventExecutor.@NonNull Factory<ImpactorEvent, ImpactorEventListener> factory) {
+    public ImpactorMethodSubscriptionAdapter(final @NotNull EventBus<ImpactorEvent> bus, final EventExecutor.@NotNull Factory<ImpactorEvent, ImpactorEventListener> factory) {
         this(bus, factory, new ImpactorMethodScanner());
     }
 
-    public ImpactorMethodSubscriptionAdapter(final @NonNull EventBus<ImpactorEvent> bus, final EventExecutor.@NonNull Factory<ImpactorEvent, ImpactorEventListener> factory, final @NonNull MethodScanner<ImpactorEventListener> scanner) {
+    public ImpactorMethodSubscriptionAdapter(final @NotNull EventBus<ImpactorEvent> bus, final EventExecutor.@NotNull Factory<ImpactorEvent, ImpactorEventListener> factory, final @NotNull MethodScanner<ImpactorEventListener> scanner) {
         this.bus = bus;
         this.factory = factory;
         this.scanner = scanner;
     }
 
     @Override
-    public void register(@NonNull ImpactorEventListener listener) {
+    public void register(@NotNull ImpactorEventListener listener) {
         this.locateSubscribers(listener, this.bus::register);
     }
 
     @Override
-    public void unregister(@NonNull ImpactorEventListener listener) {
+    public void unregister(@NotNull ImpactorEventListener listener) {
         this.bus.unregister(h -> h instanceof MethodEventSubscriber && ((MethodEventSubscriber) h).listener() == listener);
     }
 
     @SuppressWarnings("unchecked")
-    private void locateSubscribers(@NonNull final ImpactorEventListener listener, final BiConsumer<Class<? extends ImpactorEvent>, EventSubscriber<ImpactorEvent>> consumer) {
+    private void locateSubscribers(@NotNull final ImpactorEventListener listener, final BiConsumer<Class<? extends ImpactorEvent>, EventSubscriber<ImpactorEvent>> consumer) {
         Method[] methods = listener.getClass().getDeclaredMethods();
 
         for(Method method : methods) {
@@ -124,17 +124,17 @@ public class ImpactorMethodSubscriptionAdapter implements MethodSubscriptionAdap
     private static final class ImpactorMethodScanner implements MethodScanner<ImpactorEventListener> {
 
         @Override
-        public boolean shouldRegister(@NonNull ImpactorEventListener listener, @NonNull Method method) {
+        public boolean shouldRegister(@NotNull ImpactorEventListener listener, @NotNull Method method) {
             return method.getAnnotation(Subscribe.class) != null;
         }
 
         @Override
-        public int postOrder(@NonNull ImpactorEventListener listener, @NonNull Method method) {
+        public int postOrder(@NotNull ImpactorEventListener listener, @NotNull Method method) {
             return method.getAnnotation(Subscribe.class).order().ordinal();
         }
 
         @Override
-        public boolean consumeCancelledEvents(@NonNull ImpactorEventListener listener, @NonNull Method method) {
+        public boolean consumeCancelledEvents(@NotNull ImpactorEventListener listener, @NotNull Method method) {
             return method.getAnnotation(Subscribe.class).ignoreCancelled();
         }
 
@@ -151,7 +151,7 @@ public class ImpactorMethodSubscriptionAdapter implements MethodSubscriptionAdap
         private final int postOrder;
         private final boolean includeCancelled;
 
-        MethodEventSubscriber(final Class<? extends ImpactorEvent> eventClass, @NonNull final EventExecutor<ImpactorEvent, ImpactorEventListener> executor, @NonNull Method method, @NonNull final ImpactorEventListener listener, final int postOrder, final boolean includeCancelled) {
+        MethodEventSubscriber(final Class<? extends ImpactorEvent> eventClass, @NotNull final EventExecutor<ImpactorEvent, ImpactorEventListener> executor, @NotNull Method method, @NotNull final ImpactorEventListener listener, final int postOrder, final boolean includeCancelled) {
             this.event = eventClass;
             this.executor = executor;
             this.method = method;
@@ -171,7 +171,7 @@ public class ImpactorMethodSubscriptionAdapter implements MethodSubscriptionAdap
             }
         }
 
-        @NonNull
+        @NotNull
         ImpactorEventListener listener() {
             return this.listener;
         }
@@ -182,7 +182,7 @@ public class ImpactorMethodSubscriptionAdapter implements MethodSubscriptionAdap
         }
 
         @Override
-        public void invoke(@NonNull ImpactorEvent event) throws Throwable {
+        public void invoke(@NotNull ImpactorEvent event) throws Throwable {
             this.executor.invoke(this.listener, event);
         }
 

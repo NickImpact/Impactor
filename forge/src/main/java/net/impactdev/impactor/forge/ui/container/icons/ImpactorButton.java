@@ -30,13 +30,13 @@ import ca.landonjw.gooeylibs2.api.button.ButtonAction;
 import ca.landonjw.gooeylibs2.api.button.ButtonBase;
 import net.impactdev.impactor.api.ui.icons.ClickContext;
 import net.impactdev.impactor.api.ui.icons.ClickProcessor;
+import net.impactdev.impactor.api.ui.icons.DisplayProvider;
 import net.impactdev.impactor.api.utilities.Builder;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.forge.ForgeImpactorPlugin;
 import net.impactdev.impactor.forge.adventure.RelocationTranslator;
 import net.minecraft.item.ItemStack;
-import org.apache.logging.log4j.util.MessageSupplier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -45,14 +45,26 @@ import java.util.Set;
 
 public class ImpactorButton extends ButtonBase {
 
+    private final DisplayProvider<ItemStack> provider;
     private final Set<ClickProcessor> processors;
 
     private ImpactorButton(ImpactorButtonBuilder builder) {
-        super(builder.display);
+        super(builder.display.provide());
+        this.provider = builder.display;
         this.processors = builder.processors;
     }
 
-    public Set<ClickProcessor> getListeners() {
+    public DisplayProvider<ItemStack> provider() {
+        return this.provider;
+    }
+
+    public void refresh() {
+        if(!(this.provider instanceof DisplayProvider.Constant)) {
+            this.setDisplay(this.provider.provide());
+        }
+    }
+
+    public Set<ClickProcessor> listeners() {
         return this.processors;
     }
 
@@ -85,10 +97,10 @@ public class ImpactorButton extends ButtonBase {
 
     public static class ImpactorButtonBuilder implements Builder<ImpactorButton, ImpactorButtonBuilder> {
 
-        private ItemStack display;
+        private DisplayProvider<ItemStack> display;
         private final Set<ClickProcessor> processors = new LinkedHashSet<>();
 
-        public ImpactorButtonBuilder display(ItemStack display) {
+        public ImpactorButtonBuilder display(DisplayProvider<ItemStack> display) {
             this.display = display;
             return this;
         }

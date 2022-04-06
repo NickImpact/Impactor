@@ -29,6 +29,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.registry.Registry;
 import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.utilities.context.ContextualMapping;
+import net.impactdev.impactor.api.utilities.context.Provider;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -36,7 +38,7 @@ import java.util.function.Supplier;
 public final class ImpactorRegistry implements Registry {
 
     private static final Map<Class<?>, Supplier<?>> builders = Maps.newHashMap();
-    private static final Map<Class<?>, Provider<?>> bindings = Maps.newHashMap();
+    private static final ContextualMapping bindings = new ContextualMapping();
 
     @Override
     public <T> void register(Class<T> type, T value) {
@@ -49,7 +51,7 @@ public final class ImpactorRegistry implements Registry {
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> type) {
         Preconditions.checkArgument(bindings.containsKey(type), "Could not locate a matching registration for type: " + type.getCanonicalName());
-        return (T) bindings.get(type).instance();
+        return bindings.require(type).instance();
     }
 
     @Override

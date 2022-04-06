@@ -27,8 +27,8 @@ package net.impactdev.impactor.api.ui.icons;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.utilities.Builder;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Set;
 
 /**
@@ -45,7 +45,7 @@ public interface Icon<T> {
 	 *
 	 * @return The actual platform respective ItemStack representing the client perspective
 	 */
-	@Nonnull T display();
+	@NotNull DisplayProvider<T> display();
 
 	Set<ClickProcessor> listeners();
 
@@ -66,11 +66,11 @@ public interface Icon<T> {
 		 *
 		 * This field is required. Omitting this at request of build will invoke an {@link IllegalStateException}.
 		 *
-		 * @param display The ItemStack to act as the icons client-facing display
+		 * @param display A provider of the viewable ItemStack to act as the icons client-facing display
 		 * @return The current builder
 		 */
 		@Required
-		IconBuilder<T> display(T display);
+		IconBuilder<T> display(DisplayProvider<T> display);
 
 		/**
 		 * Appends a listener to the icon. This listener will act as a means of handling any click action

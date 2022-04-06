@@ -158,6 +158,15 @@ public final class ProvidedDependencies {
             .artifact("configurate-yaml")
             .version("4.1.2")
             .relocation(Relocation.of("org.spongepowered.configurate", "configurate"))
+            .with(CONFIGURATE_CORE)
+            .build();
+    public static final Dependency TYPESAFE_CONFIG = Dependency.builder()
+            .name("Typesafe Config")
+            .group("com.typesafe")
+            .artifact("config")
+            .version("1.4.0")
+            .checksum("qtv9WlJFUb7vENP4kdMFuDuyfVRwPZpN56yioS2YR+I=")
+            .relocation(Relocation.of("com.typesafe.config", "hocon"))
             .build();
     public static final Dependency CONFIGURATE_HOCON = Dependency.builder()
             .name("Configurate HOCON")
@@ -165,6 +174,7 @@ public final class ProvidedDependencies {
             .artifact("configurate-hocon")
             .version("4.1.2")
             .relocation(Relocation.of("org.spongepowered.configurate", "configurate"))
+            .with(CONFIGURATE_CORE, TYPESAFE_CONFIG)
             .build();
     public static final Dependency CONFIGURATE_GSON = Dependency.builder()
             .name("Configurate GSON")
@@ -172,6 +182,7 @@ public final class ProvidedDependencies {
             .artifact("configurate-gson")
             .version("4.1.2")
             .relocation(Relocation.of("org.spongepowered.configurate", "configurate"))
+            .with(CONFIGURATE_CORE)
             .build();
 
     // Storage Options
@@ -253,13 +264,6 @@ public final class ProvidedDependencies {
             .artifact("slf4j-simple")
             .version("1.7.30")
             .checksum("i5J5y/9rn4hZTvrjzwIDm2mVAw7sAj7UOSh0jEFnD+4=")
-            .build();
-    public static final Dependency TYPESAFE_CONFIG = Dependency.builder()
-            .name("Typesafe Config")
-            .group("com.typesafe")
-            .artifact("config")
-            .version("1.4.0")
-            .checksum("qtv9WlJFUb7vENP4kdMFuDuyfVRwPZpN56yioS2YR+I=")
-            .relocation(Relocation.of("com.typesafe.config", "hocon"))
+            .with(SLF4J_API)
             .build();
 }

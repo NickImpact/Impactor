@@ -28,15 +28,16 @@ package net.impactdev.impactor.sponge.ui.containers.icons;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.ui.icons.ClickProcessor;
+import net.impactdev.impactor.api.ui.icons.DisplayProvider;
 import net.impactdev.impactor.api.ui.icons.Icon;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-import javax.annotation.Nonnull;
 import java.util.Set;
 
 public class SpongeIcon implements Icon<ItemStack> {
 
-    private final ItemStack display;
+    private final DisplayProvider<ItemStack> display;
     private final Set<ClickProcessor> listeners;
 
     private SpongeIcon(SpongeIconBuilder builder) {
@@ -45,8 +46,8 @@ public class SpongeIcon implements Icon<ItemStack> {
     }
 
     @Override
-    @Nonnull
-    public ItemStack display() {
+    @NotNull
+    public DisplayProvider<ItemStack> display() {
         return this.display;
     }
 
@@ -57,11 +58,11 @@ public class SpongeIcon implements Icon<ItemStack> {
 
     public static class SpongeIconBuilder implements Icon.IconBuilder<ItemStack> {
 
-        private ItemStack display;
+        private DisplayProvider<ItemStack> display;
         private final Set<ClickProcessor> listeners = Sets.newLinkedHashSet();
 
         @Override
-        public IconBuilder<ItemStack> display(ItemStack display) {
+        public IconBuilder<ItemStack> display(DisplayProvider<ItemStack> display) {
             this.display = display;
             return this;
         }

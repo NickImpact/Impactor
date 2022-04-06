@@ -23,21 +23,37 @@
  *
  */
 
-package net.impactdev.impactor.api.registry;
-
-import net.impactdev.impactor.api.utilities.Builder;
+package net.impactdev.impactor.api.utilities.context;
 
 import java.util.Objects;
-import java.util.function.Supplier;
 
-public interface Registry {
+public final class Provider<T> {
+    private final T instance;
 
-    <T> void register(Class<T> type, T value);
+    public Provider(T instance) {
+        this.instance = instance;
+    }
 
-    <T> T get(Class<T> type);
+    public T instance() {
+        return instance;
+    }
 
-    <T extends Builder<?, ?>> void registerBuilderSupplier(Class<T> type, Supplier<? extends T> builder);
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        Provider<?> that = (Provider<?>) obj;
+        return Objects.equals(this.instance, that.instance);
+    }
 
-    <T extends Builder<?, ?>> T createBuilder(Class<T> type);
+    @Override
+    public int hashCode() {
+        return Objects.hash(instance);
+    }
 
+    @Override
+    public String toString() {
+        return "Provider[" +
+                "instance=" + instance + ']';
+    }
 }

@@ -51,6 +51,8 @@ import net.impactdev.impactor.api.ui.ImpactorUI;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.ui.layouts.Layout;
 import net.impactdev.impactor.api.ui.pagination.Pagination;
+import net.impactdev.impactor.api.ui.pagination.async.AsyncPagination;
+import net.impactdev.impactor.api.ui.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.api.ui.signs.SignQuery;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
@@ -65,7 +67,9 @@ import net.impactdev.impactor.common.dependencies.DependencyContainer;
 import net.impactdev.impactor.common.event.ImpactorEventBus;
 import net.impactdev.impactor.common.placeholders.PlaceholderSourcesImpl;
 import net.impactdev.impactor.common.ui.LayoutImpl;
+import net.impactdev.impactor.common.ui.pagination.async.AbstractAsyncPagination;
 import net.impactdev.impactor.sponge.api.SpongeImpactorAPIProvider;
+import net.impactdev.impactor.sponge.commands.DevCommand;
 import net.impactdev.impactor.sponge.commands.PlaceholdersCommand;
 import net.impactdev.impactor.sponge.plugin.AbstractSpongePlugin;
 import net.impactdev.impactor.sponge.scheduler.SpongeSchedulerAdapter;
@@ -85,7 +89,9 @@ import net.impactdev.impactor.sponge.text.SpongeMessageService;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
 import net.impactdev.impactor.sponge.ui.containers.SpongePagination;
 import net.impactdev.impactor.sponge.ui.containers.SpongeUI;
+import net.impactdev.impactor.sponge.ui.containers.async.SpongeAsyncPagination;
 import net.impactdev.impactor.sponge.ui.containers.icons.SpongeIcon;
+import net.impactdev.impactor.sponge.ui.containers.sectioned.SpongeSectionedPagination;
 import net.impactdev.impactor.sponge.ui.signs.SpongeSignQuery;
 import net.impactdev.impactor.sponge.util.SpongeClassPathAppender;
 import org.apache.logging.log4j.Logger;
@@ -182,6 +188,8 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 		registry.registerBuilderSupplier(Layout.LayoutBuilder.class, LayoutImpl.LayoutImplBuilder::new);
 		registry.registerBuilderSupplier(Pagination.PaginationBuilder.class, SpongePagination.SpongePaginationBuilder::new);
 		registry.registerBuilderSupplier(ImpactorUI.UIBuilder.class, SpongeUI.SpongeUIBuilder::new);
+		registry.registerBuilderSupplier(SectionedPagination.SectionedPaginationBuilder.class, SpongeSectionedPagination.SpongeSectionedPaginationBuilder::new);
+		registry.registerBuilderSupplier(AsyncPagination.AsyncPaginationBuilder.class, SpongeAsyncPagination.SpongeAsyncPaginationBuilder::new);
 
 		// Scoreboard Registration
 		registry.registerBuilderSupplier(ImpactorScoreboard.ScoreboardBuilder.class, SpongeScoreboard.SpongeScoreboardBuilder::new);
@@ -209,6 +217,7 @@ public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depend
 	@Listener
 	public void whenCommandRegistration(RegisterCommandEvent<Command.Parameterized> event) {
 		event.register(this.getPluginContainer(), new PlaceholdersCommand().create(), "placeholders");
+		event.register(this.getPluginContainer(), new DevCommand().create(), "dev");
 	}
 
 //	@Listener

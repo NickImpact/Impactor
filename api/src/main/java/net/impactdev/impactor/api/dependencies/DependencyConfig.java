@@ -74,6 +74,7 @@ public class DependencyConfig  {
                 translated[index++] = Relocation.of(obj.get("pattern").getAsString(), obj.get("replacement").getAsString());
             }
 
+            // TODO - Add with parameter
             return Dependency.builder()
                     .group(object.get("group").getAsString())
                     .artifact(object.get("artifact").getAsString())

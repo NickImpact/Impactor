@@ -28,12 +28,13 @@ package net.impactdev.impactor.api.ui;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.components.UIComponent;
+import net.impactdev.impactor.api.ui.detail.RefreshDetail;
+import net.impactdev.impactor.api.ui.detail.RefreshTypes;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.ui.layouts.Layout;
 import net.impactdev.impactor.api.utilities.Builder;
 import net.kyori.adventure.key.Key;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents the forward facing UI construct that allows a player to view the contents of a given
@@ -82,6 +83,27 @@ public interface ImpactorUI {
 	 * @param viewer The player who should have this view closed if they have it open
 	 */
 	void close(PlatformPlayer viewer);
+
+	/**
+	 * Attempts to refresh the contents of the UI based on the given refresh details.
+	 *
+	 * <p>The valid refresh types for this type of UI are:
+	 * <ul>
+	 *     <li>{@link RefreshTypes#ALL ALL}</li>
+	 *     <li>{@link RefreshTypes#LAYOUT LAYOUT}</li>
+	 *     <li>{@link RefreshTypes#SLOT_INDEX SLOT_INDEX}</li>
+	 *     <li>{@link RefreshTypes#SLOT_POS SLOT_POS}</li>
+	 * </ul>
+	 *
+	 * Any other typed detail will be rejected and will act as a no-op.
+	 *
+	 * <h2>{@link RefreshTypes#SLOT_INDEX SLOT_INDEX} and {@link RefreshTypes#SLOT_POS SLOT_POS} Notes</h2>
+	 * As part of the details, these two refresh types expect additional context to their targets.
+	 * This is accomplished by appending data points to the context of the newly created details.
+	 *
+	 * @param detail The details regarding refreshing the inventory
+	 */
+	void refresh(RefreshDetail detail);
 
 	static UIBuilder builder() {
 		return Impactor.getInstance().getRegistry().createBuilder(UIBuilder.class);

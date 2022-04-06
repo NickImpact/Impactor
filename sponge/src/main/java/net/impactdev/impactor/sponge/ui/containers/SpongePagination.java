@@ -30,40 +30,39 @@ import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
+import net.impactdev.impactor.api.ui.detail.RefreshDetail;
+import net.impactdev.impactor.api.ui.detail.RefreshType;
+import net.impactdev.impactor.api.ui.detail.RefreshTypes;
 import net.impactdev.impactor.api.ui.icons.ClickContext;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.ui.layouts.Layout;
 import net.impactdev.impactor.api.ui.pagination.Page;
 import net.impactdev.impactor.api.ui.pagination.Pagination;
 import net.impactdev.impactor.api.ui.pagination.updaters.PageUpdater;
-import net.impactdev.impactor.api.ui.pagination.updaters.PageUpdaterType;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
+import net.impactdev.impactor.api.utilities.context.Provider;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
-import net.impactdev.impactor.sponge.ui.containers.components.SizeMapping;
-import net.impactdev.impactor.sponge.ui.containers.icons.SpongeIcon;
+import net.impactdev.impactor.sponge.ui.containers.components.LayoutTranslator;
+import net.impactdev.impactor.sponge.ui.containers.components.SlotContext;
+import net.impactdev.impactor.sponge.ui.containers.utility.PageConstructor;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.util.TriState;
-import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.Keys;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cause;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.menu.ClickType;
 import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
-import org.spongepowered.api.registry.RegistryEntry;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.math.vector.Vector2i;
+import org.spongepowered.math.vector.Vector4i;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -82,6 +81,8 @@ public class SpongePagination implements Pagination {
     private final InventoryMenu view;
     private int page = 1;
 
+    private final SlotContext context;
+
     private SpongePagination(SpongePaginationBuilder builder) {
         this.namespace = builder.key;
         this.viewer = builder.viewer;
@@ -89,6 +90,8 @@ public class SpongePagination implements Pagination {
         this.layout = builder.layout;
         this.zone = builder.zone;
         this.offsets = builder.offsets;
+
+        this.context = LayoutTranslator.translate(this.layout);
 
         this.updaters = builder.updaters;
         this.updaterStyle = builder.updaterStyle;
@@ -151,6 +154,8 @@ public class SpongePagination implements Pagination {
                 return false;
             }
         });
+
+        this.context.trackAll(this.offsets, this.zone, this.pages.getCurrent().orElseThrow(NoSuchElementException::new).icons());
     }
 
     @Override
@@ -177,8 +182,28 @@ public class SpongePagination implements Pagination {
     }
 
     @Override
+    public Component title() {
+        return this.title;
+    }
+
+    @Override
     public Layout layout() {
         return this.layout;
+    }
+
+    @Override
+    public Vector2i zone() {
+        return this.zone;
+    }
+
+    @Override
+    public Vector2i offsets() {
+        return this.offsets;
+    }
+
+    @Override
+    public int page() {
+        return this.page;
     }
 
     @Override
@@ -186,6 +211,17 @@ public class SpongePagination implements Pagination {
         this.page = target;
         Page<ViewableInventory> page = (Page<ViewableInventory>) this.pages.at(target - 1);
         this.view.setCurrentInventory(page.view());
+        this.context.trackAll(this.offsets, this.zone, page.icons());
+    }
+
+    @Override
+    public List<PageUpdater> updaters() {
+        return this.updaters;
+    }
+
+    @Override
+    public TriState style() {
+        return this.updaterStyle;
     }
 
     @Override
@@ -198,10 +234,61 @@ public class SpongePagination implements Pagination {
             this.view.inventory().set(slot, ItemStack.empty());
         } else {
             Icon<ItemStack> translated = (Icon<ItemStack>) icon;
-            this.view.inventory().set(slot, translated.display());
+            this.view.inventory().set(slot, translated.display().provide());
         }
 
         return true;
+    }
+
+    @Override
+    public void refresh(RefreshDetail detail) {
+        RefreshType type = detail.type();
+        if(type == RefreshTypes.SLOT_INDEX) {
+            int position = detail.context().require(Integer.class).instance();
+            this.context.locate(position)
+                    .map(icon -> (Icon<ItemStack>) icon)
+                    .ifPresent(icon -> {
+                        this.view.inventory().set(position, icon.display().provide());
+                    });
+        } else if(type == RefreshTypes.SLOT_POS) {
+            int position = detail.context().get(Vector2i.class)
+                    .map(Provider::instance)
+                    .map(pos -> pos.x() + (9 * pos.y()))
+                    .orElseThrow(NoSuchElementException::new);
+            this.context.locate(position)
+                    .map(icon -> (Icon<ItemStack>) icon)
+                    .ifPresent(icon -> {
+                        this.view.inventory().set(position, icon.display().provide());
+                    });
+        } else if(type == RefreshTypes.GRID) {
+            Vector4i base = detail.context().require(Vector4i.class).instance();
+            Vector2i grid = base.toVector2();
+            Vector2i offset = new Vector2i(base.z(), base.w());
+
+            for(int y = offset.y(); y < grid.y() + offset.y(); y++) {
+                for(int x = offset.x(); x < grid.x() + offset.x(); x++) {
+                    final int X = x;
+                    final int Y = y;
+                    this.context.locate(X + (9 * Y))
+                            .map(icon -> (Icon<ItemStack>) icon)
+                            .ifPresent(icon -> {
+                                this.view.inventory().set(X + (9 * Y), icon.display().provide());
+                            });
+                }
+            }
+        } else {
+            if(type == RefreshTypes.ALL) {
+                this.context.tracked()
+                        .forEach((slot, icon) -> {
+                            this.view.inventory().set(slot, (ItemStack) icon.display().provide());
+                        });
+            } else if(type == RefreshTypes.LAYOUT) {
+                this.layout().elements()
+                        .forEach((slot, icon) -> {
+                            this.view.inventory().set(slot, (ItemStack) icon.display().provide());
+                        });
+            }
+        }
     }
 
     @Override
@@ -210,57 +297,7 @@ public class SpongePagination implements Pagination {
     }
 
     private CircularLinkedList<Page<?>> draftPages(List<Icon<?>> icons) {
-        CircularLinkedList<Page<?>> result = CircularLinkedList.of();
-        int max = this.zone.y() * this.zone.x();
-        int size = icons.size() / max + 1;
-
-        int slot = 0;
-        Map<Integer, Icon<?>> working = new HashMap<>();
-        for(Icon<?> icon : icons) {
-            if(slot < max) {
-                int target = this.calculateTargetSlot(slot, this.zone, this.offsets);
-                working.put(target, icon);
-                ++slot;
-            } else {
-                int target = this.calculateTargetSlot(0, this.zone, this.offsets);
-
-                this.constructPage(result, size, working);
-                working = new HashMap<>();
-                working.put(target, icon);
-                slot = 1;
-            }
-        }
-
-        if(!working.isEmpty()) {
-            this.constructPage(result, size, working);
-        }
-
-        if(result.empty()) {
-            ViewableInventory view = ViewableInventory.builder()
-                    .type(SizeMapping.from(this.layout.dimensions().x()).reference())
-                    .completeStructure()
-                    .identity(UUID.randomUUID())
-                    .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
-                    .build();
-            SpongePage page = new SpongePage(view, new HashMap<>());
-            page.draw(this, this.layout, this.updaters, 1, size);
-            result.append(page);
-        }
-
-        return result;
-    }
-
-    private void constructPage(CircularLinkedList<Page<?>> result, int size, Map<Integer, Icon<?>> working) {
-        ViewableInventory view = ViewableInventory.builder()
-                .type(SizeMapping.from(this.layout.dimensions().x()).reference())
-                .completeStructure()
-                .identity(UUID.randomUUID())
-                .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
-                .build();
-
-        SpongePage page = new SpongePage(view, working);
-        page.draw(this, this.layout, this.updaters, result.size() + 1, size);
-        result.append(page);
+        return PageConstructor.construct(icons, this);
     }
 
     private boolean within(int slot) {
@@ -274,100 +311,6 @@ public class SpongePagination implements Pagination {
         }
 
         return false;
-    }
-
-    public static final class SpongePage implements Page<ViewableInventory> {
-        private final ViewableInventory view;
-        private final Map<Integer, Icon<?>> icons;
-
-        public SpongePage(ViewableInventory view, Map<Integer, Icon<?>> icons) {
-            this.view = view;
-            this.icons = icons;
-        }
-
-        public void draw(Pagination parent, Layout layout, List<PageUpdater> updaters, int page, int maxPages) {
-            layout.elements().forEach((slot, icon) -> {
-                view.set(slot, ((SpongeIcon) icon).display());
-                icons.put(slot, icon);
-            });
-
-            updaters.forEach(updater -> {
-                SpongePagination translated = (SpongePagination) parent;
-                switch (updater.type()) {
-                    case PREVIOUS:
-                    case FIRST:
-                        if (page == 1 && translated.updaterStyle == TriState.FALSE) {
-                            return;
-                        }
-                        break;
-                    case NEXT:
-                    case LAST:
-                        if (page == maxPages && translated.updaterStyle == TriState.FALSE) {
-                            return;
-                        }
-                        break;
-                }
-
-                int target = updater.type().translate(page, maxPages);
-                Component title = updater.title(target);
-                List<Component> lore = updater.lore(target);
-
-                ItemType type = Sponge.game().registry(RegistryTypes.ITEM_TYPE)
-                        .findEntry(ResourceKey.of(updater.key().namespace(), updater.key().value()))
-                        .map(RegistryEntry::value)
-                        .orElse(ItemTypes.BARRIER.get());
-                ItemStack display = ItemStack.builder()
-                        .itemType(type)
-                        .add(Keys.CUSTOM_NAME, title)
-                        .add(Keys.LORE, lore)
-                        .build();
-                Icon<ItemStack> icon = Icon.builder(ItemStack.class)
-                        .display(display)
-                        .listener(processor -> {
-                            if (!updater.type().equals(PageUpdaterType.CURRENT)) {
-                                if (target == page) {
-                                    return false;
-                                }
-
-                                parent.page(target);
-                            }
-                            return false;
-                        })
-                        .build();
-
-                view.set(updater.slot(), icon.display());
-                this.icons.put(updater.slot(), icon);
-            });
-
-            icons.forEach((slot, icon) -> view.set(slot, ((SpongeIcon) icon).display()));
-        }
-
-        public ViewableInventory view() {return view;}
-
-        public Map<Integer, Icon<?>> icons() {return icons;}
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) return true;
-            if (obj == null || obj.getClass() != this.getClass()) return false;
-            SpongePage that = (SpongePage) obj;
-            return Objects.equals(this.view, that.view) &&
-                    Objects.equals(this.icons, that.icons);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(view, icons);
-        }
-
-        @Override
-        public String toString() {
-            return "SpongePage[" +
-                    "view=" + view + ", " +
-                    "icons=" + icons + ']';
-        }
-
-
     }
 
     public static class SpongePaginationBuilder implements PaginationBuilder {

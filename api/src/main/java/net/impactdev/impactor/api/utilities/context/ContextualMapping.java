@@ -23,48 +23,40 @@
  *
  */
 
-package net.impactdev.impactor.api.json;
+package net.impactdev.impactor.api.utilities.context;
 
 import com.google.common.collect.Maps;
-import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import org.jetbrains.annotations.Nullable;
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
-public class Registry<E> {
+public final class ContextualMapping implements PrettyPrinter.IPrettyPrintable {
 
-	private final ImpactorPlugin plugin;
-	private final Map<String, Class<? extends E>> typings = Maps.newHashMap();
+    private final Map<Class<?>, Provider<?>> context = Maps.newHashMap();
 
-	public Registry(ImpactorPlugin plugin) {
-		this.plugin = plugin;
-	}
+    public <T> ContextualMapping put(Class<T> type, Provider<T> provider) {
+        this.context.put(type, provider);
+        return this;
+    }
 
-	public void register(Class<? extends E> clazz) throws Exception {
-		if(!clazz.isAnnotationPresent(JsonTyping.class)) {
-			this.register((this.plugin.getMetadata().getID() + "_" + clazz.getSimpleName()).toLowerCase(), clazz);
-			return;
-		}
+    public boolean containsKey(Class<?> type) {
+        return this.context.containsKey(type);
+    }
 
-		this.register(clazz.getAnnotation(JsonTyping.class).value().toLowerCase(), clazz);
-	}
+    public <T> Optional<Provider<T>> get(Class<T> type) {
+        return Optional.ofNullable(this.context.get(type))
+                .map(provider -> (Provider<T>) provider);
+    }
 
-	public void register(String typing, Class<? extends E> clazz) throws Exception {
-		if(this.typings.containsKey(typing)) {
-			throw new Exception("Identical JSON typing found, aborting type registration for: " + typing);
-		}
+    public <T> Provider<T> require(Class<T> type) {
+        return this.get(type).orElseThrow(NoSuchElementException::new);
+    }
 
-		this.typings.put(typing, clazz);
-	}
+    @Override
+    public void print(PrettyPrinter printer) {
 
-	/**
-	 * Fetches the class in the registry based on the typing id.
-	 *
-	 * @param id The typing id of a registered class
-	 * @return The class in the registry matching the typing, if any.
-	 */
-	@Nullable
-	public Class<? extends E> get(String id) {
-		return typings.get(id);
-	}
+    }
+
 }

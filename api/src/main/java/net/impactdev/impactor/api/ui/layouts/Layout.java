@@ -102,7 +102,7 @@ public interface Layout {
 		/**
 		 * Draws the given icon across the border of the layout. In other words, this will cover the outermost
 		 * slots of the chest UI. If you wish for an offset border style, consider
-		 * {@link #rectangle(Icon, int, int, int, int, boolean)}.
+		 * {@link #rectangle(Icon, Vector2i, Vector2i, boolean)}.
 		 *
 		 * @param icon The icon to draw for the border
 		 * @return The updated builder
@@ -196,6 +196,9 @@ public interface Layout {
 		 * Draws a square around the center point. Additionally, if specified to be hollow, all
 		 * pieces inside the border of the square will be omitted from being drawn.
 		 *
+		 * <p>To help understand radius values, a radius of 1 is equal to just painting
+		 * the center point, whereas larger values begin forming an actual square.
+		 *
 		 * @param icon The icon to draw for the square
 		 * @param center The center point of the square
 		 * @param hollow If the center point should be omitted
@@ -208,14 +211,12 @@ public interface Layout {
 		 * can also be drawn with a hollow center, leaving just the border of the shape.
 		 *
 		 * @param icon The icon to draw for each position of the rectangle
-		 * @param x1 The first X coordinate of the container
-		 * @param y1 The first Y coordinate of the container
-		 * @param x2 The second X coordinate of the container
-		 * @param y2 The second Y coordinate of the container
+		 * @param size The size of the rectangle, where x = columns and y = rows
+		 * @param offset The offsets of the position of the rectangle in the layout
 		 * @param hollow Indicates if the drawn shape should be hollow
 		 * @return The updated builder
 		 */
-		LayoutBuilder rectangle(Icon<?> icon, int x1, int y1, int x2, int y2, boolean hollow);
+		LayoutBuilder rectangle(Icon<?> icon, Vector2i size, Vector2i offset, boolean hollow);
 
 		/**
 		 * Allows for customized drawing patterns to be directly applied to the layout builder. For instance,

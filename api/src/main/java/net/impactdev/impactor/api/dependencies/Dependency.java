@@ -28,9 +28,7 @@ package net.impactdev.impactor.api.dependencies;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.relocation.Relocation;
 import net.impactdev.impactor.api.utilities.Builder;
-import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 /**

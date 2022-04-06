@@ -23,21 +23,23 @@
  *
  */
 
-package net.impactdev.impactor.api.registry;
+package net.impactdev.impactor.api.ui.pagination.sectioned;
 
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.ui.icons.Icon;
+import net.impactdev.impactor.api.ui.pagination.updaters.PageUpdater;
+import net.kyori.adventure.util.TriState;
 
-import java.util.Objects;
-import java.util.function.Supplier;
+import java.util.List;
+import java.util.Map;
 
-public interface Registry {
+public interface SectionedPage {
 
-    <T> void register(Class<T> type, T value);
+    Map<Integer, Icon<?>> icons();
 
-    <T> T get(Class<T> type);
+    Map<Integer, Icon<?>> drawn();
 
-    <T extends Builder<?, ?>> void registerBuilderSupplier(Class<T> type, Supplier<? extends T> builder);
+    void draw(SectionedPagination.Section parent, List<PageUpdater> updaters, TriState style, int page, int maxPages);
 
-    <T extends Builder<?, ?>> T createBuilder(Class<T> type);
+    void refresh();
 
 }

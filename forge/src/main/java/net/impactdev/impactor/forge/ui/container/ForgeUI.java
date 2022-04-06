@@ -34,6 +34,7 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
 import net.impactdev.impactor.api.ui.ImpactorUI;
+import net.impactdev.impactor.api.ui.detail.RefreshDetail;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.ui.layouts.Layout;
 import net.impactdev.impactor.forge.ForgeImpactorPlugin;
@@ -104,6 +105,11 @@ public class ForgeUI implements ImpactorUI {
                 player.closeContainer();
             }
         }
+    }
+
+    @Override
+    public void refresh(RefreshDetail detail) {
+
     }
 
     private ChestTemplate create() {

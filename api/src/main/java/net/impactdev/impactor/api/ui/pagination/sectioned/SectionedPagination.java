@@ -28,6 +28,7 @@ package net.impactdev.impactor.api.ui.pagination.sectioned;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.components.UIComponent;
+import net.impactdev.impactor.api.ui.icons.DisplayProvider;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.ui.layouts.Layout;
 import net.impactdev.impactor.api.ui.pagination.Pagination;
@@ -38,9 +39,9 @@ import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.util.TriState;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +50,6 @@ import java.util.Optional;
  * {@link Pagination}, this type of pagination is composed of sections which act as their own internal
  * pagination. Each section allows for a different combination of items to be cycled amongst each other,
  * and each section need not agree with the other.
- *
  */
 public interface SectionedPagination {
 
@@ -151,12 +151,23 @@ public interface SectionedPagination {
          */
         Vector2i maximum();
 
+        default boolean within(int slot) {
+            return this.within(Vector2i.from(slot % 9, slot / 9));
+        }
+
+        default boolean within(Vector2i coordinates) {
+            Vector2i x = coordinates.sub(this.minimum());
+            Vector2i y = this.maximum().sub(coordinates);
+
+            return x.x() >= 0 && x.y() >= 0 && y.x() >= 0 && y.y() >= 0;
+        }
+
         /**
          * Represents the list of pages that this section is composed of.
          *
          * @return The circularly linked list of pages
          */
-        CircularLinkedList<Icon<?>> pages();
+        CircularLinkedList<SectionedPage> pages();
 
         /**
          * Sets the page of this section to the target page.
@@ -176,10 +187,11 @@ public interface SectionedPagination {
          * @return The calculated slot position in the pagination zone
          */
         default int calculateTargetSlot(int target, Vector2i zone, Vector2i offsets) {
-            int x = target % zone.y() + offsets.x();
-            int y = target / zone.y() + offsets.x();
+            int x = target % zone.x();
+            int y = target / zone.x();
 
-            return x + (9 * y);
+            Vector2i result = Vector2i.from(x, y).add(offsets);
+            return result.x() + (9 * result.y());
         }
 
     }
@@ -207,6 +219,22 @@ public interface SectionedPagination {
          * @return The updated builder
          */
         SectionBuilder contents(List<Icon<?>> contents);
+
+        /**
+         * Specifies the dimensions of this section. This is simply the length and width of the section, but not
+         * necessarily the position. To control the position of the section, make use of {@link #offset(Vector2i)}
+         * to reposition the section. All paginations use the grid location of (0, 0) as their base grid point.
+         * For a section that is 7 columns in length, 4 rows wide, but you want to be in the dead middle of the view
+         * which is 9x6, you can use an offset dimension of (1, 1) to position the section into that frame.
+         *
+         * @param columns The number of columns in the section
+         * @param rows The number of rows in the section
+         * @see #offset(Vector2i)
+         * @return The updated builder
+         */
+        default SectionBuilder dimensions(int columns, int rows) {
+            return this.dimensions(Vector2i.from(columns, rows));
+        }
 
         /**
          * Specifies the dimensions of this section. This is simply the length and width of the section, but not

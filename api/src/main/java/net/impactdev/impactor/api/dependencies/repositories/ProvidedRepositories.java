@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.api.dependencies.repositories;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.URL;
 import java.util.Optional;

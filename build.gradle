@@ -130,6 +130,7 @@ subprojects {
             year = 2022
         }
         newLine = true
+        exclude '**/launcher*/**'
     }
 
     compileJava.dependsOn(updateLicenses)

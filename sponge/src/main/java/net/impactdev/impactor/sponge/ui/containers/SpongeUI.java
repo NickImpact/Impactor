@@ -29,16 +29,22 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
 import net.impactdev.impactor.api.ui.ImpactorUI;
+import net.impactdev.impactor.api.ui.detail.RefreshDetail;
+import net.impactdev.impactor.api.ui.detail.RefreshType;
+import net.impactdev.impactor.api.ui.detail.RefreshTypes;
 import net.impactdev.impactor.api.ui.icons.ClickContext;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.ui.layouts.Layout;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
+import net.impactdev.impactor.api.utilities.context.Provider;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
+import net.impactdev.impactor.sponge.ui.containers.components.LayoutTranslator;
 import net.impactdev.impactor.sponge.ui.containers.components.SizeMapping;
+import net.impactdev.impactor.sponge.ui.containers.components.SlotContext;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.item.inventory.Container;
@@ -48,7 +54,10 @@ import org.spongepowered.api.item.inventory.menu.ClickType;
 import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.math.vector.Vector2i;
+import org.spongepowered.math.vector.Vector4i;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -60,13 +69,17 @@ public class SpongeUI implements ImpactorUI {
     private final Layout layout;
 
     private final InventoryMenu view;
+    private final SlotContext context;
 
     private SpongeUI(SpongeUIBuilder builder) {
         this.namespace = builder.namespace;
         this.layout = builder.layout;
 
+        this.context = LayoutTranslator.translate(this.layout);
+
         this.view = InventoryMenu.of(ViewableInventory.builder()
                 .type(SizeMapping.from(this.layout.dimensions().x()).reference())
+                .slots(this.context.slots(), 0)
                 .completeStructure()
                 .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
                 .identity(UUID.randomUUID())
@@ -89,7 +102,7 @@ public class SpongeUI implements ImpactorUI {
                 context.append(ServerPlayer.class, source);
 
                 AtomicBoolean allow = new AtomicBoolean(true);
-                Optional<Icon<?>> clicked = this.layout.icon(index);
+                Optional<Icon<?>> clicked = this.context.locate(index);
                 clicked.ifPresent(icon -> icon.listeners().forEach(listener -> {
                     boolean result = listener.process(context);
                     if(allow.get() && !result) {
@@ -130,11 +143,14 @@ public class SpongeUI implements ImpactorUI {
 
     @Override
     public void set(@Nullable Icon<?> icon, int slot) {
+        // TODO - In the event of a set, listeners are not updated via the layout,
+        // TODO - so replaced icons will still be called rather than the newly set icon.
+        // TODO - Change this
         if(icon == null) {
             this.view.inventory().set(slot, ItemStack.empty());
         } else {
             Icon<ItemStack> translated = (Icon<ItemStack>) icon;
-            this.view.inventory().set(slot, translated.display());
+            this.view.inventory().set(slot, translated.display().provide());
         }
     }
 
@@ -151,6 +167,57 @@ public class SpongeUI implements ImpactorUI {
         ServerPlayer player = manager.translate(viewer).orElseThrow(() -> new IllegalStateException("Player not available or found"));
         if(player.isViewingInventory() && player.openInventory().filter(container -> container.containsInventory(this.view.inventory())).isPresent()) {
             player.closeInventory();
+        }
+    }
+
+    @Override
+    public void refresh(RefreshDetail detail) {
+        RefreshType type = detail.type();
+        if(type == RefreshTypes.SLOT_INDEX) {
+            int position = detail.context().require(Integer.class).instance();
+            this.context.locate(position)
+                    .map(icon -> (Icon<ItemStack>) icon)
+                    .ifPresent(icon -> {
+                        this.view.inventory().set(position, icon.display().provide());
+                    });
+        } else if(type == RefreshTypes.SLOT_POS) {
+            int position = detail.context().get(Vector2i.class)
+                    .map(Provider::instance)
+                    .map(pos -> pos.x() + (9 * pos.y()))
+                    .orElseThrow(NoSuchElementException::new);
+            this.context.locate(position)
+                    .map(icon -> (Icon<ItemStack>) icon)
+                    .ifPresent(icon -> {
+                        this.view.inventory().set(position, icon.display().provide());
+                    });
+        } else if(type == RefreshTypes.GRID) {
+            Vector4i base = detail.context().require(Vector4i.class).instance();
+            Vector2i grid = base.toVector2();
+            Vector2i offset = new Vector2i(base.z(), base.w());
+
+            for(int y = offset.y(); y < grid.y() + offset.y(); y++) {
+                for(int x = offset.x(); x < grid.x() + offset.x(); x++) {
+                    final int X = x;
+                    final int Y = y;
+                    this.context.locate(X + (9 * Y))
+                            .map(icon -> (Icon<ItemStack>) icon)
+                            .ifPresent(icon -> {
+                                this.view.inventory().set(X + (9 * Y), icon.display().provide());
+                            });
+                }
+            }
+        } else {
+            if(type == RefreshTypes.ALL) {
+                this.context.tracked()
+                        .forEach((slot, icon) -> {
+                            this.view.inventory().set(slot, (ItemStack) icon.display().provide());
+                        });
+            } else if(type == RefreshTypes.LAYOUT) {
+                this.layout().elements()
+                        .forEach((slot, icon) -> {
+                            this.view.inventory().set(slot, (ItemStack) icon.display().provide());
+                        });
+            }
         }
     }
 

@@ -25,10 +25,9 @@
 
 package net.impactdev.impactor.api.ui.icons;
 
-import com.google.common.collect.Maps;
-import net.impactdev.impactor.api.registry.Registry;
+import net.impactdev.impactor.api.utilities.context.ContextualMapping;
+import net.impactdev.impactor.api.utilities.context.Provider;
 
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -43,7 +42,7 @@ public class ClickContext {
         return new ClickContext();
     }
 
-    private final Map<Class<?>, Registry.Provider<?>> context = Maps.newHashMap();
+    private final ContextualMapping context = new ContextualMapping();
 
     /**
      * Appends the associated value alongside its class typing to this context. This will override any
@@ -55,7 +54,7 @@ public class ClickContext {
      * @return The updated context
      */
     public <T> ClickContext append(Class<T> type, T value) {
-        this.context.put(type, new Registry.Provider<>(value));
+        this.context.put(type, new Provider<>(value));
         return this;
     }
 
@@ -79,8 +78,7 @@ public class ClickContext {
      * @return An optionally wrapped instance representing the provided type, or empty if not available
      */
     public <T> Optional<T> request(Class<T> type) {
-        return Optional.ofNullable(this.context.get(type))
-                .map(provider -> (T) provider.instance());
+        return this.context.get(type).map(Provider::instance);
     }
 
     /**

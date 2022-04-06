@@ -34,7 +34,7 @@ import com.google.gson.JsonElement;
 import net.impactdev.impactor.api.json.factory.JElement;
 import net.impactdev.impactor.api.logging.Logger;
 import net.impactdev.impactor.api.utilities.functional.TriConsumer;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.ArrayList;

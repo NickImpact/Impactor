@@ -41,7 +41,6 @@ import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.api.ui.ImpactorUI;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.ui.layouts.Layout;
-import net.impactdev.impactor.api.ui.pagination.Pagination;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
 import net.impactdev.impactor.common.dependencies.DependencyContainer;
 import net.impactdev.impactor.common.ui.LayoutImpl;

@@ -30,16 +30,18 @@ import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.components.UIComponent;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.ui.layouts.Layout;
+import net.impactdev.impactor.api.ui.detail.RefreshDetail;
 import net.impactdev.impactor.api.ui.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.ui.pagination.updaters.PageUpdaterType;
 import net.impactdev.impactor.api.utilities.Builder;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.util.TriState;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -73,6 +75,13 @@ public interface Pagination {
     void close();
 
     /**
+     * Specifies the title to this pagination.
+     *
+     * @return The title of the pagination
+     */
+    Component title();
+
+    /**
      * Specifies the layout used to create this view.
      *
      * @return The layout of the view
@@ -80,11 +89,51 @@ public interface Pagination {
     Layout layout();
 
     /**
+     * Indicates the size of the overall grid that this pagination can draw contents within.
+     * Without offsets, this grid is based around (0, 0), or slot index 0.
+     *
+     * @return The size of the drawable pagination zone
+     */
+    Vector2i zone();
+
+    /**
+     * Indicates an offset grid position where the pagination will base the drawable pagination
+     * zone around. For instance, an offset of (1, 1) will position the content zone starting
+     * at index 10.
+     *
+     * @return The offset position of the drawable pagination zone
+     */
+    Vector2i offsets();
+
+    /**
+     * Indicates the current page of the pagination view.
+     *
+     * @return The current page of the pagination
+     */
+    int page();
+
+    /**
      * Sets the page of this section to the target page.
      *
      * @param target The target page to view for this section
      */
     void page(int target);
+
+    /**
+     * Represents the list of updaters that are attached to this pagination. These control
+     * how the page is capable of indexing into the next page.
+     *
+     * @return A list of updaters for the pagination
+     */
+    List<PageUpdater> updaters();
+
+    /**
+     * Indicates the style for the pagination updaters. See {@link PaginationBuilder#style(TriState)}
+     * for further details on what each state represents.
+     *
+     * @return The state indicating how pagination updaters process pagination updates
+     */
+    TriState style();
 
     /**
      * Attempts to place the icon in the following slot location. If the intended slot exists inside
@@ -96,6 +145,13 @@ public interface Pagination {
      * @return <code>true</code> if the action was accepted, <code>false</code> if rejected
      */
     boolean set(@Nullable Icon<?> icon, int slot);
+
+    /**
+     * Refreshes the pagination based on the given refresh type.
+     *
+     * @param type The method of refreshing the inventory
+     */
+    void refresh(RefreshDetail type);
 
     /**
      * Represents the list of pages that this pagination is composed of.
@@ -115,10 +171,11 @@ public interface Pagination {
      * @return The calculated slot position in the pagination zone
      */
     default int calculateTargetSlot(int target, Vector2i zone, Vector2i offsets) {
-        int x = target % zone.y() + offsets.x();
-        int y = target / zone.y() + offsets.x();
+        int x = target % zone.x();
+        int y = target / zone.x();
 
-        return x + (9 * y);
+        Vector2i result = Vector2i.from(x, y).add(offsets);
+        return result.x() + (9 * result.y());
     }
 
     static PaginationBuilder builder() {

@@ -23,21 +23,29 @@
  *
  */
 
-package net.impactdev.impactor.api.registry;
+package net.impactdev.impactor.api.ui.detail;
 
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.utilities.context.ContextualMapping;
 
-import java.util.Objects;
-import java.util.function.Supplier;
+public class RefreshDetail {
 
-public interface Registry {
+    private final RefreshType type;
+    private final ContextualMapping context = new ContextualMapping();
 
-    <T> void register(Class<T> type, T value);
+    public static RefreshDetail create(RefreshType type) {
+        return new RefreshDetail(type);
+    }
 
-    <T> T get(Class<T> type);
+    private RefreshDetail(RefreshType type) {
+        this.type = type;
+    }
 
-    <T extends Builder<?, ?>> void registerBuilderSupplier(Class<T> type, Supplier<? extends T> builder);
+    public RefreshType type() {
+        return this.type;
+    }
 
-    <T extends Builder<?, ?>> T createBuilder(Class<T> type);
+    public ContextualMapping context() {
+        return this.context;
+    }
 
 }

@@ -133,29 +133,29 @@ public class LayoutImpl implements Layout {
 
         @Override
         public LayoutBuilder square(Icon<?> icon, int center, int radius, boolean hollow) {
-            return this.rectangle(icon, center - radius, center - radius, center + radius, center + radius, hollow);
+            Vector2i size = Vector2i.from(radius);
+            Vector2i offsets = Vector2i.from(center % 9, center / 9).sub(size);
+            return this.rectangle(icon, size, offsets, hollow);
         }
 
         @Override
-        public LayoutBuilder rectangle(Icon<?> icon, int x1, int y1, int x2, int y2, boolean hollow) {
-            for(int x = x1; x < x2; x++) {
-                this.slot(icon, x);
+        public LayoutBuilder rectangle(Icon<?> icon, Vector2i size, Vector2i offset, boolean hollow) {
+            for(int x = offset.x(); x < size.x() + offset.x(); x++) {
+                this.slot(icon, x + (9 * offset.y()));
             }
 
-            for(int x = x1; x <= x2; x++) {
-                for(int y = y1 + 1; y <= y2 - 1; y++) {
-                    if(x > x1 && x < x2) {
-                        if(!hollow) {
-                            this.slot(icon, x * y);
-                        }
-                    } else {
-                        this.slot(icon, x * y);
+            for(int x = offset.x(); x < size.x() + offset.x(); x++) {
+                for(int y = offset.y() + 1; y < size.y() + offset.y() - 1; y++) {
+                    if(hollow && x != offset.x() && x != size.x() + offset.x()) {
+                        continue;
                     }
+
+                    this.slot(icon, x + (9 * y));
                 }
             }
 
-            for(int x = x1 * (y2 - y1); x < x2 * (y2 - y1); x++) {
-                this.slot(icon, x);
+            for(int x = offset.x(); x < size.x() + offset.x(); x++) {
+                this.slot(icon, x + (9 * (size.y() + offset.y() - 1)));
             }
 
             return this;
@@ -169,7 +169,8 @@ public class LayoutImpl implements Layout {
 
         @Override
         public LayoutBuilder from(Layout input) {
-            return null;
+            input.elements().forEach((key, value) -> this.slot(value, key));
+            return this;
         }
 
         @Override

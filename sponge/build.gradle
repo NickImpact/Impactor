@@ -2,20 +2,11 @@ import org.spongepowered.gradle.plugin.config.PluginLoaders
 import org.spongepowered.plugin.metadata.model.PluginDependency
 
 plugins {
-    id 'org.spongepowered.gradle.plugin' version '2.0.0'
-    id 'org.spongepowered.gradle.vanilla' version '0.2'
+    id 'org.spongepowered.gradle.plugin' version '2.0.1'
 }
 
 ext {
     sponge = "8.0.0"
-}
-
-minecraft {
-    version("1.16.5")
-    runs {
-        //server()
-        client()
-    }
 }
 
 sponge {
@@ -80,7 +71,6 @@ shadowJar {
     dependencies {
         include(project(':api'))
         include(project(':common'))
-        include(dependency('net.kyori:adventure-text-minimessage:.*'))
     }
 
     // Shaded Components
@@ -97,7 +87,6 @@ shadowJar {
         exclude 'net.kyori.event.method.annotation.Subscribe'
     }
 
-    relocate 'net.kyori.adventure.text.minimessage', 'net.impactdev.impactor.relocations.minimessage'
     relocate("net.kyori.event", "com.ichorpowered.protocolcontrol.lib.kyori")
 
     // Storage Based Relocations

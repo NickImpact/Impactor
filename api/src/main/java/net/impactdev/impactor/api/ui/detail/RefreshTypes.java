@@ -23,21 +23,47 @@
  *
  */
 
-package net.impactdev.impactor.api.registry;
+package net.impactdev.impactor.api.ui.detail;
 
-import net.impactdev.impactor.api.utilities.Builder;
+public enum RefreshTypes implements RefreshType {
 
-import java.util.Objects;
-import java.util.function.Supplier;
+    /** Updates every single icon within the view */
+    ALL,
 
-public interface Registry {
+    /** Updates only icons belonging to the layout of the view */
+    LAYOUT,
 
-    <T> void register(Class<T> type, T value);
+    /** Updates only icons belonging to the content zone of a pagination */
+    CONTENT,
 
-    <T> T get(Class<T> type);
+    /** Updates an icon at a slot index (0, 1, 2, 3, etc) */
+    SLOT_INDEX,
 
-    <T extends Builder<?, ?>> void registerBuilderSupplier(Class<T> type, Supplier<? extends T> builder);
+    /**
+     * Updates an icon at a slot position, via a Vector2i
+     *
+     * <p>Examples are such:
+     * <ul>
+     *     <li>(0, 0)</li>
+     *     <li>(1, 0)</li>
+     * </ul>
+     */
+    SLOT_POS,
 
-    <T extends Builder<?, ?>> T createBuilder(Class<T> type);
+    /**
+     * Updates icons within the specified grid. To satisfy the context for
+     * this operation whilst only specifying one vector, this typing bases
+     * on a {@link org.spongepowered.math.vector.Vector4i Vector4i} to specify
+     * both the size of the grid, and the top left corner of the grid.
+     */
+    GRID,
+
+    /**
+     * Updates a particular section within a sectioned pagination. If you want to
+     * update all sections in a pagination, use {@link #CONTENT}.
+     *
+     * @see #CONTENT
+     */
+    SECTION,
 
 }

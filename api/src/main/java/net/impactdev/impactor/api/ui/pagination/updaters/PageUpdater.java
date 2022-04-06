@@ -25,42 +25,18 @@
 
 package net.impactdev.impactor.api.ui.pagination.updaters;
 
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.impactdev.impactor.api.utilities.Builder;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-public abstract class PageUpdater {
+public final class PageUpdater {
 
     private final PageUpdaterType type;
     private final int slot;
-    private final Key key;
+    private final UpdaterProvider<?> provider;
 
-    public PageUpdater(PageUpdaterType type, int slot, Key key) {
+    private PageUpdater(PageUpdaterType type, int slot, UpdaterProvider<?> provider) {
         this.type = type;
         this.slot = slot;
-        this.key = key;
-    }
-
-    public static PageUpdater.Mini of(PageUpdaterType type, int slot, Key key, String title) {
-        return new PageUpdater.Mini(type, slot, key, title, Collections.emptyList());
-    }
-
-    public static PageUpdater.Mini of(PageUpdaterType type, int slot, Key key, String title, List<String> lore) {
-        return new PageUpdater.Mini(type, slot, key, title, lore);
-    }
-
-    public static PageUpdater.Provided of(PageUpdaterType type, int slot, Key key, Component title) {
-        return new PageUpdater.Provided(type, slot, key, title, Collections.emptyList());
-    }
-
-    public static PageUpdater.Provided of(PageUpdaterType type, int slot, Key key, Component title, List<Component> lore) {
-        return new PageUpdater.Provided(type, slot, key, title, lore);
+        this.provider = provider;
     }
 
     public PageUpdaterType type() {
@@ -71,62 +47,57 @@ public abstract class PageUpdater {
         return this.slot;
     }
 
-    public Key key() {
-        return this.key;
+    public UpdaterProvider<?> provider() {
+        return this.provider;
     }
 
-    public abstract Component title(int target);
-    public abstract List<Component> lore(int target);
-
-    public static class Mini extends PageUpdater {
-
-        private static final MiniMessage mini = MiniMessage.miniMessage();
-
-        private final String title;
-        private final List<String> lore;
-
-        public Mini(PageUpdaterType type, int slot, Key key, String title, List<String> lore) {
-            super(type, slot, key);
-            this.title = title;
-            this.lore = lore;
-        }
-
-        @Override
-        public Component title(int target) {
-            TagResolver template = Placeholder.parsed("target-page", "" + target);
-            return mini.deserialize(this.title, template);
-        }
-
-        @Override
-        public List<Component> lore(int target) {
-            TagResolver template = Placeholder.parsed("target-page", "" + target);
-            return this.lore
-                    .stream()
-                    .map(line -> mini.deserialize(line, template))
-                    .collect(Collectors.toList());
-        }
+    public static PageUpdaterBuilder builder() {
+        return new PageUpdaterBuilder();
     }
 
-    public static class Provided extends PageUpdater {
+    public static class PageUpdaterBuilder implements Builder<PageUpdater, PageUpdaterBuilder> {
 
-        private final Component title;
-        private final List<Component> lore;
+        private PageUpdaterType type;
+        private int slot;
+        private UpdaterProvider<?> provider;
 
-        public Provided(PageUpdaterType type, int slot, Key key, Component title, List<Component> lore) {
-            super(type, slot, key);
-            this.title = title;
-            this.lore = lore;
+        public PageUpdaterBuilder type(PageUpdaterType type) {
+            this.type = type;
+            return this;
+        }
+
+        public PageUpdaterBuilder slot(int slot) {
+            this.slot = slot;
+            return this;
+        }
+
+        public PageUpdaterBuilder provider(UpdaterProvider<?> provider) {
+            this.provider = provider;
+            return this;
         }
 
         @Override
-        public Component title(int target) {
-            return this.title;
+        public PageUpdaterBuilder from(PageUpdater input) {
+            return this;
         }
 
         @Override
-        public List<Component> lore(int target) {
-            return this.lore;
+        public PageUpdater build() {
+            return new PageUpdater(this.type, this.slot, this.provider);
         }
     }
 
+    @FunctionalInterface
+    public interface UpdaterProvider<T> {
+
+        /**
+         * Provides a platform based ItemStack that will act as the client-facing
+         * display of the icon representing
+         *
+         * @param target The intended target page of the updater if clicked
+         * @return A displayable item that will be placed within an Icon
+         */
+        T provide(int target);
+
+    }
 }

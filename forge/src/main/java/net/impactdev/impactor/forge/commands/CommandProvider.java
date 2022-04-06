@@ -25,12 +25,12 @@
 
 package net.impactdev.impactor.forge.commands;
 
-import ca.landonjw.gooeylibs2.api.button.Button;
 import ca.landonjw.gooeylibs2.api.button.ButtonAction;
 import ca.landonjw.gooeylibs2.api.button.GooeyButton;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.ImpactorUI;
+import net.impactdev.impactor.api.ui.icons.DisplayProvider;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.impactdev.impactor.api.ui.layouts.Layout;
 import net.impactdev.impactor.forge.ForgeImpactorPlugin;
@@ -54,13 +54,13 @@ public class CommandProvider {
                     try {
                         ServerPlayerEntity source = context.getSource().getPlayerOrException();
                         Icon<ItemStack> center = Icon.builder(ItemStack.class)
-                                .display(GooeyButton.builder()
+                                .display(new DisplayProvider.Constant<>(GooeyButton.builder()
                                         .display(new ItemStack(Blocks.CHEST))
                                         .title(RelocationTranslator.relocated(MiniMessage.miniMessage()
                                                 .deserialize("<gradient:red:green:blue>Cool Test Icon</gradient>")))
                                         .build()
                                         .getDisplay()
-                                )
+                                ))
                                 .listener(c -> {
                                     ForgeImpactorPlugin.getInstance().getPluginLogger().info("Click detected on icon at slot: " + c.require(ButtonAction.class).getSlot());
                                     return false;

@@ -2,9 +2,6 @@ buildscript {
     repositories {
         mavenCentral()
         maven {
-            url "https://repository.jboss.org/nexus/content/groups/public/"
-        }
-        maven {
             name = "forge"
             url = "https://files.minecraftforge.net/maven"
         }
@@ -60,18 +57,11 @@ shadowJar {
             include(project(':api'))
             include(project(':common'))
             include(dependency('net.kyori:.*:.*'))
-            //include(dependency('ca.landonjw:GooeyLibs:.*'))
         }
     }
 
-//    minimize {
-//        exclude ('ca/landonjw/gooeylibs2/GooeyLibs.class')
-//    }
-
     relocate('net.kyori', 'net.impactdev.impactor.relocations.kyori')
-    relocate("ca.landonjw.gooeylibs2", "net.impactdev.impactor.relocations.landonjw.gooeylibs2") {
-        exclude('ca.landonjw.gooeylibs2.GooeyLibs')
-    }
+    relocate("ca.landonjw.gooeylibs2", "net.impactdev.impactor.relocations.landonjw.gooeylibs2")
 }
 
 reobf {

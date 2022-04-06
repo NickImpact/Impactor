@@ -34,11 +34,12 @@ import net.impactdev.impactor.api.ui.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.utilities.Builder;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.util.TriState;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public interface AsyncPagination extends Pagination {
 
@@ -65,7 +66,18 @@ public interface AsyncPagination extends Pagination {
 
         AsyncPaginationBuilder style(TriState state);
 
-        AsyncPaginationBuilder onTimeout(Icon<?> icon);
+        /**
+         * Indicates the timeframe this pagination will allow before timing out. In essence,
+         * the accumulator specified with {@link #accumulator(CompletableFuture)} must
+         * complete within the specified unit of time to populate the pagination. If not,
+         * the pagination will be filled with the given icon.
+         *
+         * @param time The amount of time before the accumulator can time out
+         * @param unit The unit of time for the time measurement
+         * @param icon The icon to fill the pagination with if the accumulator times out
+         * @return The updated builder
+         */
+        AsyncPaginationBuilder timeout(long time, TimeUnit unit, Icon<?> icon);
 
         AsyncPaginationBuilder waiting(Icon<?> icon);
 

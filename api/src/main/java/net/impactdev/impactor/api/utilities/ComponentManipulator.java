@@ -27,6 +27,8 @@ package net.impactdev.impactor.api.utilities;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 
 public class ComponentManipulator {
 
@@ -43,6 +45,26 @@ public class ComponentManipulator {
         }
 
         return result.toString();
+    }
+
+    /**
+     * The idea behind this method is that Minecraft with 1.16.5 changed a client setting
+     * that enforces italics on custom item titles/lores where no italic flag is set (aka
+     * {@link TextDecoration.State#NOT_SET}).
+     *
+     * <p>With the incoming source, if the source does not specify italic decoration states,
+     * this method will update the source of the component to forcibly set italics to false.
+     *
+     * @param source The source component
+     * @return A new component with the source as a child, and italics defaulted to off
+     */
+    public static Component noItalics(Component source) {
+        TextDecoration.State state = source.style().decoration(TextDecoration.ITALIC);
+        if(state == TextDecoration.State.NOT_SET) {
+            return source.style(source.style().decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+        }
+
+        return source;
     }
 
 }

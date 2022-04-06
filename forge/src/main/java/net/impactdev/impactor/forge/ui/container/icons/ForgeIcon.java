@@ -27,6 +27,7 @@ package net.impactdev.impactor.forge.ui.container.icons;
 
 import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.ui.icons.ClickProcessor;
+import net.impactdev.impactor.api.ui.icons.DisplayProvider;
 import net.impactdev.impactor.api.ui.icons.Icon;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -50,22 +51,22 @@ public class ForgeIcon implements Icon<ItemStack> {
 
     @NotNull
     @Override
-    public ItemStack display() {
-        return this.delegate.getDisplay();
+    public DisplayProvider<ItemStack> display() {
+        return this.delegate.provider();
     }
 
     @Override
     public Set<ClickProcessor> listeners() {
-        return this.delegate.getListeners();
+        return this.delegate.listeners();
     }
 
     public static class ForgeIconBuilder implements IconBuilder<ItemStack> {
 
-        private ItemStack display;
+        private DisplayProvider<ItemStack> display;
         private final Set<ClickProcessor> listeners = Sets.newLinkedHashSet();
 
         @Override
-        public IconBuilder<ItemStack> display(ItemStack display) {
+        public IconBuilder<ItemStack> display(DisplayProvider<ItemStack> display) {
             this.display = display;
             return this;
         }
