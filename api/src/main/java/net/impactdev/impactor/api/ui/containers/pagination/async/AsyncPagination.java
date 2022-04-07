@@ -1,0 +1,86 @@
+/*
+ * This file is part of Impactor, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) 2018-2022 NickImpact
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
+
+package net.impactdev.impactor.api.ui.containers.pagination.async;
+
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.ui.containers.components.UIComponent;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.pagination.Pagination;
+import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
+import net.impactdev.impactor.api.utilities.Builder;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.util.TriState;
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.math.vector.Vector2i;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
+public interface AsyncPagination extends Pagination {
+
+    static AsyncPaginationBuilder builder() {
+        return Impactor.getInstance().getRegistry().createBuilder(AsyncPaginationBuilder.class);
+    }
+
+    interface AsyncPaginationBuilder extends UIComponent<AsyncPaginationBuilder>, Builder<AsyncPagination, AsyncPaginationBuilder> {
+
+        @Required
+        AsyncPaginationBuilder provider(Key key);
+
+        @Required
+        AsyncPaginationBuilder viewer(PlatformPlayer viewer);
+
+        @Required
+        AsyncPaginationBuilder accumulator(CompletableFuture<List<Icon<?>>> provider);
+
+        AsyncPaginationBuilder zone(Vector2i dimensions);
+
+        AsyncPaginationBuilder zone(Vector2i dimensions, @Nullable Vector2i offset);
+
+        AsyncPaginationBuilder updater(PageUpdater updater);
+
+        AsyncPaginationBuilder style(TriState state);
+
+        /**
+         * Indicates the timeframe this pagination will allow before timing out. In essence,
+         * the accumulator specified with {@link #accumulator(CompletableFuture)} must
+         * complete within the specified unit of time to populate the pagination. If not,
+         * the pagination will be filled with the given icon.
+         *
+         * @param time The amount of time before the accumulator can time out
+         * @param unit The unit of time for the time measurement
+         * @param icon The icon to fill the pagination with if the accumulator times out
+         * @return The updated builder
+         */
+        AsyncPaginationBuilder timeout(long time, TimeUnit unit, Icon<?> icon);
+
+        AsyncPaginationBuilder waiting(Icon<?> icon);
+
+    }
+
+}

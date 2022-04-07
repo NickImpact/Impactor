@@ -27,9 +27,9 @@ package net.impactdev.impactor.sponge.ui.containers.icons;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
-import net.impactdev.impactor.api.ui.icons.ClickProcessor;
-import net.impactdev.impactor.api.ui.icons.DisplayProvider;
-import net.impactdev.impactor.api.ui.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.icons.ClickProcessor;
+import net.impactdev.impactor.api.ui.containers.icons.DisplayProvider;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.item.inventory.ItemStack;
 

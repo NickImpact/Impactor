@@ -48,24 +48,16 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.plugin.PluginContainer;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 public class PlaceholdersCommand {
 
@@ -156,7 +148,11 @@ public class PlaceholdersCommand {
                                             ArrayListMultimap::create
                                     ));
 
-                            Path target = SpongeImpactorPlugin.getInstance().getConfigDir().resolve("placeholders").resolve("placeholders.out");
+                            Path base = SpongeImpactorPlugin.instance()
+                                    .configDirectory()
+                                    .orElseThrow(IllegalStateException::new);
+
+                            Path target = base.resolve("placeholders").resolve("placeholders.out");
                             try {
                                 if(!target.toFile().exists()) {
                                     Files.createDirectories(target.getParent());
@@ -186,7 +182,7 @@ public class PlaceholdersCommand {
                                     printer.print(stream);
                                 }
                                 context.cause().audience().sendMessage(Component.text("Successfully wrote placeholder information to "
-                                        + SpongeImpactorPlugin.getInstance().getConfigDir().getParent().getParent().relativize(target)));
+                                        + base.getParent().getParent().relativize(target)));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

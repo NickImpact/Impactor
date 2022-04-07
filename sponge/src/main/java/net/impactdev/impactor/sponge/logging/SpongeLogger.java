@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.sponge.logging;
 
-import net.impactdev.impactor.api.logging.Logger;
+import net.impactdev.impactor.api.logging.PluginLogger;
 
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class SpongeLogger implements Logger {
+public class SpongeLogger implements PluginLogger {
 
     private final org.apache.logging.log4j.Logger delegate;
     private final Map<String, Marker> markers = new HashMap<>();

@@ -25,282 +25,220 @@
 
 package net.impactdev.impactor.sponge;
 
-import com.google.common.collect.*;
-import com.google.inject.Inject;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.configuration.Config;
 import net.impactdev.impactor.api.dependencies.Dependency;
 import net.impactdev.impactor.api.dependencies.DependencyManager;
 import net.impactdev.impactor.api.dependencies.ProvidedDependencies;
 import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
-import net.impactdev.impactor.api.event.EventBus;
-import net.impactdev.impactor.api.registry.Registry;
-import net.impactdev.impactor.api.scoreboard.ImpactorScoreboard;
-import net.impactdev.impactor.api.scoreboard.frames.types.ConstantFrame;
-import net.impactdev.impactor.api.scoreboard.frames.types.ListeningFrame;
-import net.impactdev.impactor.api.scoreboard.frames.types.RefreshingFrame;
-import net.impactdev.impactor.api.scoreboard.lines.types.AnimatedLine;
-import net.impactdev.impactor.api.scoreboard.lines.types.ConstantLine;
-import net.impactdev.impactor.api.scoreboard.lines.types.ListeningLine;
-import net.impactdev.impactor.api.scoreboard.lines.types.RefreshingLine;
-import net.impactdev.impactor.api.scoreboard.objective.types.AnimatedObjective;
-import net.impactdev.impactor.api.scoreboard.objective.types.ConstantObjective;
-import net.impactdev.impactor.api.scoreboard.objective.types.ListeningObjective;
-import net.impactdev.impactor.api.scoreboard.objective.types.RefreshingObjective;
-import net.impactdev.impactor.api.ui.ImpactorUI;
-import net.impactdev.impactor.api.ui.icons.Icon;
-import net.impactdev.impactor.api.ui.layouts.Layout;
-import net.impactdev.impactor.api.ui.pagination.Pagination;
-import net.impactdev.impactor.api.ui.pagination.async.AsyncPagination;
-import net.impactdev.impactor.api.ui.pagination.sectioned.SectionedPagination;
-import net.impactdev.impactor.api.ui.signs.SignQuery;
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
+import net.impactdev.impactor.api.logging.PluginLogger;
+import net.impactdev.impactor.api.module.Module;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.api.plugin.PluginMetadata;
-import net.impactdev.impactor.api.plugin.components.Depending;
 import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
-import net.impactdev.impactor.api.services.text.MessageService;
-import net.impactdev.impactor.api.storage.StorageType;
+import net.impactdev.impactor.api.registry.Registry;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
-import net.impactdev.impactor.common.config.ConfigMaintainer;
+import net.impactdev.impactor.common.api.ModuleImplementation;
 import net.impactdev.impactor.common.dependencies.DependencyContainer;
-import net.impactdev.impactor.common.event.ImpactorEventBus;
-import net.impactdev.impactor.common.placeholders.PlaceholderSourcesImpl;
-import net.impactdev.impactor.common.ui.LayoutImpl;
-import net.impactdev.impactor.common.ui.pagination.async.AbstractAsyncPagination;
+import net.impactdev.impactor.common.plugin.InternalImpactorPlugin;
+import net.impactdev.impactor.launcher.LoadingException;
 import net.impactdev.impactor.sponge.api.SpongeImpactorAPIProvider;
 import net.impactdev.impactor.sponge.commands.DevCommand;
 import net.impactdev.impactor.sponge.commands.PlaceholdersCommand;
-import net.impactdev.impactor.sponge.plugin.AbstractSpongePlugin;
-import net.impactdev.impactor.sponge.scheduler.SpongeSchedulerAdapter;
-import net.impactdev.impactor.sponge.scoreboard.SpongeScoreboard;
-import net.impactdev.impactor.sponge.scoreboard.frames.SpongeConstantFrame;
-import net.impactdev.impactor.sponge.scoreboard.frames.SpongeListeningFrame;
-import net.impactdev.impactor.sponge.scoreboard.frames.SpongeRefreshingFrame;
-import net.impactdev.impactor.sponge.scoreboard.lines.types.SpongeConstantLine;
-import net.impactdev.impactor.sponge.scoreboard.lines.types.updatable.SpongeAnimatedLine;
-import net.impactdev.impactor.sponge.scoreboard.lines.types.updatable.SpongeListeningLine;
-import net.impactdev.impactor.sponge.scoreboard.lines.types.updatable.SpongeRefreshingLine;
-import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeAnimatedObjective;
-import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeConstantObjective;
-import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeListeningObjective;
-import net.impactdev.impactor.sponge.scoreboard.objective.types.SpongeRefreshingObjective;
-import net.impactdev.impactor.sponge.text.SpongeMessageService;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
-import net.impactdev.impactor.sponge.ui.containers.SpongePagination;
-import net.impactdev.impactor.sponge.ui.containers.SpongeUI;
-import net.impactdev.impactor.sponge.ui.containers.async.SpongeAsyncPagination;
-import net.impactdev.impactor.sponge.ui.containers.icons.SpongeIcon;
-import net.impactdev.impactor.sponge.ui.containers.sectioned.SpongeSectionedPagination;
-import net.impactdev.impactor.sponge.ui.signs.SpongeSignQuery;
-import net.impactdev.impactor.sponge.util.SpongeClassPathAppender;
-import org.apache.logging.log4j.Logger;
+import org.reflections.Reflections;
 import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.Server;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
-import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.lifecycle.*;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
+import org.spongepowered.api.event.lifecycle.RegisterRegistryValueEvent;
 import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.plugin.PluginContainer;
-import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-@Plugin("impactor")
-public class SpongeImpactorPlugin extends AbstractSpongePlugin implements Depending {
+public class SpongeImpactorPlugin implements InternalImpactorPlugin {
 
-	private static SpongeImpactorPlugin instance;
-	private final PluginContainer pluginContainer;
+    private final SpongeImpactorBootstrap bootstrap;
 
-	@Inject
-	@ConfigDir(sharedRoot = false)
-	private Path configDir;
-	private Config config;
+    public static SpongeImpactorPlugin instance() {
+        return (SpongeImpactorPlugin) Impactor.getInstance().getRegistry().get(InternalImpactorPlugin.class);
+    }
 
-	@Inject
-	public SpongeImpactorPlugin(PluginContainer container, Logger fallback) {
-		super(PluginMetadata.builder().id("impactor").name("Impactor").version("@version@").build(), fallback);
-		this.pluginContainer = container;
-		ApiRegistrationUtil.register(new SpongeImpactorAPIProvider(new SpongeSchedulerAdapter(this, Sponge.game())));
-	}
+    public SpongeImpactorPlugin(SpongeImpactorBootstrap bootstrap) {
+        this.bootstrap = bootstrap;
+        PluginRegistry.register(this);
+        ApiRegistrationUtil.register(new SpongeImpactorAPIProvider(this.bootstrap.scheduler()));
+    }
 
-	public static SpongeImpactorPlugin getInstance() {
-		return SpongeImpactorPlugin.instance;
-	}
+    @Override
+    public PluginLogger logger() {
+        return this.bootstrap.logger();
+    }
 
-	@Listener(order = Order.FIRST)
-	public void onConstruct(ConstructPluginEvent e) {
-		instance = this;
+    @Override
+    public void construct() {
+        Registry registry = Impactor.getInstance().getRegistry();
+        registry.register(InternalImpactorPlugin.class, this);
+        registry.register(ImpactorPlugin.class, this); // TODO - Temporary
 
-		Registry registry = Impactor.getInstance().getRegistry();
-		registry.register(ImpactorPlugin.class, this);
-		registry.registerBuilderSupplier(Config.ConfigBuilder.class, ConfigMaintainer.ConfigMaintainerBuilder::new);
-		registry.register(ClassPathAppender.class, new SpongeClassPathAppender(this));
-		registry.registerBuilderSupplier(Dependency.DependencyBuilder.class, DependencyContainer.DependencyContainerBuilder::new);
-		registry.register(DependencyManager.class, new DependencyManager(this));
+        this.download();
+        this.modules();
+        this.listeners();
+        this.commands();
+        this.placeholders();
+    }
 
-		this.getPluginLogger().info("Startup", "Pooling plugin dependencies...");
-		List<Dependency> toLaunch = Lists.newArrayList();
-		for(ImpactorPlugin plugin : PluginRegistry.getAll()) {
-			if(plugin instanceof Depending) {
-				Depending dependable = (Depending) plugin;
-				for(Dependency dependency : dependable.getAllDependencies()) {
-					if(toLaunch.contains(dependency)) {
-						continue;
-					}
+    @Override
+    public void shutdown() {
 
-					toLaunch.add(dependency);
-				}
+    }
 
-				for(Dependency storage : this.getDependencyManager().registry().resolveStorageDependencies(Sets.newHashSet(dependable.getStorageRequirements()))) {
-					if(toLaunch.contains(storage)) {
-						continue;
-					}
+    @Override
+    public SpongeImpactorBootstrap bootstrapper() {
+        return this.bootstrap;
+    }
 
-					toLaunch.add(storage);
-				}
-			}
-		}
+    @Override
+    public void modules() {
+        final Registry registry = Impactor.getInstance().getRegistry();
 
-		this.getPluginLogger().info("Startup", "Dependencies found, setting these up now...");
-		this.getPluginLogger().info("Startup", "Initializing default dependencies...");
-		this.getDependencyManager().loadDependencies(ProvidedDependencies.JAR_RELOCATOR);
-		this.getDependencyManager().loadDependencies(Lists.newArrayList(
-				ProvidedDependencies.CONFIGURATE_CORE,
-				ProvidedDependencies.CONFIGURATE_HOCON,
-				ProvidedDependencies.TYPESAFE_CONFIG,
-				ProvidedDependencies.CONFIGURATE_GSON,
-				ProvidedDependencies.CONFIGURATE_YAML
-		));
-		this.getDependencyManager().loadDependencies(new HashSet<>(toLaunch));
+        new Reflections("net.impactdev.impactor")
+                .getSubTypesOf(Module.class)
+                .stream()
+                .filter(module -> module.isAnnotationPresent(ModuleImplementation.class))
+                .map(module -> {
+                    try {
+                        return (Module) module.newInstance();
+                    } catch (Exception e) {
+                        throw new LoadingException("Failed to initialize a module", e);
+                    }
+                })
+                .sorted(Comparator.comparing(Module::priority).reversed())
+                .forEach(module -> {
+                    this.logger().info("Loading module: " + module.name());
+                    module.builders(registry);
+                    module.register(registry);
+                });
+    }
 
-		Impactor.getInstance().getRegistry().register(MessageService.class, new SpongeMessageService());
-		Impactor.getInstance().getRegistry().registerBuilderSupplier(SignQuery.SignQueryBuilder.class, SpongeSignQuery.SpongeSignQueryBuilder::new);
-		Impactor.getInstance().getRegistry().register(SpongePlaceholderManager.class, new SpongePlaceholderManager());
-		Impactor.getInstance().getRegistry().registerBuilderSupplier(PlaceholderSources.SourceBuilder.class, PlaceholderSourcesImpl.PlaceholderSourcesBuilderImpl::new);
+    @Override
+    public void download() {
+        Registry registry = Impactor.getInstance().getRegistry();
+        registry.register(ClassPathAppender.class, this.bootstrap.appender());
+        registry.registerBuilderSupplier(Dependency.DependencyBuilder.class, DependencyContainer.DependencyContainerBuilder::new);
 
-		registry.registerBuilderSupplier(Icon.IconBuilder.class, SpongeIcon.SpongeIconBuilder::new);
-		registry.registerBuilderSupplier(Layout.LayoutBuilder.class, LayoutImpl.LayoutImplBuilder::new);
-		registry.registerBuilderSupplier(Pagination.PaginationBuilder.class, SpongePagination.SpongePaginationBuilder::new);
-		registry.registerBuilderSupplier(ImpactorUI.UIBuilder.class, SpongeUI.SpongeUIBuilder::new);
-		registry.registerBuilderSupplier(SectionedPagination.SectionedPaginationBuilder.class, SpongeSectionedPagination.SpongeSectionedPaginationBuilder::new);
-		registry.registerBuilderSupplier(AsyncPagination.AsyncPaginationBuilder.class, SpongeAsyncPagination.SpongeAsyncPaginationBuilder::new);
+        DependencyManager manager = new DependencyManager(this);
+        registry.register(DependencyManager.class, manager);
 
-		// Scoreboard Registration
-		registry.registerBuilderSupplier(ImpactorScoreboard.ScoreboardBuilder.class, SpongeScoreboard.SpongeScoreboardBuilder::new);
+        this.logger().info("Attempting to load runtime dependencies...");
+        this.logger().info("Initializing priority dependencies...");
 
-		// Objectives
-		registry.registerBuilderSupplier(ConstantObjective.ConstantObjectiveBuilder.class, SpongeConstantObjective.SpongeConstantObjectiveBuilder::new);
-		registry.registerBuilderSupplier(RefreshingObjective.RefreshingObjectiveBuilder.class, SpongeRefreshingObjective.SpongeRefreshingObjectiveBuilder::new);
-		registry.registerBuilderSupplier(ListeningObjective.ListeningObjectiveBuilder.class, SpongeListeningObjective.SpongeListeningObjectiveBuilder::new);
-		registry.registerBuilderSupplier(AnimatedObjective.AnimatedObjectiveBuilder.class, SpongeAnimatedObjective.SpongeAnimatedObjectiveBuilder::new);
+        Instant start = Instant.now();
+        manager.loadDependencies(ProvidedDependencies.JAR_RELOCATOR);
 
-		// Lines
-		registry.registerBuilderSupplier(ConstantLine.ConstantLineBuilder.class, SpongeConstantLine.SpongeConstantLineBuilder::new);
-		registry.registerBuilderSupplier(RefreshingLine.RefreshingLineBuilder.class, SpongeRefreshingLine.SpongeRefreshingLineBuilder::new);
-		registry.registerBuilderSupplier(AnimatedLine.AnimatedBuilder.class, SpongeAnimatedLine.SpongeAnimatedBuilder::new);
-		registry.registerBuilderSupplier(ListeningLine.ListeningBuilder.class, SpongeListeningLine.SpongeListeningLineBuilder::new);
+        this.logger().info("Pooling plugin dependencies...");
+        Set<Dependency> dependencies = Sets.newHashSet();
+        for(ImpactorPlugin plugin : PluginRegistry.getAll()) {
+            dependencies.addAll(plugin.dependencies());
+            dependencies.addAll(manager.registry().resolveStorageDependencies(plugin.storageRequirements()));
+        }
+        manager.loadDependencies(dependencies);
 
-		// Frames
-		registry.registerBuilderSupplier(ConstantFrame.ConstantFrameBuilder.class, SpongeConstantFrame.SpongeConstantFrameBuilder::new);
-		registry.registerBuilderSupplier(RefreshingFrame.RefreshingFrameBuilder.class, SpongeRefreshingFrame.SpongeRefreshingFrameBuilder::new);
-		registry.registerBuilderSupplier(ListeningFrame.ListeningFrameBuilder.class, SpongeListeningFrame.SpongeListeningFrameBuilder::new);
-		Impactor.getInstance().getRegistry().register(EventBus.class, new ImpactorEventBus());
-		((ImpactorEventBus) Impactor.getInstance().getEventBus()).enable();
-	}
+        Instant end = Instant.now();
+        long ms = Duration.between(start, end).toMillis();
+        this.logger().info("Dependency injection complete, took " + String.format("%02d.%03d seconds", TimeUnit.MILLISECONDS.toSeconds(ms), (ms % 1000)));
+    }
 
-	@Listener
-	public void whenCommandRegistration(RegisterCommandEvent<Command.Parameterized> event) {
-		event.register(this.getPluginContainer(), new PlaceholdersCommand().create(), "placeholders");
-		event.register(this.getPluginContainer(), new DevCommand().create(), "dev");
-	}
+    @Override
+    public void listeners() {
 
-//	@Listener
-//	public void onServerStart(StartedEngineEvent<Server> event) {
-//		ImmutableList<PlaceholderParser> parsers = Impactor.getInstance().getRegistry().get(SpongePlaceholderManager.class).getAllPlatformParsers();
-//		this.getPluginLogger().info("&eAvailable Placeholders:");
-//		Multimap<String, ResourceKey> sorted = ArrayListMultimap.create();
-//		Pattern pattern = Pattern.compile("(.+):(.+)");
-//
-//		parsers.stream()
-//				.map(parser -> parser.key(RegistryTypes.PLACEHOLDER_PARSER))
-//				.sorted(Comparator.comparing(ResourceKey::formatted))
-//				.forEach(parser -> {
-//					Matcher matcher = pattern.matcher(parser.formatted());
-//					if(matcher.find()) {
-//						Optional<PluginContainer> container = Sponge.pluginManager().plugin(matcher.group(1));
-//						sorted.put(container.map(c -> c.metadata().name().orElse("Unknown")).orElse("Custom"), parser);
-//					} else {
-//						sorted.put("Custom", parser);
-//					}
-//				});
-//
+    }
 
-//	}
+    @Override
+    public void commands() {
+        this.bootstrap.registerListener(new RegisterCommandsListener(this.bootstrap.container()));
+    }
 
-	@Listener
-	public void onShutdown(StoppingEngineEvent<Server> event) {
-		((ImpactorEventBus)Impactor.getInstance().getEventBus()).disable();
-	}
+    public static final class RegisterCommandsListener {
 
-	@Listener
-	public void onGlobalRegistryValueRegistrationEvent(final RegisterRegistryValueEvent.GameScoped event) {
-		final RegisterRegistryValueEvent.RegistryStep<PlaceholderParser> placeholderParserRegistryStep =
-				event.registry(RegistryTypes.PLACEHOLDER_PARSER);
-		new SpongePlaceholderManager().getAllInternalParsers().forEach(metadata -> {
-			placeholderParserRegistryStep.register(ResourceKey.of(this.pluginContainer, metadata.getToken()), metadata.getParser());
-		});
-	}
+        private final PluginContainer container;
 
-	public Path getConfigDir() {
-		return this.configDir;
-	}
+        public RegisterCommandsListener(PluginContainer container) {
+            this.container = container;
+        }
 
-	public Config getConfig() {
-		return this.config;
-	}
+        @Listener
+        public void whenCommandRegistration(RegisterCommandEvent<Command.Parameterized> event) {
+            event.register(this.container, new PlaceholdersCommand().create(), "placeholders");
+            event.register(this.container, new DevCommand().create(), "dev");
+        }
 
-	public DependencyManager getDependencyManager() {
-		return Impactor.getInstance().getRegistry().get(DependencyManager.class);
-	}
+    }
 
-	@Override
-	public List<Dependency> getAllDependencies() {
-		return ImmutableList.copyOf(Lists.newArrayList(
-				ProvidedDependencies.KYORI_EVENT_API,
-				ProvidedDependencies.KYORI_EVENT_METHOD,
-				ProvidedDependencies.KYORI_EVENT_METHOD_ASM,
-				ProvidedDependencies.BYTEBUDDY,
-				ProvidedDependencies.FLOW_MATH
-		));
-	}
+    @Override
+    public void placeholders() {
+        this.bootstrap.registerListener(new RegisterPlaceholdersListener(this.bootstrap.container()));
+    }
 
-	@Override
-	public List<StorageType> getStorageRequirements() {
-		return Lists.newArrayList();
-	}
+    public static final class RegisterPlaceholdersListener {
 
-	public PluginContainer getPluginContainer() {
-		return this.pluginContainer;
-	}
+        private final PluginContainer container;
 
-	@Override
-	public void construct() {
+        public RegisterPlaceholdersListener(PluginContainer container) {
+            this.container = container;
+        }
 
-	}
+        @Listener
+        public void onGlobalRegistryValueRegistrationEvent(final RegisterRegistryValueEvent.GameScoped event) {
+            final RegisterRegistryValueEvent.RegistryStep<PlaceholderParser> placeholderParserRegistryStep =
+                    event.registry(RegistryTypes.PLACEHOLDER_PARSER);
+            new SpongePlaceholderManager().getAllInternalParsers().forEach(metadata -> {
+                placeholderParserRegistryStep.register(ResourceKey.of(this.container, metadata.getToken()), metadata.getParser());
+            });
+        }
 
-	@Override
-	public void enable() {
+    }
 
-	}
+    @Override
+    public Set<Dependency> dependencies() {
+        return ImmutableSet.copyOf(Lists.newArrayList(
+                ProvidedDependencies.KYORI_EVENT_API,
+                ProvidedDependencies.KYORI_EVENT_METHOD,
+                ProvidedDependencies.KYORI_EVENT_METHOD_ASM,
+                ProvidedDependencies.BYTEBUDDY,
+                ProvidedDependencies.FLOW_MATH,
+                ProvidedDependencies.CONFIGURATE_CORE,
+                ProvidedDependencies.CONFIGURATE_HOCON,
+                ProvidedDependencies.TYPESAFE_CONFIG,
+                ProvidedDependencies.CONFIGURATE_GSON,
+                ProvidedDependencies.CONFIGURATE_YAML,
+                Dependency.builder()
+                        .name("Reflections")
+                        .group("org.reflections")
+                        .artifact("reflections")
+                        .version("0.10.2")
+                        .with(Dependency.builder()
+                                .name("Java Assist")
+                                .group("org.javassist")
+                                .artifact("javassist")
+                                .version("3.28.0-GA")
+                                .build()
+                        )
+                        .build()
+        ));
+    }
 
-	@Override
-	public void disable() {
-
-	}
+    @Override
+    public Optional<Path> configDirectory() {
+        return Optional.of(this.bootstrap.configDirectory());
+    }
 }

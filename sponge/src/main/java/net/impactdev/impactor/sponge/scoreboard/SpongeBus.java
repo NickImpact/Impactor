@@ -56,7 +56,7 @@ public class SpongeBus extends PlatformBus<Event> {
             };
             Sponge.eventManager().registerListener(EventListenerRegistration.builder(type)
                     .listener(listener)
-                    .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                    .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                     .order(Order.DEFAULT)
                     .build()
             );

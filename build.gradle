@@ -75,9 +75,6 @@ subprojects {
         options.encoding = 'UTF-8'
     }
 
-    project.ext.sponge = 'S8.0.0'
-    project.ext.spigot = '1.12.2'
-
     repositories {
         mavenCentral()
         maven { url = 'https://jitpack.io' }
@@ -150,6 +147,8 @@ task copyJars(type: Copy) {
     exclude '*API.jar'
     exclude '*Common.jar'
     exclude 'velocity*.jar'
+    exclude 'launcher*.jar'
+    exclude '*.jarinjar'
 }
 
 publishing {
@@ -173,29 +172,37 @@ publishing {
             version project.version
         }
 
-        common(MavenPublication) {
-            def project = project(':common')
+        launcher(MavenPublication) {
+            def project = project(':launcher')
             from project.components.java
             groupId project.group
-            artifactId "common"
+            artifactId "launcher"
             version project.version
         }
 
-        bungee(MavenPublication) {
-            def project = project(':bungee')
-            from project.components.java
-            groupId project.group
-            artifactId "bungee"
-            version project.version
-        }
+//        common(MavenPublication) {
+//            def project = project(':common')
+//            from project.components.java
+//            groupId project.group
+//            artifactId "common"
+//            version project.version
+//        }
 
-        velocity(MavenPublication) {
-            def project = project(':velocity')
-            from project.components.java
-            groupId project.group
-            artifactId "velocity"
-            version project.version
-        }
+//        bungee(MavenPublication) {
+//            def project = project(':bungee')
+//            from project.components.java
+//            groupId project.group
+//            artifactId "bungee"
+//            version project.version
+//        }
+
+//        velocity(MavenPublication) {
+//            def project = project(':velocity')
+//            from project.components.java
+//            groupId project.group
+//            artifactId "velocity"
+//            version project.version
+//        }
 
         sponge(MavenPublication) {
             def project = project(':sponge')

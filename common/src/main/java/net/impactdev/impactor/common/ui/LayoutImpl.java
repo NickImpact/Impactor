@@ -28,8 +28,8 @@ package net.impactdev.impactor.common.ui;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import net.impactdev.impactor.api.ui.icons.Icon;
-import net.impactdev.impactor.api.ui.layouts.Layout;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.layouts.Layout;
 import org.spongepowered.math.vector.Vector2i;
 
 import java.util.Map;

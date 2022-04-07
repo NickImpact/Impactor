@@ -45,7 +45,6 @@ import org.spongepowered.api.util.Ticks;
 
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class SpongeAnimatedObjective extends AbstractSpongeObjective implements AnimatedObjective {
 
@@ -110,14 +109,14 @@ public class SpongeAnimatedObjective extends AbstractSpongeObjective implements 
                 task = Sponge.server().scheduler().submit(Task.builder()
                         .execute(this::update)
                         .interval(Ticks.of(this.timing.getInterval()))
-                        .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                        .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                         .build()
                 );
             } else {
                 task = Sponge.server().scheduler().submit(Task.builder()
                         .execute(this::update)
                         .interval(this.timing.getInterval(), this.timing.getUnit())
-                        .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                        .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                         .build()
                 );
             }

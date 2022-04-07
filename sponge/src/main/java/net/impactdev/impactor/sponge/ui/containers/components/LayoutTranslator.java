@@ -26,9 +26,9 @@
 package net.impactdev.impactor.sponge.ui.containers.components;
 
 import com.google.common.collect.Maps;
-import net.impactdev.impactor.api.ui.icons.Icon;
-import net.impactdev.impactor.api.ui.layouts.Layout;
-import net.impactdev.impactor.api.ui.pagination.sectioned.SectionedPagination;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.layouts.Layout;
+import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.ui.containers.icons.SpongeIcon;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -44,7 +44,7 @@ public class LayoutTranslator {
                 .grid(layout.dimensions().x(), layout.dimensions().y())
                 .completeStructure()
                 .identity(UUID.randomUUID())
-                .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                 .build();
 
         layout.elements().forEach((slot, icon) -> inventory.set(slot, ((SpongeIcon) icon).display().provide()));
@@ -60,7 +60,7 @@ public class LayoutTranslator {
                 .grid(layout.dimensions().x(), layout.dimensions().y())
                 .completeStructure()
                 .identity(UUID.randomUUID())
-                .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                 .build();
 
         Map<Integer, Icon<?>> tracked = Maps.newHashMap(layout.elements());

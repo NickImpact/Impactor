@@ -26,9 +26,9 @@
 package net.impactdev.impactor.forge.ui.container.icons;
 
 import com.google.common.collect.Sets;
-import net.impactdev.impactor.api.ui.icons.ClickProcessor;
-import net.impactdev.impactor.api.ui.icons.DisplayProvider;
-import net.impactdev.impactor.api.ui.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.icons.ClickProcessor;
+import net.impactdev.impactor.api.ui.containers.icons.DisplayProvider;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 

@@ -25,7 +25,15 @@
 
 package net.impactdev.impactor.api.plugin;
 
-import net.impactdev.impactor.api.logging.Logger;
+import net.impactdev.impactor.api.configuration.Config;
+import net.impactdev.impactor.api.dependencies.Dependency;
+import net.impactdev.impactor.api.logging.PluginLogger;
+import net.impactdev.impactor.api.storage.StorageType;
+
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Represents a basic plugin style that'll surround the basis to a plugin that can be deployed off
@@ -37,20 +45,53 @@ import net.impactdev.impactor.api.logging.Logger;
  */
 public interface ImpactorPlugin {
 
-	PluginMetadata IMPACTOR = PluginMetadata.builder()
-			.id("impactor")
-			.name("Impactor")
-			.version("@version@")
-			.build();
+	PluginMetadata metadata();
 
-	PluginMetadata getMetadata();
-
-	Logger getPluginLogger();
+	PluginLogger logger();
 
 	void construct();
 
-	void enable();
+	void shutdown();
 
-	void disable();
+	/**
+	 * Represents the path to the configuration directory of the plugin. By default,
+	 * this returns an empty optional to symbolize a plugin without configuration.
+	 *
+	 * @return
+	 */
+	default Optional<Path> configDirectory() {
+		return Optional.empty();
+	}
+
+	default Optional<Config> config() {
+		return Optional.empty();
+	}
+
+	/**
+	 * Specifies the set of dependencies a plugin might require at runtime. By default,
+	 * a plugin is assumed to require no dependencies, and this returns an empty set
+	 * to suggest such.
+	 *
+	 * <p>The use of this feature is to accommodate a smaller jar by not shading every
+	 * package into the target jar. A jar handling these properties should still
+	 * make use of the Gradle shadow plugin to apply any necessary relocations a dependency
+	 * might require.
+	 *
+	 * @return A set of dependencies a plugin will require at runtime.
+	 */
+	default Set<Dependency> dependencies() {
+		return Collections.emptySet();
+	}
+
+	/**
+	 * Represents a set of storage options a plugin might require for operation. These
+	 * types are then passed to Impactor at time of dependency collection, and provides
+	 * the necessary drivers for each storage type to the classpath.
+	 *
+	 * @return A set of storage types a plugin will require at runtime.
+	 */
+	default Set<StorageType> storageRequirements() {
+		return Collections.emptySet();
+	}
 
 }

@@ -37,7 +37,6 @@ import net.impactdev.impactor.api.dependencies.classpath.ReflectionClassPathAppe
 import net.impactdev.impactor.api.event.EventBus;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.plugin.PluginMetadata;
-import net.impactdev.impactor.api.plugin.components.Depending;
 import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
 import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;

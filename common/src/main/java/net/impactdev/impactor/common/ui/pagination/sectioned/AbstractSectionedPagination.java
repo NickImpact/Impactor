@@ -27,11 +27,11 @@ package net.impactdev.impactor.common.ui.pagination.sectioned;
 
 import com.google.common.collect.ImmutableSet;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.ui.icons.Icon;
-import net.impactdev.impactor.api.ui.layouts.Layout;
-import net.impactdev.impactor.api.ui.pagination.sectioned.SectionedPage;
-import net.impactdev.impactor.api.ui.pagination.sectioned.SectionedPagination;
-import net.impactdev.impactor.api.ui.pagination.updaters.PageUpdater;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.layouts.Layout;
+import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPage;
+import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
+import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.util.TriState;

@@ -28,13 +28,13 @@ package net.impactdev.impactor.sponge.ui.containers;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
-import net.impactdev.impactor.api.ui.ImpactorUI;
-import net.impactdev.impactor.api.ui.detail.RefreshDetail;
-import net.impactdev.impactor.api.ui.detail.RefreshType;
-import net.impactdev.impactor.api.ui.detail.RefreshTypes;
-import net.impactdev.impactor.api.ui.icons.ClickContext;
-import net.impactdev.impactor.api.ui.icons.Icon;
-import net.impactdev.impactor.api.ui.layouts.Layout;
+import net.impactdev.impactor.api.ui.containers.ImpactorUI;
+import net.impactdev.impactor.api.ui.containers.detail.RefreshDetail;
+import net.impactdev.impactor.api.ui.containers.detail.RefreshType;
+import net.impactdev.impactor.api.ui.containers.detail.RefreshTypes;
+import net.impactdev.impactor.api.ui.containers.icons.ClickContext;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.layouts.Layout;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
 import net.impactdev.impactor.api.utilities.context.Provider;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
@@ -81,7 +81,7 @@ public class SpongeUI implements ImpactorUI {
                 .type(SizeMapping.from(this.layout.dimensions().x()).reference())
                 .slots(this.context.slots(), 0)
                 .completeStructure()
-                .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                 .identity(UUID.randomUUID())
                 .build()
         );
@@ -125,7 +125,7 @@ public class SpongeUI implements ImpactorUI {
                 printer.newline();
                 printer.add("The stacktrace of the error is detailed below:");
                 printer.add(error);
-                printer.log(SpongeImpactorPlugin.getInstance().getPluginLogger(), PrettyPrinter.Level.ERROR, "UI");
+                printer.log(SpongeImpactorPlugin.instance().logger(), PrettyPrinter.Level.ERROR, "UI");
                 return false;
             }
         });

@@ -28,7 +28,6 @@ package net.impactdev.impactor.sponge.scoreboard.lines.types.updatable;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scheduler.SchedulerTask;
-import net.impactdev.impactor.api.scoreboard.components.LineIdentifier;
 import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
 import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
@@ -42,16 +41,12 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.scoreboard.Scoreboard;
-import org.spongepowered.api.scoreboard.Team;
-import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.util.Ticks;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Queue;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class SpongeRefreshingLine extends AbstractSpongeSBLine implements RefreshingLine {
@@ -112,14 +107,14 @@ public class SpongeRefreshingLine extends AbstractSpongeSBLine implements Refres
                 task = Sponge.server().scheduler().submit(Task.builder()
                         .execute(this::update)
                         .interval(Ticks.of(this.timings.getInterval()))
-                        .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                        .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                         .build()
                 );
             } else {
                 task = Sponge.server().scheduler().submit(Task.builder()
                         .execute(this::update)
                         .interval(this.timings.getInterval(), this.timings.getUnit())
-                        .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                        .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                         .build()
                 );
             }

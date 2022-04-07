@@ -82,7 +82,7 @@ public class SpongeScoreboard implements ImpactorScoreboard<ServerPlayer> {
 
         Sponge.eventManager().registerListener(
                 EventListenerRegistration.builder(ServerSideConnectionEvent.Disconnect.class)
-                        .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                        .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                         .order(Order.FIRST)
                         .listener(disconnect -> {
                             if(this.source.equals(disconnect.player().uniqueId())) {

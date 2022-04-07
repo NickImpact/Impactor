@@ -27,13 +27,12 @@ package net.impactdev.impactor.api.dependencies;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
 import net.impactdev.impactor.api.dependencies.repositories.DependencyRepository;
 import net.impactdev.impactor.api.dependencies.repositories.ProvidedRepositories;
-import net.impactdev.impactor.api.logging.Logger;
+import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.api.dependencies.classloader.IsolatedClassLoader;
@@ -87,6 +86,7 @@ public class DependencyManager {
 	/** Cached relocation handler instance */
 	private RelocationHandler relocationHandler = null;
 
+	// TODO - Move to common
 	public DependencyManager(ImpactorPlugin plugin) {
 		this.plugin = plugin;
 		this.registry = new DependencyRegistry();
@@ -182,7 +182,7 @@ public class DependencyManager {
 			try {
 				this.loadDependency(dependency);
 			} catch (Throwable e) {
-				this.plugin.getPluginLogger().error("Dependencies", "Unable to load dependency " + dependency.name());
+				this.plugin.logger().error("Unable to load dependency " + dependency.name());
 				e.printStackTrace();
 			}
 		}
@@ -197,7 +197,7 @@ public class DependencyManager {
 			return;
 		}
 
-		this.plugin.getPluginLogger().info("Dependencies", "Loading dependency: " + dependency.name());
+		this.plugin.logger().info("Loading dependency: " + dependency.name());
 		Path file = remapDependency(dependency, downloadDependency(dependency));
 		this.load(dependency, file);
 
@@ -305,13 +305,13 @@ public class DependencyManager {
 		}
 
 		private byte[] download(DependencyRepository repository, Dependency dependency) throws DependencyDownloadException {
-			Logger logger = Impactor.getInstance().getRegistry().get(ImpactorPlugin.class).getPluginLogger();
+			PluginLogger logger = Impactor.getInstance().getRegistry().get(ImpactorPlugin.class).logger();
 
 			byte[] bytes = downloadRaw(repository, dependency);
 			Optional<byte[]> checksum = dependency.checksum();
 			try {
 				byte[] hash = MessageDigest.getInstance("SHA-256").digest(bytes);
-				logger.debug("Dependencies", "Checksum = " + Base64.getEncoder().encodeToString(hash));
+				logger.debug("Checksum = " + Base64.getEncoder().encodeToString(hash));
 
 				if(checksum.isPresent()) {
 					if (!Arrays.equals(checksum.get(), hash)) {
@@ -324,7 +324,7 @@ public class DependencyManager {
 				throw new DependencyDownloadException("Failed to decode file hash", e);
 			}
 
-			logger.info("Dependencies", "Successfully downloaded dependency '" + dependency.name() + "'");
+			logger.info("Successfully downloaded dependency '" + dependency.name() + "'");
 			return bytes;
 		}
 

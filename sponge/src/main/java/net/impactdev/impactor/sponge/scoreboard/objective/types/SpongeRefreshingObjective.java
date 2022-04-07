@@ -85,14 +85,14 @@ public class SpongeRefreshingObjective extends AbstractSpongeObjective implement
                 task = Sponge.server().scheduler().submit(Task.builder()
                         .execute(this::update)
                         .interval(Ticks.of(this.timings.getInterval()))
-                        .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                        .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                         .build()
                 );
             } else {
                 task = Sponge.server().scheduler().submit(Task.builder()
                         .execute(this::update)
                         .interval(this.timings.getInterval(), this.timings.getUnit())
-                        .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                        .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                         .build()
                 );
             }

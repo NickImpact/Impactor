@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.sponge.ui.containers.components;
 
-import net.impactdev.impactor.api.ui.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.math.vector.Vector2i;

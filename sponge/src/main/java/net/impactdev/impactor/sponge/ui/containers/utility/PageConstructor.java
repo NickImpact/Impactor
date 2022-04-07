@@ -25,9 +25,9 @@
 
 package net.impactdev.impactor.sponge.ui.containers.utility;
 
-import net.impactdev.impactor.api.ui.icons.Icon;
-import net.impactdev.impactor.api.ui.pagination.Page;
-import net.impactdev.impactor.api.ui.pagination.Pagination;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.pagination.Page;
+import net.impactdev.impactor.api.ui.containers.pagination.Pagination;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.ui.containers.SpongePage;
@@ -72,7 +72,7 @@ public class PageConstructor {
                     .type(SizeMapping.from(parent.layout().dimensions().y()).reference())
                     .completeStructure()
                     .identity(UUID.randomUUID())
-                    .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                    .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                     .build();
             SpongePage page = new SpongePage(view, new HashMap<>());
             page.draw(parent, parent.layout(), parent.updaters(), 1, size);
@@ -87,7 +87,7 @@ public class PageConstructor {
                 .type(SizeMapping.from(parent.layout().dimensions().y()).reference())
                 .completeStructure()
                 .identity(UUID.randomUUID())
-                .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                 .build();
 
         SpongePage page = new SpongePage(view, working);

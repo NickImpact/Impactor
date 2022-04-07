@@ -28,12 +28,12 @@ package net.impactdev.impactor.sponge.scheduler;
 import com.google.common.base.Suppliers;
 import net.impactdev.impactor.api.scheduler.SchedulerAdapter;
 import net.impactdev.impactor.api.scheduler.SchedulerTask;
-import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.scheduler.TaskExecutorService;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.util.Collections;
 import java.util.Set;
@@ -45,7 +45,7 @@ import java.util.function.Supplier;
 
 public class SpongeSchedulerAdapter implements SchedulerAdapter {
 
-    private final SpongeImpactorPlugin bootstrap;
+    private final PluginContainer container;
     private final Game game;
 
     private final Scheduler asyncScheduler;
@@ -54,13 +54,13 @@ public class SpongeSchedulerAdapter implements SchedulerAdapter {
 
     private final Set<ScheduledTask> tasks = Collections.newSetFromMap(new WeakHashMap<>());
 
-    public SpongeSchedulerAdapter(SpongeImpactorPlugin plugin, Game game) {
+    public SpongeSchedulerAdapter(Game game, PluginContainer container) {
         this.game = game;
-        this.bootstrap = plugin;
+        this.container = container;
 
         this.asyncScheduler = game.asyncScheduler();
-        this.async = this.asyncScheduler.executor(plugin.getPluginContainer());
-        this.sync = Suppliers.memoize(() -> this.game.server().scheduler().executor(plugin.getPluginContainer()));
+        this.async = this.asyncScheduler.executor(container);
+        this.sync = Suppliers.memoize(() -> this.game.server().scheduler().executor(container));
     }
 
     @Override
@@ -83,7 +83,7 @@ public class SpongeSchedulerAdapter implements SchedulerAdapter {
 
         Task task = builder
                 .execute(runnable)
-                .plugin(this.bootstrap.getPluginContainer())
+                .plugin(this.container)
                 .build();
         ScheduledTask scheduledTask = this.asyncScheduler.submit(task);
         this.tasks.add(scheduledTask);

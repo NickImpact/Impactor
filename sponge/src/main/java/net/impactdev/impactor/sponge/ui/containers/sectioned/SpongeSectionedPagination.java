@@ -29,13 +29,13 @@ import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
-import net.impactdev.impactor.api.ui.icons.ClickContext;
-import net.impactdev.impactor.api.ui.icons.Icon;
-import net.impactdev.impactor.api.ui.layouts.Layout;
-import net.impactdev.impactor.api.ui.pagination.sectioned.SectionedPage;
-import net.impactdev.impactor.api.ui.pagination.sectioned.SectionedPagination;
-import net.impactdev.impactor.api.ui.pagination.updaters.PageUpdater;
-import net.impactdev.impactor.api.ui.pagination.updaters.PageUpdaterType;
+import net.impactdev.impactor.api.ui.containers.icons.ClickContext;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.layouts.Layout;
+import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPage;
+import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
+import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
+import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdaterType;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.common.ui.pagination.sectioned.AbstractSectionedPage;
@@ -82,7 +82,7 @@ public class SpongeSectionedPagination extends AbstractSectionedPagination imple
 
         this.view = InventoryMenu.of(viewable.completeStructure()
                 .identity(UUID.randomUUID())
-                .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                 .build());
         this.view.setTitle(builder.title);
         this.view.setReadOnly(builder.readonly);
@@ -125,7 +125,7 @@ public class SpongeSectionedPagination extends AbstractSectionedPagination imple
                 printer.newline();
                 printer.add("The stacktrace of the error is detailed below:");
                 printer.add(error);
-                printer.log(SpongeImpactorPlugin.getInstance().getPluginLogger(), PrettyPrinter.Level.ERROR, "UI");
+                printer.log(SpongeImpactorPlugin.instance().logger(), PrettyPrinter.Level.ERROR, "UI");
                 return false;
             }
         });
@@ -280,7 +280,6 @@ public class SpongeSectionedPagination extends AbstractSectionedPagination imple
             return Icon.builder(ItemStack.class)
                     .display(() -> (ItemStack) updater.provider().provide(target))
                     .listener(processor -> {
-                        SpongeImpactorPlugin.getInstance().getPluginLogger().info("Running page updater processor");
                         if (!updater.type().equals(PageUpdaterType.CURRENT)) {
                             if (target == page) {
                                 return false;

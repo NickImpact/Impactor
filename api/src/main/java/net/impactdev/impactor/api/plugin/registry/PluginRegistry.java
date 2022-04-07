@@ -41,7 +41,7 @@ public final class PluginRegistry {
     private static final Map<String, ImpactorPlugin> plugins = Maps.newHashMap();
 
     public static void register(ImpactorPlugin plugin) {
-        plugins.put(plugin.getMetadata().getID(), plugin);
+        plugins.put(plugin.metadata().getID(), plugin);
     }
 
     public static Optional<ImpactorPlugin> get(String id) {

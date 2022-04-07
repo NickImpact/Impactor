@@ -25,12 +25,12 @@
 
 package net.impactdev.impactor.sponge.ui.containers;
 
-import net.impactdev.impactor.api.ui.icons.Icon;
-import net.impactdev.impactor.api.ui.layouts.Layout;
-import net.impactdev.impactor.api.ui.pagination.Page;
-import net.impactdev.impactor.api.ui.pagination.Pagination;
-import net.impactdev.impactor.api.ui.pagination.updaters.PageUpdater;
-import net.impactdev.impactor.api.ui.pagination.updaters.PageUpdaterType;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.layouts.Layout;
+import net.impactdev.impactor.api.ui.containers.pagination.Page;
+import net.impactdev.impactor.api.ui.containers.pagination.Pagination;
+import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
+import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdaterType;
 import net.impactdev.impactor.sponge.ui.containers.icons.SpongeIcon;
 import net.kyori.adventure.util.TriState;
 import org.spongepowered.api.item.inventory.ItemStack;

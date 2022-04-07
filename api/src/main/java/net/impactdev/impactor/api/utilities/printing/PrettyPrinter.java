@@ -29,10 +29,7 @@ package net.impactdev.impactor.api.utilities.printing;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import net.impactdev.impactor.api.json.factory.JElement;
-import net.impactdev.impactor.api.logging.Logger;
+import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.utilities.functional.TriConsumer;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,23 +50,23 @@ import java.util.regex.Pattern;
  */
 public class PrettyPrinter {
 
-    private static final ImmutableMap<Level, BiConsumer<Logger, String>> UNMARKED_LOGGER_LEVEL =
-            ImmutableMap.<Level, BiConsumer<Logger, String>>builder()
-                    .put(Level.INFO, Logger::info)
-                    .put(Level.WARNING, Logger::warn)
-                    .put(Level.ERROR, Logger::error)
-                    .put(Level.DEBUG, Logger::debug)
+    private static final ImmutableMap<Level, BiConsumer<PluginLogger, String>> UNMARKED_LOGGER_LEVEL =
+            ImmutableMap.<Level, BiConsumer<PluginLogger, String>>builder()
+                    .put(Level.INFO, PluginLogger::info)
+                    .put(Level.WARNING, PluginLogger::warn)
+                    .put(Level.ERROR, PluginLogger::error)
+                    .put(Level.DEBUG, PluginLogger::debug)
                     .build();
-    private static final BiConsumer<Logger, String> DEFAULT_UNMARKED_LOGGER = Logger::info;
+    private static final BiConsumer<PluginLogger, String> DEFAULT_UNMARKED_LOGGER = PluginLogger::info;
 
-    private static final ImmutableMap<Level, TriConsumer<Logger, String, String>> MARKED_LOGGER_LEVEL =
-            ImmutableMap.<Level, TriConsumer<Logger, String, String>>builder()
-                    .put(Level.INFO, Logger::info)
-                    .put(Level.WARNING, Logger::warn)
-                    .put(Level.ERROR, Logger::error)
-                    .put(Level.DEBUG, Logger::debug)
+    private static final ImmutableMap<Level, TriConsumer<PluginLogger, String, String>> MARKED_LOGGER_LEVEL =
+            ImmutableMap.<Level, TriConsumer<PluginLogger, String, String>>builder()
+                    .put(Level.INFO, PluginLogger::info)
+                    .put(Level.WARNING, PluginLogger::warn)
+                    .put(Level.ERROR, PluginLogger::error)
+                    .put(Level.DEBUG, PluginLogger::debug)
                     .build();
-    private static final TriConsumer<Logger, String, String> DEFAULT_MARKED_LOGGER = Logger::info;
+    private static final TriConsumer<PluginLogger, String, String> DEFAULT_MARKED_LOGGER = PluginLogger::info;
 
     public enum Level {
         INFO,
@@ -1003,7 +1000,7 @@ public class PrettyPrinter {
         }
     }
 
-    public PrettyPrinter log(Logger logger, Level level) {
+    public PrettyPrinter log(PluginLogger logger, Level level) {
         return this.log(logger, level, null);
     }
 
@@ -1013,7 +1010,7 @@ public class PrettyPrinter {
      * @param logger logger to log to
      * @return fluent interface
      */
-    public PrettyPrinter log(Logger logger, String marker) {
+    public PrettyPrinter log(PluginLogger logger, String marker) {
         return this.log(logger, Level.INFO, marker);
     }
 
@@ -1024,7 +1021,7 @@ public class PrettyPrinter {
      * @param level log level
      * @return fluent interface
      */
-    public PrettyPrinter log(Logger logger, Level level, String marker) {
+    public PrettyPrinter log(PluginLogger logger, Level level, String marker) {
         this.updateWidth();
         this.logSpecial(logger, level, marker, this.horizontalRule);
         for (Object line : this.lines) {
@@ -1038,7 +1035,7 @@ public class PrettyPrinter {
         return this;
     }
 
-    private void logSpecial(Logger logger, Level level, @Nullable String marker, ISpecialEntry line) {
+    private void logSpecial(PluginLogger logger, Level level, @Nullable String marker, ISpecialEntry line) {
         if(marker == null) {
             UNMARKED_LOGGER_LEVEL.getOrDefault(level, DEFAULT_UNMARKED_LOGGER).accept(logger,
                     String.format("/*%s*/", line.toString()));
@@ -1048,7 +1045,7 @@ public class PrettyPrinter {
         }
     }
 
-    private void logString(Logger logger, Level level, @Nullable String marker, String line) {
+    private void logString(PluginLogger logger, Level level, @Nullable String marker, String line) {
         if (line != null) {
             if(marker != null) {
                 MARKED_LOGGER_LEVEL.getOrDefault(level, DEFAULT_MARKED_LOGGER).accept(logger, marker,
@@ -1079,7 +1076,7 @@ public class PrettyPrinter {
      * Convenience method, alternative to using <code>Thread.dumpStack</code> which
      * prints to stderr in pretty-printed format.
      */
-    public static void dumpStack(Logger logger) {
+    public static void dumpStack(PluginLogger logger) {
         new PrettyPrinter().add(new Exception("Stack trace")).print(System.err);
     }
 
@@ -1088,7 +1085,7 @@ public class PrettyPrinter {
      *
      * @param th Throwable to log
      */
-    public static void print(Logger logger, Throwable th) {
+    public static void print(PluginLogger logger, Throwable th) {
         new PrettyPrinter().add(th).print(System.err);
     }
 }

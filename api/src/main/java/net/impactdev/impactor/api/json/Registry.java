@@ -42,7 +42,7 @@ public class Registry<E> {
 
 	public void register(Class<? extends E> clazz) throws Exception {
 		if(!clazz.isAnnotationPresent(JsonTyping.class)) {
-			this.register((this.plugin.getMetadata().getID() + "_" + clazz.getSimpleName()).toLowerCase(), clazz);
+			this.register((this.plugin.metadata().getID() + "_" + clazz.getSimpleName()).toLowerCase(), clazz);
 			return;
 		}
 

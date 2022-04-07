@@ -31,12 +31,12 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
 import net.impactdev.impactor.api.scheduler.SchedulerAdapter;
 import net.impactdev.impactor.api.services.text.MessageService;
-import net.impactdev.impactor.api.ui.detail.RefreshDetail;
-import net.impactdev.impactor.api.ui.icons.ClickContext;
-import net.impactdev.impactor.api.ui.icons.DisplayProvider;
-import net.impactdev.impactor.api.ui.icons.Icon;
-import net.impactdev.impactor.api.ui.pagination.Page;
-import net.impactdev.impactor.api.ui.pagination.async.AsyncPagination;
+import net.impactdev.impactor.api.ui.containers.detail.RefreshDetail;
+import net.impactdev.impactor.api.ui.containers.icons.ClickContext;
+import net.impactdev.impactor.api.ui.containers.icons.DisplayProvider;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.pagination.Page;
+import net.impactdev.impactor.api.ui.containers.pagination.async.AsyncPagination;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
@@ -128,7 +128,7 @@ public class SpongeAsyncPagination extends AbstractAsyncPagination {
                 printer.newline();
                 printer.add("The stacktrace of the error is detailed below:");
                 printer.add(error);
-                printer.log(SpongeImpactorPlugin.getInstance().getPluginLogger(), PrettyPrinter.Level.ERROR, "ui");
+                printer.log(SpongeImpactorPlugin.instance().logger(), PrettyPrinter.Level.ERROR, "ui");
                 return false;
             }
         });
@@ -216,7 +216,7 @@ public class SpongeAsyncPagination extends AbstractAsyncPagination {
                     .type(ContainerTypes.GENERIC_9X6)
                     .completeStructure()
                     .identity(UUID.randomUUID())
-                    .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                    .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                     .build();
 
             SpongePage page = new SpongePage(view, Maps.newHashMap());
@@ -232,7 +232,7 @@ public class SpongeAsyncPagination extends AbstractAsyncPagination {
                 .type(ContainerTypes.GENERIC_9X6)
                 .completeStructure()
                 .identity(UUID.randomUUID())
-                .plugin(SpongeImpactorPlugin.getInstance().getPluginContainer())
+                .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                 .build();
 
         SpongePage page = new SpongePage(view, Maps.newHashMap());
