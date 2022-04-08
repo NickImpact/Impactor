@@ -45,7 +45,7 @@ public class BungeeSchedulerAdapter implements SchedulerAdapter {
 
     public BungeeSchedulerAdapter(BungeeImpactorBootstrap bootstrap) {
         this.bootstrap = bootstrap;
-        this.executor = r -> bootstrap.getProxy().getScheduler().runAsync(bootstrap, r);
+        this.executor = r -> bootstrap.proxy().getScheduler().runAsync(bootstrap.loader(), r);
     }
 
     @Override
@@ -60,21 +60,21 @@ public class BungeeSchedulerAdapter implements SchedulerAdapter {
 
     @Override
     public SchedulerTask asyncLater(Runnable task, long delay, TimeUnit unit) {
-        ScheduledTask t = this.bootstrap.getProxy().getScheduler().schedule(this.bootstrap, task, delay, unit);
+        ScheduledTask t = this.bootstrap.proxy().getScheduler().schedule(this.bootstrap.loader(), task, delay, unit);
         this.tasks.add(t);
         return t::cancel;
     }
 
     @Override
     public SchedulerTask asyncRepeating(Runnable task, long interval, TimeUnit unit) {
-        ScheduledTask t = this.bootstrap.getProxy().getScheduler().schedule(this.bootstrap, task, interval, interval, unit);
+        ScheduledTask t = this.bootstrap.proxy().getScheduler().schedule(this.bootstrap.loader(), task, interval, interval, unit);
         this.tasks.add(t);
         return t::cancel;
     }
 
     @Override
     public SchedulerTask asyncDelayedAndRepeating(Runnable task, long delay, TimeUnit dUnit, long interval, TimeUnit iUnit) {
-        ScheduledTask t = this.bootstrap.getProxy().getScheduler().schedule(this.bootstrap, task, interval, interval, iUnit);
+        ScheduledTask t = this.bootstrap.proxy().getScheduler().schedule(this.bootstrap.loader(), task, interval, interval, iUnit);
         this.tasks.add(t);
         return t::cancel;
     }

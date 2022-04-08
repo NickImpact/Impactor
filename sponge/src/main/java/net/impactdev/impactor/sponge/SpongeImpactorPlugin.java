@@ -27,27 +27,19 @@ package net.impactdev.impactor.sponge;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.Dependency;
-import net.impactdev.impactor.api.dependencies.DependencyManager;
 import net.impactdev.impactor.api.dependencies.ProvidedDependencies;
-import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
 import net.impactdev.impactor.api.logging.PluginLogger;
-import net.impactdev.impactor.api.module.Module;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
 import net.impactdev.impactor.api.registry.Registry;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
-import net.impactdev.impactor.common.api.ModuleImplementation;
-import net.impactdev.impactor.common.dependencies.DependencyContainer;
 import net.impactdev.impactor.common.plugin.InternalImpactorPlugin;
-import net.impactdev.impactor.launcher.LoadingException;
 import net.impactdev.impactor.sponge.api.SpongeImpactorAPIProvider;
 import net.impactdev.impactor.sponge.commands.DevCommand;
 import net.impactdev.impactor.sponge.commands.PlaceholdersCommand;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
-import org.reflections.Reflections;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.event.Listener;
@@ -58,14 +50,10 @@ import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.nio.file.Path;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-public class SpongeImpactorPlugin implements InternalImpactorPlugin {
+public class SpongeImpactorPlugin extends InternalImpactorPlugin {
 
     private final SpongeImpactorBootstrap bootstrap;
 
@@ -75,7 +63,7 @@ public class SpongeImpactorPlugin implements InternalImpactorPlugin {
 
     public SpongeImpactorPlugin(SpongeImpactorBootstrap bootstrap) {
         this.bootstrap = bootstrap;
-        PluginRegistry.register(this);
+        this.register();
         ApiRegistrationUtil.register(new SpongeImpactorAPIProvider(this.bootstrap.scheduler()));
     }
 
@@ -93,14 +81,10 @@ public class SpongeImpactorPlugin implements InternalImpactorPlugin {
         this.download();
         this.modules();
         this.listeners();
-        this.commands();
-        this.placeholders();
     }
 
     @Override
-    public void shutdown() {
-
-    }
+    public void shutdown() {}
 
     @Override
     public SpongeImpactorBootstrap bootstrapper() {
@@ -108,59 +92,9 @@ public class SpongeImpactorPlugin implements InternalImpactorPlugin {
     }
 
     @Override
-    public void modules() {
-        final Registry registry = Impactor.getInstance().getRegistry();
-
-        new Reflections("net.impactdev.impactor")
-                .getSubTypesOf(Module.class)
-                .stream()
-                .filter(module -> module.isAnnotationPresent(ModuleImplementation.class))
-                .map(module -> {
-                    try {
-                        return (Module) module.newInstance();
-                    } catch (Exception e) {
-                        throw new LoadingException("Failed to initialize a module", e);
-                    }
-                })
-                .sorted(Comparator.comparing(Module::priority).reversed())
-                .forEach(module -> {
-                    this.logger().info("Loading module: " + module.name());
-                    module.builders(registry);
-                    module.register(registry);
-                });
-    }
-
-    @Override
-    public void download() {
-        Registry registry = Impactor.getInstance().getRegistry();
-        registry.register(ClassPathAppender.class, this.bootstrap.appender());
-        registry.registerBuilderSupplier(Dependency.DependencyBuilder.class, DependencyContainer.DependencyContainerBuilder::new);
-
-        DependencyManager manager = new DependencyManager(this);
-        registry.register(DependencyManager.class, manager);
-
-        this.logger().info("Attempting to load runtime dependencies...");
-        this.logger().info("Initializing priority dependencies...");
-
-        Instant start = Instant.now();
-        manager.loadDependencies(ProvidedDependencies.JAR_RELOCATOR);
-
-        this.logger().info("Pooling plugin dependencies...");
-        Set<Dependency> dependencies = Sets.newHashSet();
-        for(ImpactorPlugin plugin : PluginRegistry.getAll()) {
-            dependencies.addAll(plugin.dependencies());
-            dependencies.addAll(manager.registry().resolveStorageDependencies(plugin.storageRequirements()));
-        }
-        manager.loadDependencies(dependencies);
-
-        Instant end = Instant.now();
-        long ms = Duration.between(start, end).toMillis();
-        this.logger().info("Dependency injection complete, took " + String.format("%02d.%03d seconds", TimeUnit.MILLISECONDS.toSeconds(ms), (ms % 1000)));
-    }
-
-    @Override
     public void listeners() {
-
+        this.commands();
+        this.placeholders();
     }
 
     @Override
@@ -221,19 +155,7 @@ public class SpongeImpactorPlugin implements InternalImpactorPlugin {
                 ProvidedDependencies.TYPESAFE_CONFIG,
                 ProvidedDependencies.CONFIGURATE_GSON,
                 ProvidedDependencies.CONFIGURATE_YAML,
-                Dependency.builder()
-                        .name("Reflections")
-                        .group("org.reflections")
-                        .artifact("reflections")
-                        .version("0.10.2")
-                        .with(Dependency.builder()
-                                .name("Java Assist")
-                                .group("org.javassist")
-                                .artifact("javassist")
-                                .version("3.28.0-GA")
-                                .build()
-                        )
-                        .build()
+                ProvidedDependencies.REFLECTIONS
         ));
     }
 

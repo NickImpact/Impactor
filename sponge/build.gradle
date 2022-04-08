@@ -33,7 +33,10 @@ blossom {
 }
 
 shadowJar {
-    archiveName = "impactor-sponge.jarinjar"
+    archiveBaseName.set("impactor-sponge")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+    archiveExtension.set("jarinjar")
 
     dependencies {
         include(project(':common'))

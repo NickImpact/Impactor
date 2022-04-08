@@ -25,122 +25,71 @@
 
 package net.impactdev.impactor.bungee;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.Dependency;
 import net.impactdev.impactor.api.dependencies.ProvidedDependencies;
-import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
-import net.impactdev.impactor.api.dependencies.classpath.ReflectionClassPathAppender;
-import net.impactdev.impactor.api.event.EventBus;
+import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.api.plugin.PluginMetadata;
-import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
-import net.impactdev.impactor.api.storage.StorageType;
-import net.impactdev.impactor.api.dependencies.DependencyManager;
+import net.impactdev.impactor.api.registry.Registry;
 import net.impactdev.impactor.bungee.api.BungeeImpactorAPIProvider;
-import net.impactdev.impactor.bungee.plugin.AbstractBungeePlugin;
-import net.impactdev.impactor.bungee.scheduler.BungeeSchedulerAdapter;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
-import net.impactdev.impactor.common.event.ImpactorEventBus;
+import net.impactdev.impactor.common.plugin.ImpactorBootstrap;
+import net.impactdev.impactor.common.plugin.InternalImpactorPlugin;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.logging.Logger;
+import java.util.Set;
 
-public class BungeeImpactorPlugin extends AbstractBungeePlugin implements Depending {
+public class BungeeImpactorPlugin extends InternalImpactorPlugin {
 
 	private final BungeeImpactorBootstrap bootstrap;
 
-	public BungeeImpactorPlugin(BungeeImpactorBootstrap bootstrap, Logger logger) {
-		super(PluginMetadata.builder().id("impactor").name("Impactor").version("@version@").build(), logger);
+	public BungeeImpactorPlugin(BungeeImpactorBootstrap bootstrap) {
 		this.bootstrap = bootstrap;
-	}
-
-	public void onLoad() {}
-
-	public void onEnable() {
-		ApiRegistrationUtil.register(new BungeeImpactorAPIProvider(
-				new BungeeSchedulerAdapter(this.bootstrap)
-		));
-
-		Impactor.getInstance().getRegistry().register(ImpactorPlugin.class, this);
-		Impactor.getInstance().getRegistry().register(ClassPathAppender.class, new ReflectionClassPathAppender(this.getClass().getClassLoader()));
-		Impactor.getInstance().getRegistry().register(DependencyManager.class, new DependencyManager(this));
-
-		this.getPluginLogger().info("Startup", "Pooling plugin dependencies...");
-		List<Dependency> toLaunch = Lists.newArrayList();
-		for(ImpactorPlugin plugin : PluginRegistry.getAll()) {
-			if(plugin instanceof Depending) {
-				Depending dependable = (Depending) plugin;
-
-				for(Dependency dependency : dependable.getAllDependencies()) {
-					if(toLaunch.contains(dependency)) {
-						continue;
-					}
-
-					toLaunch.add(dependency);
-				}
-
-				for(Dependency storage : this.getDependencyManager().registry().resolveStorageDependencies(Sets.newHashSet(dependable.getStorageRequirements()))) {
-					if(toLaunch.contains(storage)) {
-						continue;
-					}
-
-					toLaunch.add(storage);
-				}
-			}
-		}
-
-		this.getPluginLogger().info("Startup", "Dependencies found, setting these up now...");
-		this.getPluginLogger().info("Startup", "Initializing default dependencies...");
-		this.getDependencyManager().loadDependencies(ProvidedDependencies.JAR_RELOCATOR);
-		this.getDependencyManager().loadDependencies(Lists.newArrayList(
-				ProvidedDependencies.CONFIGURATE_CORE,
-				ProvidedDependencies.CONFIGURATE_HOCON,
-				ProvidedDependencies.TYPESAFE_CONFIG,
-				ProvidedDependencies.CONFIGURATE_GSON,
-				ProvidedDependencies.CONFIGURATE_YAML
-		));
-		this.getDependencyManager().loadDependencies(new HashSet<>(toLaunch));
-
-		Impactor.getInstance().getRegistry().register(EventBus.class, new ImpactorEventBus());
-	}
-
-	public DependencyManager getDependencyManager() {
-		return Impactor.getInstance().getRegistry().get(DependencyManager.class);
+		this.register();
+		ApiRegistrationUtil.register(new BungeeImpactorAPIProvider(this.bootstrap.scheduler()));
 	}
 
 	@Override
-	public List<Dependency> getAllDependencies() {
-		return ImmutableList.copyOf(Lists.newArrayList(
+	public Set<Dependency> dependencies() {
+		return ImmutableSet.copyOf(Lists.newArrayList(
 				ProvidedDependencies.KYORI_EVENT_API,
 				ProvidedDependencies.KYORI_EVENT_METHOD,
 				ProvidedDependencies.KYORI_EVENT_METHOD_ASM,
 				ProvidedDependencies.BYTEBUDDY,
-				ProvidedDependencies.ASM,
-				ProvidedDependencies.ASM_COMMONS
+				ProvidedDependencies.REFLECTIONS
 		));
 	}
 
 	@Override
-	public List<StorageType> getStorageRequirements() {
-		return Lists.newArrayList();
+	public PluginLogger logger() {
+		return this.bootstrap.logger();
 	}
 
 	@Override
 	public void construct() {
+		Registry registry = Impactor.getInstance().getRegistry();
+		registry.register(InternalImpactorPlugin.class, this);
+		registry.register(ImpactorPlugin.class, this); // TODO - Temporary
 
+		this.download();
+		this.modules();
 	}
 
 	@Override
-	public void enable() {
+	public void shutdown() {}
 
+	@Override
+	public ImpactorBootstrap bootstrapper() {
+		return this.bootstrap;
 	}
 
 	@Override
-	public void disable() {
+	public void listeners() {}
 
-	}
+	@Override
+	public void commands() {}
+
+	@Override
+	public void placeholders() {}
 }

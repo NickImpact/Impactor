@@ -3,9 +3,13 @@ include (
         'api',
         'launcher',
         'common',
-        //'bungee',
-        //'forge',
+        'bungee',
+        'bungee:bungee-launcher',
+        'forge',
+        'forge:forge-launcher',
         'sponge',
         'sponge:sponge-launcher',
-        //'velocity'
+        'velocity',
+        'velocity:velocity-launcher'
 )
+

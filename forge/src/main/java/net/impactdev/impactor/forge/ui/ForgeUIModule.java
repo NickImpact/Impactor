@@ -23,29 +23,29 @@
  *
  */
 
-package net.impactdev.impactor.forge;
+package net.impactdev.impactor.forge.ui;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
-import org.apache.logging.log4j.LogManager;
+import net.impactdev.impactor.api.registry.Registry;
+import net.impactdev.impactor.api.ui.UIModule;
+import net.impactdev.impactor.api.ui.containers.ImpactorUI;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.layouts.Layout;
+import net.impactdev.impactor.common.api.ModuleImplementation;
+import net.impactdev.impactor.common.ui.LayoutImpl;
+import net.impactdev.impactor.forge.ui.container.ForgeUI;
+import net.impactdev.impactor.forge.ui.container.icons.ForgeIcon;
 
-@Mod("impactor")
-public class ForgeBootstrap {
+@ModuleImplementation
+public class ForgeUIModule implements UIModule {
 
-    private final ForgeImpactorPlugin plugin;
+    @Override
+    public void register(Registry registry) {}
 
-    public ForgeBootstrap() {
-        this.plugin = new ForgeImpactorPlugin(this, LogManager.getLogger("Impactor"));
-        this.plugin.construct();
-        MinecraftForge.EVENT_BUS.register(this);
+    @Override
+    public void builders(Registry registry) {
+        registry.registerBuilderSupplier(Icon.IconBuilder.class, ForgeIcon.ForgeIconBuilder::new);
+        registry.registerBuilderSupplier(Layout.LayoutBuilder.class, LayoutImpl.LayoutImplBuilder::new);
+        registry.registerBuilderSupplier(ImpactorUI.UIBuilder.class, ForgeUI.ForgeUIBuilder::new);
     }
-
-    @SubscribeEvent
-    public void starting(FMLServerStartedEvent event) {
-        this.plugin.getPluginLogger().info("Startup", "Impactor for Forge Loaded");
-    }
-
 
 }

@@ -37,9 +37,9 @@ public enum ProvidedRepositories implements DependencyRepository {
      */
     IMPACT_DEV(
             from("https://maven.impactdev.net/repository/development/"),
-            resolver("https://maven.impactdev.net/service/rest/v1/search/assets/download?repository=development&",
+            resolver("https://maven.impactdev.net/service/rest/v1/search/assets/",
                     ((parent, dependency) -> from(parent, String.format(
-                            "g=%s&a=%s&v=LATEST",
+                            "download?repository=development&group=%s&name=%s&sort=version&maven.extension=jar&maven.classifier",
                             dependency.group(),
                             dependency.artifact()
                     )))

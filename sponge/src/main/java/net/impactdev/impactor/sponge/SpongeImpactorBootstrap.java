@@ -26,7 +26,6 @@
 package net.impactdev.impactor.sponge;
 
 import com.google.inject.Injector;
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
 import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.scheduler.SchedulerAdapter;

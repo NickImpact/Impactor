@@ -83,7 +83,7 @@ public class ForgeImpactorAPIProvider extends ImpactorAPIProvider {
 
     @Override
     public EventBus getEventBus() {
-        return null;
+        return this.getRegistry().get(EventBus.class);
     }
 
     @Override

@@ -30,6 +30,7 @@ import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
 import net.impactdev.impactor.common.players.CommonPlatformPlayer;
 import net.impactdev.impactor.velocity.VelocityImpactorBootstrap;
+import net.impactdev.impactor.velocity.VelocityImpactorPlugin;
 import net.kyori.adventure.text.Component;
 
 import java.util.Optional;
@@ -58,6 +59,6 @@ public class VelocityPlatformPlayerManager implements PlatformPlayerManager<Play
 
     @Override
     public Optional<Player> translate(PlatformPlayer player) {
-        return VelocityImpactorBootstrap.getInstance().getProxy().getPlayer(player.uuid());
+        return VelocityImpactorPlugin.instance().bootstrapper().getProxy().getPlayer(player.uuid());
     }
 }

@@ -28,6 +28,7 @@ package net.impactdev.impactor.api.plugin;
 import net.impactdev.impactor.api.configuration.Config;
 import net.impactdev.impactor.api.dependencies.Dependency;
 import net.impactdev.impactor.api.logging.PluginLogger;
+import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
 import net.impactdev.impactor.api.storage.StorageType;
 
 import java.nio.file.Path;
@@ -52,6 +53,10 @@ public interface ImpactorPlugin {
 	void construct();
 
 	void shutdown();
+
+	default void register() {
+		PluginRegistry.register(this);
+	}
 
 	/**
 	 * Represents the path to the configuration directory of the plugin. By default,

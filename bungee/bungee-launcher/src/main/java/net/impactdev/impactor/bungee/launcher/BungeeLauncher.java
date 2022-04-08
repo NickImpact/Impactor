@@ -23,48 +23,51 @@
  *
  */
 
-package net.impactdev.impactor.velocity.plugin;
+package net.impactdev.impactor.bungee.launcher;
 
-import net.impactdev.impactor.api.logging.Logger;
-import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.api.plugin.PluginMetadata;
-import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
-import net.impactdev.impactor.velocity.logging.VelocityLogger;
+import net.impactdev.impactor.launcher.ImpactorPluginLauncher;
+import net.impactdev.impactor.launcher.JarInJarClassLoader;
+import net.impactdev.impactor.launcher.LaunchablePlugin;
+import net.impactdev.impactor.launcher.LauncherBootstrap;
+import net.md_5.bungee.api.plugin.Plugin;
 
-public class AbstractVelocityPlugin implements ImpactorPlugin {
+public class BungeeLauncher extends Plugin implements LaunchablePlugin {
 
-    private final PluginMetadata metadata;
-    private final Logger logger;
+    private static final String INTERNAL_JAR = "impactor-bungee.jarinjar";
+    private static final String BOOTSTRAP_CLASS = "net.impactdev.impactor.bungee.BungeeImpactorBootstrap";
 
-    public AbstractVelocityPlugin(PluginMetadata metadata, org.slf4j.Logger delegate) {
-        this.metadata = metadata;
-        this.logger = new VelocityLogger(this, delegate);
+    private final LauncherBootstrap plugin;
 
-        PluginRegistry.register(this);
+    public BungeeLauncher() {
+        JarInJarClassLoader loader = new JarInJarClassLoader(this.getClass().getClassLoader(), INTERNAL_JAR);
+        this.plugin = this.create(loader);
+
+        ImpactorPluginLauncher.initialize(loader);
     }
 
     @Override
-    public PluginMetadata getMetadata() {
-        return this.metadata;
+    public String path() {
+        return INTERNAL_JAR;
     }
 
     @Override
-    public Logger getPluginLogger() {
-        return this.logger;
+    public String bootstrapper() {
+        return BOOTSTRAP_CLASS;
     }
 
     @Override
-    public void construct() {
-
+    public LauncherBootstrap create(JarInJarClassLoader loader) {
+        return loader.instantiatePlugin(this.bootstrapper(), Plugin.class, this);
     }
 
     @Override
-    public void enable() {
-
+    public void onLoad() {
+        this.plugin.construct();
     }
 
     @Override
-    public void disable() {
-
+    public void onEnable() {
+        super.onEnable();
     }
+
 }

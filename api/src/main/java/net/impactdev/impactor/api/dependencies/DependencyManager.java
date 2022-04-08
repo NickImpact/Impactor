@@ -38,6 +38,7 @@ import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.api.dependencies.classloader.IsolatedClassLoader;
 import net.impactdev.impactor.api.dependencies.relocation.Relocation;
 import net.impactdev.impactor.api.dependencies.relocation.RelocationHandler;
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 
 import java.io.File;
 import java.io.IOException;
@@ -220,17 +221,25 @@ public class DependencyManager {
 			return file;
 		}
 
-		DependencyDownloadException last = null;
+		List<DependencyDownloadException> exceptions = Lists.newArrayList();
 		for(DependencyRepository repository : this.repositories) {
 			try {
 				this.downloader.download(repository, dependency, file);
 				return file;
 			} catch (DependencyDownloadException e) {
-				last = e;
+				exceptions.add(e);
 			}
 		}
 
-		throw Objects.requireNonNull(last);
+		new PrettyPrinter(80)
+				.title("Noted Exceptions per Repository")
+				.consume(printer -> {
+					for(DependencyDownloadException exception : exceptions) {
+						printer.add(exception).newline();
+					}
+				})
+				.log(this.plugin.logger(), PrettyPrinter.Level.ERROR);
+		throw new RuntimeException();
 	}
 
 	private Path remapDependency(Dependency dependency, Path normalFile) throws Exception {
@@ -272,13 +281,13 @@ public class DependencyManager {
 			}
 		}
 
-		private URLConnection openConnection(DependencyRepository resository, Dependency dependency) throws IOException {
+		private URLConnection openConnection(DependencyRepository repository, Dependency dependency) throws IOException {
 			URLConnection connection;
-			if(dependency.snapshot() && resository.snapshots().isPresent()) {
-				URL url = resository.snapshots().get().resolve(dependency);
+			if(dependency.snapshot() && repository.snapshots().isPresent()) {
+				URL url = repository.snapshots().get().resolve(dependency);
 				connection = url.openConnection();
 			} else {
-				URL dependencyURL = new URL(resository.releases() + dependency.getMavenPath());
+				URL dependencyURL = new URL(repository.releases() + dependency.getMavenPath());
 				connection = dependencyURL.openConnection();
 			}
 

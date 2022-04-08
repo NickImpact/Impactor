@@ -1,0 +1,51 @@
+plugins {
+    id 'com.github.johnrengelman.shadow'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "Velocity"
+        url = "https://nexus.velocitypowered.com/repository/maven-public/"
+    }
+}
+
+dependencies {
+    implementation project(':api')
+    implementation project(':launcher')
+
+    compileOnly group: 'com.velocitypowered', name: 'velocity-api', version: "${project.velocity}"
+    annotationProcessor group: 'com.velocitypowered', name: 'velocity-api', version: "${project.velocity}"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+shadowJar {
+    archiveBaseName.set("Impactor-Velocity")
+    archiveClassifier.set("")
+    archiveVersion.set("${project.velocity}-${project.plugin}")
+
+    from {
+        project(':velocity').tasks.shadowJar.archiveFile
+    }
+}
+
+license {
+    header = file('../../HEADER.txt')
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+    from(sourceSets.main.resources.srcDirs) {
+        expand 'pluginVersion': project.version
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+blossom {
+    replaceToken '@version@', version
+}

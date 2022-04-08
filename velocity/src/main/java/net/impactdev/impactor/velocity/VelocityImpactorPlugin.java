@@ -25,118 +25,79 @@
 
 package net.impactdev.impactor.velocity;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.Dependency;
-import net.impactdev.impactor.api.dependencies.DependencyManager;
 import net.impactdev.impactor.api.dependencies.ProvidedDependencies;
-import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
-import net.impactdev.impactor.api.dependencies.classpath.ReflectionClassPathAppender;
-import net.impactdev.impactor.api.event.EventBus;
+import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
-import net.impactdev.impactor.api.storage.StorageType;
+import net.impactdev.impactor.api.registry.Registry;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
-import net.impactdev.impactor.common.event.ImpactorEventBus;
+import net.impactdev.impactor.common.plugin.InternalImpactorPlugin;
 import net.impactdev.impactor.velocity.api.VelocityImpactorAPIProvider;
-import net.impactdev.impactor.velocity.plugin.AbstractVelocityPlugin;
-import net.impactdev.impactor.velocity.scheduler.VelocitySchedulerAdapter;
 
-import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
 
-public class VelocityImpactorPlugin extends AbstractVelocityPlugin implements Depending {
+public class VelocityImpactorPlugin extends InternalImpactorPlugin {
 
-    public static VelocityImpactorPlugin instance;
-
+    private static VelocityImpactorPlugin instance;
     private final VelocityImpactorBootstrap bootstrap;
 
-    public VelocityImpactorPlugin(VelocityImpactorBootstrap bootstrap, org.slf4j.Logger logger) {
-        super(PluginMetadata.builder()
-                .id("impactor")
-                .name("Impactor")
-                .version("@version@")
-                .build(), logger);
+    public VelocityImpactorPlugin(VelocityImpactorBootstrap bootstrap) {
         this.bootstrap = bootstrap;
-
-        instance = this;
+        this.register();
+        ApiRegistrationUtil.register(new VelocityImpactorAPIProvider(this.bootstrap.scheduler()));
     }
 
-    public void init() {
-        ApiRegistrationUtil.register(new VelocityImpactorAPIProvider(new VelocitySchedulerAdapter(this.bootstrap )));
-
-        Impactor.getInstance().getRegistry().register(ImpactorPlugin.class, this);
-        Impactor.getInstance().getRegistry().register(ClassPathAppender.class, new ReflectionClassPathAppender(this.getClass().getClassLoader()));
-        Impactor.getInstance().getRegistry().register(DependencyManager.class, new DependencyManager(this));
-
-        this.getPluginLogger().info("Startup", "Pooling plugin dependencies...");
-        List<Dependency> toLaunch = Lists.newArrayList();
-        for(ImpactorPlugin plugin : PluginRegistry.getAll()) {
-            if(plugin instanceof Depending) {
-                Depending dependable = (Depending) plugin;
-
-                for(Dependency dependency : dependable.getAllDependencies()) {
-                    if(toLaunch.contains(dependency)) {
-                        continue;
-                    }
-
-                    toLaunch.add(dependency);
-                }
-
-                for(Dependency storage : this.getDependencyManager().registry().resolveStorageDependencies(Sets.newHashSet(dependable.getStorageRequirements()))) {
-                    if(toLaunch.contains(storage)) {
-                        continue;
-                    }
-
-                    toLaunch.add(storage);
-                }
-            }
-        }
-
-        this.getPluginLogger().info("Startup", "Dependencies found, setting these up now...");
-        this.getPluginLogger().info("Startup", "Initializing default dependencies...");
-        this.getDependencyManager().loadDependencies(ProvidedDependencies.JAR_RELOCATOR);
-        this.getDependencyManager().loadDependencies(Lists.newArrayList(
-                ProvidedDependencies.CONFIGURATE_CORE,
-                ProvidedDependencies.CONFIGURATE_HOCON,
-                ProvidedDependencies.TYPESAFE_CONFIG,
-                ProvidedDependencies.CONFIGURATE_GSON,
-                ProvidedDependencies.CONFIGURATE_YAML
-        ));
-        this.getDependencyManager().loadDependencies(new HashSet<>(toLaunch));
-
-        Impactor.getInstance().getRegistry().register(EventBus.class, new ImpactorEventBus());
-    }
-
-    public static VelocityImpactorPlugin getInstance() {
+    public static VelocityImpactorPlugin instance() {
         return instance;
     }
 
-    public VelocityImpactorBootstrap getBootstrap() {
-        return bootstrap;
-    }
-
-    private DependencyManager getDependencyManager() {
-        return Impactor.getInstance().getRegistry().get(DependencyManager.class);
-    }
-
     @Override
-    public List<Dependency> getAllDependencies() {
-        return ImmutableList.copyOf(Lists.newArrayList(
+    public Set<Dependency> dependencies() {
+        return ImmutableSet.copyOf(Lists.newArrayList(
                 ProvidedDependencies.KYORI_EVENT_API,
                 ProvidedDependencies.KYORI_EVENT_METHOD,
                 ProvidedDependencies.KYORI_EVENT_METHOD_ASM,
                 ProvidedDependencies.BYTEBUDDY,
-                ProvidedDependencies.ASM,
-                ProvidedDependencies.ASM_COMMONS
+                ProvidedDependencies.REFLECTIONS
         ));
     }
 
     @Override
-    public List<StorageType> getStorageRequirements() {
-        return Lists.newArrayList();
+    public PluginLogger logger() {
+        return this.bootstrap.logger();
     }
+
+    @Override
+    public void construct() {
+        instance = this;
+
+        Registry registry = Impactor.getInstance().getRegistry();
+        registry.register(InternalImpactorPlugin.class, this);
+        registry.register(ImpactorPlugin.class, this); // TODO - Temporary
+
+        this.download();
+        this.modules();
+        this.listeners();
+    }
+
+    @Override
+    public void shutdown() {}
+
+    @Override
+    public VelocityImpactorBootstrap bootstrapper() {
+        return this.bootstrap;
+    }
+
+    @Override
+    protected void listeners() {}
+
+    @Override
+    protected void commands() {}
+
+    @Override
+    protected void placeholders() {}
 }

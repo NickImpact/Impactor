@@ -41,7 +41,9 @@ dependencies {
 }
 
 shadowJar {
-    archiveFileName = "Impactor-Sponge-${project.sponge}-${project.plugin}.jar"
+    archiveBaseName.set("Impactor-Sponge")
+    archiveClassifier.set("")
+    archiveVersion.set("${project.sponge}-${project.plugin}")
 
     from {
         project(':sponge').tasks.shadowJar.archiveFile
@@ -50,4 +52,8 @@ shadowJar {
 
 artifacts {
     archives shadowJar
+}
+
+license {
+    header = file('../../HEADER.txt')
 }

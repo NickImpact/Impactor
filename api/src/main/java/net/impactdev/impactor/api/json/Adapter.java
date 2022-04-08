@@ -64,7 +64,7 @@ public abstract class Adapter<E> implements JsonSerializer<E>, JsonDeserializer<
 	public JsonElement serialize(E src, Type type, JsonSerializationContext ctx) {
 		JsonElement element = ctx.serialize(src);
 		JsonObject obj = (JsonObject) element;
-		obj.addProperty("type", src.getClass().isAnnotationPresent(JsonTyping.class) ? src.getClass().getAnnotation(JsonTyping.class).value() : (this.plugin.metadata().getID() + "_" + src.getClass().getSimpleName()).toLowerCase());
+		obj.addProperty("type", src.getClass().isAnnotationPresent(JsonTyping.class) ? src.getClass().getAnnotation(JsonTyping.class).value() : (this.plugin.metadata().id() + "_" + src.getClass().getSimpleName()).toLowerCase());
 		return obj;
 	}
 

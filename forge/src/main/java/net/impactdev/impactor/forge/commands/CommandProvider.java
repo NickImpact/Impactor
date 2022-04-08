@@ -29,7 +29,7 @@ import ca.landonjw.gooeylibs2.api.button.ButtonAction;
 import ca.landonjw.gooeylibs2.api.button.GooeyButton;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.ui.ImpactorUI;
+import net.impactdev.impactor.api.ui.containers.ImpactorUI;
 import net.impactdev.impactor.api.ui.containers.icons.DisplayProvider;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
@@ -62,7 +62,7 @@ public class CommandProvider {
                                         .getDisplay()
                                 ))
                                 .listener(c -> {
-                                    ForgeImpactorPlugin.getInstance().getPluginLogger().info("Click detected on icon at slot: " + c.require(ButtonAction.class).getSlot());
+                                    ForgeImpactorPlugin.instance().logger().info("Click detected on icon at slot: " + c.require(ButtonAction.class).getSlot());
                                     return false;
                                 })
                                 .build();

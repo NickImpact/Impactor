@@ -41,6 +41,7 @@ dependencies {
     // Impactor
     api project(':api')
     api project(':common')
+    compileOnly project(':launcher')
 
     // Gooey Libs
     api 'ca.landonjw:GooeyLibs:1.16.5-2.3.0'
@@ -50,16 +51,19 @@ dependencies {
 }
 
 shadowJar {
-    archiveName = "Impactor-Forge-${forge}-${version}.jar"
+    archiveBaseName.set("impactor-forge")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+    archiveExtension.set("jarinjar")
 
     include {
         dependencies {
-            include(project(':api'))
             include(project(':common'))
             include(dependency('net.kyori:.*:.*'))
         }
     }
 
+    relocate('net.kyori.event', 'net.impactdev.impactor.relocations.eventbus')
     relocate('net.kyori', 'net.impactdev.impactor.relocations.kyori')
     relocate("ca.landonjw.gooeylibs2", "net.impactdev.impactor.relocations.landonjw.gooeylibs2")
 }

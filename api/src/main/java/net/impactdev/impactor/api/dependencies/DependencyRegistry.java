@@ -76,13 +76,19 @@ public class DependencyRegistry {
 	}
 
 	public boolean shouldAutoLoad(Dependency dependency) {
-		List<Dependency> list = Lists.newArrayList(
-				ProvidedDependencies.ASM,
-				ProvidedDependencies.ASM_COMMONS,
-				ProvidedDependencies.JAR_RELOCATOR,
-				ProvidedDependencies.H2
-		);
-		return !list.contains(dependency);
+		return !dontAutoLoad.contains(dependency);
 	}
 
+	private static final List<Dependency> dontAutoLoad = Lists.newArrayList(
+			ProvidedDependencies.JAR_RELOCATOR,
+			ProvidedDependencies.H2
+	);
+
+	static {
+		try {
+			Class.forName("org.objectweb.asm.Type");
+			dontAutoLoad.add(ProvidedDependencies.ASM);
+			dontAutoLoad.add(ProvidedDependencies.ASM_COMMONS);
+		} catch (Exception ignored) {}
+	}
 }

@@ -25,106 +25,92 @@
 
 package net.impactdev.impactor.forge;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.Dependency;
-import net.impactdev.impactor.api.dependencies.DependencyManager;
 import net.impactdev.impactor.api.dependencies.ProvidedDependencies;
-import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
 import net.impactdev.impactor.api.dependencies.relocation.Relocation;
-import net.impactdev.impactor.api.logging.Logger;
+import net.impactdev.impactor.api.logging.PluginLogger;
+import net.impactdev.impactor.api.module.Module;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.api.registry.Registry;
-import net.impactdev.impactor.api.storage.StorageType;
-import net.impactdev.impactor.api.ui.ImpactorUI;
-import net.impactdev.impactor.api.ui.containers.icons.Icon;
-import net.impactdev.impactor.api.ui.containers.layouts.Layout;
 import net.impactdev.impactor.common.api.ApiRegistrationUtil;
-import net.impactdev.impactor.common.dependencies.DependencyContainer;
-import net.impactdev.impactor.common.ui.LayoutImpl;
+import net.impactdev.impactor.common.config.ImpactorConfigModule;
+import net.impactdev.impactor.common.event.ImpactorEventBusModule;
+import net.impactdev.impactor.common.plugin.ImpactorBootstrap;
+import net.impactdev.impactor.common.plugin.InternalImpactorPlugin;
 import net.impactdev.impactor.forge.api.ForgeImpactorAPIProvider;
 import net.impactdev.impactor.forge.commands.CommandProvider;
-import net.impactdev.impactor.forge.dependencies.ForgeClassPathAppender;
-import net.impactdev.impactor.forge.logging.ForgeLogger;
-import net.impactdev.impactor.forge.ui.container.ForgeUI;
-import net.impactdev.impactor.forge.ui.container.icons.ForgeIcon;
+import net.impactdev.impactor.forge.ui.ForgeUIModule;
 import net.minecraftforge.common.MinecraftForge;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
-public class ForgeImpactorPlugin implements ImpactorPlugin, Depending {
+public class ForgeImpactorPlugin extends InternalImpactorPlugin {
 
     private static ForgeImpactorPlugin instance;
 
-    private final ForgeBootstrap bootstrap;
-    private final Logger logger;
-    private final PluginMetadata metadata = PluginMetadata.builder()
-            .id("impactor")
-            .name("Impactor")
-            .version("@version@")
-            .description("Cross Platform API ")
-            .build();
+    private final ForgeImpactorBootstrap bootstrap;
 
-    public ForgeImpactorPlugin(ForgeBootstrap bootstrap, org.apache.logging.log4j.Logger delegate) {
+    public ForgeImpactorPlugin(ForgeImpactorBootstrap bootstrap) {
         instance = this;
         this.bootstrap = bootstrap;
-        this.logger = new ForgeLogger(delegate);
+        ApiRegistrationUtil.register(new ForgeImpactorAPIProvider());
+        this.register();
     }
 
-    public static ForgeImpactorPlugin getInstance() {
+    public static ForgeImpactorPlugin instance() {
         return instance;
     }
 
-    public ForgeBootstrap getBootstrap() {
-        return this.bootstrap;
-    }
-
     @Override
-    public PluginMetadata getMetadata() {
-        return this.metadata;
-    }
-
-    @Override
-    public Logger getPluginLogger() {
-        return this.logger;
+    public PluginLogger logger() {
+        return this.bootstrap.logger();
     }
 
     @Override
     public void construct() {
-        ApiRegistrationUtil.register(new ForgeImpactorAPIProvider());
+        instance = this;
+
         Registry registry = Impactor.getInstance().getRegistry();
-        registry.register(ImpactorPlugin.class, this);
-        registry.register(ClassPathAppender.class, new ForgeClassPathAppender(this));
-        registry.registerBuilderSupplier(Dependency.DependencyBuilder.class, DependencyContainer.DependencyContainerBuilder::new);
+        registry.register(InternalImpactorPlugin.class, this);
+        registry.register(ImpactorPlugin.class, this); // TODO - Temporary
 
-        DependencyManager manager = new DependencyManager(this);
-        registry.register(DependencyManager.class, manager);
-        manager.loadDependencies(ProvidedDependencies.JAR_RELOCATOR);
-        manager.loadDependencies(this.getAllDependencies());
-
-        registry.registerBuilderSupplier(Icon.IconBuilder.class, ForgeIcon.ForgeIconBuilder::new);
-        registry.registerBuilderSupplier(Layout.LayoutBuilder.class, LayoutImpl.LayoutImplBuilder::new);
-//        registry.registerBuilderSupplier(Pagination.PaginationBuilder.class, SpongePagination.SpongePaginationBuilder::new);
-        registry.registerBuilderSupplier(ImpactorUI.UIBuilder.class, ForgeUI.ForgeUIBuilder::new);
-
-        MinecraftForge.EVENT_BUS.register(new CommandProvider());
+        this.download();
+        this.modules();
+        this.listeners();
     }
 
     @Override
-    public void enable() {
+    public void shutdown() {}
 
+    @Override
+    protected void modules() {
+        List<Class<? extends Module>> modules = Lists.newArrayList(
+                ForgeUIModule.class,
+                ImpactorEventBusModule.class,
+                ImpactorConfigModule.class
+        );
+
+        Registry registry = Impactor.getInstance().getRegistry();
+        modules.forEach(implementation -> {
+            try {
+                Module module = implementation.newInstance();
+
+                this.logger().info("Loading module: " + module.name());
+                module.builders(registry);
+                module.register(registry);
+            } catch (Exception e) {
+                this.logger().error("Failed to instantiate a module with class type: " + implementation.getSimpleName());
+            }
+        });
     }
 
     @Override
-    public void disable() {
-
-    }
-
-    @Override
-    public List<Dependency> getAllDependencies() {
-        return Lists.newArrayList(
+    public Set<Dependency> dependencies() {
+        return ImmutableSet.copyOf(Lists.newArrayList(
                 ProvidedDependencies.ADVENTURE_GSON_SERIALIZER,
                 ProvidedDependencies.ADVENTURE_MINIMESSAGE,
                 Dependency.builder()
@@ -135,12 +121,26 @@ public class ForgeImpactorPlugin implements ImpactorPlugin, Depending {
                         .checksum("0sBRBZ3W4ezFRB3COytWJQwl/88Atw4MP0D7YVLOr4o=")
                         .relocation(Relocation.of("ca{}landonjw", "landonjw"))
                         .build(),
-                ProvidedDependencies.SPONGE_MATH
-        );
+                ProvidedDependencies.SPONGE_MATH,
+                ProvidedDependencies.KYORI_EVENT_API,
+                ProvidedDependencies.KYORI_EVENT_METHOD,
+                ProvidedDependencies.KYORI_EVENT_METHOD_ASM
+        ));
     }
 
     @Override
-    public List<StorageType> getStorageRequirements() {
-        return Collections.emptyList();
+    public ImpactorBootstrap bootstrapper() {
+        return this.bootstrap;
     }
+
+    @Override
+    protected void listeners() {}
+
+    @Override
+    protected void commands() {
+        MinecraftForge.EVENT_BUS.register(new CommandProvider());
+    }
+
+    @Override
+    protected void placeholders() {}
 }

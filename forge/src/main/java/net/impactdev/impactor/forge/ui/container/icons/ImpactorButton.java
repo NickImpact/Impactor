@@ -87,7 +87,7 @@ public class ImpactorButton extends ButtonBase {
             printer.newline();
             printer.add("The tracked exception is detailed below:");
             printer.add(e);
-            printer.log(ForgeImpactorPlugin.getInstance().getPluginLogger(), "UI");
+            printer.log(ForgeImpactorPlugin.instance().logger(), "UI");
         }
     }
 

@@ -25,10 +25,29 @@
 
 package net.impactdev.impactor.common.plugin;
 
+import com.google.common.collect.Sets;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.dependencies.Dependency;
+import net.impactdev.impactor.api.dependencies.DependencyManager;
+import net.impactdev.impactor.api.dependencies.ProvidedDependencies;
+import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
+import net.impactdev.impactor.api.module.Module;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.plugin.PluginMetadata;
+import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
+import net.impactdev.impactor.api.registry.Registry;
+import net.impactdev.impactor.common.api.ModuleImplementation;
+import net.impactdev.impactor.common.dependencies.DependencyContainer;
+import net.impactdev.impactor.launcher.LoadingException;
+import org.reflections.Reflections;
 
-public interface InternalImpactorPlugin extends ImpactorPlugin {
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+public abstract class InternalImpactorPlugin implements ImpactorPlugin {
 
     PluginMetadata METADATA = PluginMetadata.builder()
             .id("impactor")
@@ -38,20 +57,65 @@ public interface InternalImpactorPlugin extends ImpactorPlugin {
             .build();
 
     @Override
-    default PluginMetadata metadata() {
+    public PluginMetadata metadata() {
         return METADATA;
     }
 
-    ImpactorBootstrap bootstrapper();
+    protected void modules() {
+        final Registry registry = Impactor.getInstance().getRegistry();
 
-    void modules();
+        new Reflections("net.impactdev.impactor")
+                .getSubTypesOf(Module.class)
+                .stream()
+                .filter(module -> module.isAnnotationPresent(ModuleImplementation.class))
+                .map(module -> {
+                    try {
+                        return (Module) module.newInstance();
+                    } catch (Exception e) {
+                        throw new LoadingException("Failed to initialize a module", e);
+                    }
+                })
+                .sorted(Comparator.comparing(Module::priority).reversed())
+                .forEach(module -> {
+                    this.logger().info("Loading module: " + module.name());
+                    module.builders(registry);
+                    module.register(registry);
+                });
+    }
 
-    void download();
+    protected void download() {
+        Registry registry = Impactor.getInstance().getRegistry();
+        registry.register(ClassPathAppender.class, this.bootstrapper().appender());
+        registry.registerBuilderSupplier(Dependency.DependencyBuilder.class, DependencyContainer.DependencyContainerBuilder::new);
 
-    void listeners();
+        DependencyManager manager = new DependencyManager(this);
+        registry.register(DependencyManager.class, manager);
 
-    void commands();
+        this.logger().info("Attempting to load runtime dependencies...");
+        this.logger().info("Initializing priority dependencies...");
 
-    void placeholders();
+        Instant start = Instant.now();
+        manager.loadDependencies(ProvidedDependencies.JAR_RELOCATOR);
+
+        this.logger().info("Pooling plugin dependencies...");
+        Set<Dependency> dependencies = Sets.newHashSet();
+        for(ImpactorPlugin plugin : PluginRegistry.getAll()) {
+            dependencies.addAll(plugin.dependencies());
+            dependencies.addAll(manager.registry().resolveStorageDependencies(plugin.storageRequirements()));
+        }
+        manager.loadDependencies(dependencies);
+
+        Instant end = Instant.now();
+        long ms = Duration.between(start, end).toMillis();
+        this.logger().info("Dependency injection complete, took " + String.format("%02d.%03d seconds", TimeUnit.MILLISECONDS.toSeconds(ms), (ms % 1000)));
+    }
+
+    public abstract ImpactorBootstrap bootstrapper();
+
+    protected abstract void listeners();
+
+    protected abstract void commands();
+
+    protected abstract void placeholders();
 
 }

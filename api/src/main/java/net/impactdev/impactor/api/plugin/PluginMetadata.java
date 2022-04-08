@@ -41,19 +41,19 @@ public final class PluginMetadata {
 		this.description = description;
 	}
 
-	public String getID() {
+	public String id() {
 		return id;
 	}
 
-	public String getName() {
+	public String name() {
 		return name;
 	}
 
-	public String getVersion() {
+	public String version() {
 		return version;
 	}
 
-	public String getDescription() {
+	public String description() {
 		return description;
 	}
 

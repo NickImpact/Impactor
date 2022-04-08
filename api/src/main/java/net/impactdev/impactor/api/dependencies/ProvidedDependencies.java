@@ -32,14 +32,14 @@ public final class ProvidedDependencies {
     // ASM
     public static final Dependency ASM = Dependency.builder()
             .name("ASM")
-            .group("org.ow2.asm")
+            .group("org{}ow2{}asm")
             .artifact("asm")
             .version("9.2")
             .checksum("udT+TXGTjfOIOfDspCqqpkz4sxPWeNoDbwyzyhmbR/U=")
             .build();
     public static final Dependency ASM_COMMONS = Dependency.builder()
             .name("ASM Commons")
-            .group("org.ow2.asm")
+            .group("org{}ow2{}asm")
             .artifact("asm-commons")
             .version("9.2")
             .checksum("vkzlMTiiOLtSLNeBz5Hzulzi9sqT7GLUahYqEnIl4KY=")
@@ -265,5 +265,20 @@ public final class ProvidedDependencies {
             .version("1.7.30")
             .checksum("i5J5y/9rn4hZTvrjzwIDm2mVAw7sAj7UOSh0jEFnD+4=")
             .with(SLF4J_API)
+            .build();
+    public static final Dependency REFLECTIONS = Dependency.builder()
+            .name("Reflections")
+            .group("org.reflections")
+            .artifact("reflections")
+            .version("0.10.2")
+            .checksum("k4otCP5UBQ12ELlE2N3DoJNVcQ2ea+CqyDjbwE6aKCU=")
+            .with(Dependency.builder()
+                    .name("Java Assist")
+                    .group("org.javassist")
+                    .artifact("javassist")
+                    .version("3.28.0-GA")
+                    .checksum("V9Cp6ShvgvTqqFESUYaZf4Eb784OIGD/ChWnf1qd2ac=")
+                    .build()
+            )
             .build();
 }

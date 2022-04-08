@@ -25,47 +25,113 @@
 
 package net.impactdev.impactor.velocity;
 
-import com.google.inject.Inject;
-import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
-import com.velocitypowered.api.plugin.Plugin;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import net.impactdev.impactor.api.logging.Logger;
+import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
+import net.impactdev.impactor.api.logging.PluginLogger;
+import net.impactdev.impactor.api.logging.Slf4jLogger;
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import net.impactdev.impactor.common.plugin.ImpactorBootstrap;
+import net.impactdev.impactor.common.plugin.classpath.JarInJarClassPathAppender;
+import net.impactdev.impactor.launcher.LauncherBootstrap;
+import net.impactdev.impactor.velocity.scheduler.VelocitySchedulerAdapter;
+import org.slf4j.Logger;
 
-@Plugin(id = "impactor", name = "Impactor", version = "@version@", authors = {"NickImpact"})
-public class VelocityImpactorBootstrap {
+import java.nio.file.Path;
+import java.util.function.Supplier;
 
-    private static VelocityImpactorBootstrap instance;
+public class VelocityImpactorBootstrap implements ImpactorBootstrap, LauncherBootstrap {
+
+    /** The launcher responsible for invoking the bootstrapper */
+    private final Supplier<Injector> loader;
 
     private final VelocityImpactorPlugin plugin;
     private final ProxyServer server;
+    private final Path configDirectory;
+    private final PluginLogger logger;
 
-    @Inject
-    public VelocityImpactorBootstrap(ProxyServer server, org.slf4j.Logger logger) {
-        instance = this;
-        this.server = server;
-        this.plugin = new VelocityImpactorPlugin(this, logger);
-    }
+    /** The scheduler adapter responsible for scheduled tasks on the Sponge platform */
+    private final VelocitySchedulerAdapter scheduler;
 
-    @Subscribe
-    public void onInit(ProxyInitializeEvent event) {
-        try {
-            this.plugin.init();
-        } catch (Exception e) {
-            //exception = e;
-            e.printStackTrace();
-        }
-    }
+    /** The class path appender the plugin will use for runtime downloaded libraries */
+    private final ClassPathAppender appender;
 
-    public static VelocityImpactorBootstrap getInstance() {
-        return instance;
+    public VelocityImpactorBootstrap(Supplier<Injector> loader) {
+        this.loader = loader;
+
+        Injector injector = loader.get();
+        this.server = injector.getInstance(ProxyServer.class);
+        this.configDirectory = injector.getInstance(Key.get(Path.class, DataDirectory.class));
+        this.scheduler = new VelocitySchedulerAdapter(this);
+        this.appender = new JarInJarClassPathAppender(this.getClass().getClassLoader());
+        this.logger = new Slf4jLogger(injector.getInstance(Logger.class));
+        this.plugin = new VelocityImpactorPlugin(this);
     }
 
     public ProxyServer getProxy() {
         return this.server;
     }
 
-    public Logger getLogger() {
-        return this.plugin.getPluginLogger();
+    @Override
+    public void construct() {
+        try {
+            this.plugin.construct();
+        } catch (Throwable e) {
+            new PrettyPrinter(80)
+                    .title("Impactor Encountered an Exception")
+                    .add("Server Information").center().newline()
+                    .add("Server Brand: " + this.serverBrand() + " (Version: " + this.serverVersion() + ")")
+                    .add("Impactor: " + this.version())
+                    .hr()
+                    .add("During launch, Impactor encountered an error which prevented it from")
+                    .add("launching correctly!")
+                    .newline()
+                    .add("The tracked exception can be viewed below:")
+                    .hr('-')
+                    .add(e)
+                    .log(this.logger(), PrettyPrinter.Level.ERROR);
+        }
+    }
+
+    @Override
+    public void shutdown() {
+
+    }
+
+    @Override
+    public PluginLogger logger() {
+        return this.logger;
+    }
+
+    @Override
+    public Path configDirectory() {
+        return this.configDirectory;
+    }
+
+    @Override
+    public VelocitySchedulerAdapter scheduler() {
+        return this.scheduler;
+    }
+
+    @Override
+    public ClassPathAppender appender() {
+        return this.appender;
+    }
+
+    @Override
+    public String version() {
+        return this.plugin.metadata().version();
+    }
+
+    @Override
+    public String serverBrand() {
+        return this.server.getVersion().getName() + " - " + this.server.getVersion().getVendor();
+    }
+
+    @Override
+    public String serverVersion() {
+        return this.server.getVersion().getVersion();
     }
 }
