@@ -64,7 +64,7 @@ public class SpongeRefreshingFrame extends AbstractSpongeFrame implements Refres
 
     @Override
     public Component getText() {
-        MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
+        MessageService service = Impactor.getInstance().getRegistry().get(MessageService.class);
         Component result = service.parse(this.raw, this.sources);
         for(FrameEffect effect : this.effects) {
             result = effect.translate(result);
@@ -114,12 +114,6 @@ public class SpongeRefreshingFrame extends AbstractSpongeFrame implements Refres
         @Override
         public RefreshingFrameBuilder sources(PlaceholderSources sources) {
             this.sources = sources;
-            return this;
-        }
-
-        @Override
-        public RefreshingFrameBuilder from(RefreshingFrame input) {
-            this.raw = ((SpongeRefreshingFrame) input).raw;
             return this;
         }
 

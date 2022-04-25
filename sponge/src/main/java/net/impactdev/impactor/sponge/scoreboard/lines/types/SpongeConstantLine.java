@@ -75,7 +75,7 @@ public class SpongeConstantLine extends AbstractSpongeSBLine implements Constant
 
         @Override
         public ConstantLineBuilder text(String raw, PlaceholderSources sources) {
-            MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
+            MessageService service = Impactor.getInstance().getRegistry().get(MessageService.class);
             this.supplier = new LazyComponent(fallback -> service.parse(
                     raw,
                     PlaceholderSources.builder()
@@ -89,13 +89,6 @@ public class SpongeConstantLine extends AbstractSpongeSBLine implements Constant
         @Override
         public ConstantLineBuilder text(Component text) {
             this.supplier = new LazyComponent(fallback -> text);
-            return this;
-        }
-
-        @Override
-        public ConstantLineBuilder from(ConstantLine input) {
-            Preconditions.checkArgument(input instanceof SpongeConstantLine);
-            this.supplier = ((SpongeConstantLine) input).supplier;
             return this;
         }
 

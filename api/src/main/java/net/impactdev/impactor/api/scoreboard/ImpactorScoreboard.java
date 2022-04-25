@@ -30,7 +30,7 @@ import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 
 import java.util.List;
 import java.util.Map;
@@ -190,7 +190,7 @@ public interface ImpactorScoreboard<P> {
      *
      * @param <P> The type of player represented by the platform
      */
-    interface ScoreboardBuilder<P> extends Builder<ImpactorScoreboard<P>, ScoreboardBuilder<P>> {
+    interface ScoreboardBuilder<P> extends Builder<ImpactorScoreboard<P>> {
 
         /**
          * Specifies the objective/title of the scoreboard.
@@ -207,7 +207,7 @@ public interface ImpactorScoreboard<P> {
      *
      * @param <P> The type of player represented by the platform
      */
-    interface LinesComponentBuilder<P> extends Builder<ImpactorScoreboard<P>, LinesComponentBuilder<P>> {
+    interface LinesComponentBuilder<P> extends Builder<ImpactorScoreboard<P>> {
 
         /**
          * Appends a single line to the scoreboard. If its score matches another line

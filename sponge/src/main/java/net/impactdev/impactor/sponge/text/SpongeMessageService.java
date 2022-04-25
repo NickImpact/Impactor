@@ -56,7 +56,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class SpongeMessageService implements MessageService<Component> {
+public class SpongeMessageService implements MessageService {
 
 	private static final Pattern MODIFIERS = Pattern.compile(":([sp]+)$", Pattern.CASE_INSENSITIVE);
 	private static final Pattern TOKEN_LOCATOR = Pattern.compile("(^[^{]+)?([{][{](?<placeholder>[\\w-:]+)(\\|(?<arguments>.+))?[}][}])(.+)?");

@@ -108,11 +108,6 @@ public class NumberBasedGradientProcessor<T extends Number> extends GradientProc
         }
 
         @Override
-        public NumberBasedGradientProcessorBuilder<T> from(NumberBasedGradientProcessor<T> input) {
-            return null;
-        }
-
-        @Override
         public NumberBasedGradientProcessor<T> build() {
             return new NumberBasedGradientProcessor<>(this);
         }

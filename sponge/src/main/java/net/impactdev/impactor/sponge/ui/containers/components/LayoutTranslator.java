@@ -29,6 +29,7 @@ import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
+import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.ui.containers.icons.SpongeIcon;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -48,14 +49,14 @@ public class LayoutTranslator {
                 .build();
 
         layout.elements().forEach((slot, icon) -> inventory.set(slot, ((SpongeIcon) icon).display().provide()));
-        return new SlotContext(inventory.slots(), layout.elements());
+        return new SlotContext(inventory.slots(), Maps.newHashMap(layout.elements()));
     }
 
-    public static Map<Integer, Icon<?>> translate(SectionedPagination.Section section) {
+    public static Map<Integer, Icon<?>> translate(Section section) {
         return section.pages().nextOrThrow().drawn();
     }
 
-    public static SlotContext merge(Layout layout, Set<SectionedPagination.Section> sections) {
+    public static SlotContext merge(Layout layout, Set<Section> sections) {
         Inventory inventory = Inventory.builder()
                 .grid(layout.dimensions().x(), layout.dimensions().y())
                 .completeStructure()
@@ -67,7 +68,9 @@ public class LayoutTranslator {
         layout.elements().forEach((slot, icon) -> inventory.set(slot, ((SpongeIcon) icon).display().provide()));
         sections.forEach(section -> {
             Map<Integer, Icon<?>> translated = translate(section);
-            translated.forEach((slot, icon) -> inventory.set(slot, ((SpongeIcon) icon).display().provide()));
+            translated.forEach((slot, icon) -> {
+                inventory.set(slot, ((SpongeIcon) icon).display().provide());
+            });
             tracked.putAll(translated);
         });
 

@@ -281,4 +281,12 @@ public final class ProvidedDependencies {
                     .build()
             )
             .build();
+    public static final Dependency CAFFEINE = Dependency.builder()
+            .name("Caffeine")
+            .group("com{}github{}ben-manes{}caffeine")
+            .artifact("caffeine")
+            .version("2.8.4")
+            .checksum("KV9YN5gQj6b507VJApJpPF5PkCon0DZqAi0T7Ln0lag=")
+            .relocation(Relocation.of("com{}github{}benmanes{}caffeine", "caffeine"))
+            .build();
 }

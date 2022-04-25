@@ -181,24 +181,6 @@ public class DependencyContainer implements Dependency {
         }
 
         @Override
-        public DependencyBuilder from(Dependency input) {
-            this.name = input.name();
-            this.group = input.group();
-            this.artifact = input.artifact();
-            this.version = input.version();
-            this.checksum = input.checksum()
-                    .map(bytes -> Base64.getEncoder().encodeToString(bytes))
-                    .orElse(null);
-
-            this.relocations.clear();
-            this.relocations.addAll(input.relocations());
-
-            this.bundled.clear();
-            this.bundled.addAll(input.bundled());
-            return this;
-        }
-
-        @Override
         public Dependency build() {
             return new DependencyContainer(this);
         }

@@ -25,25 +25,24 @@
 
 package net.impactdev.impactor.sponge.ui;
 
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.registry.Registry;
 import net.impactdev.impactor.api.ui.UIModule;
 import net.impactdev.impactor.api.ui.containers.ImpactorUI;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
-import net.impactdev.impactor.api.ui.containers.pagination.Pagination;
-import net.impactdev.impactor.api.ui.containers.pagination.async.AsyncPagination;
+import net.impactdev.impactor.api.ui.containers.pagination.builders.PaginationBuilder;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
+import net.impactdev.impactor.api.ui.containers.pagination.sectioned.builders.SectionedPaginationBuilder;
 import net.impactdev.impactor.api.ui.signs.SignQuery;
 import net.impactdev.impactor.common.api.ModuleImplementation;
 import net.impactdev.impactor.common.ui.LayoutImpl;
-import net.impactdev.impactor.sponge.ui.containers.SpongePagination;
+import net.impactdev.impactor.common.ui.pagination.builders.ImpactorPaginationBuilder;
 import net.impactdev.impactor.sponge.ui.containers.SpongeUI;
-import net.impactdev.impactor.sponge.ui.containers.async.SpongeAsyncPagination;
 import net.impactdev.impactor.sponge.ui.containers.icons.SpongeIcon;
+import net.impactdev.impactor.sponge.ui.containers.pagination.builders.SpongeImpactorPaginationBuilder;
 import net.impactdev.impactor.sponge.ui.containers.sectioned.SpongeSectionedPagination;
+import net.impactdev.impactor.sponge.ui.containers.sectioned.builders.SpongeSectionedPaginationBuilder;
 import net.impactdev.impactor.sponge.ui.signs.SpongeSignQuery;
-
 
 @ModuleImplementation
 public final class SpongeUIModule implements UIModule {
@@ -55,11 +54,9 @@ public final class SpongeUIModule implements UIModule {
     public void builders(Registry registry) {
         registry.registerBuilderSupplier(Icon.IconBuilder.class, SpongeIcon.SpongeIconBuilder::new);
         registry.registerBuilderSupplier(Layout.LayoutBuilder.class, LayoutImpl.LayoutImplBuilder::new);
-        registry.registerBuilderSupplier(Pagination.PaginationBuilder.class, SpongePagination.SpongePaginationBuilder::new);
+        registry.registerBuilderSupplier(PaginationBuilder.class, SpongeImpactorPaginationBuilder::new);
         registry.registerBuilderSupplier(ImpactorUI.UIBuilder.class, SpongeUI.SpongeUIBuilder::new);
-        registry.registerBuilderSupplier(SectionedPagination.SectionedPaginationBuilder.class, SpongeSectionedPagination.SpongeSectionedPaginationBuilder::new);
-        registry.registerBuilderSupplier(AsyncPagination.AsyncPaginationBuilder.class, SpongeAsyncPagination.SpongeAsyncPaginationBuilder::new);
-
+        registry.registerBuilderSupplier(SectionedPaginationBuilder.class, SpongeSectionedPaginationBuilder::new);
         registry.registerBuilderSupplier(SignQuery.SignQueryBuilder.class, SpongeSignQuery.SpongeSignQueryBuilder::new);
     }
 

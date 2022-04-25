@@ -50,6 +50,12 @@ public class CircularLinkedList<E> implements Iterable<E> {
 		return list;
 	}
 
+	public static <E> CircularLinkedList<E> fromStream(Stream<E> stream) {
+		CircularLinkedList<E> result = new CircularLinkedList<>();
+		stream.forEach(result::append);
+		return result;
+	}
+
 	@SuppressWarnings("UnusedAssignment")
 	public void append(E value) {
 		Node<E> node = new Node<>(value);
@@ -142,9 +148,4 @@ public class CircularLinkedList<E> implements Iterable<E> {
 		return this.getFramesNonCircular().iterator();
 	}
 
-	public static <E> CircularLinkedList<E> fromStream(Stream<E> stream) {
-		CircularLinkedList<E> result = new CircularLinkedList<>();
-		stream.forEach(result::append);
-		return result;
-	}
 }

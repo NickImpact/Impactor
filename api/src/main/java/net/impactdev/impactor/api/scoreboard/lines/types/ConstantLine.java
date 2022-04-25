@@ -27,7 +27,7 @@ package net.impactdev.impactor.api.scoreboard.lines.types;
 
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 import net.kyori.adventure.text.Component;
 
 /**
@@ -36,7 +36,7 @@ import net.kyori.adventure.text.Component;
  */
 public interface ConstantLine extends ScoreboardLine {
 
-    interface ConstantLineBuilder extends Builder<ConstantLine, ConstantLineBuilder> {
+    interface ConstantLineBuilder extends Builder<ConstantLine> {
 
         /**
          * Creates a line that is lazily constructed, using raw input as its constant text

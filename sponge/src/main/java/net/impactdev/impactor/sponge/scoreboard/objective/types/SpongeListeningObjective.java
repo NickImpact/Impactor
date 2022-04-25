@@ -90,14 +90,6 @@ public class SpongeListeningObjective extends AbstractSpongeObjective implements
         }
 
         @Override
-        public ListeningObjectiveBuilder from(ListeningObjective input) {
-            Preconditions.checkArgument(input instanceof SpongeListeningObjective);
-            this.frame = ((SpongeListeningObjective)input).frame;
-
-            return this;
-        }
-
-        @Override
         public ListeningObjective build() {
             return new SpongeListeningObjective(this);
         }

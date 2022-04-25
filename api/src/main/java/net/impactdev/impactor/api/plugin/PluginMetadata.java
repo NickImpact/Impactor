@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.api.plugin;
 
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 
 public final class PluginMetadata {
 
@@ -61,7 +61,7 @@ public final class PluginMetadata {
 		return new PluginMetadataBuilder();
 	}
 
-	public static class PluginMetadataBuilder implements Builder<PluginMetadata, PluginMetadataBuilder> {
+	public static class PluginMetadataBuilder implements Builder<PluginMetadata> {
 		private String id;
 		private String name;
 		private String version;
@@ -84,16 +84,6 @@ public final class PluginMetadata {
 
 		public PluginMetadataBuilder description(String description) {
 			this.description = description;
-			return this;
-		}
-
-		@Override
-		public PluginMetadataBuilder from(PluginMetadata input) {
-			this.id = input.id;
-			this.name = input.name;
-			this.version = input.version;
-			this.description = input.description;
-
 			return this;
 		}
 

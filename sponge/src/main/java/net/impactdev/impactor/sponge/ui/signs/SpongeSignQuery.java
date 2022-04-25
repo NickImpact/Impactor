@@ -29,17 +29,19 @@ package net.impactdev.impactor.sponge.ui.signs;
 //import com.ichorpowered.protocolcontrol.packet.PacketDirection;
 //import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
 //import com.ichorpowered.protocolcontrol.service.ProtocolService;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.signs.SignQuery;
 import net.impactdev.impactor.api.ui.signs.SignSubmission;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.math.vector.Vector3i;
 
 import java.util.List;
 
-public class SpongeSignQuery implements SignQuery<TextComponent, ServerPlayer, Vector3i> {
+public class SpongeSignQuery implements SignQuery {
 
-    private final List<TextComponent> lines;
+    private final List<Component> lines;
     private final Vector3i position;
     private final boolean reopen;
     private final SignSubmission callback;
@@ -52,7 +54,7 @@ public class SpongeSignQuery implements SignQuery<TextComponent, ServerPlayer, V
     }
 
     @Override
-    public List<TextComponent> getText() {
+    public List<Component> getText() {
         return this.lines;
     }
 
@@ -72,7 +74,7 @@ public class SpongeSignQuery implements SignQuery<TextComponent, ServerPlayer, V
     }
 
     @Override
-    public void sendTo(ServerPlayer player) {
+    public void sendTo(PlatformPlayer player) {
         throw new UnsupportedOperationException("Awaiting a 8.0.0 compatible build");
 //        BlockState sign = BlockTypes.STANDING_SIGN.getDefaultState();
 //        player.sendBlockChange(this.position.toInt(), sign);
@@ -111,48 +113,39 @@ public class SpongeSignQuery implements SignQuery<TextComponent, ServerPlayer, V
 //        }
     }
 
-    public static class SpongeSignQueryBuilder implements SignQueryBuilder<TextComponent, ServerPlayer, Vector3i> {
+    public static class SpongeSignQueryBuilder implements SignQueryBuilder {
 
-        private List<TextComponent> lines;
+        private List<Component> lines;
         private Vector3i position;
         private boolean reopen;
         private SignSubmission callback;
 
         @Override
-        public SignQueryBuilder<TextComponent, ServerPlayer, Vector3i> text(List<TextComponent> text) {
+        public SpongeSignQueryBuilder text(List<Component> text) {
             this.lines = text;
             return this;
         }
 
         @Override
-        public SignQueryBuilder<TextComponent, ServerPlayer, Vector3i> position(Vector3i position) {
+        public SignQueryBuilder position(Vector3i position) {
             this.position = position;
             return this;
         }
 
         @Override
-        public SignQueryBuilder<TextComponent, ServerPlayer, Vector3i> reopenOnFailure(boolean state) {
+        public SignQueryBuilder reopenOnFailure(boolean state) {
             this.reopen = state;
             return this;
         }
 
         @Override
-        public SignQueryBuilder<TextComponent, ServerPlayer, Vector3i> response(SignSubmission response) {
+        public SignQueryBuilder response(SignSubmission response) {
             this.callback = response;
             return this;
         }
 
         @Override
-        public SignQueryBuilder<TextComponent, ServerPlayer, Vector3i> from(SignQuery<TextComponent, ServerPlayer, Vector3i> query) {
-            this.lines = query.getText();
-            this.position = query.getSignPosition();
-            this.reopen = query.shouldReopenOnFailure();
-            this.callback = query.getSubmissionHandler();
-            return this;
-        }
-
-        @Override
-        public SignQuery<TextComponent, ServerPlayer, Vector3i> build() {
+        public SignQuery build() {
             return new SpongeSignQuery(this);
         }
     }

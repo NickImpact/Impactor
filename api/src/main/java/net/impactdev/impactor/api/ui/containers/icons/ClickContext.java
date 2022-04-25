@@ -25,8 +25,10 @@
 
 package net.impactdev.impactor.api.ui.containers.icons;
 
+import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.utilities.context.ContextualMapping;
 import net.impactdev.impactor.api.utilities.context.Provider;
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -54,7 +56,20 @@ public class ClickContext {
      * @return The updated context
      */
     public <T> ClickContext append(Class<T> type, T value) {
-        this.context.put(type, new Provider<>(value));
+        return this.append(TypeToken.get(type), value);
+    }
+
+    /**
+     * Appends the associated value alongside its class typing to this context. This will override any
+     * currently provided values with the same typing.
+     *
+     * @param type The type to associate with this context
+     * @param value The actual value represented by the typing
+     * @param <T> The type of the field being assigned to the context
+     * @return The updated context
+     */
+    public <T> ClickContext append(TypeToken<T> type, T value) {
+        this.context.put(type, value);
         return this;
     }
 
@@ -70,6 +85,17 @@ public class ClickContext {
     }
 
     /**
+     * Checks to see if the context carries a particular typing. This is mostly used for data querying, and can
+     * be used to avoid a possible {@link NoSuchElementException} from use of invoking {@link #require(Class)}.
+     *
+     * @param type The type to request from the context
+     * @return <code>true</code> if the value is available in this context, <code>false</code> otherwise
+     */
+    public boolean has(TypeToken<?> type) {
+        return this.context.containsKey(type);
+    }
+
+    /**
      * Attempts to locate and provide a value from the context. If the context does not contain
      * the requested typing, this will return an empty Optional.
      *
@@ -78,7 +104,19 @@ public class ClickContext {
      * @return An optionally wrapped instance representing the provided type, or empty if not available
      */
     public <T> Optional<T> request(Class<T> type) {
-        return this.context.get(type).map(Provider::instance);
+        return this.request(TypeToken.get(type));
+    }
+
+    /**
+     * Attempts to locate and provide a value from the context. If the context does not contain
+     * the requested typing, this will return an empty Optional.
+     *
+     * @param type The type to request from the context
+     * @param <T> The actual typing to provide from the request
+     * @return An optionally wrapped instance representing the provided type, or empty if not available
+     */
+    public <T> Optional<T> request(TypeToken<T> type) {
+        return this.context.get(type);
     }
 
     /**
@@ -91,6 +129,26 @@ public class ClickContext {
      * @throws NoSuchElementException If no value actually exists for the required typing.
      */
     public <T> T require(Class<T> type) throws NoSuchElementException {
-        return this.request(type).orElseThrow(() -> new NoSuchElementException("Missing Type: " + type.getSimpleName()));
+        return this.require(TypeToken.get(type));
+    }
+
+    /**
+     * Enacts to the context that a field should be required for event consuming. If the requested value
+     * is not found, this will trigger a {@link NoSuchElementException}.
+     *
+     * @param type The type to request from the context
+     * @param <T> The actual typing to provide from the request
+     * @return The value provided by the typing as assigned to this context
+     * @throws NoSuchElementException If no value actually exists for the required typing.
+     */
+    public <T> T require(TypeToken<T> type) throws NoSuchElementException {
+        return this.request(type).orElseThrow(() -> {
+            PrettyPrinter debugger = new PrettyPrinter(80);
+            debugger.title("Context Mapping").hr();
+            debugger.add(this.context);
+            debugger.print(System.out);
+
+            return new NoSuchElementException("Missing Type: " + type.getType().getTypeName());
+        });
     }
 }

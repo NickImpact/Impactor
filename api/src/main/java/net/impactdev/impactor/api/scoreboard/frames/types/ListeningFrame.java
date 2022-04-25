@@ -29,7 +29,7 @@ import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.events.Bus;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 
 import java.util.UUID;
 
@@ -55,7 +55,7 @@ public interface ListeningFrame<L> extends ScoreboardFrame.UpdatableFrame {
      */
     EventHandler<L> getEventHandler();
 
-    interface ListeningFrameBuilder<L> extends Builder<ListeningFrame<L>, ListeningFrameBuilder<L>> {
+    interface ListeningFrameBuilder<L> extends Builder<ListeningFrame<L>> {
 
         /**
          * Sets the frame to listen against events of the following type. This is normally set during

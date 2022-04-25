@@ -26,10 +26,13 @@
 package net.impactdev.impactor.api.ui.containers.icons;
 
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.builders.Required;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * An icon represents an ItemStack that will be used for displaying a component within a UI. Each icon allows
@@ -47,10 +50,44 @@ public interface Icon<T> {
 	 */
 	@NotNull DisplayProvider<T> display();
 
+	/**
+	 * Provides the set of listeners attached to this icon, as an immutable set.
+	 *
+	 * @return An immutable set of listeners attached to the icon
+	 */
 	Set<ClickProcessor> listeners();
+
+	/**
+	 * Appends a new click processor to the already created icon. This is meant for dynamic utility
+	 * where updating an icon variable based on later creation context is not available.
+	 *
+	 * @param processor The processor to append to the icon
+	 * @return This icon with the newly appended processor
+	 */
+	@Contract("_ -> this")
+	Icon<T> listener(ClickProcessor processor);
 
 	static <T> IconBuilder<T> builder(Class<T> typing) {
 		return (IconBuilder<T>) Impactor.getInstance().getRegistry().createBuilder(IconBuilder.class);
+	}
+
+	/**
+	 * Represents an icon which is bound to a given object. These types of icons are convenient
+	 * for solutions which may attempt to sort icons based on their creating type.
+	 *
+	 * @param <D> The type of display viewable to the client
+	 * @param <T> The type of object bound to this icon
+	 */
+	interface Binding<D, T> extends Icon<D> {
+
+		/**
+		 * The bound object to this icon. This binding will be used for elements such as sorting,
+		 * or can even provide additional information related to icon interactions.
+		 *
+		 * @return The bound object of the icon
+		 */
+		T binding();
+
 	}
 
 	/**
@@ -59,7 +96,7 @@ public interface Icon<T> {
 	 *
 	 * @param <T> The platform-based ItemStack typing
 	 */
-	interface IconBuilder<T> extends Builder<Icon<T>, IconBuilder<T>> {
+	interface IconBuilder<T> extends Builder<Icon<T>> {
 
 		/**
 		 * Sets the display of the icon to the following platform-based ItemStack.
@@ -80,6 +117,19 @@ public interface Icon<T> {
 		 * @return The current builder
 		 */
 		IconBuilder<T> listener(ClickProcessor processor);
+
+		IconBuilder<T> from(Icon<?> parent);
+
+		/**
+		 * Builds a which is bound to the instance given as a binding object. This object will be used for
+		 * operations such as sorting, and allows working with the source object represented through
+		 * a displayable item rather than parsing components of the display itself.
+		 *
+		 * @param binding The object to bind to the icon
+		 * @return A new icon built with the bound object
+		 * @param <E> The typing of the binding object
+		 */
+		<E> Icon.Binding<T, E> build(Supplier<E> binding);
 
 	}
 

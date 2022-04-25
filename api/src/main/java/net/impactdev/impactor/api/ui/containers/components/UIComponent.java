@@ -25,7 +25,10 @@
 
 package net.impactdev.impactor.api.ui.containers.components;
 
+import net.impactdev.impactor.api.ui.containers.icons.ClickProcessor;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
+import net.impactdev.impactor.api.utilities.context.ContextualMapping;
 import net.kyori.adventure.text.Component;
 
 public interface UIComponent<T extends UIComponent<T>> {
@@ -57,4 +60,37 @@ public interface UIComponent<T extends UIComponent<T>> {
      */
     T readonly(boolean state);
 
+    /**
+     * Registers a universal click processor that applies to the entire container. This is different
+     * from an {@link Icon icon's} set of listeners, and is meant to cover cases outside normal icon listening.
+     *
+     * @param processor A processor for handling global click events
+     * @return The updated builder
+     */
+    T onClick(ClickProcessor processor);
+
+    /**
+     * Registers a close handler for the UI that is capable of controlling the close of the UI.
+     * If the UI is closed, but the call to this handler returns false, the action will be denied,
+     * and the UI will be reopened to the client.
+     *
+     * @param processor The handler for the action
+     * @return The updated builder
+     */
+    T onClose(CloseProcessor processor);
+
+    @FunctionalInterface
+    interface CloseProcessor {
+
+        /**
+         * Processes the action of a UI close, providing a set of contextual data that might be useful
+         * to the close. This method then additionally allows for the handler to determine if the close
+         * should indeed be allowed. If disallowed, the UI will reopen to the client on the next tick.
+         *
+         * @param context The context data regarding the current viewable inventory
+         * @return <code>true</code> to allow the UI to close, false otherwise
+         */
+        boolean handle(ContextualMapping context);
+
+    }
 }

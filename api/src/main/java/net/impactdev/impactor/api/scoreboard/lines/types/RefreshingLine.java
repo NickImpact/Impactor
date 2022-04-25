@@ -31,7 +31,7 @@ import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
 import net.impactdev.impactor.api.scoreboard.effects.RGBFadeEffect;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 import net.kyori.adventure.text.Component;
 
 import java.util.concurrent.TimeUnit;
@@ -50,7 +50,7 @@ public interface RefreshingLine extends ScoreboardLine, Updatable {
      */
     TimeConfiguration getTimingConfig();
 
-    interface RefreshingLineBuilder extends Builder<RefreshingLine, RefreshingLineBuilder> {
+    interface RefreshingLineBuilder extends Builder<RefreshingLine> {
 
         /**
          * Indicates a set of raw text that will be parsed into a {@link Component} every

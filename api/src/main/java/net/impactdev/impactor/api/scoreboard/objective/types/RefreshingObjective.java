@@ -29,7 +29,7 @@ import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +37,7 @@ public interface RefreshingObjective extends ScoreboardObjective, Updatable {
 
     TimeConfiguration getTimingConfig();
 
-    interface RefreshingObjectiveBuilder extends Builder<RefreshingObjective, RefreshingObjectiveBuilder> {
+    interface RefreshingObjectiveBuilder extends Builder<RefreshingObjective> {
 
         RefreshingObjectiveBuilder text(String raw);
 

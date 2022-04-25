@@ -23,23 +23,38 @@
  *
  */
 
-package net.impactdev.impactor.api.ui.containers.pagination.sectioned;
+package net.impactdev.impactor.sponge.ui.containers.sectioned.sections;
 
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
-import net.kyori.adventure.util.TriState;
+import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdaterType;
+import net.impactdev.impactor.common.ui.pagination.sectioned.pages.AbstractSectionedPage;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-import java.util.List;
 import java.util.Map;
 
-public interface SectionedPage {
+public class SpongeSectionedPage extends AbstractSectionedPage {
 
-    Map<Integer, Icon<?>> icons();
+    public SpongeSectionedPage(Map<Integer, Icon<?>> icons) {
+        super(icons);
+    }
 
-    Map<Integer, Icon<?>> drawn();
+    @Override
+    protected Icon<?> updater(Section parent, PageUpdater updater, int page, int target) {
+        return Icon.builder(ItemStack.class)
+                .display(() -> (ItemStack) updater.provider().provide(target))
+                .listener(processor -> {
+                    if (!updater.type().equals(PageUpdaterType.CURRENT)) {
+                        if (target == page) {
+                            return false;
+                        }
 
-    void draw(SectionedPagination.Section parent, List<PageUpdater> updaters, TriState style, int page, int maxPages);
-
-    void refresh();
+                        parent.page(target);
+                    }
+                    return false;
+                })
+                .build();
+    }
 
 }

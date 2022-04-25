@@ -28,7 +28,7 @@ package net.impactdev.impactor.api.configuration;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.configuration.keys.EnduringKey;
 import net.impactdev.impactor.api.configuration.loader.KeyProvider;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 
 import java.nio.file.Path;
 
@@ -62,7 +62,7 @@ public interface Config {
 		return Impactor.getInstance().getRegistry().createBuilder(ConfigBuilder.class);
 	}
 
-	interface ConfigBuilder extends Builder<Config, ConfigBuilder> {
+	interface ConfigBuilder extends Builder<Config> {
 
 		/**
 		 * The class that will provide the config keys. This class must be marked

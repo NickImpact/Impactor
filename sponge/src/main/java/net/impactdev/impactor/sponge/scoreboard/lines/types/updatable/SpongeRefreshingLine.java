@@ -79,7 +79,7 @@ public class SpongeRefreshingLine extends AbstractSpongeSBLine implements Refres
 
     @Override
     public Component getText() {
-        MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
+        MessageService service = Impactor.getInstance().getRegistry().get(MessageService.class);
         Component result = service.parse(this.raw, this.sources);
         for(FrameEffect effect : this.effects) {
             result = effect.translate(result);
@@ -184,14 +184,6 @@ public class SpongeRefreshingLine extends AbstractSpongeSBLine implements Refres
         @Override
         public RefreshingLineBuilder sources(PlaceholderSources sources) {
             this.sources = sources;
-            return this;
-        }
-
-        @Override
-        public RefreshingLineBuilder from(RefreshingLine input) {
-            this.raw = ((SpongeRefreshingLine) input).raw;
-            this.timings = input.getTimingConfig();
-
             return this;
         }
 

@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.api.scoreboard.effects;
 
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
@@ -61,7 +61,7 @@ public class RGBFadeEffect implements FrameEffect {
 
             int index = 0;
             for(char c : content.toCharArray()) {
-                TextColor color = TextColor.color(HSVLike.of((hue + (index++ * spacer)) % 360.0F / 360.0F, 1.0F, 1.0F));
+                TextColor color = TextColor.color(HSVLike.hsvLike((hue + (index++ * spacer)) % 360.0F / 360.0F, 1.0F, 1.0F));
                 Component next = Component.text(c).color(color);
                 builder.append(next);
             }
@@ -76,7 +76,7 @@ public class RGBFadeEffect implements FrameEffect {
         return new RGBFadeEffectBuilder();
     }
 
-    public static class RGBFadeEffectBuilder implements Builder<RGBFadeEffect, RGBFadeEffectBuilder> {
+    public static class RGBFadeEffectBuilder implements Builder<RGBFadeEffect> {
 
         private int frames;
         private int step;
@@ -103,11 +103,6 @@ public class RGBFadeEffect implements FrameEffect {
 
         public RGBFadeEffectBuilder start(int start) {
             this.start = start;
-            return this;
-        }
-
-        @Override
-        public RGBFadeEffectBuilder from(RGBFadeEffect input) {
             return this;
         }
 

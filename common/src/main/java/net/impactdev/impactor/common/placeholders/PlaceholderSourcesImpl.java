@@ -43,6 +43,28 @@ public class PlaceholderSourcesImpl implements PlaceholderSources {
     }
 
     @Override
+    public <T> PlaceholderSources append(Class<T> type, Supplier<T> supplier) {
+        return this.append(TypeToken.get(type), supplier);
+    }
+
+    @Override
+    public <T> PlaceholderSources append(TypeToken<T> type, Supplier<T> supplier) {
+        this.sources.put(type, supplier);
+        return this;
+    }
+
+    @Override
+    public <T> PlaceholderSources appendIfAbsent(Class<T> type, Supplier<T> supplier) {
+        return this.appendIfAbsent(TypeToken.get(type), supplier);
+    }
+
+    @Override
+    public <T> PlaceholderSources appendIfAbsent(TypeToken<T> type, Supplier<T> supplier) {
+        this.sources.putIfAbsent(type, supplier);
+        return this;
+    }
+
+    @Override
     public <T> Optional<T> getSource(Class<T> type) {
         return this.getSource(TypeToken.get(type));
     }
@@ -74,13 +96,18 @@ public class PlaceholderSourcesImpl implements PlaceholderSources {
 
         @Override
         public <T> SourceBuilder appendIfAbsent(Class<T> type, Supplier<T> supplier) {
-            this.sources.putIfAbsent(TypeToken.get(type), supplier);
+            return this.appendIfAbsent(TypeToken.get(type), supplier);
+        }
+
+        @Override
+        public <T> SourceBuilder appendIfAbsent(TypeToken<T> type, Supplier<T> supplier) {
+            this.sources.putIfAbsent(type, supplier);
             return this;
         }
 
         @Override
-        public SourceBuilder from(PlaceholderSources input) {
-            this.sources.putAll(((PlaceholderSourcesImpl) input).sources);
+        public SourceBuilder from(PlaceholderSources sources) {
+            this.sources.putAll(((PlaceholderSourcesImpl) sources).sources);
             return this;
         }
 

@@ -26,13 +26,14 @@
 package net.impactdev.impactor.api.ui.containers;
 
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.builders.Required;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.components.UIComponent;
 import net.impactdev.impactor.api.ui.containers.detail.RefreshDetail;
 import net.impactdev.impactor.api.ui.containers.detail.RefreshTypes;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.Nullable;
 
@@ -109,7 +110,7 @@ public interface ImpactorUI {
 		return Impactor.getInstance().getRegistry().createBuilder(UIBuilder.class);
 	}
 
-	interface UIBuilder extends UIComponent<UIBuilder>, Builder<ImpactorUI, UIBuilder> {
+	interface UIBuilder extends UIComponent<UIBuilder>, Builder<ImpactorUI> {
 
 		/**
 		 * Sets the key referencing the provider of this pagination. This key provides both a namespace
@@ -121,6 +122,8 @@ public interface ImpactorUI {
 		 */
 		@Required
 		UIBuilder provider(Key key);
+
+		UIBuilder from(ImpactorUI parent);
 
 	}
 

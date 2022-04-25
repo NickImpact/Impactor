@@ -29,14 +29,16 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
 import net.impactdev.impactor.api.ui.containers.ImpactorUI;
+import net.impactdev.impactor.api.ui.containers.components.UIComponent;
 import net.impactdev.impactor.api.ui.containers.detail.RefreshDetail;
 import net.impactdev.impactor.api.ui.containers.detail.RefreshType;
 import net.impactdev.impactor.api.ui.containers.detail.RefreshTypes;
 import net.impactdev.impactor.api.ui.containers.icons.ClickContext;
+import net.impactdev.impactor.api.ui.containers.icons.ClickProcessor;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
-import net.impactdev.impactor.api.utilities.context.Provider;
+import net.impactdev.impactor.api.utilities.context.ContextualMapping;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.ui.containers.components.LayoutTranslator;
@@ -45,6 +47,7 @@ import net.impactdev.impactor.sponge.ui.containers.components.SlotContext;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.item.inventory.Container;
@@ -54,6 +57,8 @@ import org.spongepowered.api.item.inventory.menu.ClickType;
 import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.Ticks;
 import org.spongepowered.math.vector.Vector2i;
 import org.spongepowered.math.vector.Vector4i;
 
@@ -67,9 +72,12 @@ public class SpongeUI implements ImpactorUI {
     private final Key namespace;
     private final Component title;
     private final Layout layout;
+    private final boolean readonly;
 
     private final InventoryMenu view;
     private final SlotContext context;
+    private final ClickProcessor clickProcessor;
+    private final UIComponent.CloseProcessor closeProcessor;
 
     private SpongeUI(SpongeUIBuilder builder) {
         this.namespace = builder.namespace;
@@ -78,7 +86,7 @@ public class SpongeUI implements ImpactorUI {
         this.context = LayoutTranslator.translate(this.layout);
 
         this.view = InventoryMenu.of(ViewableInventory.builder()
-                .type(SizeMapping.from(this.layout.dimensions().x()).reference())
+                .type(SizeMapping.from(this.layout.dimensions().y()).reference())
                 .slots(this.context.slots(), 0)
                 .completeStructure()
                 .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
@@ -86,8 +94,12 @@ public class SpongeUI implements ImpactorUI {
                 .build()
         );
 
+        this.clickProcessor = builder.clickProcessor;
+        this.closeProcessor = builder.closeHandler;
+
         this.view.setTitle(this.title = builder.title);
-        this.view.setReadOnly(builder.readonly);
+        this.view.setReadOnly(this.readonly = builder.readonly);
+
         this.view.registerSlotClick((cause, container, slot, index, clickType) -> {
             try {
                 ServerPlayer source = cause.first(ServerPlayer.class)
@@ -109,12 +121,14 @@ public class SpongeUI implements ImpactorUI {
                         allow.set(false);
                     }
                 }));
+
+                allow.set(this.clickProcessor.process(context) && allow.get());
                 return allow.get();
             } catch (Throwable error) {
                 PrettyPrinter printer = new PrettyPrinter(80);
                 printer.newline().add("Exception occurred during click processing!").center().newline();
                 printer.hr();
-                printer.add("Affected Pagination: " + this.namespace.asString());
+                printer.add("Affected UI: " + this.namespace.asString());
                 printer.add("Context:");
                 printer.kv("Title", ComponentManipulator.flatten(this.title));
                 printer.kv("Read Only", builder.readonly);
@@ -127,6 +141,40 @@ public class SpongeUI implements ImpactorUI {
                 printer.add(error);
                 printer.log(SpongeImpactorPlugin.instance().logger(), PrettyPrinter.Level.ERROR, "UI");
                 return false;
+            }
+        });
+        this.view.registerClose((cause, container) -> {
+            try {
+                ServerPlayer source = cause.first(ServerPlayer.class)
+                        .orElseThrow(() -> new IllegalStateException("Close action without player cause"));
+
+                ContextualMapping mapping = new ContextualMapping();
+                mapping.put(Cause.class, cause);
+                mapping.put(Container.class, container);
+                mapping.put(ServerPlayer.class, source);
+
+                if(!builder.closeHandler.handle(mapping)) {
+                    Task task = Task.builder()
+                            .delay(Ticks.single())
+                            .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
+                            .execute(() -> this.open(PlatformPlayer.from(source)))
+                            .build();
+                    Sponge.server().scheduler().submit(task);
+                }
+            } catch (Throwable e) {
+                PrettyPrinter printer = new PrettyPrinter(80);
+                printer.newline().add("Exception occurred during close processing!").center().newline();
+                printer.hr();
+                printer.add("Affected UI: " + this.namespace.asString());
+                printer.add("Context:");
+                printer.kv("Title", ComponentManipulator.flatten(this.title));
+                printer.kv("Read Only", builder.readonly);
+                printer.newline();
+                printer.hr();
+                printer.newline();
+                printer.add("The stacktrace of the error is detailed below:");
+                printer.add(e);
+                printer.log(SpongeImpactorPlugin.instance().logger(), PrettyPrinter.Level.ERROR, "UI");
             }
         });
     }
@@ -143,14 +191,13 @@ public class SpongeUI implements ImpactorUI {
 
     @Override
     public void set(@Nullable Icon<?> icon, int slot) {
-        // TODO - In the event of a set, listeners are not updated via the layout,
-        // TODO - so replaced icons will still be called rather than the newly set icon.
-        // TODO - Change this
         if(icon == null) {
             this.view.inventory().set(slot, ItemStack.empty());
+            this.context.track(slot, null);
         } else {
             Icon<ItemStack> translated = (Icon<ItemStack>) icon;
             this.view.inventory().set(slot, translated.display().provide());
+            this.context.track(slot, icon);
         }
     }
 
@@ -174,7 +221,7 @@ public class SpongeUI implements ImpactorUI {
     public void refresh(RefreshDetail detail) {
         RefreshType type = detail.type();
         if(type == RefreshTypes.SLOT_INDEX) {
-            int position = detail.context().require(Integer.class).instance();
+            int position = detail.context().require(Integer.class);
             this.context.locate(position)
                     .map(icon -> (Icon<ItemStack>) icon)
                     .ifPresent(icon -> {
@@ -182,7 +229,6 @@ public class SpongeUI implements ImpactorUI {
                     });
         } else if(type == RefreshTypes.SLOT_POS) {
             int position = detail.context().get(Vector2i.class)
-                    .map(Provider::instance)
                     .map(pos -> pos.x() + (9 * pos.y()))
                     .orElseThrow(NoSuchElementException::new);
             this.context.locate(position)
@@ -191,7 +237,7 @@ public class SpongeUI implements ImpactorUI {
                         this.view.inventory().set(position, icon.display().provide());
                     });
         } else if(type == RefreshTypes.GRID) {
-            Vector4i base = detail.context().require(Vector4i.class).instance();
+            Vector4i base = detail.context().require(Vector4i.class);
             Vector2i grid = base.toVector2();
             Vector2i offset = new Vector2i(base.z(), base.w());
 
@@ -228,6 +274,9 @@ public class SpongeUI implements ImpactorUI {
         private Layout layout;
         private boolean readonly = true;
 
+        private ClickProcessor clickProcessor = context -> false;
+        private CloseProcessor closeHandler = context -> true;
+
         @Override
         public UIBuilder provider(Key key) {
             this.namespace = key;
@@ -253,7 +302,26 @@ public class SpongeUI implements ImpactorUI {
         }
 
         @Override
+        public UIBuilder onClick(ClickProcessor processor) {
+            this.clickProcessor = processor;
+            return this;
+        }
+
+        @Override
+        public UIBuilder onClose(CloseProcessor processor) {
+            this.closeHandler = processor;
+            return this;
+        }
+
+        @Override
         public UIBuilder from(ImpactorUI input) {
+            SpongeUI parent = (SpongeUI) input;
+            this.namespace = input.namespace();
+            this.title = parent.title;
+            this.layout = parent.layout;
+            this.readonly = parent.readonly;
+            this.clickProcessor = parent.clickProcessor;
+            this.closeHandler = parent.closeProcessor;
             return this;
         }
 

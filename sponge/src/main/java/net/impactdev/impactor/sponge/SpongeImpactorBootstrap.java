@@ -27,14 +27,15 @@ package net.impactdev.impactor.sponge;
 
 import com.google.inject.Injector;
 import net.impactdev.impactor.api.dependencies.classpath.ClassPathAppender;
+import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.scheduler.SchedulerAdapter;
 import net.impactdev.impactor.common.plugin.ImpactorBootstrap;
 import net.impactdev.impactor.common.plugin.classpath.JarInJarClassPathAppender;
 import net.impactdev.impactor.launcher.LauncherBootstrap;
 import net.impactdev.impactor.sponge.launcher.LaunchParameters;
-import net.impactdev.impactor.sponge.logging.SpongeLogger;
 import net.impactdev.impactor.sponge.scheduler.SpongeSchedulerAdapter;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
@@ -73,7 +74,7 @@ public class SpongeImpactorBootstrap implements ImpactorBootstrap, LauncherBoots
         Game game = injector.getInstance(Game.class);
 
         this.pluginContainer = injector.getInstance(PluginContainer.class);
-        this.logger = new SpongeLogger(injector.getInstance(org.apache.logging.log4j.Logger.class));
+        this.logger = new Log4jLogger(injector.getInstance(Logger.class));
         this.scheduler = new SpongeSchedulerAdapter(game, this.pluginContainer);
         this.appender = new JarInJarClassPathAppender(this.getClass().getClassLoader());
         this.plugin = new SpongeImpactorPlugin(this);

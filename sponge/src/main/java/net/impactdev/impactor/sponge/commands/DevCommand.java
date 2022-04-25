@@ -32,7 +32,7 @@ import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.api.ui.containers.icons.DisplayProvider;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
-import net.impactdev.impactor.api.ui.containers.pagination.async.AsyncPagination;
+import net.impactdev.impactor.api.ui.containers.pagination.Pagination;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdaterType;
@@ -55,6 +55,7 @@ import org.spongepowered.math.vector.Vector2i;
 
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -68,7 +69,7 @@ public class DevCommand {
                             ServerPlayer target = cause.first(ServerPlayer.class)
                                     .orElseThrow(() -> new CommandException(Component.text("Can only query against a player!")));
 
-                            MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
+                            MessageService service = Impactor.getInstance().getRegistry().get(MessageService.class);
                             cause.audience().sendMessage(service.parse("&7Opening Sectioned UI Test... "));
 
                             Icon<ItemStack> border = Icon.builder(ItemStack.class)
@@ -90,6 +91,7 @@ public class DevCommand {
                                     )
                                     .viewer(PlatformPlayer.from(target))
                                     .section()
+                                    .synchronous()
                                     .dimensions(1, 4)
                                     .offset(Vector2i.ONE)
                                     .contents(this.generate(5))
@@ -113,6 +115,7 @@ public class DevCommand {
                                     )
                                     .complete()
                                     .section()
+                                    .synchronous()
                                     .dimensions(5, 2)
                                     .offset(Vector2i.from(3, 1))
                                     .contents(this.generate(20))
@@ -135,6 +138,7 @@ public class DevCommand {
                                             .build()
                                     )
                                     .complete()
+                                    .onClose(ctx -> true)
                                     .build();
 
                             pagination.open();
@@ -148,7 +152,7 @@ public class DevCommand {
                             ServerPlayer target = cause.first(ServerPlayer.class)
                                     .orElseThrow(() -> new CommandException(Component.text("Can only query against a player!")));
 
-                            MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
+                            MessageService service = Impactor.getInstance().getRegistry().get(MessageService.class);
                             cause.audience().sendMessage(service.parse("&7Opening Async UI Test... "));
 
                             Icon<ItemStack> border = Icon.builder(ItemStack.class)
@@ -158,7 +162,8 @@ public class DevCommand {
                                             .build()
                                     ))
                                     .build();
-                            AsyncPagination pagination = AsyncPagination.builder()
+
+                            Pagination pagination = Pagination.builder()
                                     .provider(Key.key("impactor:async-test"))
                                     .viewer(PlatformPlayer.from(target))
                                     .title(MiniMessage.miniMessage().deserialize("<gradient:red:yellow>Async Pagination Test</gradient>"))
@@ -169,8 +174,9 @@ public class DevCommand {
                                             .slots(border, 45, 53)
                                             .build()
                                     )
-                                    .accumulator(CompletableFuture.completedFuture(Lists.newArrayList()))
                                     .zone(Vector2i.from(7, 3), Vector2i.ONE)
+                                    .asynchronous()
+                                    .accumulator(CompletableFuture.completedFuture(Lists.newArrayList()))
                                     .build();
                             pagination.open();
                             return CommandResult.success();
@@ -183,7 +189,7 @@ public class DevCommand {
                             ServerPlayer target = cause.first(ServerPlayer.class)
                                     .orElseThrow(() -> new CommandException(Component.text("Can only query against a player!")));
 
-                            MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
+                            MessageService service = Impactor.getInstance().getRegistry().get(MessageService.class);
                             cause.audience().sendMessage(service.parse("&7Opening Async UI Test... "));
 
                             Icon<ItemStack> border = Icon.builder(ItemStack.class)
@@ -193,7 +199,7 @@ public class DevCommand {
                                             .build()
                                     ))
                                     .build();
-                            AsyncPagination pagination = AsyncPagination.builder()
+                            Pagination pagination = Pagination.builder()
                                     .provider(Key.key("impactor:async-test"))
                                     .viewer(PlatformPlayer.from(target))
                                     .title(MiniMessage.miniMessage().deserialize("<gradient:red:yellow>Async Pagination Test</gradient>"))
@@ -204,6 +210,8 @@ public class DevCommand {
                                             .slots(border, 45, 53)
                                             .build()
                                     )
+                                    .zone(Vector2i.from(7, 3), Vector2i.ONE)
+                                    .asynchronous()
                                     .accumulator(CompletableFuture.supplyAsync(() -> {
                                         try {
                                             Thread.sleep(6000);
@@ -214,7 +222,6 @@ public class DevCommand {
 
                                         return Lists.newArrayList();
                                     }))
-                                    .zone(Vector2i.from(7, 3), Vector2i.ONE)
                                     .build();
                             pagination.open();
                             return CommandResult.success();
@@ -239,6 +246,8 @@ public class DevCommand {
                     .build()
             );
         }
+
         return results;
     }
+
 }

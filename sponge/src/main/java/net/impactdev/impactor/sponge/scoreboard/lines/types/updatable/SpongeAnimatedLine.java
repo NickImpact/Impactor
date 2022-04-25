@@ -225,11 +225,6 @@ public class SpongeAnimatedLine extends AbstractSpongeSBLine implements Animated
         }
 
         @Override
-        public AnimatedLine.AnimatedBuilder from(AnimatedLine input) {
-            return this;
-        }
-
-        @Override
         public AnimatedLine build() {
             Preconditions.checkArgument(this.frames.size() > 0);
             Preconditions.checkArgument(this.timing != null);

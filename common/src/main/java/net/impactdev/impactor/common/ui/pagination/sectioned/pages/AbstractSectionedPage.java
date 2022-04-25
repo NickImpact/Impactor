@@ -23,11 +23,12 @@
  *
  */
 
-package net.impactdev.impactor.common.ui.pagination.sectioned;
+package net.impactdev.impactor.common.ui.pagination.sectioned.pages;
 
 import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
-import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPage;
+import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
+import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.SectionedPage;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
 import net.kyori.adventure.util.TriState;
@@ -55,13 +56,11 @@ public abstract class AbstractSectionedPage implements SectionedPage {
     }
 
     @Override
-    public void refresh() {
-
-    }
+    public void refresh() {}
 
     @Override
-    public void draw(SectionedPagination.Section parent, List<PageUpdater> updaters,
-                                      TriState style, int page, int maxPages) {
+    public void draw(Section parent, List<PageUpdater> updaters,
+                     TriState style, int page, int maxPages) {
         this.drawn = Maps.newHashMap();
         updaters.forEach(updater -> {
             switch (updater.type()) {
@@ -87,6 +86,6 @@ public abstract class AbstractSectionedPage implements SectionedPage {
         this.drawn.putAll(this.icons);
     }
 
-    protected abstract Icon<?> updater(SectionedPagination.Section parent, PageUpdater updater, int page, int target);
+    protected abstract Icon<?> updater(Section parent, PageUpdater updater, int page, int target);
 
 }

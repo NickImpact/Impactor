@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.api.ui.containers.pagination.updaters;
 
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 
 public final class PageUpdater {
 
@@ -55,7 +55,7 @@ public final class PageUpdater {
         return new PageUpdaterBuilder();
     }
 
-    public static class PageUpdaterBuilder implements Builder<PageUpdater, PageUpdaterBuilder> {
+    public static class PageUpdaterBuilder implements Builder<PageUpdater> {
 
         private PageUpdaterType type;
         private int slot;
@@ -73,11 +73,6 @@ public final class PageUpdater {
 
         public PageUpdaterBuilder provider(UpdaterProvider<?> provider) {
             this.provider = provider;
-            return this;
-        }
-
-        @Override
-        public PageUpdaterBuilder from(PageUpdater input) {
             return this;
         }
 

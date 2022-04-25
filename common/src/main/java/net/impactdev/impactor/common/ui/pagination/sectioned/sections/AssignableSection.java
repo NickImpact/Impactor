@@ -23,21 +23,16 @@
  *
  */
 
-package net.impactdev.impactor.api.ui.containers.pagination;
+package net.impactdev.impactor.common.ui.pagination.sectioned.sections;
 
-import net.impactdev.impactor.api.ui.containers.icons.Icon;
-import net.impactdev.impactor.api.ui.containers.layouts.Layout;
-import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
+import net.impactdev.impactor.common.ui.pagination.sectioned.AbstractSectionedPagination;
 
-import java.util.List;
-import java.util.Map;
+public abstract class AssignableSection {
 
-public interface Page<T> {
+    protected AbstractSectionedPagination parent;
 
-    T view();
-
-    Map<Integer, Icon<?>> icons();
-
-    void draw(Pagination parent, Layout layout, List<PageUpdater> updaters, int page, int maxPages);
+    public void assignTo(AbstractSectionedPagination parent) {
+        this.parent = parent;
+    }
 
 }

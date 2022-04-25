@@ -123,11 +123,6 @@ public class ConfigMaintainer implements Config {
         }
 
         @Override
-        public ConfigBuilder from(Config input) {
-            return this;
-        }
-
-        @Override
         public Config build() {
             return new ConfigMaintainer(this.path, this.supply, this.provider);
         }

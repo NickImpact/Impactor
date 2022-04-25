@@ -23,11 +23,11 @@
  *
  */
 
-package net.impactdev.impactor.sponge.ui.containers;
+package net.impactdev.impactor.sponge.ui.containers.pagination.components;
 
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
-import net.impactdev.impactor.api.ui.containers.pagination.Page;
+import net.impactdev.impactor.api.ui.containers.pagination.components.Page;
 import net.impactdev.impactor.api.ui.containers.pagination.Pagination;
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdaterType;
@@ -95,6 +95,17 @@ public final class SpongePage implements Page<ViewableInventory> {
 
     public ViewableInventory view() {
         return view;
+    }
+
+    @Override
+    public Layout toLayout() {
+        return Layout.builder()
+                .custom(builder -> {
+                    for(Map.Entry<Integer, Icon<?>> entry : this.icons.entrySet()) {
+                        builder.slot(entry.getValue(), entry.getKey());
+                    }
+                })
+                .build();
     }
 
     public Map<Integer, Icon<?>> icons() {

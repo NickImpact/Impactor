@@ -29,17 +29,14 @@ import com.google.common.collect.ImmutableSet;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
-import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPage;
+import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
-import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
-import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
+import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
+import net.impactdev.impactor.common.ui.pagination.sectioned.sections.AssignableSection;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.util.TriState;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -51,13 +48,13 @@ public abstract class AbstractSectionedPagination implements SectionedPagination
     protected final PlatformPlayer viewer;
     protected final Set<Section> sections;
 
-    protected AbstractSectionedPagination(Key provider, PlatformPlayer viewer, Layout layout, Set<Section> sections) {
-        this.provider = provider;
-        this.viewer = viewer;
-        this.layout = layout;
-        this.sections = sections;
+    protected AbstractSectionedPagination(ImpactorSectionedPaginationBuilder builder) {
+        this.provider = builder.provider;
+        this.viewer = builder.viewer;
+        this.layout = builder.layout;
+        this.sections = builder.sections;
         for(Section section : sections) {
-            ((AbstractSection) section).assignTo(this);
+            ((AssignableSection) section).assignTo(this);
         }
     }
 
@@ -72,7 +69,7 @@ public abstract class AbstractSectionedPagination implements SectionedPagination
     }
 
     protected Set<Section> sections() {
-        return ImmutableSet.copyOf(sections);
+        return ImmutableSet.copyOf(this.sections);
     }
 
     @Override
@@ -86,6 +83,8 @@ public abstract class AbstractSectionedPagination implements SectionedPagination
                 .findAny();
     }
 
+    public abstract void setUnsafe(@Nullable Icon<?> icon, int slot);
+
     private boolean greaterOrEqual(Vector2i query, Vector2i compare) {
         return query.x() >= compare.x() && query.y() >= compare.y();
     }
@@ -94,77 +93,4 @@ public abstract class AbstractSectionedPagination implements SectionedPagination
         return query.x() <= compare.x() && query.y() <= compare.y();
     }
 
-    public static abstract class AbstractSection implements Section {
-
-        private final Vector2i min;
-        private final Vector2i max;
-
-        private final CircularLinkedList<SectionedPage> pages;
-        private final List<PageUpdater> updaters;
-        private final TriState style;
-
-        public AbstractSection(Vector2i min, Vector2i max, List<Icon<?>> icons, List<PageUpdater> updaters, TriState style) {
-            this.min = min;
-            this.max = max;
-
-            this.updaters = updaters;
-            this.style = style;
-            this.pages = this.draft(icons);
-        }
-
-        @Override
-        public Vector2i minimum() {
-            return this.min;
-        }
-
-        @Override
-        public Vector2i maximum() {
-            return this.max;
-        }
-
-        @Override
-        public CircularLinkedList<SectionedPage> pages() {
-            return this.pages;
-        }
-
-        protected abstract void assignTo(SectionedPagination parent);
-
-        protected CircularLinkedList<SectionedPage> draft(List<Icon<?>> icons) {
-            CircularLinkedList<SectionedPage> result = CircularLinkedList.of();
-
-            Vector2i zone = this.max.sub(this.min).add(Vector2i.ONE);
-            int max = zone.y() * zone.x();
-            int size = icons.size() / max + (icons.size() % max == 0 ? 0 : 1);
-
-            int slot = 0;
-            Map<Integer, Icon<?>> working = new HashMap<>();
-            for(Icon<?> icon : icons) {
-                if(slot < max) {
-                    int target = this.calculateTargetSlot(slot, zone, this.min);
-                    working.put(target, icon);
-                    ++slot;
-                } else {
-                    int target = this.calculateTargetSlot(0, zone, this.min);
-
-                    result.append(this.constructPage(this.updaters, this.style, result.size() + 1, size, working));
-                    working = new HashMap<>();
-                    working.put(target, icon);
-                    slot = 1;
-                }
-            }
-
-            if(!working.isEmpty()) {
-                result.append(this.constructPage(this.updaters, this.style, result.size() + 1, size, working));
-            }
-
-            if(result.empty()) {
-
-            }
-
-            return result;
-        }
-
-        protected abstract SectionedPage constructPage(List<PageUpdater> updaters, TriState style,
-                                              int index, int size, Map<Integer, Icon<?>> working);
-    }
 }

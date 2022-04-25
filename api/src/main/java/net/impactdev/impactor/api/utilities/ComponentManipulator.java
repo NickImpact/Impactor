@@ -27,24 +27,22 @@ package net.impactdev.impactor.api.utilities;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.flattener.ComponentFlattener;
+import net.kyori.adventure.text.flattener.FlattenerListener;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Supplier;
 
 public class ComponentManipulator {
 
+    private static final Supplier<ImpactorFlattener> listener = ImpactorFlattener::new;
+
     public static String flatten(Component component) {
-        StringBuilder result = new StringBuilder();
-        if(component instanceof TextComponent) {
-            result = new StringBuilder(((TextComponent) component).content());
-        }
-
-        if(component.children().isEmpty()) {
-            for(Component child : component.children()) {
-                result.append(flatten(child));
-            }
-        }
-
-        return result.toString();
+        ImpactorFlattener fl = listener.get();
+        ComponentFlattener.textOnly().flatten(component, fl);
+        return fl.result();
     }
 
     /**
@@ -65,6 +63,20 @@ public class ComponentManipulator {
         }
 
         return source;
+    }
+
+    public static class ImpactorFlattener implements FlattenerListener {
+
+        private final StringBuilder result = new StringBuilder();
+
+        @Override
+        public void component(@NotNull String text) {
+            this.result.append(text);
+        }
+
+        public String result() {
+            return this.result.toString();
+        }
     }
 
 }

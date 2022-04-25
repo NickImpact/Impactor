@@ -26,39 +26,42 @@
 package net.impactdev.impactor.api.ui.signs;
 
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.List;
 
-public interface SignQuery<T, P, M> {
+public interface SignQuery {
 
     String TEXT_FORMAT = "{\"text\":\"%s\"}";
     int action = 9;
 
-    List<T> getText();
+    List<Component> getText();
 
-    M getSignPosition();
+    Vector3i getSignPosition();
 
     boolean shouldReopenOnFailure();
 
     SignSubmission getSubmissionHandler();
 
-    void sendTo(P player);
+    void sendTo(PlatformPlayer player);
 
     @SuppressWarnings("unchecked")
-    static <T, P, M> SignQueryBuilder<T, P, M> builder() {
+    static SignQueryBuilder builder() {
         return Impactor.getInstance().getRegistry().createBuilder(SignQueryBuilder.class);
     }
 
-    interface SignQueryBuilder<T, P, M> extends Builder<SignQuery<T, P, M>, SignQueryBuilder<T, P, M>> {
+    interface SignQueryBuilder extends Builder<SignQuery> {
 
-        SignQueryBuilder<T, P, M> text(List<T> text);
+        SignQueryBuilder text(List<Component> text);
 
-        SignQueryBuilder<T, P, M> position(M position);
+        SignQueryBuilder position(Vector3i position);
 
-        SignQueryBuilder<T, P, M> reopenOnFailure(boolean state);
+        SignQueryBuilder reopenOnFailure(boolean state);
 
-        SignQueryBuilder<T, P, M> response(SignSubmission response);
+        SignQueryBuilder response(SignSubmission response);
 
     }
 

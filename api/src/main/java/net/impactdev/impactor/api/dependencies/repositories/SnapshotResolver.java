@@ -26,9 +26,9 @@
 package net.impactdev.impactor.api.dependencies.repositories;
 
 import com.google.common.base.Preconditions;
-import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.builders.Required;
 import net.impactdev.impactor.api.dependencies.Dependency;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 
 import java.net.URL;
 
@@ -61,7 +61,7 @@ public class SnapshotResolver {
         return new SnapshotResolverBuilder();
     }
 
-    public static class SnapshotResolverBuilder implements Builder<SnapshotResolver, SnapshotResolverBuilder> {
+    public static class SnapshotResolverBuilder implements Builder<SnapshotResolver> {
 
         private URL path;
         private Resolver resolver;
@@ -75,11 +75,6 @@ public class SnapshotResolver {
         @Required
         public SnapshotResolverBuilder resolver(Resolver resolver) {
             this.resolver = resolver;
-            return this;
-        }
-
-        @Override
-        public SnapshotResolverBuilder from(SnapshotResolver input) {
             return this;
         }
 

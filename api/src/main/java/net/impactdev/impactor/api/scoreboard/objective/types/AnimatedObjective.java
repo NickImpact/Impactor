@@ -26,14 +26,8 @@
 package net.impactdev.impactor.api.scoreboard.objective.types;
 
 import net.impactdev.impactor.api.scoreboard.components.ScoreboardAnimation;
-import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
-import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
-import net.impactdev.impactor.api.utilities.Builder;
-import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
-
-import java.util.concurrent.TimeUnit;
 
 public interface AnimatedObjective extends ScoreboardObjective, Updatable, ScoreboardAnimation {
 

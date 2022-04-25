@@ -215,11 +215,6 @@ public class SpongeAnimatedObjective extends AbstractSpongeObjective implements 
         }
 
         @Override
-        public AnimatedObjectiveBuilder from(AnimatedObjective input) {
-            return this;
-        }
-
-        @Override
         public AnimatedObjective build() {
             return new SpongeAnimatedObjective(this);
         }

@@ -92,12 +92,6 @@ public class SpongeListeningLine extends AbstractSpongeSBLine implements Listeni
         }
 
         @Override
-        public ListeningBuilder from(ListeningLine input) {
-            this.frame = ((SpongeListeningLine) input).frame;
-            return this;
-        }
-
-        @Override
         public ListeningLine build() {
             return new SpongeListeningLine(this);
         }

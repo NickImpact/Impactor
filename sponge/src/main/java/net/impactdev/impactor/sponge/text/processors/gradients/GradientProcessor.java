@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.sponge.text.processors.gradients;
 
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.sponge.text.processors.ComponentProcessor;
 import net.kyori.adventure.text.format.TextColor;
 
@@ -40,7 +40,7 @@ public abstract class GradientProcessor<T> implements ComponentProcessor<T> {
         this.colors = builder.colors;
     }
 
-    public static abstract class GradientProcessorBuilder<T extends GradientProcessor<?>> implements Builder<T, GradientProcessorBuilder<T>> {
+    public static abstract class GradientProcessorBuilder<T extends GradientProcessor<?>> implements Builder<T> {
 
         protected final LinkedList<TextColor> colors = new LinkedList<>();
 

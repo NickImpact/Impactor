@@ -28,7 +28,7 @@ package net.impactdev.impactor.api.ui.containers.layouts;
 import com.google.common.collect.ImmutableMap;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 import org.spongepowered.math.vector.Vector2i;
 
 import java.util.Optional;
@@ -46,7 +46,7 @@ public interface Layout {
 		return Impactor.getInstance().getRegistry().createBuilder(LayoutBuilder.class);
 	}
 
-	interface LayoutBuilder extends Builder<Layout, LayoutBuilder> {
+	interface LayoutBuilder extends Builder<Layout> {
 
 		/**
 		 * Determines the amount of rows that will make up this chest UI. This is bounded by a lower limit
@@ -232,6 +232,8 @@ public interface Layout {
 		 * @return The updated builder
 		 */
 		LayoutBuilder custom(Consumer<LayoutBuilder> consumer);
+
+		LayoutBuilder from(Layout layout);
 
 	}
 }

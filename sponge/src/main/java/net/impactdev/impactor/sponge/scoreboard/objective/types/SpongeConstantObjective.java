@@ -70,7 +70,7 @@ public class SpongeConstantObjective extends AbstractSpongeObjective implements 
 
         @Override
         public SpongeConstantObjectiveBuilder raw(String raw, PlaceholderSources sources) {
-            MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
+            MessageService service = Impactor.getInstance().getRegistry().get(MessageService.class);
             this.supplier = new LazyComponent(fallback -> service.parse(
                     raw,
                     PlaceholderSources.builder()
@@ -84,13 +84,6 @@ public class SpongeConstantObjective extends AbstractSpongeObjective implements 
         @Override
         public SpongeConstantObjectiveBuilder text(Component text) {
             this.supplier = new LazyComponent(fallback -> text);
-            return this;
-        }
-
-        @Override
-        public ConstantObjectiveBuilder from(ConstantObjective input) {
-            Preconditions.checkArgument(input instanceof SpongeConstantObjective);
-            this.supplier = ((SpongeConstantObjective) input).supplier;
             return this;
         }
 

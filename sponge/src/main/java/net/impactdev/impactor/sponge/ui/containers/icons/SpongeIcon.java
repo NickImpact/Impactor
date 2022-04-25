@@ -26,6 +26,7 @@
 package net.impactdev.impactor.sponge.ui.containers.icons;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.ui.containers.icons.ClickProcessor;
 import net.impactdev.impactor.api.ui.containers.icons.DisplayProvider;
@@ -34,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 public class SpongeIcon implements Icon<ItemStack> {
 
@@ -53,7 +55,28 @@ public class SpongeIcon implements Icon<ItemStack> {
 
     @Override
     public Set<ClickProcessor> listeners() {
-        return this.listeners;
+        return ImmutableSet.copyOf(this.listeners);
+    }
+
+    @Override
+    public Icon<ItemStack> listener(ClickProcessor processor) {
+        this.listeners.add(processor);
+        return this;
+    }
+
+    public static class SpongeBinding<T> extends SpongeIcon implements Icon.Binding<ItemStack, T> {
+
+        private final Supplier<T> binding;
+
+        private SpongeBinding(SpongeIconBuilder builder, Supplier<T> binding) {
+            super(builder);
+            this.binding = binding;
+        }
+
+        @Override
+        public T binding() {
+            return this.binding.get();
+        }
     }
 
     public static class SpongeIconBuilder implements Icon.IconBuilder<ItemStack> {
@@ -74,8 +97,13 @@ public class SpongeIcon implements Icon<ItemStack> {
         }
 
         @Override
-        public IconBuilder<ItemStack> from(Icon<ItemStack> input) {
-            return this;
+        public IconBuilder<ItemStack> from(Icon<?> parent) {
+            return null;
+        }
+
+        @Override
+        public <E> Binding<ItemStack, E> build(Supplier<E> binding) {
+            return new SpongeBinding<>(this, binding);
         }
 
         @Override

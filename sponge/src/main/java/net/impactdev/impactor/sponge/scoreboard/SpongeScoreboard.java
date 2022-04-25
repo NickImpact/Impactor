@@ -70,11 +70,11 @@ public class SpongeScoreboard implements ImpactorScoreboard<ServerPlayer> {
         this.visibility = TriState.NOT_SET;
     }
 
-    private SpongeScoreboard(SpongeScoreboardBuilder builder, @NonNull UUID source) {
+    private SpongeScoreboard(SpongeScoreboard parent, @NonNull UUID source) {
         Preconditions.checkNotNull(source);
 
-        this.objective = (AbstractSpongeObjective) builder.objective;
-        this.lines = builder.lines;
+        this.objective = parent.objective;
+        this.lines = parent.lines;
         this.source = source;
         this.visibility = TriState.FALSE;
         this.objective.consumeFocus(this.player().get());
@@ -109,7 +109,7 @@ public class SpongeScoreboard implements ImpactorScoreboard<ServerPlayer> {
 
     @Override
     public ImpactorScoreboard<ServerPlayer> assignTo(ServerPlayer user) {
-        return new SpongeScoreboardBuilder().from(this).build(user);
+        return new SpongeScoreboard(this, user.uniqueId());
     }
 
     @Override
@@ -193,23 +193,6 @@ public class SpongeScoreboard implements ImpactorScoreboard<ServerPlayer> {
         }
 
         @Override
-        public SpongeScoreboardBuilder from(ImpactorScoreboard<ServerPlayer> input) {
-            this.objective = input.getTitle().copy();
-            this.lines = input.getLines().stream()
-                    .map(line -> new Tuple<>(line, line.copy()))
-                    .map(pair -> ((AbstractSpongeSBLine) pair.getSecond()).assignScore(((AbstractSpongeObjective) this.objective).resolve(), pair.getFirst().getScore()))
-                    .collect(Collectors.toList());
-            return this;
-        }
-
-        private SpongeScoreboard build(ServerPlayer delegate) {
-            Preconditions.checkNotNull(this.objective);
-            Preconditions.checkNotNull(delegate);
-
-            return new SpongeScoreboard(this, delegate.uniqueId());
-        }
-
-        @Override
         public SpongeScoreboard build() {
             throw new UnsupportedOperationException("Cannot build from this builder! Valid via an objective configuration");
         }
@@ -233,11 +216,6 @@ public class SpongeScoreboard implements ImpactorScoreboard<ServerPlayer> {
         @Override
         public LinesComponentBuilder<ServerPlayer> lines(Map<ScoreboardLine, Integer> lines) {
             lines.forEach(this::line);
-            return this;
-        }
-
-        @Override
-        public LinesComponentBuilder<ServerPlayer> from(ImpactorScoreboard<ServerPlayer> input) {
             return this;
         }
 

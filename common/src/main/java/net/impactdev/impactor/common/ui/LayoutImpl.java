@@ -116,7 +116,7 @@ public class LayoutImpl implements Layout {
             for(int i = (column - 1); i < (9 * this.rows); i += 9) {
                 this.slot(icon, i);
             }
-            return null;
+            return this;
         }
 
         @Override
@@ -169,6 +169,7 @@ public class LayoutImpl implements Layout {
 
         @Override
         public LayoutBuilder from(Layout input) {
+            this.size(input.dimensions().y());
             input.elements().forEach((key, value) -> this.slot(value, key));
             return this;
         }

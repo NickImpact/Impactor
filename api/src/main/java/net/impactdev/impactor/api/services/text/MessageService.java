@@ -27,6 +27,7 @@ package net.impactdev.impactor.api.services.text;
 
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.services.Service;
+import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collections;
@@ -38,10 +39,8 @@ import java.util.stream.Collectors;
  * Represents a service responsible for raw string based inputs being translated into the platform
  * specific text representation. This service may optionally also make use of input source suppliers
  * to apply them to systems like placeholders.
- *
- * @param <T> The output type for a message
  */
-public interface MessageService<T> extends Service {
+public interface MessageService extends Service {
 
 	/**
 	 * Parses a message with no expectation of sources being present. In other words,
@@ -51,7 +50,7 @@ public interface MessageService<T> extends Service {
 	 * @param message The message we wish to translate
 	 * @return The translated message
 	 */
-	default T parse(@NonNull String message) {
+	default Component parse(@NonNull String message) {
 		return this.parse(message, PlaceholderSources.empty());
 	}
 
@@ -64,7 +63,7 @@ public interface MessageService<T> extends Service {
 	 * @param sources The sources made available via suppliers for any required contextual information
 	 * @return The translated message
 	 */
-	T parse(@NonNull String message, PlaceholderSources sources);
+	Component parse(@NonNull String message, PlaceholderSources sources);
 
 	/**
 	 * Translates a set of input messages with no associated sources. See {@link #parse(String)} to
@@ -73,7 +72,7 @@ public interface MessageService<T> extends Service {
 	 * @param input The list of input messages to translate
 	 * @return A translated list of messages based on the input
 	 */
-	default List<T> parse(@NonNull List<String> input) {
+	default List<Component> parse(@NonNull List<String> input) {
 		return this.parse(input, PlaceholderSources.empty());
 	}
 
@@ -85,7 +84,7 @@ public interface MessageService<T> extends Service {
 	 * @param sources
 	 * @return
 	 */
-	default List<T> parse(@NonNull List<String> input, @NonNull PlaceholderSources sources) {
+	default List<Component> parse(@NonNull List<String> input, @NonNull PlaceholderSources sources) {
 		return input.stream().map(s -> this.parse(s, sources)).collect(Collectors.toList());
 	}
 

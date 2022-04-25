@@ -62,7 +62,7 @@ public class SpongeRefreshingObjective extends AbstractSpongeObjective implement
 
     @Override
     public Component getText() {
-        MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
+        MessageService service = Impactor.getInstance().getRegistry().get(MessageService.class);
         return service.parse(this.raw, sources);
     }
 
@@ -162,14 +162,6 @@ public class SpongeRefreshingObjective extends AbstractSpongeObjective implement
         @Override
         public RefreshingObjectiveBuilder sources(PlaceholderSources sources) {
             this.sources = sources;
-            return this;
-        }
-
-        @Override
-        public SpongeRefreshingObjectiveBuilder from(RefreshingObjective input) {
-            this.raw = ((SpongeRefreshingObjective) input).raw;
-            this.timings = input.getTimingConfig();
-
             return this;
         }
 

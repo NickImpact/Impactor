@@ -28,9 +28,8 @@ package net.impactdev.impactor.common.registry;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.registry.Registry;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.utilities.context.ContextualMapping;
-import net.impactdev.impactor.api.utilities.context.Provider;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -44,25 +43,25 @@ public final class ImpactorRegistry implements Registry {
     public <T> void register(Class<T> type, T value) {
         Preconditions.checkNotNull(type, "Input type was null");
         Preconditions.checkNotNull(value, "Input value type was null");
-        bindings.put(type, new Provider<>(value));
+        bindings.put(type, value);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> type) {
         Preconditions.checkArgument(bindings.containsKey(type), "Could not locate a matching registration for type: " + type.getCanonicalName());
-        return bindings.require(type).instance();
+        return bindings.require(type);
     }
 
     @Override
-    public <T extends Builder<?, ?>> void registerBuilderSupplier(Class<T> type, Supplier<? extends T> builder) {
+    public <T extends Builder<?>> void registerBuilderSupplier(Class<T> type, Supplier<? extends T> builder) {
         Preconditions.checkArgument(!builders.containsKey(type), "Already registered a builder supplier for: " + type.getCanonicalName());
         builders.put(type, builder);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends Builder<?, ?>> T createBuilder(Class<T> type) {
+    public <T extends Builder<?>> T createBuilder(Class<T> type) {
         Preconditions.checkNotNull(type, "Input builder type was null");
         final Supplier<?> supplier = builders.get(type);
         Preconditions.checkNotNull(supplier, "Could not find a Supplier for the provided builder type: " + type.getCanonicalName());

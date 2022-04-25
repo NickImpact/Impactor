@@ -26,11 +26,11 @@
 package net.impactdev.impactor.sponge.ui.containers.utility;
 
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
-import net.impactdev.impactor.api.ui.containers.pagination.Page;
+import net.impactdev.impactor.api.ui.containers.pagination.components.Page;
 import net.impactdev.impactor.api.ui.containers.pagination.Pagination;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
-import net.impactdev.impactor.sponge.ui.containers.SpongePage;
+import net.impactdev.impactor.sponge.ui.containers.pagination.components.SpongePage;
 import net.impactdev.impactor.sponge.ui.containers.components.SizeMapping;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
@@ -41,7 +41,7 @@ import java.util.UUID;
 
 public class PageConstructor {
 
-    public static CircularLinkedList<Page<?>> construct(List<Icon<?>> icons, Pagination parent) {
+    public static <E extends Icon<?>> CircularLinkedList<Page<?>> construct(List<E> icons, Pagination parent) {
         CircularLinkedList<Page<?>> pages = new CircularLinkedList<>();
         int max = parent.zone().y() * parent.zone().x();
         int size = icons.size() / max + (icons.size() % max == 0 ? 0 : 1);

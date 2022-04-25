@@ -31,7 +31,7 @@ public enum PageUpdaterType {
     FIRST((current, max) -> 1),
     PREVIOUS((current, max) -> Math.max(1, current - 1)),
     CURRENT((current, max) -> current),
-    NEXT((current, max) -> Math.min(current + 1, max)),
+    NEXT((current, max) -> Math.max(1, Math.min(current + 1, max))),
     LAST((current, max) -> max);
 
     private final BiFunction<Integer, Integer, Integer> translator;

@@ -27,7 +27,7 @@ package net.impactdev.impactor.api.scoreboard.effects;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -144,7 +144,7 @@ public class GradientEffect implements FrameEffect {
         return new GradientEffectBuilder();
     }
 
-    public static class GradientEffectBuilder implements Builder<GradientEffect, GradientEffectBuilder> {
+    public static class GradientEffectBuilder implements Builder<GradientEffect> {
 
         private TextColor start = NamedTextColor.BLACK;
         private List<TextColor> additional = Lists.newArrayList();
@@ -156,11 +156,6 @@ public class GradientEffect implements FrameEffect {
 
         public GradientEffectBuilder next(TextColor color) {
             this.additional.add(color);
-            return this;
-        }
-
-        @Override
-        public GradientEffectBuilder from(GradientEffect input) {
             return this;
         }
 

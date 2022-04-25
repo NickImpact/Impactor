@@ -119,7 +119,7 @@ public class PlaceholdersCommand {
                                     .orElse(cause.first(ServerPlayer.class)
                                             .orElseThrow(() -> new CommandException(Component.text("Can only query against a player!"))));
 
-                            MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
+                            MessageService service = Impactor.getInstance().getRegistry().get(MessageService.class);
                             ResourceKey in = context.requireOne(placeholder);
                             cause.audience().sendMessage(service.parse("&7Now attempting to parse placeholder: ").append(Component.text(in.formatted()).color(NamedTextColor.GREEN)));
                             Component result = service.parse("{{" + in.formatted() + "}}", PlaceholderSources.builder().append(ServerPlayer.class, () -> target).build());

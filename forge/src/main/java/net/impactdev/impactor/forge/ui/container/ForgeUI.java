@@ -35,6 +35,7 @@ import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
 import net.impactdev.impactor.api.ui.containers.ImpactorUI;
 import net.impactdev.impactor.api.ui.containers.detail.RefreshDetail;
+import net.impactdev.impactor.api.ui.containers.icons.ClickProcessor;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
 import net.impactdev.impactor.forge.adventure.RelocationTranslator;
@@ -150,6 +151,16 @@ public class ForgeUI implements ImpactorUI {
         public UIBuilder readonly(boolean state) {
             this.readonly = state;
             return this;
+        }
+
+        @Override
+        public UIBuilder onClick(ClickProcessor processor) {
+            return null;
+        }
+
+        @Override
+        public UIBuilder onClose(CloseProcessor handler) {
+            return null;
         }
 
         @Override

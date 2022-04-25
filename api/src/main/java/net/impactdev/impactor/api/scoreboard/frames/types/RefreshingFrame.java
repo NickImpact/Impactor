@@ -28,11 +28,11 @@ package net.impactdev.impactor.api.scoreboard.frames.types;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 
 public interface RefreshingFrame extends ScoreboardFrame.UpdatableFrame {
 
-    interface RefreshingFrameBuilder extends Builder<RefreshingFrame, RefreshingFrameBuilder> {
+    interface RefreshingFrameBuilder extends Builder<RefreshingFrame> {
 
         RefreshingFrameBuilder raw(String raw);
 

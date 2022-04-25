@@ -61,7 +61,7 @@ public class SpongeListeningFrame<L> extends AbstractSpongeFrame implements List
 
     @Override
     public Component getText() {
-        MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
+        MessageService service = Impactor.getInstance().getRegistry().get(MessageService.class);
         return service.parse(this.raw, this.sources);
     }
 
@@ -150,14 +150,6 @@ public class SpongeListeningFrame<L> extends AbstractSpongeFrame implements List
         @Override
         public ListeningFrameBuilder<L> sources(PlaceholderSources sources) {
             this.sources = sources;
-            return this;
-        }
-
-        @Override
-        public ListeningFrameBuilder<L> from(ListeningFrame<L> input) {
-            this.raw = ((SpongeListeningFrame<L>) input).raw;
-            this.handler = input.getEventHandler();
-            this.bus = ((SpongeListeningFrame<L>) input).bus;
             return this;
         }
 

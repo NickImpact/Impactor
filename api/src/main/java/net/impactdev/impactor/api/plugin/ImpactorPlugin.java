@@ -50,9 +50,9 @@ public interface ImpactorPlugin {
 
 	PluginLogger logger();
 
-	void construct();
+	void construct() throws Exception;
 
-	void shutdown();
+	void shutdown() throws Exception;
 
 	default void register() {
 		PluginRegistry.register(this);

@@ -28,10 +28,11 @@ package net.impactdev.impactor.forge.ui.container.icons;
 import ca.landonjw.gooeylibs2.api.adventure.ForgeTranslator;
 import ca.landonjw.gooeylibs2.api.button.ButtonAction;
 import ca.landonjw.gooeylibs2.api.button.ButtonBase;
+import com.google.common.collect.ImmutableSet;
 import net.impactdev.impactor.api.ui.containers.icons.ClickContext;
 import net.impactdev.impactor.api.ui.containers.icons.ClickProcessor;
 import net.impactdev.impactor.api.ui.containers.icons.DisplayProvider;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.forge.ForgeImpactorPlugin;
@@ -65,7 +66,11 @@ public class ImpactorButton extends ButtonBase {
     }
 
     public Set<ClickProcessor> listeners() {
-        return this.processors;
+        return ImmutableSet.copyOf(this.processors);
+    }
+
+    public void listener(ClickProcessor processor) {
+        this.processors.add(processor);
     }
 
     @Override
@@ -95,7 +100,7 @@ public class ImpactorButton extends ButtonBase {
         return new ImpactorButtonBuilder();
     }
 
-    public static class ImpactorButtonBuilder implements Builder<ImpactorButton, ImpactorButtonBuilder> {
+    public static class ImpactorButtonBuilder implements Builder<ImpactorButton> {
 
         private DisplayProvider<ItemStack> display;
         private final Set<ClickProcessor> processors = new LinkedHashSet<>();
@@ -112,11 +117,6 @@ public class ImpactorButton extends ButtonBase {
 
         public ImpactorButtonBuilder processors(Collection<ClickProcessor> processors) {
             this.processors.addAll(processors);
-            return this;
-        }
-
-        @Override
-        public ImpactorButtonBuilder from(ImpactorButton input) {
             return this;
         }
 

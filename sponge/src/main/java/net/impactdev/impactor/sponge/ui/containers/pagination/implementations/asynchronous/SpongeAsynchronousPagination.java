@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.sponge.ui.containers.async;
+package net.impactdev.impactor.sponge.ui.containers.pagination.implementations.asynchronous;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -35,16 +35,18 @@ import net.impactdev.impactor.api.ui.containers.detail.RefreshDetail;
 import net.impactdev.impactor.api.ui.containers.icons.ClickContext;
 import net.impactdev.impactor.api.ui.containers.icons.DisplayProvider;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
-import net.impactdev.impactor.api.ui.containers.pagination.Page;
-import net.impactdev.impactor.api.ui.containers.pagination.async.AsyncPagination;
+import net.impactdev.impactor.api.ui.containers.pagination.components.Page;
+import net.impactdev.impactor.api.ui.containers.pagination.components.TimeoutDetails;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
-import net.impactdev.impactor.common.ui.pagination.async.AbstractAsyncPagination;
+import net.impactdev.impactor.common.ui.pagination.types.AbstractAsynchronousPagination;
+import net.impactdev.impactor.common.ui.pagination.builders.ImpactorPaginationBuilder;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
-import net.impactdev.impactor.sponge.ui.containers.SpongePage;
+import net.impactdev.impactor.sponge.ui.containers.components.LayoutTranslator;
+import net.impactdev.impactor.sponge.ui.containers.components.SlotContext;
+import net.impactdev.impactor.sponge.ui.containers.pagination.components.SpongePage;
 import net.impactdev.impactor.sponge.ui.containers.utility.PageConstructor;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.data.Keys;
@@ -64,20 +66,26 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-public class SpongeAsyncPagination extends AbstractAsyncPagination {
+public abstract class SpongeAsynchronousPagination extends AbstractAsynchronousPagination {
 
     private final InventoryMenu view;
+    private final SlotContext context;
 
-    private SpongeAsyncPagination(SpongeAsyncPaginationBuilder builder) {
-        super(builder);
+    public SpongeAsynchronousPagination(
+            ImpactorPaginationBuilder builder,
+            CompletableFuture<? extends List<? extends Icon<?>>> accumulator,
+            @Nullable Icon<?> waiting,
+            @Nullable TimeoutDetails timeout
+    ) {
+        super(builder, accumulator, waiting, timeout);
 
-        this.view = InventoryMenu.of(this.waiting());
-
+        SpongePage page = this.waiting();
+        this.pages = CircularLinkedList.of(page);
+        this.context = LayoutTranslator.translate(page.toLayout());
+        this.view = this.waiting().view().asMenu();
         this.view.setTitle(this.title());
         this.view.setReadOnly(this.readonly);
         this.view.registerSlotClick((cause, container, slot, index, clickType) -> {
@@ -99,7 +107,7 @@ public class SpongeAsyncPagination extends AbstractAsyncPagination {
                 context.append(ClickType.class, clickType);
                 context.append(ServerPlayer.class, source);
 
-                AtomicBoolean allow = new AtomicBoolean(true);
+                AtomicBoolean allow = new AtomicBoolean(builder.readonly);
                 Optional<Icon<?>> clicked = Optional.ofNullable(this.pages.at(this.page() - 1).icons().get(index));
                 clicked.ifPresent(icon -> icon.listeners().forEach(listener -> {
                     boolean result = listener.process(context);
@@ -115,7 +123,7 @@ public class SpongeAsyncPagination extends AbstractAsyncPagination {
                 printer.add("Affected Pagination: " + this.provider().asString());
                 printer.add("Context:");
                 printer.kv("Title", ComponentManipulator.flatten(this.title()));
-                printer.kv("Read Only", this.readonly);
+                printer.kv("Read Only", readonly);
                 printer.kv("Page", this.page());
                 printer.kv("Slot Clicked", index);
                 printer.kv("Click Type", clickType.key(RegistryTypes.CLICK_TYPE));
@@ -134,6 +142,36 @@ public class SpongeAsyncPagination extends AbstractAsyncPagination {
         });
     }
 
+    protected abstract <E extends Icon<?>> void consume(List<E> icons);
+
+    @Override
+    public void page(int target) {
+        super.page(target);
+
+        Page<ViewableInventory> page = (Page<ViewableInventory>) this.pages.at(target - 1);
+        this.view.setCurrentInventory(page.view());
+        this.context.trackAll(this.offsets(), this.zone(), page.icons());
+    }
+
+    @Override
+    protected void queue() {
+        SchedulerAdapter scheduler = Impactor.getInstance().getScheduler();
+        this.accumulator.acceptEither(this.timeoutAfter(this.timeout.time(), this.timeout.unit()), list -> {
+            this.consume(list);
+
+            scheduler.executeSync(() -> {
+                this.pages = this.define(list);
+                this.page(1);
+            });
+        }).exceptionally(ex -> {
+            scheduler.executeSync(() -> {
+                this.pages = CircularLinkedList.of(this.timeout());
+                this.page(1);
+            });
+            return null;
+        });
+    }
+
     @Override
     public void open() {
         PlatformPlayerManager<ServerPlayer> manager = (PlatformPlayerManager<ServerPlayer>) Impactor.getInstance().getPlatform().playerManager();
@@ -149,29 +187,23 @@ public class SpongeAsyncPagination extends AbstractAsyncPagination {
     }
 
     @Override
-    public void page(int target) {
-        super.page(target);
-        Page<ViewableInventory> page = (Page<ViewableInventory>) this.pages.at(target - 1);
-        this.view.setCurrentInventory(page.view());
-    }
-
-    @Override
     public void refresh(RefreshDetail type) {
 
     }
 
-    protected void setUnsafe(@Nullable Icon<?> icon, int slot) {
+    @Override
+    protected CircularLinkedList<Page<?>> define(List<? extends Icon<?>> icons) {
+        return PageConstructor.construct(icons, this);
+    }
+
+    @Override
+    protected void setUnsafe(Icon<?> icon, int slot) {
         Icon<ItemStack> i = (Icon<ItemStack>) icon;
         if(icon == null) {
             this.view.inventory().set(slot, ItemStack.empty());
         } else {
             this.view.inventory().set(slot, i.display().provide());
         }
-    }
-
-    @Override
-    protected CircularLinkedList<Page<?>> define(List<Icon<?>> icons) {
-        return PageConstructor.construct(icons, this);
     }
 
     @Override
@@ -187,7 +219,7 @@ public class SpongeAsyncPagination extends AbstractAsyncPagination {
 
     @Override
     protected Icon<?> timeoutIfNotSet() {
-        MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
+        MessageService service = Impactor.getInstance().getRegistry().get(MessageService.class);
         return Icon.builder(ItemStack.class)
                 .display(new DisplayProvider.Constant<>(ItemStack.builder()
                         .itemType(ItemTypes.RED_STAINED_GLASS_PANE)
@@ -203,31 +235,7 @@ public class SpongeAsyncPagination extends AbstractAsyncPagination {
                 .build();
     }
 
-    @Override
-    protected void queue() {
-        SchedulerAdapter scheduler = Impactor.getInstance().getScheduler();
-        this.accumulator.acceptEither(this.timeoutAfter(this.timeout.time(), this.timeout.unit()), list -> {
-            scheduler.executeSync(() -> {
-                this.pages = this.define(list);
-                this.page(1);
-            });
-        }).exceptionally(ex -> {
-            ViewableInventory view = ViewableInventory.builder()
-                    .type(ContainerTypes.GENERIC_9X6)
-                    .completeStructure()
-                    .identity(UUID.randomUUID())
-                    .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
-                    .build();
-
-            SpongePage page = new SpongePage(view, Maps.newHashMap());
-            page.draw(this, this.fill(this.timeout.filler()), this.updaters, 1, 1);
-            this.pages = CircularLinkedList.of(page);
-            scheduler.executeSync(() -> this.view.setCurrentInventory(view));
-            return null;
-        });
-    }
-
-    private ViewableInventory waiting() {
+    private SpongePage waiting() {
         ViewableInventory view = ViewableInventory.builder()
                 .type(ContainerTypes.GENERIC_9X6)
                 .completeStructure()
@@ -236,23 +244,20 @@ public class SpongeAsyncPagination extends AbstractAsyncPagination {
                 .build();
 
         SpongePage page = new SpongePage(view, Maps.newHashMap());
-        page.draw(this, this.fill(this.waiting), this.updaters, 1, 1);
-        this.pages = CircularLinkedList.of(page);
-        return view;
+        page.draw(this, this.fill(this.waiting), this.updaters(), 1, 1);
+        return page;
     }
 
-    private <W> CompletableFuture<W> timeoutAfter(long timeout, TimeUnit unit) {
-        CompletableFuture<W> result = new CompletableFuture<>();
-        Impactor.getInstance().getScheduler().asyncLater(() -> result.completeExceptionally(new TimeoutException()), timeout, unit);
-        return result;
-    }
+    private SpongePage timeout() {
+        ViewableInventory view = ViewableInventory.builder()
+                .type(ContainerTypes.GENERIC_9X6)
+                .completeStructure()
+                .identity(UUID.randomUUID())
+                .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
+                .build();
 
-    public static class SpongeAsyncPaginationBuilder extends AbstractAsyncPaginationBuilder {
-
-        @Override
-        public AsyncPagination complete() {
-            return new SpongeAsyncPagination(this);
-        }
-
+        SpongePage page = new SpongePage(view, Maps.newHashMap());
+        page.draw(this, this.fill(this.timeout.filler()), this.updaters(), 1, 1);
+        return page;
     }
 }

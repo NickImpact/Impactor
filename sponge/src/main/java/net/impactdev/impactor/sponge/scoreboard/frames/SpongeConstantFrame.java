@@ -76,7 +76,7 @@ public class SpongeConstantFrame extends AbstractSpongeFrame implements Constant
 
         @Override
         public SpongeConstantFrameBuilder raw(String raw, PlaceholderSources sources) {
-            MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
+            MessageService service = Impactor.getInstance().getRegistry().get(MessageService.class);
             this.supplier = new LazyComponent(fallback -> service.parse(
                     raw,
                     PlaceholderSources.builder()
@@ -90,12 +90,6 @@ public class SpongeConstantFrame extends AbstractSpongeFrame implements Constant
         @Override
         public SpongeConstantFrameBuilder text(Component text) {
             this.supplier = new LazyComponent(fallback -> text);
-            return this;
-        }
-
-        @Override
-        public ConstantFrameBuilder from(ConstantFrame input) {
-            this.supplier = ((SpongeConstantFrame) input).supplier;
             return this;
         }
 

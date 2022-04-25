@@ -27,7 +27,7 @@ package net.impactdev.impactor.api.dependencies;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.dependencies.relocation.Relocation;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 
 import java.util.*;
 
@@ -89,7 +89,7 @@ public interface Dependency {
         return Impactor.getInstance().getRegistry().createBuilder(DependencyBuilder.class);
     }
 
-    interface DependencyBuilder extends Builder<Dependency, DependencyBuilder> {
+    interface DependencyBuilder extends Builder<Dependency> {
 
         DependencyBuilder name(String name);
 

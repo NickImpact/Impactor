@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.api.scoreboard.effects;
 
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 
@@ -79,7 +79,7 @@ public class ProgressBarEffect implements FrameEffect {
         return new ProgressBarEffectBuilder();
     }
 
-    private static class ProgressBarEffectBuilder implements Builder<ProgressBarEffect, ProgressBarEffectBuilder> {
+    private static class ProgressBarEffectBuilder implements Builder<ProgressBarEffect> {
 
         private int size;
         private int max;
@@ -104,11 +104,6 @@ public class ProgressBarEffect implements FrameEffect {
         public ProgressBarEffectBuilder remaining(Component remaining) {
             this.remaining = remaining;
             return this;
-        }
-
-        @Override
-        public ProgressBarEffectBuilder from(ProgressBarEffect input) {
-            return null;
         }
 
         @Override

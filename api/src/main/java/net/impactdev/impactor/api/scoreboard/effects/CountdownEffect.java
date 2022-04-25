@@ -28,21 +28,14 @@ package net.impactdev.impactor.api.scoreboard.effects;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.services.text.MessageService;
-import net.impactdev.impactor.api.utilities.Builder;
-import net.impactdev.impactor.api.utilities.Time;
+import net.impactdev.impactor.api.builders.Builder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 public class CountdownEffect implements FrameEffect {
 
@@ -96,7 +89,7 @@ public class CountdownEffect implements FrameEffect {
         return new CountdownEffectBuilder();
     }
 
-    public static class CountdownEffectBuilder implements Builder<CountdownEffect, CountdownEffectBuilder> {
+    public static class CountdownEffectBuilder implements Builder<CountdownEffect> {
 
         private LocalDateTime target;
         private Component complete;
@@ -107,15 +100,10 @@ public class CountdownEffect implements FrameEffect {
         }
 
         public CountdownEffectBuilder whenComplete(String raw, PlaceholderSources sources) {
-            MessageService<Component> service = Impactor.getInstance().getRegistry().get(MessageService.class);
+            MessageService service = Impactor.getInstance().getRegistry().get(MessageService.class);
 
             this.complete = service.parse(raw, sources);
             return this;
-        }
-
-        @Override
-        public CountdownEffectBuilder from(CountdownEffect input) {
-            return null;
         }
 
         @Override

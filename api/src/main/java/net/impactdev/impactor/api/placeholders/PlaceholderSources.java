@@ -27,10 +27,9 @@ package net.impactdev.impactor.api.placeholders;
 
 import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.utilities.Builder;
+import net.impactdev.impactor.api.builders.Builder;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -39,6 +38,14 @@ public interface PlaceholderSources {
     static PlaceholderSources empty() {
         return PlaceholderSources.builder().build();
     }
+
+    <T> PlaceholderSources append(Class<T> type, Supplier<T> supplier);
+
+    <T> PlaceholderSources append(TypeToken<T> type, Supplier<T> supplier);
+
+    <T> PlaceholderSources appendIfAbsent(Class<T> type, Supplier<T> supplier);
+
+    <T> PlaceholderSources appendIfAbsent(TypeToken<T> type, Supplier<T> supplier);
 
     <T> Optional<T> getSource(Class<T> type);
 
@@ -50,13 +57,17 @@ public interface PlaceholderSources {
         return Impactor.getInstance().getRegistry().createBuilder(SourceBuilder.class);
     }
 
-    interface SourceBuilder extends Builder<PlaceholderSources, SourceBuilder> {
+    interface SourceBuilder extends Builder<PlaceholderSources> {
 
         <T> SourceBuilder append(Class<T> type, Supplier<T> supplier);
 
         <T> SourceBuilder append(TypeToken<T> type, Supplier<T> supplier);
 
         <T> SourceBuilder appendIfAbsent(Class<T> type, Supplier<T> supplier);
+
+        <T> SourceBuilder appendIfAbsent(TypeToken<T> type, Supplier<T> supplier);
+
+        SourceBuilder from(PlaceholderSources sources);
 
     }
 

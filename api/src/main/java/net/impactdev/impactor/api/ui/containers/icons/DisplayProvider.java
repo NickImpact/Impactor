@@ -25,6 +25,9 @@
 
 package net.impactdev.impactor.api.ui.containers.icons;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
+
 /**
  * An IconProvider is simply a layer for providing an Icon to a UI. The purpose for this
  * functional interface is simply to provide a means for updating an icon on a refresh

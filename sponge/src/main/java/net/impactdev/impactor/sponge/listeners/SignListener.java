@@ -38,7 +38,7 @@ import java.util.UUID;
 
 public class SignListener {
 
-    public final static Map<UUID, SignQuery<TextComponent, ServerPlayer, Vector3i>> requests = Maps.newHashMap();
+    public final static Map<UUID, SignQuery> requests = Maps.newHashMap();
 
 //    @Subscribe
 //    public void onSignUpdate(PacketEvent<CUpdateSignPacket> event) {

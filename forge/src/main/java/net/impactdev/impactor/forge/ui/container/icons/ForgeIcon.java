@@ -33,6 +33,7 @@ import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 public class ForgeIcon implements Icon<ItemStack> {
 
@@ -60,6 +61,12 @@ public class ForgeIcon implements Icon<ItemStack> {
         return this.delegate.listeners();
     }
 
+    @Override
+    public Icon<ItemStack> listener(ClickProcessor processor) {
+        this.delegate.listeners().add(processor);
+        return this;
+    }
+
     public static class ForgeIconBuilder implements IconBuilder<ItemStack> {
 
         private DisplayProvider<ItemStack> display;
@@ -78,8 +85,13 @@ public class ForgeIcon implements Icon<ItemStack> {
         }
 
         @Override
-        public IconBuilder<ItemStack> from(Icon<ItemStack> input) {
+        public IconBuilder<ItemStack> from(Icon<?> parent) {
             return this;
+        }
+
+        @Override
+        public <E> Binding<ItemStack, E> build(Supplier<E> binding) {
+            return null;
         }
 
         @Override
