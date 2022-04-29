@@ -44,6 +44,7 @@ import net.impactdev.impactor.sponge.ui.containers.components.LayoutTranslator;
 import net.impactdev.impactor.sponge.ui.containers.components.SlotContext;
 import net.impactdev.impactor.sponge.ui.containers.sectioned.sections.asynchronous.SpongeAsynchronousSection;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.item.inventory.Container;
@@ -54,6 +55,8 @@ import org.spongepowered.api.item.inventory.menu.ClickType;
 import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.Ticks;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -134,7 +137,11 @@ public class SpongeSectionedPagination extends AbstractSectionedPagination imple
             }
         }
 
-        this.view.open(player);
+        Sponge.server().scheduler().submit(Task.builder()
+                .execute(() -> this.view.open(player))
+                .delay(Ticks.single())
+                .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
+                .build());
     }
 
     @Override

@@ -70,15 +70,12 @@ public abstract class SpongeAsynchronousSection extends AbstractAsynchronousSect
     @Override
     public void queue() {
         SchedulerAdapter scheduler = Impactor.getInstance().getScheduler();
-        SpongeImpactorPlugin.instance().logger().info("Queuing pagination contents");
         this.accumulator.acceptEither(this.timeoutAfter(this.timeout.time(), this.timeout.unit()), list -> {
             this.consume(list);
-            SpongeImpactorPlugin.instance().logger().info("Contents received, should be updating page");
 
             scheduler.executeSync(() -> {
                 this.pages = this.draft(list);
                 this.page(1);
-                SpongeImpactorPlugin.instance().logger().info("Printed page");
             });
         }).exceptionally(ex -> {
             scheduler.executeSync(() -> {

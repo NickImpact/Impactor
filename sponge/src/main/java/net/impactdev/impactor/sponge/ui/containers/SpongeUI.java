@@ -205,7 +205,11 @@ public class SpongeUI implements ImpactorUI {
     public void open(PlatformPlayer viewer) {
         PlatformPlayerManager<ServerPlayer> manager = (PlatformPlayerManager<ServerPlayer>) Impactor.getInstance().getPlatform().playerManager();
         ServerPlayer player = manager.translate(viewer).orElseThrow(() -> new IllegalStateException("Player not available or found"));
-        this.view.open(player);
+        Sponge.server().scheduler().submit(Task.builder()
+                .execute(() -> this.view.open(player))
+                .delay(Ticks.single())
+                .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
+                .build());
     }
 
     @Override
