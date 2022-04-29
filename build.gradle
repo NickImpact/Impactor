@@ -30,7 +30,7 @@ version '4.0.0-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(16)
+        languageVersion = JavaLanguageVersion.of(8)
     }
 }
 

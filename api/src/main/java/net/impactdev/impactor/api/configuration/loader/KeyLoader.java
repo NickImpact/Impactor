@@ -55,7 +55,7 @@ public class KeyLoader {
         AtomicInteger index = new AtomicInteger();
         Arrays.stream(provider.getDeclaredFields())
                 .filter(field -> Modifier.isStatic(field.getModifiers()))
-                .filter(field -> ConfigKey.class.equals(field.getType()))
+                .filter(field -> ConfigKey.class.isAssignableFrom(field.getType()))
                 .forEach(field -> {
                     try {
                         // get the key instance

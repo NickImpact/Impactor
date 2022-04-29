@@ -195,14 +195,14 @@ public class ConfigAdapter implements ConfigurationAdapter {
             return def;
         }
 
-        Map<String, Object> m;
+        Map<String, String> m;
         try {
-            m = Optional.ofNullable(node.get(new io.leangen.geantyref.TypeToken<Map<String, Object>>() {})).orElse(
+            m = Optional.ofNullable(node.get(new io.leangen.geantyref.TypeToken<Map<String, String>>() {})).orElse(
                     Collections.emptyMap());
         } catch (SerializationException e) {
             e.printStackTrace();
             m = Collections.emptyMap();
         }
-        return m.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().toString()));
+        return m.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
