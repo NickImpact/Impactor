@@ -26,12 +26,16 @@
 package net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections;
 
 import io.leangen.geantyref.TypeToken;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import org.spongepowered.math.vector.Vector2i;
 
 import java.util.Comparator;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * A section is the internal pagination that a {@link SectionedPagination} maintains. Each section is expected
@@ -102,6 +106,8 @@ public interface Section {
         Vector2i result = Vector2i.from(x, y).add(offsets);
         return result.x() + (9 * result.y());
     }
+
+    void refresh(BiConsumer<Integer, Icon<?>> consumer);
 
     interface Generic<T> extends Section {
 

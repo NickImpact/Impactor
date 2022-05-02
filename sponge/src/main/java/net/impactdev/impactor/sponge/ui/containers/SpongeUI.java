@@ -216,9 +216,7 @@ public class SpongeUI implements ImpactorUI {
     public void close(PlatformPlayer viewer) {
         PlatformPlayerManager<ServerPlayer> manager = (PlatformPlayerManager<ServerPlayer>) Impactor.getInstance().getPlatform().playerManager();
         ServerPlayer player = manager.translate(viewer).orElseThrow(() -> new IllegalStateException("Player not available or found"));
-        if(player.isViewingInventory() && player.openInventory().filter(container -> container.containsInventory(this.view.inventory())).isPresent()) {
-            player.closeInventory();
-        }
+        player.closeInventory();
     }
 
     @Override

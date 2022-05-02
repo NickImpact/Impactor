@@ -35,6 +35,7 @@ import net.kyori.adventure.util.TriState;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public abstract class AbstractSectionedPage implements SectionedPage {
 
@@ -56,7 +57,11 @@ public abstract class AbstractSectionedPage implements SectionedPage {
     }
 
     @Override
-    public void refresh() {}
+    public void refresh(BiConsumer<Integer, Icon<?>> consumer) {
+        for(Map.Entry<Integer, Icon<?>> entry : this.icons().entrySet()) {
+            consumer.accept(entry.getKey(), entry.getValue());
+        }
+    }
 
     @Override
     public void draw(Section parent, List<PageUpdater> updaters,

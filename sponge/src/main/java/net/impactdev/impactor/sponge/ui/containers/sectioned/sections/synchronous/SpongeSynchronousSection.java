@@ -35,6 +35,7 @@ import net.kyori.adventure.util.TriState;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public abstract class SpongeSynchronousSection extends AbstractSynchronousSection {
 

@@ -28,6 +28,9 @@ package net.impactdev.impactor.sponge.ui.containers.sectioned;
 import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
+import net.impactdev.impactor.api.ui.containers.detail.RefreshDetail;
+import net.impactdev.impactor.api.ui.containers.detail.RefreshType;
+import net.impactdev.impactor.api.ui.containers.detail.RefreshTypes;
 import net.impactdev.impactor.api.ui.containers.icons.ClickContext;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
@@ -57,7 +60,10 @@ import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Ticks;
+import org.spongepowered.math.vector.Vector2i;
+import org.spongepowered.math.vector.Vector4i;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -157,6 +163,59 @@ public class SpongeSectionedPagination extends AbstractSectionedPagination imple
         }
 
         return false;
+    }
+
+    @Override
+    public void refresh(RefreshDetail details) {
+        RefreshType type = details.type();
+        if(type == RefreshTypes.SLOT_INDEX) {
+            int position = details.context().require(Integer.class);
+            this.context.locate(position)
+                    .map(icon -> (Icon<ItemStack>) icon)
+                    .ifPresent(icon -> {
+                        this.view.inventory().set(position, icon.display().provide());
+                    });
+        } else if(type == RefreshTypes.SLOT_POS) {
+            int position = details.context().get(Vector2i.class)
+                    .map(pos -> pos.x() + (9 * pos.y()))
+                    .orElseThrow(NoSuchElementException::new);
+            this.context.locate(position)
+                    .map(icon -> (Icon<ItemStack>) icon)
+                    .ifPresent(icon -> {
+                        this.view.inventory().set(position, icon.display().provide());
+                    });
+        } else if(type == RefreshTypes.GRID) {
+            Vector4i base = details.context().require(Vector4i.class);
+            Vector2i grid = base.toVector2();
+            Vector2i offset = new Vector2i(base.z(), base.w());
+
+            for (int y = offset.y(); y < grid.y() + offset.y(); y++) {
+                for (int x = offset.x(); x < grid.x() + offset.x(); x++) {
+                    final int X = x;
+                    final int Y = y;
+                    this.context.locate(X + (9 * Y))
+                            .map(icon -> (Icon<ItemStack>) icon)
+                            .ifPresent(icon -> {
+                                this.view.inventory().set(X + (9 * Y), icon.display().provide());
+                            });
+                }
+            }
+        } else if(type == RefreshTypes.SECTION) {
+            Section section = details.context().require(Section.class);
+            section.refresh((slot, icon) -> this.view.inventory().set(slot, (ItemStack) icon.display().provide()));
+        } else {
+            if(type == RefreshTypes.ALL) {
+                this.context.tracked()
+                        .forEach((slot, icon) -> {
+                            this.view.inventory().set(slot, (ItemStack) icon.display().provide());
+                        });
+            } else if(type == RefreshTypes.LAYOUT) {
+                this.layout().elements()
+                        .forEach((slot, icon) -> {
+                            this.view.inventory().set(slot, (ItemStack) icon.display().provide());
+                        });
+            }
+        }
     }
 
     @Override

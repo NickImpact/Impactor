@@ -31,11 +31,17 @@ import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.ui.containers.icons.ClickProcessor;
 import net.impactdev.impactor.api.ui.containers.icons.DisplayProvider;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import net.impactdev.impactor.api.utilities.ComponentManipulator;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.item.inventory.ItemStack;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class SpongeIcon implements Icon<ItemStack> {
 
@@ -50,7 +56,24 @@ public class SpongeIcon implements Icon<ItemStack> {
     @Override
     @NotNull
     public DisplayProvider<ItemStack> display() {
-        return this.display;
+        return display.manipulate(item -> {
+            Optional<Component> title = item.get(Keys.CUSTOM_NAME);
+            Optional<List<Component>> lore = item.get(Keys.LORE);
+
+            title.ifPresent(t -> {
+                Component updated = ComponentManipulator.noItalics(t);
+                item.offer(Keys.CUSTOM_NAME, updated);
+            });
+
+            lore.ifPresent(l -> {
+                List<Component> updated = l.stream()
+                        .map(ComponentManipulator::noItalics)
+                        .collect(Collectors.toList());
+                item.offer(Keys.LORE, updated);
+            });
+
+            return item;
+        });
     }
 
     @Override

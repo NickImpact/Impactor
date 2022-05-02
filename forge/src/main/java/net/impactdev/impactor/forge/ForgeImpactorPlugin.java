@@ -121,10 +121,7 @@ public class ForgeImpactorPlugin extends InternalImpactorPlugin {
                         .checksum("0sBRBZ3W4ezFRB3COytWJQwl/88Atw4MP0D7YVLOr4o=")
                         .relocation(Relocation.of("ca{}landonjw", "landonjw"))
                         .build(),
-                ProvidedDependencies.SPONGE_MATH,
-                ProvidedDependencies.KYORI_EVENT_API,
-                ProvidedDependencies.KYORI_EVENT_METHOD,
-                ProvidedDependencies.KYORI_EVENT_METHOD_ASM
+                ProvidedDependencies.SPONGE_MATH
         ));
     }
 

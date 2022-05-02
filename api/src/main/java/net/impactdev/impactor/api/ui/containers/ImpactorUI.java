@@ -94,6 +94,7 @@ public interface ImpactorUI {
 	 *     <li>{@link RefreshTypes#LAYOUT LAYOUT}</li>
 	 *     <li>{@link RefreshTypes#SLOT_INDEX SLOT_INDEX}</li>
 	 *     <li>{@link RefreshTypes#SLOT_POS SLOT_POS}</li>
+	 *     <li>{@link RefreshTypes#GRID}</li>
 	 * </ul>
 	 *
 	 * Any other typed detail will be rejected and will act as a no-op.

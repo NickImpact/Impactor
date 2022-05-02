@@ -26,6 +26,8 @@
 package net.impactdev.impactor.api.ui.containers.pagination.sectioned;
 
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.ui.containers.detail.RefreshDetail;
+import net.impactdev.impactor.api.ui.containers.detail.RefreshTypes;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
 import net.impactdev.impactor.api.ui.containers.pagination.Pagination;
@@ -118,6 +120,29 @@ public interface SectionedPagination {
     default Optional<Section> at(Vector2i coordinates) {
         return this.at(coordinates.x(), coordinates.y());
     }
+
+    /**
+     * Attempts to refresh the contents of the UI based on the given refresh details.
+     *
+     * <p>The valid refresh types for this type of UI are:
+     * <ul>
+     *     <li>{@link RefreshTypes#ALL ALL}</li>
+     *     <li>{@link RefreshTypes#LAYOUT LAYOUT}</li>
+     *     <li>{@link RefreshTypes#SLOT_INDEX SLOT_INDEX}</li>
+     *     <li>{@link RefreshTypes#SLOT_POS SLOT_POS}</li>
+     *     <li>{@link RefreshTypes#GRID}</li>
+     *     <li>{@link RefreshTypes#SECTION}</li>
+     * </ul>
+     *
+     * Any other typed detail will be rejected and will act as a no-op.
+     *
+     * <h2>{@link RefreshTypes#SLOT_INDEX SLOT_INDEX} and {@link RefreshTypes#SLOT_POS SLOT_POS} Notes</h2>
+     * As part of the details, these two refresh types expect additional context to their targets.
+     * This is accomplished by appending data points to the context of the newly created details.
+     *
+     * @param details The details regarding refreshing the inventory
+     */
+    void refresh(RefreshDetail details);
 
     static SectionedPaginationBuilder builder() {
         return Impactor.getInstance().getRegistry().createBuilder(SectionedPaginationBuilder.class);

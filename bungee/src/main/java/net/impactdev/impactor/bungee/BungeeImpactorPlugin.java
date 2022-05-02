@@ -53,9 +53,6 @@ public class BungeeImpactorPlugin extends InternalImpactorPlugin {
 	@Override
 	public Set<Dependency> dependencies() {
 		return ImmutableSet.copyOf(Lists.newArrayList(
-				ProvidedDependencies.KYORI_EVENT_API,
-				ProvidedDependencies.KYORI_EVENT_METHOD,
-				ProvidedDependencies.KYORI_EVENT_METHOD_ASM,
 				ProvidedDependencies.BYTEBUDDY,
 				ProvidedDependencies.REFLECTIONS
 		));

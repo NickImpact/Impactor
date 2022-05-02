@@ -29,6 +29,14 @@ shadowJar {
     from {
         project(':velocity').tasks.shadowJar.archiveFile
     }
+
+    dependencies {
+        include(project(':api'))
+        include(project(':launcher'))
+        include(dependency('net.kyori:event-api:.*'))
+        include(dependency('net.kyori:event-method:.*'))
+        include(dependency('net.kyori:event-method-asm:.*'))
+    }
 }
 
 license {

@@ -31,6 +31,7 @@ import net.kyori.adventure.util.TriState;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public interface SectionedPage {
 
@@ -40,6 +41,6 @@ public interface SectionedPage {
 
     void draw(Section parent, List<PageUpdater> updaters, TriState style, int page, int maxPages);
 
-    void refresh();
+    void refresh(BiConsumer<Integer, Icon<?>> consumer);
 
 }

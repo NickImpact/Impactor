@@ -26,7 +26,6 @@
 package net.impactdev.impactor.api.event;
 
 import net.kyori.event.ReifiedEvent;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A super-interface for all Impactor events.

@@ -118,32 +118,6 @@ public final class ProvidedDependencies {
             .with(ADVENTURE, KYORI_KEYS)
             .build();
 
-    public static final Dependency KYORI_EVENT_API = Dependency.builder()
-            .name("Kyori Event API")
-            .group("net{}kyori")
-            .artifact("event-api")
-            .version("3.0.0")
-            .checksum("yjvdTdAyktl3iFEQFLHC3qYwwt7/DbCd7Zc8Q4SlIag=")
-            .relocation(Relocation.of("net{}kyori{}event", "eventbus"))
-            .build();
-    public static final Dependency KYORI_EVENT_METHOD = Dependency.builder()
-            .name("Kyori Event Method")
-            .group("net{}kyori")
-            .artifact("event-method")
-            .version("3.0.0")
-            .checksum("CpQqZvtZv/xqjHoCkL+baUgey33g7ey7czZXfCMtoH0=")
-            .relocation(Relocation.of("net{}kyori{}event", "eventbus"))
-            .build();
-    public static final Dependency KYORI_EVENT_METHOD_ASM = Dependency.builder()
-            .name("Kyori Event Method ASM")
-            .group("net{}kyori")
-            .artifact("event-method-asm")
-            .version("3.0.0")
-            .checksum("GnH7tbzQkrqklOGfK2nKNIoorpYXBHMabUdvoEGH8kk=")
-            .relocation(Relocation.of("net{}kyori{}event", "eventbus"))
-            .build();
-
-
     // Configurate
     public static final Dependency CONFIGURATE_CORE = Dependency.builder()
             .name("Configurate Core")

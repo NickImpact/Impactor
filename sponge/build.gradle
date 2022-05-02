@@ -52,11 +52,7 @@ shadowJar {
     //
     // In other words, we should only attempt to relocate everything but the Subscribe annotation,
     // as Impactor uses it's own version.
-    relocate ('net.kyori.event', 'net.impactdev.impactor.relocations.eventbus') {
-        exclude 'net.kyori.event.method.annotation.Subscribe'
-    }
-
-    relocate("net.kyori.event", "com.ichorpowered.protocolcontrol.lib.kyori")
+    relocate ('net.kyori.event', 'net.impactdev.impactor.relocations.eventbus')
 
     // Storage Based Relocations
     relocate ('com.zaxxer.hikari', 'net.impactdev.impactor.relocations.hikari')

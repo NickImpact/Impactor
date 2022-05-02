@@ -25,22 +25,13 @@
 
 package net.impactdev.impactor.api.event.type;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.util.annotation.eventgen.PropertySettings;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public interface Cancellable {
 
     @PropertySettings(requiredParameter = false)
-    @NonNull AtomicBoolean cancellationState();
+    boolean isCancelled();
 
-    default boolean isCancelled() {
-        return cancellationState().get();
-    }
-
-    default boolean setCancelled(boolean state) {
-        return cancellationState().getAndSet(state);
-    }
+    void setCancelled(boolean state);
 
 }

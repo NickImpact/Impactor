@@ -61,11 +61,13 @@ public class SpongeAsynchronousGenericPagination<T>
     @Override
     public void filter(Predicate<T> predicate) {
         this.filter = predicate;
+        this.redraw();
     }
 
     @Override
     public void sort(Comparator<T> comparator) {
         this.sorter = comparator;
+        this.redraw();
     }
 
     @SuppressWarnings("DuplicatedCode")

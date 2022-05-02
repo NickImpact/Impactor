@@ -39,7 +39,6 @@ import net.impactdev.impactor.api.utilities.ComponentManipulator;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionBuilder;
 import net.impactdev.impactor.common.ui.pagination.sectioned.sections.AbstractAsynchronousSection;
-import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.ui.containers.sectioned.sections.SpongeSectionedPage;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.util.TriState;

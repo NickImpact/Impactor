@@ -31,6 +31,7 @@ import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Se
 import net.impactdev.impactor.common.ui.pagination.sectioned.builders.sections.ImpactorAsynchronousBasicSectionBuilder;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public class SpongeAsynchronousBasicSection extends SpongeAsynchronousSection {
 

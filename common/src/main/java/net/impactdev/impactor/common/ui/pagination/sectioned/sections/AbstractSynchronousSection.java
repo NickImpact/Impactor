@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public abstract class AbstractSynchronousSection extends AssignableSection implements Section {
 
@@ -129,6 +130,11 @@ public abstract class AbstractSynchronousSection extends AssignableSection imple
         }
 
         return result;
+    }
+
+    @Override
+    public void refresh(BiConsumer<Integer, Icon<?>> consumer) {
+        this.pages.at(this.page() - 1).refresh(consumer);
     }
 
     protected abstract SectionedPage constructPage(List<PageUpdater> updaters, TriState style, int index, int size, Map<Integer, Icon<?>> working);

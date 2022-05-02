@@ -28,6 +28,11 @@ package net.impactdev.impactor.api.ui.containers.icons;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
 /**
  * An IconProvider is simply a layer for providing an Icon to a UI. The purpose for this
  * functional interface is simply to provide a means for updating an icon on a refresh
@@ -79,6 +84,10 @@ public interface DisplayProvider<T> {
      * @return An icon for the particular display
      */
     T provide();
+
+    default DisplayProvider<T> manipulate(Function<T, T> manipulator) {
+        return () -> manipulator.apply(this.provide());
+    }
 
     /**
      * An implementation of the {@link DisplayProvider} which features an icon that is expected to never
