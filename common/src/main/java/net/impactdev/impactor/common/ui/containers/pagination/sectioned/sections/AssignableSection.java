@@ -23,22 +23,16 @@
  *
  */
 
-package net.impactdev.impactor.sponge.ui.containers.sectioned.builders;
+package net.impactdev.impactor.common.ui.containers.pagination.sectioned.sections;
 
-import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
-import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
-import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.sections.ImpactorAsynchronousGenericSectionBuilder;
-import net.impactdev.impactor.sponge.ui.containers.sectioned.sections.asynchronous.SpongeAsynchronousGenericSection;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.AbstractSectionedPagination;
 
-public class SpongeAsynchronousGenericSectionBuilder<T> extends ImpactorAsynchronousGenericSectionBuilder<T> {
+public abstract class AssignableSection {
 
-    public SpongeAsynchronousGenericSectionBuilder(ImpactorSectionedPaginationBuilder parent) {
-        super(parent);
-    }
+    protected AbstractSectionedPagination parent;
 
-    @Override
-    protected Section create() {
-        return new SpongeAsynchronousGenericSection<>(this);
+    public void assignTo(AbstractSectionedPagination parent) {
+        this.parent = parent;
     }
 
 }

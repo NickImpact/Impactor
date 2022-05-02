@@ -37,8 +37,8 @@ import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Se
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionBuilder;
-import net.impactdev.impactor.common.ui.pagination.sectioned.sections.AbstractAsynchronousSection;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.sections.AbstractAsynchronousSection;
 import net.impactdev.impactor.sponge.ui.containers.sectioned.sections.SpongeSectionedPage;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.util.TriState;
@@ -132,5 +132,12 @@ public abstract class SpongeAsynchronousSection extends AbstractAsynchronousSect
         SpongeSectionedPage page = new SpongeSectionedPage(working);
         page.draw(this, updaters, style, index, size);
         return page;
+    }
+
+    @Override
+    public void handleClose() {
+        if(!this.accumulator.isDone()) {
+            this.accumulator.cancel(true);
+        }
     }
 }

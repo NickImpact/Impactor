@@ -28,10 +28,9 @@ package net.impactdev.impactor.sponge.ui.containers.sectioned.sections.asynchron
 import net.impactdev.impactor.api.ui.containers.icons.ClickContext;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.sections.ImpactorAsynchronousBasicSectionBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.sections.ImpactorAsynchronousBasicSectionBuilder;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class SpongeAsynchronousBasicSection extends SpongeAsynchronousSection {
 

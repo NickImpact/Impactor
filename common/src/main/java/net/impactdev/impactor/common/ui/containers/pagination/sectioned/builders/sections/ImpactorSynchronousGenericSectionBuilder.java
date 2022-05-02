@@ -23,30 +23,47 @@
  *
  */
 
-package net.impactdev.impactor.common.ui.pagination.sectioned.builders.sections;
+package net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.sections;
 
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.builders.SectionBuilder;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionBuilder;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 
-public abstract class ImpactorSynchronousBasicSectionBuilder
-        extends ImpactorSectionBuilder<SectionBuilder.Synchronous.Basic>
-        implements SectionBuilder.Synchronous.Basic
+public abstract class ImpactorSynchronousGenericSectionBuilder<T>
+        extends ImpactorSectionBuilder<SectionBuilder.Synchronous.Generic<T>>
+        implements SectionBuilder.Synchronous.Generic<T>
 {
 
-    public List<Icon<?>> contents = Lists.newArrayList();
+    public List<Icon.Binding<?, T>> contents = Lists.newArrayList();
+    public Predicate<T> filter;
+    public Comparator<T> sorter;
 
-    public ImpactorSynchronousBasicSectionBuilder(ImpactorSectionedPaginationBuilder parent) {
+    public ImpactorSynchronousGenericSectionBuilder(ImpactorSectionedPaginationBuilder parent) {
         super(parent);
     }
 
     @Override
-    public Basic contents(List<Icon<?>> contents) {
+    public Generic<T> contents(List<Icon.Binding<?, T>> contents) {
         this.contents = contents;
         return this;
     }
+
+    @Override
+    public Generic<T> filter(Predicate<T> filter) {
+        this.filter = filter;
+        return this;
+    }
+
+    @Override
+    public Generic<T> sort(Comparator<T> sorter) {
+        this.sorter = sorter;
+        return this;
+    }
+
 }

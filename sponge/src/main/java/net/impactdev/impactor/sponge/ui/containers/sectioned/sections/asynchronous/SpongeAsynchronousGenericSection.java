@@ -29,11 +29,10 @@ import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.ui.containers.icons.ClickContext;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.sections.ImpactorAsynchronousGenericSectionBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.sections.ImpactorAsynchronousGenericSectionBuilder;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.common.ui.pagination.sectioned.builders;
+package net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders;
 
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.builders.SectionBuilder;

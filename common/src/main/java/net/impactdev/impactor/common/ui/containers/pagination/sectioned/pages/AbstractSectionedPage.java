@@ -23,13 +23,12 @@
  *
  */
 
-package net.impactdev.impactor.common.ui.pagination.sectioned.pages;
+package net.impactdev.impactor.common.ui.containers.pagination.sectioned.pages;
 
 import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.SectionedPage;
-import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
 import net.kyori.adventure.util.TriState;
 

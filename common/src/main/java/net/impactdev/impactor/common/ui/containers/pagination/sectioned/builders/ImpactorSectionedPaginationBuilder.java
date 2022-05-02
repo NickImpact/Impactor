@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.common.ui.pagination.sectioned.builders;
+package net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders;
 
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.icons.ClickProcessor;

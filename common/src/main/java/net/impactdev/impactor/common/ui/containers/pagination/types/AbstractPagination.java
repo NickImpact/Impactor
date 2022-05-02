@@ -23,16 +23,15 @@
  *
  */
 
-package net.impactdev.impactor.common.ui.pagination.types;
+package net.impactdev.impactor.common.ui.containers.pagination.types;
 
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
 import net.impactdev.impactor.api.ui.containers.pagination.Pagination;
 import net.impactdev.impactor.api.ui.containers.pagination.components.Page;
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
-import net.impactdev.impactor.common.ui.pagination.builders.ImpactorPaginationBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.builders.ImpactorPaginationBuilder;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.util.TriState;

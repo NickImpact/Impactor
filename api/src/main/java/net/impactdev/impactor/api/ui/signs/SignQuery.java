@@ -38,13 +38,13 @@ public interface SignQuery {
     String TEXT_FORMAT = "{\"text\":\"%s\"}";
     int action = 9;
 
-    List<Component> getText();
+    List<Component> text();
 
-    Vector3i getSignPosition();
+    Vector3i position();
 
     boolean shouldReopenOnFailure();
 
-    SignSubmission getSubmissionHandler();
+    SignSubmission submissionHandler();
 
     void sendTo(PlatformPlayer player);
 

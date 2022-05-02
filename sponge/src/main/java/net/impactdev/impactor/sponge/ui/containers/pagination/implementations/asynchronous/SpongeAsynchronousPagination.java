@@ -40,8 +40,8 @@ import net.impactdev.impactor.api.ui.containers.pagination.components.TimeoutDet
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
-import net.impactdev.impactor.common.ui.pagination.types.AbstractAsynchronousPagination;
-import net.impactdev.impactor.common.ui.pagination.builders.ImpactorPaginationBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.types.AbstractAsynchronousPagination;
+import net.impactdev.impactor.common.ui.containers.pagination.builders.ImpactorPaginationBuilder;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.ui.containers.components.LayoutTranslator;
 import net.impactdev.impactor.sponge.ui.containers.components.SlotContext;
@@ -183,7 +183,13 @@ public abstract class SpongeAsynchronousPagination extends AbstractAsynchronousP
 
     @Override
     public void close() {
+        PlatformPlayerManager<ServerPlayer> manager = (PlatformPlayerManager<ServerPlayer>) Impactor.getInstance().getPlatform().playerManager();
+        ServerPlayer player = manager.translate(this.viewer).orElseThrow(() -> new IllegalStateException("Player not available or found"));
 
+        player.closeInventory();
+        if(!this.accumulator.isDone()) {
+            this.accumulator.cancel(true);
+        }
     }
 
     @Override

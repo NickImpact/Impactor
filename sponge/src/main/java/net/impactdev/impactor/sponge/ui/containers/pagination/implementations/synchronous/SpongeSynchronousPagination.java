@@ -35,8 +35,8 @@ import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.pagination.components.Page;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
-import net.impactdev.impactor.common.ui.pagination.types.AbstractPagination;
-import net.impactdev.impactor.common.ui.pagination.builders.ImpactorPaginationBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.types.AbstractPagination;
+import net.impactdev.impactor.common.ui.containers.pagination.builders.ImpactorPaginationBuilder;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.ui.containers.components.LayoutTranslator;
 import net.impactdev.impactor.sponge.ui.containers.components.SlotContext;
@@ -147,9 +147,7 @@ public abstract class SpongeSynchronousPagination extends AbstractPagination {
     public void close() {
         PlatformPlayerManager<ServerPlayer> manager = (PlatformPlayerManager<ServerPlayer>) Impactor.getInstance().getPlatform().playerManager();
         ServerPlayer player = manager.translate(this.viewer).orElseThrow(() -> new IllegalStateException("Player not available or found"));
-        if(player.isViewingInventory() && player.openInventory().filter(container -> container.containsInventory(this.view.inventory())).isPresent()) {
-            player.closeInventory();
-        }
+        player.closeInventory();
     }
 
     @Override

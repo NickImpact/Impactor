@@ -25,7 +25,6 @@
 
 package net.impactdev.impactor.sponge.ui.containers.sectioned;
 
-import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
 import net.impactdev.impactor.api.ui.containers.detail.RefreshDetail;
@@ -35,13 +34,11 @@ import net.impactdev.impactor.api.ui.containers.icons.ClickContext;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
-import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.SectionedPage;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
-import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
-import net.impactdev.impactor.common.ui.pagination.sectioned.AbstractSectionedPagination;
-import net.impactdev.impactor.common.ui.pagination.sectioned.sections.AbstractSynchronousSection;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.AbstractSectionedPagination;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.sections.AbstractSynchronousSection;
 import net.impactdev.impactor.sponge.SpongeImpactorPlugin;
 import net.impactdev.impactor.sponge.ui.containers.components.LayoutTranslator;
 import net.impactdev.impactor.sponge.ui.containers.components.SlotContext;
@@ -152,7 +149,13 @@ public class SpongeSectionedPagination extends AbstractSectionedPagination imple
 
     @Override
     public void close() {
+        PlatformPlayerManager<ServerPlayer> manager = (PlatformPlayerManager<ServerPlayer>) Impactor.getInstance().getPlatform().playerManager();
+        ServerPlayer player = manager.translate(this.viewer).orElseThrow(() -> new IllegalStateException("Player not available or found"));
 
+        player.closeInventory();
+        for(Section section : this.sections) {
+            ((AbstractSynchronousSection) section).handleClose();
+        }
     }
 
     @Override

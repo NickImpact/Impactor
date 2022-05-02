@@ -23,16 +23,30 @@
  *
  */
 
-package net.impactdev.impactor.common.ui.pagination.sectioned.sections;
+package net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.sections;
 
-import net.impactdev.impactor.common.ui.pagination.sectioned.AbstractSectionedPagination;
+import com.google.common.collect.Lists;
+import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.pagination.sectioned.builders.SectionBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
 
-public abstract class AssignableSection {
+import java.util.List;
 
-    protected AbstractSectionedPagination parent;
+public abstract class ImpactorSynchronousBasicSectionBuilder
+        extends ImpactorSectionBuilder<SectionBuilder.Synchronous.Basic>
+        implements SectionBuilder.Synchronous.Basic
+{
 
-    public void assignTo(AbstractSectionedPagination parent) {
-        this.parent = parent;
+    public List<Icon<?>> contents = Lists.newArrayList();
+
+    public ImpactorSynchronousBasicSectionBuilder(ImpactorSectionedPaginationBuilder parent) {
+        super(parent);
     }
 
+    @Override
+    public Basic contents(List<Icon<?>> contents) {
+        this.contents = contents;
+        return this;
+    }
 }

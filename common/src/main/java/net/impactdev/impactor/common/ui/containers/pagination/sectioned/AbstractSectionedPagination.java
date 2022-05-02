@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.common.ui.pagination.sectioned;
+package net.impactdev.impactor.common.ui.containers.pagination.sectioned;
 
 import com.google.common.collect.ImmutableSet;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
@@ -31,8 +31,8 @@ import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
-import net.impactdev.impactor.common.ui.pagination.sectioned.sections.AssignableSection;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.sections.AssignableSection;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;

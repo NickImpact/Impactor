@@ -29,7 +29,7 @@ import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdaterType;
-import net.impactdev.impactor.common.ui.pagination.sectioned.pages.AbstractSectionedPage;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.pages.AbstractSectionedPage;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Map;

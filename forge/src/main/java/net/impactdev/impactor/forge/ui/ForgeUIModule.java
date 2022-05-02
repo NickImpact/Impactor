@@ -31,7 +31,7 @@ import net.impactdev.impactor.api.ui.containers.ImpactorUI;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
 import net.impactdev.impactor.common.api.ModuleImplementation;
-import net.impactdev.impactor.common.ui.LayoutImpl;
+import net.impactdev.impactor.common.ui.containers.LayoutImpl;
 import net.impactdev.impactor.forge.ui.container.ForgeUI;
 import net.impactdev.impactor.forge.ui.container.icons.ForgeIcon;
 

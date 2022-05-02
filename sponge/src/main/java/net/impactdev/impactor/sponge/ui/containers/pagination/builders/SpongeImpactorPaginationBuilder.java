@@ -27,7 +27,7 @@ package net.impactdev.impactor.sponge.ui.containers.pagination.builders;
 
 import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.ui.containers.pagination.Pagination;
-import net.impactdev.impactor.common.ui.pagination.builders.ImpactorPaginationBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.builders.ImpactorPaginationBuilder;
 import net.impactdev.impactor.sponge.ui.containers.pagination.implementations.asynchronous.SpongeAsynchronousBasicPagination;
 import net.impactdev.impactor.sponge.ui.containers.pagination.implementations.asynchronous.SpongeAsynchronousGenericPagination;
 import net.impactdev.impactor.sponge.ui.containers.pagination.implementations.synchronous.SpongeSynchronousGenericPagination;

@@ -28,14 +28,13 @@ package net.impactdev.impactor.sponge.ui.containers.sectioned.sections.synchrono
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.SectionedPage;
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionBuilder;
-import net.impactdev.impactor.common.ui.pagination.sectioned.sections.AbstractSynchronousSection;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.sections.AbstractSynchronousSection;
 import net.impactdev.impactor.sponge.ui.containers.sectioned.sections.SpongeSectionedPage;
 import net.kyori.adventure.util.TriState;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 public abstract class SpongeSynchronousSection extends AbstractSynchronousSection {
 
@@ -51,4 +50,6 @@ public abstract class SpongeSynchronousSection extends AbstractSynchronousSectio
         return page;
     }
 
+    @Override
+    public void handleClose() {}
 }

@@ -23,16 +23,15 @@
  *
  */
 
-package net.impactdev.impactor.common.ui.pagination.sectioned.sections;
+package net.impactdev.impactor.common.ui.containers.pagination.sectioned.sections;
 
-import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.ui.containers.icons.ClickContext;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.SectionedPage;
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionBuilder;
 import net.kyori.adventure.util.TriState;
 import org.spongepowered.math.vector.Vector2i;
 
@@ -140,4 +139,6 @@ public abstract class AbstractSynchronousSection extends AssignableSection imple
     protected abstract SectionedPage constructPage(List<PageUpdater> updaters, TriState style, int index, int size, Map<Integer, Icon<?>> working);
 
     public abstract void appendToClickContext(ClickContext context);
+
+    public abstract void handleClose();
 }

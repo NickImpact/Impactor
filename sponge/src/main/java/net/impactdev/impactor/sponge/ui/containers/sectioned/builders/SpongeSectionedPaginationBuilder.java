@@ -28,7 +28,7 @@ package net.impactdev.impactor.sponge.ui.containers.sectioned.builders;
 import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.builders.SectionBuilder;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
 import net.impactdev.impactor.sponge.ui.containers.sectioned.SpongeSectionedPagination;
 
 public class SpongeSectionedPaginationBuilder extends ImpactorSectionedPaginationBuilder {

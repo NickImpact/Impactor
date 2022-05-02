@@ -31,16 +31,13 @@ import net.impactdev.impactor.api.ui.containers.ImpactorUI;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
 import net.impactdev.impactor.api.ui.containers.pagination.builders.PaginationBuilder;
-import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.builders.SectionedPaginationBuilder;
 import net.impactdev.impactor.api.ui.signs.SignQuery;
 import net.impactdev.impactor.common.api.ModuleImplementation;
-import net.impactdev.impactor.common.ui.LayoutImpl;
-import net.impactdev.impactor.common.ui.pagination.builders.ImpactorPaginationBuilder;
+import net.impactdev.impactor.common.ui.containers.LayoutImpl;
 import net.impactdev.impactor.sponge.ui.containers.SpongeUI;
 import net.impactdev.impactor.sponge.ui.containers.icons.SpongeIcon;
 import net.impactdev.impactor.sponge.ui.containers.pagination.builders.SpongeImpactorPaginationBuilder;
-import net.impactdev.impactor.sponge.ui.containers.sectioned.SpongeSectionedPagination;
 import net.impactdev.impactor.sponge.ui.containers.sectioned.builders.SpongeSectionedPaginationBuilder;
 import net.impactdev.impactor.sponge.ui.signs.SpongeSignQuery;
 

@@ -32,6 +32,7 @@ package net.impactdev.impactor.sponge.ui.signs;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.signs.SignQuery;
 import net.impactdev.impactor.api.ui.signs.SignSubmission;
+import net.impactdev.impactor.common.ui.signs.ImpactorSignQuery;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -39,38 +40,10 @@ import org.spongepowered.math.vector.Vector3i;
 
 import java.util.List;
 
-public class SpongeSignQuery implements SignQuery {
+public class SpongeSignQuery extends ImpactorSignQuery {
 
-    private final List<Component> lines;
-    private final Vector3i position;
-    private final boolean reopen;
-    private final SignSubmission callback;
-
-    private SpongeSignQuery(SpongeSignQueryBuilder builder) {
-        this.lines = builder.lines;
-        this.position = builder.position;
-        this.reopen = builder.reopen;
-        this.callback = builder.callback;
-    }
-
-    @Override
-    public List<Component> getText() {
-        return this.lines;
-    }
-
-    @Override
-    public Vector3i getSignPosition() {
-        return this.position;
-    }
-
-    @Override
-    public boolean shouldReopenOnFailure() {
-        return this.reopen;
-    }
-
-    @Override
-    public SignSubmission getSubmissionHandler() {
-        return this.callback;
+    public SpongeSignQuery(SpongeSignQueryBuilder builder) {
+        super(builder.lines, builder.position, builder.reopen, builder.callback);
     }
 
     @Override
@@ -113,40 +86,12 @@ public class SpongeSignQuery implements SignQuery {
 //        }
     }
 
-    public static class SpongeSignQueryBuilder implements SignQueryBuilder {
-
-        private List<Component> lines;
-        private Vector3i position;
-        private boolean reopen;
-        private SignSubmission callback;
-
-        @Override
-        public SpongeSignQueryBuilder text(List<Component> text) {
-            this.lines = text;
-            return this;
-        }
-
-        @Override
-        public SignQueryBuilder position(Vector3i position) {
-            this.position = position;
-            return this;
-        }
-
-        @Override
-        public SignQueryBuilder reopenOnFailure(boolean state) {
-            this.reopen = state;
-            return this;
-        }
-
-        @Override
-        public SignQueryBuilder response(SignSubmission response) {
-            this.callback = response;
-            return this;
-        }
+    public static class SpongeSignQueryBuilder extends ImpactorSignQueryBuilder {
 
         @Override
         public SignQuery build() {
             return new SpongeSignQuery(this);
         }
+
     }
 }

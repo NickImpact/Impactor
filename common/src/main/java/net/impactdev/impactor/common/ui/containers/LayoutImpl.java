@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.common.ui;
+package net.impactdev.impactor.common.ui.containers;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;

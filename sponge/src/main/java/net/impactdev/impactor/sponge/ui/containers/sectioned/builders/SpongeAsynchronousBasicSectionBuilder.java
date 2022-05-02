@@ -26,8 +26,8 @@
 package net.impactdev.impactor.sponge.ui.containers.sectioned.builders;
 
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.sections.ImpactorAsynchronousBasicSectionBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.sections.ImpactorAsynchronousBasicSectionBuilder;
 import net.impactdev.impactor.sponge.ui.containers.sectioned.sections.asynchronous.SpongeAsynchronousBasicSection;
 
 public class SpongeAsynchronousBasicSectionBuilder extends ImpactorAsynchronousBasicSectionBuilder {

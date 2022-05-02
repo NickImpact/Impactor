@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.common.ui.pagination.builders;
+package net.impactdev.impactor.common.ui.containers.pagination.builders;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;

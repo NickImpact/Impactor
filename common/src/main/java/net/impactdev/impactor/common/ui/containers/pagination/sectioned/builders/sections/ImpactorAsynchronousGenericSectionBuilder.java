@@ -23,34 +23,51 @@
  *
  */
 
-package net.impactdev.impactor.common.ui.pagination.sectioned.builders.sections;
+package net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.sections;
 
-import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import net.impactdev.impactor.api.ui.containers.pagination.components.TimeoutDetails;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.builders.SectionBuilder;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionBuilder;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
-public abstract class ImpactorSynchronousGenericSectionBuilder<T>
-        extends ImpactorSectionBuilder<SectionBuilder.Synchronous.Generic<T>>
-        implements SectionBuilder.Synchronous.Generic<T>
+public abstract class ImpactorAsynchronousGenericSectionBuilder<T>
+            extends ImpactorSectionBuilder<SectionBuilder.Asynchronous.Generic<T>>
+            implements SectionBuilder.Asynchronous.Generic<T>
 {
 
-    public List<Icon.Binding<?, T>> contents = Lists.newArrayList();
+    public CompletableFuture<List<Icon.Binding<?, T>>> accumulator;
+    public Icon<?> waiting;
+    public TimeoutDetails timeout;
     public Predicate<T> filter;
     public Comparator<T> sorter;
 
-    public ImpactorSynchronousGenericSectionBuilder(ImpactorSectionedPaginationBuilder parent) {
+    public ImpactorAsynchronousGenericSectionBuilder(ImpactorSectionedPaginationBuilder parent) {
         super(parent);
     }
 
     @Override
-    public Generic<T> contents(List<Icon.Binding<?, T>> contents) {
-        this.contents = contents;
+    public Generic<T> waiting(Icon<?> filler) {
+        this.waiting = filler;
+        return this;
+    }
+
+    @Override
+    public Generic<T> timeout(long amount, TimeUnit unit, @Nullable Icon<?> filler) {
+        this.timeout = new TimeoutDetails(filler, amount, unit);
+        return this;
+    }
+
+    @Override
+    public Generic<T> accumulator(CompletableFuture<List<Icon.Binding<?, T>>> accumulator) {
+        this.accumulator = accumulator;
         return this;
     }
 

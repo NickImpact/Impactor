@@ -23,13 +23,13 @@
  *
  */
 
-package net.impactdev.impactor.common.ui.pagination.sectioned.builders.sections;
+package net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.sections;
 
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.pagination.components.TimeoutDetails;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.builders.SectionBuilder;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionBuilder;
-import net.impactdev.impactor.common.ui.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
