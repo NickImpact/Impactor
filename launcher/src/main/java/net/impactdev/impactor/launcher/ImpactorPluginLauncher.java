@@ -26,9 +26,12 @@
 package net.impactdev.impactor.launcher;
 
 import java.net.URL;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class ImpactorPluginLauncher {
 
+    private static final CountDownLatch latch = new CountDownLatch(1);
     private static ImpactorPluginLauncher launcher;
     private final JarInJarClassLoader loader;
 
@@ -38,10 +41,17 @@ public class ImpactorPluginLauncher {
         }
 
         launcher = new ImpactorPluginLauncher(loader);
+        latch.countDown();
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static ImpactorPluginLauncher get() {
-        return launcher;
+        try {
+            latch.await(5, TimeUnit.SECONDS);
+            return launcher;
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private ImpactorPluginLauncher(JarInJarClassLoader loader) {

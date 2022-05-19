@@ -1,3 +1,11 @@
+plugins {
+    id 'org.spongepowered.gradle.vanilla' version '0.2'
+}
+
+minecraft {
+    version('1.16.5')
+}
+
 repositories {
     mavenCentral()
     maven {

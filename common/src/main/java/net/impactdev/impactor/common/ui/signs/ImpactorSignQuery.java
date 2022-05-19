@@ -25,7 +25,6 @@
 
 package net.impactdev.impactor.common.ui.signs;
 
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.signs.SignQuery;
 import net.impactdev.impactor.api.ui.signs.SignSubmission;
 import net.kyori.adventure.text.Component;
@@ -49,22 +48,22 @@ public abstract class ImpactorSignQuery implements SignQuery {
 
     @Override
     public List<Component> text() {
-        return null;
+        return this.text;
     }
 
     @Override
     public Vector3i position() {
-        return null;
+        return this.position;
     }
 
     @Override
     public boolean shouldReopenOnFailure() {
-        return false;
+        return this.reopenOnFailure;
     }
 
     @Override
     public SignSubmission submissionHandler() {
-        return null;
+        return this.handler;
     }
 
     public static abstract class ImpactorSignQueryBuilder implements SignQueryBuilder {

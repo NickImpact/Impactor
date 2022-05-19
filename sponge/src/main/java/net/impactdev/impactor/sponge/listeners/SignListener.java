@@ -25,13 +25,16 @@
 
 package net.impactdev.impactor.sponge.listeners;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-//import com.ichorpowered.protocolcontrol.event.PacketEvent;
+import com.ichorpowered.protocolcontrol.event.PacketEvent;
+import com.ichorpowered.protocolcontrol.event.annotation.Subscribe;
+import com.ichorpowered.protocolcontrol.packet.PacketDirection;
+import com.ichorpowered.protocolcontrol.packet.PacketType;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.signs.SignQuery;
-//import net.kyori.event.method.annotation.Subscribe;
-import net.kyori.adventure.text.TextComponent;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.math.vector.Vector3i;
+import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
 
 import java.util.Map;
 import java.util.UUID;
@@ -40,19 +43,21 @@ public class SignListener {
 
     public final static Map<UUID, SignQuery> requests = Maps.newHashMap();
 
-//    @Subscribe
-//    public void onSignUpdate(PacketEvent<CUpdateSignPacket> event) {
-//        if(requests.containsKey(event.profile().player())) {
-//            SignQuery<Text, Player> query = requests.remove(event.profile().player());
-//            Impactor.getInstance().getScheduler().executeSync(() -> {
-//                if(!query.getSubmissionHandler().process(Lists.newArrayList(event.packet().getLines()))) {
-//                    if(query.shouldReopenOnFailure()) {
-//                        requests.put(event.profile().player(), query);
-//                        query.sendTo(Sponge.getServer().getPlayer(event.profile().player()).get());
-//                    }
-//                }
-//            });
-//        }
-//    }
+    @Subscribe(type = PacketType.UPDATE_SIGN, direction = PacketDirection.INCOMING)
+    public void onSignUpdate(PacketEvent event) {
+        if(requests.containsKey(event.profile().id())) {
+            SignQuery query = requests.remove(event.profile().id());
+            // TODO - Not forge friendly
+            ServerboundSignUpdatePacket packet = (ServerboundSignUpdatePacket) event.packet();
+            Impactor.getInstance().getScheduler().executeSync(() -> {
+                if(!query.submissionHandler().process(Lists.newArrayList(packet.getLines()))) {
+                    if(query.shouldReopenOnFailure()) {
+                        requests.put(event.profile().id(), query);
+                        query.sendTo(PlatformPlayer.from(event.profile().player().orElseThrow(IllegalStateException::new)));
+                    }
+                }
+            });
+        }
+    }
 
 }
