@@ -199,13 +199,13 @@ public interface PaginationBuilder extends UIComponent<PaginationBuilder>, Build
              * @param icons The icons to associate with the pagination
              * @return The updated builder
              */
-            Basic contents(List<Icon<?>> icons);
+            Basic contents(List<Icon> icons);
 
         }
 
         interface Generic<T> extends Synchronous<Pagination.Generic<T>> {
 
-            Generic<T> contents(List<Icon.Binding<?, T>> icons);
+            Generic<T> contents(List<Icon.Binding<T>> icons);
 
             Generic<T> filter(Predicate<T> filter);
 
@@ -229,20 +229,20 @@ public interface PaginationBuilder extends UIComponent<PaginationBuilder>, Build
          * @param icon The icon to fill the pagination with if the accumulator times out
          * @return The updated builder
          */
-        B timeout(long time, TimeUnit unit, Icon<?> icon);
+        B timeout(long time, TimeUnit unit, Icon icon);
 
-        B waiting(Icon<?> icon);
+        B waiting(Icon icon);
 
         interface Basic extends Asynchronous<Pagination, Basic> {
 
             @Required
-            Basic accumulator(CompletableFuture<List<Icon<?>>> provider);
+            Basic accumulator(CompletableFuture<List<Icon>> provider);
 
         }
 
         interface Generic<T> extends Asynchronous<Pagination.Generic<T>, Generic<T>> {
 
-            Generic<T> accumulator(CompletableFuture<List<Icon.Binding<?, T>>> accumulator);
+            Generic<T> accumulator(CompletableFuture<List<Icon.Binding<T>>> accumulator);
 
             Generic<T> filter(Predicate<T> filter);
 

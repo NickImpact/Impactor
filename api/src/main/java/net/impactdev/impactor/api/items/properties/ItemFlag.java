@@ -23,34 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.api.ui.containers.pagination.components;
+package net.impactdev.impactor.api.items.properties;
 
-import net.impactdev.impactor.api.ui.containers.icons.Icon;
-
-import java.util.concurrent.TimeUnit;
-
-public class TimeoutDetails {
-
-    private final Icon filler;
-
-    private final long time;
-    private final TimeUnit unit;
-
-    public TimeoutDetails(Icon filler, long time, TimeUnit unit) {
-        this.filler = filler;
-        this.time = time;
-        this.unit = unit;
-    }
-
-    public Icon filler() {
-        return this.filler;
-    }
-
-    public long time() {
-        return this.time;
-    }
-
-    public TimeUnit unit() {
-        return this.unit;
-    }
+public enum ItemFlag {
 }

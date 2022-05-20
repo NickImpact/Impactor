@@ -35,12 +35,12 @@ import java.util.function.BiConsumer;
 
 public interface SectionedPage {
 
-    Map<Integer, Icon<?>> icons();
+    Map<Integer, Icon> icons();
 
-    Map<Integer, Icon<?>> drawn();
+    Map<Integer, Icon> drawn();
 
     void draw(Section parent, List<PageUpdater> updaters, TriState style, int page, int maxPages);
 
-    void refresh(BiConsumer<Integer, Icon<?>> consumer);
+    void refresh(BiConsumer<Integer, Icon> consumer);
 
 }

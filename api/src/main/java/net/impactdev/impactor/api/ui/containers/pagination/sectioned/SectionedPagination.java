@@ -84,7 +84,7 @@ public interface SectionedPagination {
      * @param slot The slot inside the view that should be modified
      * @return <code>true</code> if the action was accepted, <code>false</code> if rejected
      */
-    boolean set(@Nullable Icon<?> icon, int slot);
+    boolean set(@Nullable Icon icon, int slot);
 
     /**
      * If it exists, provides the section at the target slot. Otherwise, this will result in an empty

@@ -2,14 +2,14 @@ rootProject.name = 'Impactor'
 include (
         'api',
         'launcher',
-        'common',
-        'bungee',
-        'bungee:bungee-launcher',
-        'forge',
-        'forge:forge-launcher',
-        'sponge',
-        'sponge:sponge-launcher',
-        'velocity',
-        'velocity:velocity-launcher'
+        //'common',
+        //'bungee',
+        //'bungee:bungee-launcher',
+        //'forge',
+        //'forge:forge-launcher',
+        //'sponge',
+        //'sponge:sponge-launcher',
+        //'velocity',
+        //'velocity:velocity-launcher'
 )
 

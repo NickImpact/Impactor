@@ -36,9 +36,9 @@ import java.util.function.Consumer;
 
 public interface Layout {
 
-	ImmutableMap<Integer, Icon<?>> elements();
+	ImmutableMap<Integer, Icon> elements();
 
-	Optional<Icon<?>> icon(int slot);
+	Optional<Icon> icon(int slot);
 
 	Vector2i dimensions();
 
@@ -71,7 +71,7 @@ public interface Layout {
 		 * @return The layout builder following the attempted update
 		 * @throws IllegalArgumentException If the given slot is not within the bounds of the container
 		 */
-		LayoutBuilder slot(Icon<?> icon, int slot);
+		LayoutBuilder slot(Icon icon, int slot);
 
 		/**
 		 * Sets the following icon to the set of slots given.
@@ -83,7 +83,7 @@ public interface Layout {
 		 * @return
 		 * @throws IllegalArgumentException If a given slot is not within the bounds of the container
 		 */
-		default LayoutBuilder slots(Icon<?> icon, int... slots) {
+		default LayoutBuilder slots(Icon icon, int... slots) {
 			for(int slot : slots) {
 				this.slot(icon, slot);
 			}
@@ -97,7 +97,7 @@ public interface Layout {
 		 * @param icon The icon to fill the inventory with, if any slots are left available
 		 * @return The layout builder following the attempted update
 		 */
-		LayoutBuilder fill(Icon<?> icon);
+		LayoutBuilder fill(Icon icon);
 
 		/**
 		 * Draws the given icon across the border of the layout. In other words, this will cover the outermost
@@ -107,7 +107,7 @@ public interface Layout {
 		 * @param icon The icon to draw for the border
 		 * @return The updated builder
 		 */
-		LayoutBuilder border(Icon<?> icon);
+		LayoutBuilder border(Icon icon);
 
 		/**
 		 * Draws the icon across the specified row for all slots in that row. This must agree with the
@@ -119,7 +119,7 @@ public interface Layout {
 		 * @return The updated builder
 		 * @throws IllegalArgumentException If the given row is outside the acceptable bounds
 		 */
-		LayoutBuilder row(Icon<?> icon, int row);
+		LayoutBuilder row(Icon icon, int row);
 
 		/**
 		 * Draws the icon across the specified rows for all slots in that row. This must agree with the
@@ -131,7 +131,7 @@ public interface Layout {
 		 * @return The updated builder
 		 * @throws IllegalArgumentException If the given row is outside the acceptable bounds
 		 */
-		default LayoutBuilder rows(Icon<?> icon, int... rows) {
+		default LayoutBuilder rows(Icon icon, int... rows) {
 			for(int row : rows) {
 				this.row(icon, row);
 			}
@@ -149,7 +149,7 @@ public interface Layout {
 		 * @return The updated builder
 		 * @throws IllegalArgumentException If the given column is outside the acceptable bounds
 		 */
-		LayoutBuilder column(Icon<?> icon, int column);
+		LayoutBuilder column(Icon icon, int column);
 
 		/**
 		 * Draws the icon across the specified columns for all slots in that column. Values outside the column
@@ -161,7 +161,7 @@ public interface Layout {
 		 * @return The updated builder
 		 * @throws IllegalArgumentException If a given column is outside the acceptable bounds
 		 */
-		default LayoutBuilder columns(Icon<?> icon, int... columns) {
+		default LayoutBuilder columns(Icon icon, int... columns) {
 			for(int column : columns) {
 				this.column(icon, column);
 			}
@@ -176,7 +176,7 @@ public interface Layout {
 		 * @param icon The icon to draw at the center of the container
 		 * @return The updated builder
 		 */
-		LayoutBuilder center(Icon<?> icon);
+		LayoutBuilder center(Icon icon);
 
 		/**
 		 * Draws a square around the center point, with a radius of 2. This means the square is composed of the
@@ -188,7 +188,7 @@ public interface Layout {
 		 * @param hollow If the center point should be omitted
 		 * @return The updated builder
 		 */
-		default LayoutBuilder square(Icon<?> icon, int center, boolean hollow) {
+		default LayoutBuilder square(Icon icon, int center, boolean hollow) {
 			return this.square(icon, center, 2, hollow);
 		}
 
@@ -204,7 +204,7 @@ public interface Layout {
 		 * @param hollow If the center point should be omitted
 		 * @return The updated builder
 		 */
-		LayoutBuilder square(Icon<?> icon, int center, int radius, boolean hollow);
+		LayoutBuilder square(Icon icon, int center, int radius, boolean hollow);
 
 		/**
 		 * Draws a rectangle in the UI using the following coordinates. Additionally, this shape
@@ -216,7 +216,7 @@ public interface Layout {
 		 * @param hollow Indicates if the drawn shape should be hollow
 		 * @return The updated builder
 		 */
-		LayoutBuilder rectangle(Icon<?> icon, Vector2i size, Vector2i offset, boolean hollow);
+		LayoutBuilder rectangle(Icon icon, Vector2i size, Vector2i offset, boolean hollow);
 
 		/**
 		 * Allows for customized drawing patterns to be directly applied to the layout builder. For instance,

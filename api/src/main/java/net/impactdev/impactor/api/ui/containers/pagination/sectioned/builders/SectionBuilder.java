@@ -160,7 +160,7 @@ public interface SectionBuilder<T extends SectionBuilder<T>> {
              * @param contents The icons to associate with the pagination
              * @return The updated builder
              */
-            Basic contents(List<Icon<?>> contents);
+            Basic contents(List<Icon> contents);
 
         }
 
@@ -174,7 +174,7 @@ public interface SectionBuilder<T extends SectionBuilder<T>> {
              * @param contents The icons to associate with the pagination
              * @return The updated builder
              */
-            Generic<T> contents(List<Icon.Binding<?, T>> contents);
+            Generic<T> contents(List<Icon.Binding<T>> contents);
 
             Generic<T> filter(Predicate<T> filter);
 
@@ -193,7 +193,7 @@ public interface SectionBuilder<T extends SectionBuilder<T>> {
          * @param filler The icon to fill the section with
          * @return The updated builder
          */
-        B waiting(Icon<?> filler);
+        B waiting(Icon filler);
 
         /**
          * Specifies the amount of time the accumulator is permitted to wait before
@@ -208,7 +208,7 @@ public interface SectionBuilder<T extends SectionBuilder<T>> {
          *               to substitute its own icon.
          * @return The updated builder
          */
-        B timeout(long amount, TimeUnit unit, @Nullable Icon<?> filler);
+        B timeout(long amount, TimeUnit unit, @Nullable Icon filler);
 
         interface Basic extends Asynchronous<Basic> {
 
@@ -232,13 +232,13 @@ public interface SectionBuilder<T extends SectionBuilder<T>> {
              *                    fill the pagination over time.
              * @return The updated builder
              */
-            Basic accumulator(CompletableFuture<List<Icon<?>>> accumulator);
+            Basic accumulator(CompletableFuture<List<Icon>> accumulator);
 
         }
 
         interface Generic<T> extends Asynchronous<Generic<T>> {
 
-            Generic<T> accumulator(CompletableFuture<List<Icon.Binding<?, T>>> accumulator);
+            Generic<T> accumulator(CompletableFuture<List<Icon.Binding<T>>> accumulator);
 
             Generic<T> filter(Predicate<T> filter);
 

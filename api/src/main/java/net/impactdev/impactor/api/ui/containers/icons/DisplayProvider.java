@@ -25,6 +25,7 @@
 
 package net.impactdev.impactor.api.ui.containers.icons;
 
+import net.impactdev.impactor.api.items.ViewableItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 
@@ -50,11 +51,9 @@ import java.util.function.Supplier;
  * provide will return the display item as it was created. In practice, provide
  * on this interface will only be fired once, as the view implementations should
  * skip over this type during a refresh call.
- *
- * @param <T> The platform specific type for an ItemStack
  */
 @FunctionalInterface
-public interface DisplayProvider<T> {
+public interface DisplayProvider {
 
     /**
      * Creates a displayable ItemStack. If an icon changes overtime, this method should consider
@@ -83,9 +82,9 @@ public interface DisplayProvider<T> {
      *
      * @return An icon for the particular display
      */
-    T provide();
+    ViewableItem provide();
 
-    default DisplayProvider<T> manipulate(Function<T, T> manipulator) {
+    default DisplayProvider manipulate(Function<ViewableItem, ViewableItem> manipulator) {
         return () -> manipulator.apply(this.provide());
     }
 
@@ -94,19 +93,17 @@ public interface DisplayProvider<T> {
      * change. From the point of creation, the icon configured will remain constant, and never
      * feature a change of icon. This provider type is primarily useful for icons where a page
      * is expected to refresh, and you wish for an icon to not actually be refreshed at all.
-     *
-     * @param <T> The platform specific type for an ItemStack
      */
-    class Constant<T> implements DisplayProvider<T> {
+    class Constant implements DisplayProvider {
 
-        private final T display;
+        private final ViewableItem display;
 
-        public Constant(T display) {
+        public Constant(ViewableItem display) {
             this.display = display;
         }
 
         @Override
-        public T provide() {
+        public ViewableItem provide() {
             return this.display;
         }
 

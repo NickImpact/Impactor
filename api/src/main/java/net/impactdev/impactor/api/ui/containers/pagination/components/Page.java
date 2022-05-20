@@ -39,7 +39,7 @@ public interface Page<T> {
 
     Layout toLayout();
 
-    Map<Integer, Icon<?>> icons();
+    Map<Integer, Icon> icons();
 
     void draw(Pagination parent, Layout layout, List<PageUpdater> updaters, int page, int maxPages);
 

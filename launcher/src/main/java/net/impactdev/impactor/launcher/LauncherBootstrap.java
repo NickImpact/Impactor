@@ -25,10 +25,19 @@
 
 package net.impactdev.impactor.launcher;
 
+import java.nio.file.Path;
+
 /**
  * Minimal bootstrap plugin, called by the loader plugin.
  */
 public interface LauncherBootstrap {
+
+    /**
+     * Represents the direct location of the created jar
+     *
+     * @return
+     */
+    Path location();
 
     /**
      * This method should handle the actual registration of additional event listeners

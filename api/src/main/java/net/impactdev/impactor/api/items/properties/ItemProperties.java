@@ -23,34 +23,17 @@
  *
  */
 
-package net.impactdev.impactor.api.ui.containers.pagination.components;
+package net.impactdev.impactor.api.items.properties;
 
-import net.impactdev.impactor.api.ui.containers.icons.Icon;
+import io.leangen.geantyref.TypeToken;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.Optional;
 
-public class TimeoutDetails {
+public interface ItemProperties {
 
-    private final Icon filler;
+    Map<String, Object> mapping();
 
-    private final long time;
-    private final TimeUnit unit;
+    <T> Optional<T> locate(String key);
 
-    public TimeoutDetails(Icon filler, long time, TimeUnit unit) {
-        this.filler = filler;
-        this.time = time;
-        this.unit = unit;
-    }
-
-    public Icon filler() {
-        return this.filler;
-    }
-
-    public long time() {
-        return this.time;
-    }
-
-    public TimeUnit unit() {
-        return this.unit;
-    }
 }

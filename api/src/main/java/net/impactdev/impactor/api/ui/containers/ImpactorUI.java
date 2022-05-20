@@ -68,7 +68,7 @@ public interface ImpactorUI {
 	 * @param slot The slot to set the icon at
 	 * @throws IllegalArgumentException If the given slot is outside the boundaries of the UI.
 	 */
-	void set(@Nullable Icon<?> icon, int slot);
+	void set(@Nullable Icon icon, int slot);
 
 	/**
 	 * Opens the view for the specified player.

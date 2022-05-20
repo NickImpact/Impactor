@@ -28,6 +28,7 @@ package net.impactdev.impactor.api.ui.containers.icons;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.builders.Required;
+import net.impactdev.impactor.api.items.ViewableItem;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +41,7 @@ import java.util.function.Supplier;
  * to itself. It is not required that an icon provide any listeners at all, and any button without an attached
  * event will simply act as a display icon.
  */
-public interface Icon<T> {
+public interface Icon {
 
 	/**
 	 * Gets the actual platform representation of the icon. This display simply represents how a client will
@@ -48,7 +49,7 @@ public interface Icon<T> {
 	 *
 	 * @return The actual platform respective ItemStack representing the client perspective
 	 */
-	@NotNull DisplayProvider<T> display();
+	@NotNull DisplayProvider display();
 
 	/**
 	 * Provides the set of listeners attached to this icon, as an immutable set.
@@ -65,20 +66,19 @@ public interface Icon<T> {
 	 * @return This icon with the newly appended processor
 	 */
 	@Contract("_ -> this")
-	Icon<T> listener(ClickProcessor processor);
+	Icon listener(ClickProcessor processor);
 
-	static <T> IconBuilder<T> builder(Class<T> typing) {
-		return (IconBuilder<T>) Impactor.getInstance().getRegistry().createBuilder(IconBuilder.class);
+	static IconBuilder builder() {
+		return Impactor.getInstance().getRegistry().createBuilder(IconBuilder.class);
 	}
 
 	/**
 	 * Represents an icon which is bound to a given object. These types of icons are convenient
 	 * for solutions which may attempt to sort icons based on their creating type.
 	 *
-	 * @param <D> The type of display viewable to the client
 	 * @param <T> The type of object bound to this icon
 	 */
-	interface Binding<D, T> extends Icon<D> {
+	interface Binding<T> extends Icon {
 
 		/**
 		 * The bound object to this icon. This binding will be used for elements such as sorting,
@@ -93,10 +93,8 @@ public interface Icon<T> {
 	/**
 	 * Constructs an icon based on the following parameters. At a minimum, a display for an icon is required
 	 * for it to be valid. Otherwise, listeners can be added as desired.
-	 *
-	 * @param <T> The platform-based ItemStack typing
 	 */
-	interface IconBuilder<T> extends Builder<Icon<T>> {
+	interface IconBuilder extends Builder<Icon> {
 
 		/**
 		 * Sets the display of the icon to the following platform-based ItemStack.
@@ -107,7 +105,7 @@ public interface Icon<T> {
 		 * @return The current builder
 		 */
 		@Required
-		IconBuilder<T> display(DisplayProvider<T> display);
+		IconBuilder display(DisplayProvider display);
 
 		/**
 		 * Appends a listener to the icon. This listener will act as a means of handling any click action
@@ -116,9 +114,9 @@ public interface Icon<T> {
 		 * @param processor The processor to append to the Icon's listener set.
 		 * @return The current builder
 		 */
-		IconBuilder<T> listener(ClickProcessor processor);
+		IconBuilder listener(ClickProcessor processor);
 
-		IconBuilder<T> from(Icon<?> parent);
+		IconBuilder from(Icon parent);
 
 		/**
 		 * Builds a which is bound to the instance given as a binding object. This object will be used for
@@ -129,7 +127,7 @@ public interface Icon<T> {
 		 * @return A new icon built with the bound object
 		 * @param <E> The typing of the binding object
 		 */
-		<E> Icon.Binding<T, E> build(Supplier<E> binding);
+		<E> Icon.Binding<E> build(Supplier<E> binding);
 
 	}
 

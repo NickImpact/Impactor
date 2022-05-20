@@ -26,7 +26,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'maven-publish-auth'
 
 group 'net.impactdev.impactor'
-version '4.0.0-SNAPSHOT'
+version '5.0.0-SNAPSHOT'
 
 java {
     toolchain {
@@ -60,7 +60,7 @@ subprojects {
     apply plugin: 'org.cadixdev.licenser'
 
     group = 'net.impactdev.impactor'
-    version = '4.0.0-SNAPSHOT'
+    version = '5.0.0-SNAPSHOT'
 
     java {
         toolchain {
@@ -203,13 +203,13 @@ publishing {
 //            version project.version
 //        }
 
-        sponge(MavenPublication) {
-            def project = project(':sponge')
-            from project.components.java
-            groupId project.group
-            artifactId "sponge"
-            version project.version
-        }
+//        sponge(MavenPublication) {
+//            def project = project(':sponge')
+//            from project.components.java
+//            groupId project.group
+//            artifactId "sponge"
+//            version project.version
+//        }
     }
 }
 

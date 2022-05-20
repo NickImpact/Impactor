@@ -107,7 +107,7 @@ public interface Section {
         return result.x() + (9 * result.y());
     }
 
-    void refresh(BiConsumer<Integer, Icon<?>> consumer);
+    void refresh(BiConsumer<Integer, Icon> consumer);
 
     interface Generic<T> extends Section {
 
