@@ -26,7 +26,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'maven-publish-auth'
 
 group 'net.impactdev.impactor'
-version '4.0.0-SNAPSHOT'
+version '4.0.0'
 
 java {
     toolchain {
@@ -60,7 +60,7 @@ subprojects {
     apply plugin: 'org.cadixdev.licenser'
 
     group = 'net.impactdev.impactor'
-    version = '4.0.0-SNAPSHOT'
+    version = '4.0.0'
 
     java {
         toolchain {
