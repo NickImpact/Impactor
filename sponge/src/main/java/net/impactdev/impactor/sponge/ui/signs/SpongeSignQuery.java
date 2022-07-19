@@ -26,12 +26,12 @@
 package net.impactdev.impactor.sponge.ui.signs;
 
 import com.google.common.reflect.TypeToken;
-import com.ichorpowered.protocolcontrol.channel.ChannelProfile;
-import com.ichorpowered.protocolcontrol.packet.PacketDirection;
-import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
-import com.ichorpowered.protocolcontrol.packet.PacketType;
-import com.ichorpowered.protocolcontrol.service.ProtocolService;
-import com.ichorpowered.protocolcontrol.service.ServiceProvider;
+//import com.ichorpowered.protocolcontrol.channel.ChannelProfile;
+//import com.ichorpowered.protocolcontrol.packet.PacketDirection;
+//import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
+//import com.ichorpowered.protocolcontrol.packet.PacketType;
+//import com.ichorpowered.protocolcontrol.service.ProtocolService;
+//import com.ichorpowered.protocolcontrol.service.ServiceProvider;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
@@ -63,38 +63,38 @@ public class SpongeSignQuery extends ImpactorSignQuery {
         ServerPlayer sponge = manager.translate(player).orElseThrow(() -> new IllegalStateException("Player not available or found"));
         sponge.sendBlockChange(this.position().toInt(), sign);
 
-        ProtocolService service = ServiceProvider.get();
-        final ChannelProfile profile = Objects.requireNonNull(service.channels().profile(player.uuid()));
-
-        try {
-            final PacketRemapper.Wrapped view = service.remapper().wrap(PacketType.OPEN_SIGN_MENU, PacketDirection.OUTGOING);
-            final PacketRemapper.Wrapped update = service.remapper().wrap(PacketType.UPDATE_TILE_ENTITY, PacketDirection.OUTGOING);
-
-            BlockPos position = new BlockPos(this.position().x(), this.position().y(), this.position().z());
-            view.set(TypeToken.of(BlockPos.class), 0, position);
-
-            CompoundTag data = new CompoundTag();
-            data.putInt("x", position.getX());
-            data.putInt("y", position.getY());
-            data.putInt("z", position.getZ());
-            data.putString("id", "minecraft:sign");
-
-            IntStream.rangeClosed(1, 4).forEach(line -> data.putString(
-                    "Text" + line,
-                    this.text().size() >= line ? String.format(TEXT_FORMAT, PlainTextComponentSerializer.plainText().serialize(this.text().get(line - 1))) : " "
-            ));
-
-            update.set(TypeToken.of(BlockPos.class), 0, position);
-            update.set(TypeToken.of(int.class), 0, 9);
-            update.set(TypeToken.of(CompoundTag.class), 0, data);
-
-            profile.send(PacketDirection.OUTGOING, update.packet());
-            profile.send(PacketDirection.OUTGOING, view.packet());
-
-            SignListener.requests.put(player.uuid(), this);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
+//        ProtocolService service = ServiceProvider.get();
+//        final ChannelProfile profile = Objects.requireNonNull(service.channels().profile(player.uuid()));
+//
+//        try {
+//            final PacketRemapper.Wrapped view = service.remapper().wrap(PacketType.OPEN_SIGN_MENU, PacketDirection.OUTGOING);
+//            final PacketRemapper.Wrapped update = service.remapper().wrap(PacketType.UPDATE_TILE_ENTITY, PacketDirection.OUTGOING);
+//
+//            BlockPos position = new BlockPos(this.position().x(), this.position().y(), this.position().z());
+//            view.set(TypeToken.of(BlockPos.class), 0, position);
+//
+//            CompoundTag data = new CompoundTag();
+//            data.putInt("x", position.getX());
+//            data.putInt("y", position.getY());
+//            data.putInt("z", position.getZ());
+//            data.putString("id", "minecraft:sign");
+//
+//            IntStream.rangeClosed(1, 4).forEach(line -> data.putString(
+//                    "Text" + line,
+//                    this.text().size() >= line ? String.format(TEXT_FORMAT, PlainTextComponentSerializer.plainText().serialize(this.text().get(line - 1))) : " "
+//            ));
+//
+//            update.set(TypeToken.of(BlockPos.class), 0, position);
+//            update.set(TypeToken.of(int.class), 0, 9);
+//            update.set(TypeToken.of(CompoundTag.class), 0, data);
+//
+//            profile.send(PacketDirection.OUTGOING, update.packet());
+//            profile.send(PacketDirection.OUTGOING, view.packet());
+//
+//            SignListener.requests.put(player.uuid(), this);
+//        } catch (Throwable throwable) {
+//            throwable.printStackTrace();
+//        }
     }
 
     public static class SpongeSignQueryBuilder extends ImpactorSignQueryBuilder {
