@@ -11,6 +11,8 @@ buildscript {
     dependencies {
         classpath 'com.google.guava:guava:27.1-jre'
         classpath 'org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1'
+        classpath 'com.google.guava:guava:27.1-jre'
+        classpath 'org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1'
     }
 }
 
