@@ -26,7 +26,12 @@
 package net.impactdev.impactor.common.players;
 
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.kyori.adventure.audience.MessageType;
+import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.UUID;
 
@@ -49,4 +54,10 @@ public class CommonPlatformPlayer implements PlatformPlayer {
     public Component name() {
         return this.name;
     }
+
+    @Override
+    public Vector3d position() {
+        return null;
+    }
+
 }

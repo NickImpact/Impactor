@@ -31,6 +31,8 @@ import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.Layout;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
+import net.impactdev.impactor.common.ui.containers.pagination.locators.IconLocator;
+import net.impactdev.impactor.common.ui.containers.pagination.locators.SectionedIconLocator;
 import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
 import net.impactdev.impactor.common.ui.containers.pagination.sectioned.sections.AssignableSection;
 import net.kyori.adventure.key.Key;
@@ -47,6 +49,7 @@ public abstract class AbstractSectionedPagination implements SectionedPagination
 
     protected final PlatformPlayer viewer;
     protected final Set<Section> sections;
+    protected final IconLocator locator;
 
     protected AbstractSectionedPagination(ImpactorSectionedPaginationBuilder builder) {
         this.provider = builder.provider;
@@ -56,6 +59,8 @@ public abstract class AbstractSectionedPagination implements SectionedPagination
         for(Section section : sections) {
             ((AssignableSection) section).assignTo(this);
         }
+
+        this.locator = new SectionedIconLocator(builder.layout, builder.sections);
     }
 
     @Override
@@ -81,6 +86,10 @@ public abstract class AbstractSectionedPagination implements SectionedPagination
                             this.lessOrEqual(location, section.maximum());
                 })
                 .findAny();
+    }
+
+    public IconLocator locator() {
+        return this.locator;
     }
 
     public abstract void setUnsafe(@Nullable Icon<?> icon, int slot);

@@ -26,6 +26,7 @@
 package net.impactdev.impactor.api.registry;
 
 import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.plugin.PluginMetadata;
 
 import java.util.function.Supplier;
 
@@ -34,6 +35,10 @@ public interface Registry {
     <T> void register(Class<T> type, T value);
 
     <T> T get(Class<T> type);
+
+    <T> void register(String pluginID, Class<T> type, T value);
+
+    <T> T get(String pluginID, Class<T> type);
 
     <T extends Builder<?>> void registerBuilderSupplier(Class<T> type, Supplier<? extends T> builder);
 

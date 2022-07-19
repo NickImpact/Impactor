@@ -26,15 +26,19 @@
 package net.impactdev.impactor.api.platform.players;
 
 import net.impactdev.impactor.api.Impactor;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.UUID;
 
-public interface PlatformPlayer {
+public interface PlatformPlayer extends Audience {
 
     UUID uuid();
 
     Component name();
+
+    Vector3d position();
 
     static PlatformPlayer from(Object instance) {
         return Impactor.getInstance().getPlatform().playerManager().from(instance);

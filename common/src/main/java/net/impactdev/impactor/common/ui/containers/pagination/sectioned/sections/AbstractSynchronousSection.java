@@ -25,13 +25,16 @@
 
 package net.impactdev.impactor.common.ui.containers.pagination.sectioned.sections;
 
+import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.ui.containers.icons.ClickContext;
 import net.impactdev.impactor.api.ui.containers.icons.Icon;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Section;
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.SectionedPage;
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
+import net.impactdev.impactor.common.ui.containers.pagination.builders.PageConstructionDetails;
 import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionBuilder;
+import net.impactdev.impactor.common.ui.containers.pagination.sectioned.pages.LazyPageProvider;
 import net.kyori.adventure.util.TriState;
 import org.spongepowered.math.vector.Vector2i;
 
@@ -96,36 +99,21 @@ public abstract class AbstractSynchronousSection extends AssignableSection imple
         return this.pages;
     }
 
-    protected  <E extends Icon<?>> CircularLinkedList<SectionedPage> draft(List<E> icons) {
+    protected <E extends Icon<?>> CircularLinkedList<SectionedPage> draft(List<E> icons) {
         CircularLinkedList<SectionedPage> result = CircularLinkedList.of();
 
         Vector2i zone = this.maximum.sub(this.minimum).add(Vector2i.ONE);
         int max = zone.y() * zone.x();
-        int size = icons.size() / max + (icons.size() % max == 0 ? 0 : 1);
 
-        int slot = 0;
-        Map<Integer, Icon<?>> working = new HashMap<>();
-        for(Icon<?> icon : icons) {
-            if(slot < max) {
-                int target = this.calculateTargetSlot(slot, zone, this.minimum);
-                working.put(target, icon);
-                ++slot;
-            } else {
-                int target = this.calculateTargetSlot(0, zone, this.maximum);
-
-                result.append(this.constructPage(this.updaters, this.style, result.size() + 1, size, working));
-                working = new HashMap<>();
-                working.put(target, icon);
-                slot = 1;
-            }
-        }
-
-        if(!working.isEmpty()) {
-            result.append(this.constructPage(this.updaters, this.style, result.size() + 1, size, working));
+        int index = 0;
+        int page = 1;
+        while(index < icons.size()) {
+            result.append(this.page(icons, page++, index, index + max));
+            index += max;
         }
 
         if(result.empty()) {
-            result.append(this.constructPage(this.updaters, this.style, 1, 1, Collections.emptyMap()));
+            result.append(this.page(Lists.newArrayList(), 1, 0, 0));
         }
 
         return result;
@@ -136,9 +124,23 @@ public abstract class AbstractSynchronousSection extends AssignableSection imple
         this.pages.at(this.page() - 1).refresh(consumer);
     }
 
-    protected abstract SectionedPage constructPage(List<PageUpdater> updaters, TriState style, int index, int size, Map<Integer, Icon<?>> working);
+    private <E extends Icon<?>> LazyPageProvider<E> page(List<E> icons, int page, int start, int end) {
+        PageConstructionDetails<E> details = PageConstructionDetails.<E>create()
+                .icons(icons)
+                .zone(this.maximum.sub(this.minimum).add(Vector2i.ONE))
+                .offsets(this.minimum)
+                .page(page)
+                .total(icons.size() / Math.max(1, end - start) + 1)
+                .indexes(start, end)
+                .updaters(this.updaters)
+                .style(this.style);
+        return new LazyPageProvider<>(() -> this.constructPage(details));
+    }
+
+    protected abstract <E extends Icon<?>> SectionedPage constructPage(PageConstructionDetails<E> details);
 
     public abstract void appendToClickContext(ClickContext context);
 
     public abstract void handleClose();
+
 }

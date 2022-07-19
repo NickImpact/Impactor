@@ -37,10 +37,11 @@ public class StorageCredentials {
     private final int maxPoolSize;
     private final int minIdleConnections;
     private final int maxLifetime;
+    private final int keepAliveTime;
     private final int connectionTimeout;
     private final Map<String, String> properties;
 
-    public StorageCredentials(String address, String database, String username, String password, int maxPoolSize, int minIdleConnections, int maxLifetime, int connectionTimeout, Map<String, String> properties) {
+    public StorageCredentials(String address, String database, String username, String password, int maxPoolSize, int minIdleConnections, int maxLifetime, int keepAliveTime, int connectionTimeout, Map<String, String> properties) {
         this.address = address;
         this.database = database;
         this.username = username;
@@ -48,6 +49,7 @@ public class StorageCredentials {
         this.maxPoolSize = maxPoolSize;
         this.minIdleConnections = minIdleConnections;
         this.maxLifetime = maxLifetime;
+        this.keepAliveTime = keepAliveTime;
         this.connectionTimeout = connectionTimeout;
         this.properties = properties;
     }
@@ -80,6 +82,10 @@ public class StorageCredentials {
         return this.maxLifetime;
     }
 
+    public int getKeepAliveTime() {
+        return this.keepAliveTime;
+    }
+
     public int getConnectionTimeout() {
         return this.connectionTimeout;
     }
@@ -87,4 +93,5 @@ public class StorageCredentials {
     public Map<String, String> getProperties() {
         return this.properties;
     }
+
 }

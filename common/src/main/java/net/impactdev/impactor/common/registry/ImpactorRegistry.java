@@ -30,14 +30,16 @@ import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.registry.Registry;
 import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.utilities.context.ContextualMapping;
+import net.impactdev.impactor.api.utilities.context.Provider;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
 public final class ImpactorRegistry implements Registry {
 
-    private static final Map<Class<?>, Supplier<?>> builders = Maps.newHashMap();
-    private static final ContextualMapping bindings = new ContextualMapping();
+    private final Map<Class<?>, Supplier<?>> builders = Maps.newHashMap();
+    private final ContextualMapping bindings = new ContextualMapping();
+    private final Map<String, Map<Class<?>, Provider<?>>> pluginBindings = Maps.newHashMap();
 
     @Override
     public <T> void register(Class<T> type, T value) {
@@ -51,6 +53,20 @@ public final class ImpactorRegistry implements Registry {
     public <T> T get(Class<T> type) {
         Preconditions.checkArgument(bindings.containsKey(type), "Could not locate a matching registration for type: " + type.getCanonicalName());
         return bindings.require(type);
+    }
+
+    @Override
+    public <T> void register(String pluginID, Class<T> type, T value) {
+        Preconditions.checkNotNull(type, "Input type was null");
+        Preconditions.checkNotNull(value, "Input value type was null");
+
+        this.pluginBindings.computeIfAbsent(pluginID, key -> Maps.newHashMap())
+                .put(type, new Provider<>(value));
+    }
+
+    @Override
+    public <T> T get(String pluginID, Class<T> type) {
+        return (T) this.pluginBindings.get(pluginID).get(type);
     }
 
     @Override

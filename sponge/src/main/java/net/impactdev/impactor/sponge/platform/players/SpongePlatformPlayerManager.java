@@ -27,7 +27,6 @@ package net.impactdev.impactor.sponge.platform.players;
 
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
-import net.impactdev.impactor.common.players.CommonPlatformPlayer;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -50,7 +49,7 @@ public class SpongePlatformPlayerManager implements PlatformPlayerManager<Server
     public PlatformPlayer from(Object instance) {
         if(this.verify(instance)) {
             ServerPlayer player = this.platformType().cast(instance);
-            return new CommonPlatformPlayer(player.uniqueId(), Component.text(player.name()));
+            return new SpongePlatformPlayer(player.uniqueId(), Component.text(player.name()));
         }
 
         throw new IllegalArgumentException("Type is not a acceptable player typing");

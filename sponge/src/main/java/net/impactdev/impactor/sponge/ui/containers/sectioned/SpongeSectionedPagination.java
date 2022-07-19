@@ -36,6 +36,8 @@ import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Se
 import net.impactdev.impactor.api.ui.containers.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import net.impactdev.impactor.common.ui.containers.pagination.locators.IconLocator;
+import net.impactdev.impactor.common.ui.containers.pagination.locators.SectionedIconLocator;
 import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionedPaginationBuilder;
 import net.impactdev.impactor.common.ui.containers.pagination.sectioned.AbstractSectionedPagination;
 import net.impactdev.impactor.common.ui.containers.pagination.sectioned.sections.AbstractSynchronousSection;
@@ -60,6 +62,7 @@ import org.spongepowered.api.util.Ticks;
 import org.spongepowered.math.vector.Vector2i;
 import org.spongepowered.math.vector.Vector4i;
 
+import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -68,20 +71,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SpongeSectionedPagination extends AbstractSectionedPagination implements SectionedPagination {
 
     private final InventoryMenu view;
-    private final SlotContext context;
 
     public SpongeSectionedPagination(ImpactorSectionedPaginationBuilder builder) {
         super(builder);
-        this.context = LayoutTranslator.merge(this.layout(), this.sections());
 
         ViewableInventory.Builder.BuildingStep viewable = ViewableInventory.builder()
-                .type(ContainerTypes.GENERIC_9X6)
-                .slots(this.context.slots(), 0);
+                .type(ContainerTypes.GENERIC_9X6);
 
         this.view = InventoryMenu.of(viewable.completeStructure()
                 .identity(UUID.randomUUID())
                 .plugin(SpongeImpactorPlugin.instance().bootstrapper().container())
                 .build());
+        this.locator.view().forEach((slot, icon) -> this.view.inventory().set(slot, (ItemStack) icon.display().provide()));
         this.view.setTitle(builder.title);
         this.view.setReadOnly(builder.readonly);
         this.view.registerSlotClick((cause, container, slot, index, clickType) -> {
@@ -100,7 +101,7 @@ public class SpongeSectionedPagination extends AbstractSectionedPagination imple
                 this.at(index).ifPresent(section -> ((AbstractSynchronousSection) section).appendToClickContext(context));
 
                 AtomicBoolean allow = new AtomicBoolean(builder.readonly);
-                Optional<Icon<?>> clicked = this.context.locate(index);
+                Optional<Icon<?>> clicked = this.locator().locate(index);
                 clicked.ifPresent(icon -> icon.listeners().forEach(listener -> {
                     boolean result = listener.process(context);
                     if(allow.get() && !result) {
@@ -173,7 +174,7 @@ public class SpongeSectionedPagination extends AbstractSectionedPagination imple
         RefreshType type = details.type();
         if(type == RefreshTypes.SLOT_INDEX) {
             int position = details.context().require(Integer.class);
-            this.context.locate(position)
+            this.locator().locate(position)
                     .map(icon -> (Icon<ItemStack>) icon)
                     .ifPresent(icon -> {
                         this.view.inventory().set(position, icon.display().provide());
@@ -182,7 +183,7 @@ public class SpongeSectionedPagination extends AbstractSectionedPagination imple
             int position = details.context().get(Vector2i.class)
                     .map(pos -> pos.x() + (9 * pos.y()))
                     .orElseThrow(NoSuchElementException::new);
-            this.context.locate(position)
+            this.locator().locate(position)
                     .map(icon -> (Icon<ItemStack>) icon)
                     .ifPresent(icon -> {
                         this.view.inventory().set(position, icon.display().provide());
@@ -196,7 +197,7 @@ public class SpongeSectionedPagination extends AbstractSectionedPagination imple
                 for (int x = offset.x(); x < grid.x() + offset.x(); x++) {
                     final int X = x;
                     final int Y = y;
-                    this.context.locate(X + (9 * Y))
+                    this.locator().locate(X + (9 * Y))
                             .map(icon -> (Icon<ItemStack>) icon)
                             .ifPresent(icon -> {
                                 this.view.inventory().set(X + (9 * Y), icon.display().provide());
@@ -208,7 +209,7 @@ public class SpongeSectionedPagination extends AbstractSectionedPagination imple
             section.refresh((slot, icon) -> this.view.inventory().set(slot, (ItemStack) icon.display().provide()));
         } else {
             if(type == RefreshTypes.ALL) {
-                this.context.tracked()
+                this.locator().view()
                         .forEach((slot, icon) -> {
                             this.view.inventory().set(slot, (ItemStack) icon.display().provide());
                         });
@@ -230,7 +231,7 @@ public class SpongeSectionedPagination extends AbstractSectionedPagination imple
             this.view.inventory().set(slot, translated.display().provide());
         }
 
-        this.context.track(slot, translated);
+        this.locator.override(slot, icon);
     }
 
 }

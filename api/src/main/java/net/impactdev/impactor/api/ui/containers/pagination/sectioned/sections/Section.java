@@ -33,9 +33,7 @@ import org.spongepowered.math.vector.Vector2i;
 
 import java.util.Comparator;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * A section is the internal pagination that a {@link SectionedPagination} maintains. Each section is expected

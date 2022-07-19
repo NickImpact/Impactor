@@ -28,6 +28,7 @@ package net.impactdev.impactor.sponge;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.chat.ChatProcessor;
 import net.impactdev.impactor.api.dependencies.Dependency;
 import net.impactdev.impactor.api.dependencies.ProvidedDependencies;
 import net.impactdev.impactor.api.logging.PluginLogger;
@@ -39,8 +40,10 @@ import net.impactdev.impactor.common.plugin.InternalImpactorPlugin;
 import net.impactdev.impactor.sponge.api.SpongeImpactorAPIProvider;
 import net.impactdev.impactor.sponge.commands.DevCommand;
 import net.impactdev.impactor.sponge.commands.PlaceholdersCommand;
+import net.impactdev.impactor.sponge.listeners.SpongeChatProcessor;
 import net.impactdev.impactor.sponge.text.placeholders.SpongePlaceholderManager;
 import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
@@ -95,6 +98,10 @@ public class SpongeImpactorPlugin extends InternalImpactorPlugin {
     public void listeners() {
         this.commands();
         this.placeholders();
+
+        ChatProcessor processor = new SpongeChatProcessor();
+        Impactor.getInstance().getRegistry().register(ChatProcessor.class, processor);
+        Sponge.eventManager().registerListeners(this.bootstrap.container(), processor);
     }
 
     @Override

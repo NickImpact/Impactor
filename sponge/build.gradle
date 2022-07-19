@@ -34,6 +34,11 @@ dependencies {
 
     shadow 'com.github.ben-manes.caffeine:caffeine:2.8.4'
     shadow 'me.lucko:jar-relocator:1.5'
+
+    testImplementation 'net.kyori:adventure-api:4.10.1'
+    testImplementation 'net.kyori:adventure-text-serializer-legacy:4.10.1'
+    testImplementation 'net.kyori:adventure-text-serializer-gson:4.10.1'
+    testImplementation 'net.kyori:adventure-text-minimessage:4.10.1'
 }
 
 blossom {

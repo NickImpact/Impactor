@@ -37,6 +37,7 @@ import net.impactdev.impactor.api.ui.containers.pagination.sectioned.sections.Se
 import net.impactdev.impactor.api.ui.containers.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
+import net.impactdev.impactor.common.ui.containers.pagination.builders.PageConstructionDetails;
 import net.impactdev.impactor.common.ui.containers.pagination.sectioned.builders.ImpactorSectionBuilder;
 import net.impactdev.impactor.common.ui.containers.pagination.sectioned.sections.AbstractAsynchronousSection;
 import net.impactdev.impactor.sponge.ui.containers.sectioned.sections.SpongeSectionedPage;
@@ -87,14 +88,23 @@ public abstract class SpongeAsynchronousSection extends AbstractAsynchronousSect
 
     @Override
     protected SectionedPage fill(Icon<?> icon) {
-        Map<Integer, Icon<?>> icons = Maps.newHashMap();
+        List<Icon<?>> icons = Lists.newArrayList();
 
         Vector2i zone = this.maximum().sub(this.minimum()).add(Vector2i.ONE);
         for(int i = 0; i < zone.x() * zone.y(); i++) {
-            icons.put(this.calculateTargetSlot(i, zone, this.minimum()), icon);
+            icons.add(icon);
         }
 
-        return this.constructPage(this.updaters, this.style, 1, 1, icons);
+        PageConstructionDetails<Icon<?>> details = PageConstructionDetails.create()
+                .icons(icons)
+                .zone(zone)
+                .offsets(this.minimum())
+                .page(1)
+                .total(1)
+                .indexes(0, zone.x() + (zone.y() * 9))
+                .updaters(this.updaters)
+                .style(this.style);
+        return this.constructPage(details);
     }
 
     @Override
@@ -128,9 +138,18 @@ public abstract class SpongeAsynchronousSection extends AbstractAsynchronousSect
     }
 
     @Override
-    protected SectionedPage constructPage(List<PageUpdater> updaters, TriState style, int index, int size, Map<Integer, Icon<?>> working) {
-        SpongeSectionedPage page = new SpongeSectionedPage(working);
-        page.draw(this, updaters, style, index, size);
+    protected <E extends Icon<?>> SectionedPage constructPage(PageConstructionDetails<E> details) {
+        Vector2i indices = details.getIndexes();
+        List<E> icons = details.getIcons().subList(indices.x(), Math.min(indices.y(), details.getIcons().size()));
+
+        Map<Integer, Icon<?>> parameters = Maps.newHashMap();
+        for(int i = 0; i < icons.size(); i++) {
+            int slot = this.calculateTargetSlot(i, details.getZone(), details.getOffsets());
+            parameters.put(slot, icons.get(i));
+        }
+
+        SpongeSectionedPage page = new SpongeSectionedPage(parameters);
+        page.draw(this, details.getUpdaters(), details.getStyle(), details.getPage(), details.getTotal());
         return page;
     }
 

@@ -58,6 +58,9 @@ shadowJar {
     }
 
     relocate ('net.kyori.event', 'net.impactdev.impactor.relocations.eventbus')
+    relocate ('com.zaxxer.hikari', 'net.impactdev.impactor.relocations.hikari')
+    relocate ('org.mariadb.jdbc', 'net.impactdev.impactor.relocations.mariadb')
+    relocate ('com.mysql', 'net.impactdev.impactor.relocations.mysql')
 }
 
 artifacts {
