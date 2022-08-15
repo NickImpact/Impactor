@@ -62,7 +62,7 @@ public class ImpactorBus implements Bus<ImpactorEvent> {
 
     @Override
     public <E extends ImpactorEvent> TriFunction<Updatable, UUID, ListeningFrame.EventHandler<E>, RegisteredEvent> getRegisterHandler(Class<E> type) {
-        return (line, assignee, handler) -> new RegisteredEvent(Impactor.getInstance().getEventBus().subscribe(
+        return (line, assignee, handler) -> new RegisteredEvent(Impactor.instance().events().subscribe(
                 null, // TODO - Consolidate this (ImpactorPlugin.IMPACTOR)
                 type,
                 event -> {

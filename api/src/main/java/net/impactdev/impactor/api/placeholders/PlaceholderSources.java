@@ -54,7 +54,7 @@ public interface PlaceholderSources {
     Collection<Supplier<?>> suppliers();
 
     static SourceBuilder builder() {
-        return Impactor.getInstance().getRegistry().createBuilder(SourceBuilder.class);
+        return Impactor.instance().builders().provide(SourceBuilder.class);
     }
 
     interface SourceBuilder extends Builder<PlaceholderSources> {

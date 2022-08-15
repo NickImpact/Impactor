@@ -59,7 +59,7 @@ public interface Config {
 	void reload();
 
 	static ConfigBuilder builder() {
-		return Impactor.getInstance().getRegistry().createBuilder(ConfigBuilder.class);
+		return Impactor.instance().builders().provide(ConfigBuilder.class);
 	}
 
 	interface ConfigBuilder extends Builder<Config> {

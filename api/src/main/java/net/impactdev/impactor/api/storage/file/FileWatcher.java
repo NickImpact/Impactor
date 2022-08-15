@@ -63,8 +63,8 @@ public class FileWatcher {
         this.basePath = basePath;
         this.watchService = basePath.getFileSystem().newWatchService();
 
-        Impactor.getInstance().getScheduler().asyncLater(this::initLocations, 5, TimeUnit.SECONDS);
-        Impactor.getInstance().getScheduler().asyncRepeating(this::tick, 1, TimeUnit.SECONDS);
+        Impactor.instance().scheduler().asyncLater(this::initLocations, 5, TimeUnit.SECONDS);
+        Impactor.instance().scheduler().asyncRepeating(this::tick, 1, TimeUnit.SECONDS);
     }
 
     public WatchedLocation getWatcher(Path path) {

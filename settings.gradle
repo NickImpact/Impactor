@@ -1,15 +1,16 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven {
+            url = "https://repo.spongepowered.org/repository/maven-public/"
+        }
+    }
+}
+
 rootProject.name = 'Impactor'
 include (
         'api',
+        'common',
         'launcher',
-        //'common',
-        //'bungee',
-        //'bungee:bungee-launcher',
-        //'forge',
-        //'forge:forge-launcher',
-        //'sponge',
-        //'sponge:sponge-launcher',
-        //'velocity',
-        //'velocity:velocity-launcher'
 )
 

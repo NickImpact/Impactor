@@ -100,7 +100,7 @@ public class CountdownEffect implements FrameEffect {
         }
 
         public CountdownEffectBuilder whenComplete(String raw, PlaceholderSources sources) {
-            MessageService service = Impactor.getInstance().getRegistry().get(MessageService.class);
+            MessageService service = Impactor.instance().services().provide(MessageService.class);
 
             this.complete = service.parse(raw, sources);
             return this;

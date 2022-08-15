@@ -98,17 +98,22 @@ public interface ImpactorUI {
 	 * </ul>
 	 *
 	 * Any other typed detail will be rejected and will act as a no-op.
-	 *
-	 * <h2>{@link RefreshTypes#SLOT_INDEX SLOT_INDEX} and {@link RefreshTypes#SLOT_POS SLOT_POS} Notes</h2>
-	 * As part of the details, these two refresh types expect additional context to their targets.
-	 * This is accomplished by appending data points to the context of the newly created details.
+	 * <dl>
+	 *     <dt><span class="strong">{@link RefreshTypes#SLOT_INDEX SLOT_INDEX} and
+	 * 	       {@link RefreshTypes#SLOT_POS SLOT_POS} Notes</span>
+	 *     </dt>
+	 *     <dd>
+	 *         As part of the details, these two refresh types expect additional context to their targets.
+	 * 	       This is accomplished by appending data points to the context of the newly created details.
+	 *     </dd>
+	 * </dl>
 	 *
 	 * @param detail The details regarding refreshing the inventory
 	 */
 	void refresh(RefreshDetail detail);
 
 	static UIBuilder builder() {
-		return Impactor.getInstance().getRegistry().createBuilder(UIBuilder.class);
+		return Impactor.instance().builders().provide(UIBuilder.class);
 	}
 
 	interface UIBuilder extends UIComponent<UIBuilder>, Builder<ImpactorUI> {

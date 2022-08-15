@@ -25,8 +25,6 @@
 
 package net.impactdev.impactor.api.module;
 
-import net.impactdev.impactor.api.registry.Registry;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -42,10 +40,6 @@ public interface Module {
                 .map(Priority::value)
                 .orElse(0);
     }
-
-    void register(Registry registry);
-
-    void builders(Registry registry);
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)

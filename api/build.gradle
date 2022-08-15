@@ -1,16 +1,55 @@
+plugins {
+    id("org.spongepowered.gradle.vanilla") version "0.2.1-SNAPSHOT"
+}
+
+minecraft {
+    version('1.16.5')
+    runs {
+        client()
+    }
+}
+
 repositories {
     mavenCentral()
+    maven {
+        name 'Sponge Releases'
+        url 'https://repo.spongepowered.org/repository/maven-releases'
+    }
 }
 
 dependencies {
-    shadow group: 'com.zaxxer', name: 'HikariCP', version: '4.0.3'
-    shadow 'com.github.ben-manes.caffeine:caffeine:2.8.2'
-    shadow 'io.leangen.geantyref:geantyref:1.3.11'
+    // Impact Dev Modules
+    api 'net.impactdev:json:1.0.0'
 
-    annotationProcessor('org.spongepowered:event-impl-gen:8.0.0-SNAPSHOT')
+    // Adventure
+    api 'net.kyori:adventure-api:4.11.0'
+    api 'net.kyori:adventure-text-serializer-legacy:4.11.0'
+    api 'net.kyori:adventure-text-serializer-gson:4.11.0'
+    api 'net.kyori:adventure-text-minimessage:4.11.0'
+
+    // Kyori Events
+    api('net.kyori:event-api:3.0.0') {
+        exclude(group: 'com.google.guava', module: 'guava')
+    }
+    api 'net.kyori:event-method:3.0.0'
+    api 'net.kyori:event-method-asm:3.0.0'
+
+    // Event Generation
     compileOnlyApi('org.spongepowered:event-impl-gen-annotations:8.0.0-SNAPSHOT')
 
-    shadow 'org.apache.logging.log4j:log4j-api:2.17.1'
+    // Configurate
+    implementation 'org.spongepowered:configurate-core:4.1.2'
+    implementation 'org.spongepowered:configurate-gson:4.1.2'
+    implementation 'org.spongepowered:configurate-hocon:4.1.2'
+    implementation 'org.spongepowered:configurate-yaml:4.1.2'
 
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    // Misc
+    api 'io.leangen.geantyref:geantyref:1.3.13'
+    api group: 'org.spongepowered', name: 'math', version: '2.0.1'
+    implementation 'org.apache.logging.log4j:log4j-api:2.17.2'
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '4.0.3'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.mockito:mockito-core:4.6.1'
 }

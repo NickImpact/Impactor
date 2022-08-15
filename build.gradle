@@ -44,8 +44,8 @@ repositories {
 }
 
 dependencies {
-    api group: 'com.zaxxer', name: 'HikariCP', version: '4.0.3'
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
 
 tasks.withType(JavaCompile) { task ->
@@ -64,7 +64,7 @@ subprojects {
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(8)
+            languageVersion = JavaLanguageVersion.of(16)
         }
 
         withSourcesJar()
@@ -77,42 +77,18 @@ subprojects {
 
     repositories {
         mavenCentral()
+        maven {
+            name = "Impact Development"
+            url = "https://maven.impactdev.net/repository/development/"
+        }
         maven { url = 'https://jitpack.io' }
         maven { url = "https://repo.aikar.co/content/groups/aikar/" }
         maven { url = "https://hub.spigotmc.org/nexus/content/groups/public/" }
     }
 
     dependencies {
-        // Google
-        shadow 'com.google.guava:guava:27.1-jre'
-        shadow 'com.google.code.gson:gson:2.8.0'
-
-        // Configurate
-        shadow 'org.spongepowered:configurate-core:4.1.2'
-        shadow 'org.spongepowered:configurate-gson:4.1.2'
-        shadow 'org.spongepowered:configurate-hocon:4.1.2'
-        shadow 'org.spongepowered:configurate-yaml:4.1.2'
-
-        // Adventure
-        shadow 'net.kyori:adventure-api:4.10.1'
-        shadow 'net.kyori:adventure-text-serializer-legacy:4.10.1'
-        shadow 'net.kyori:adventure-text-serializer-gson:4.10.1'
-        shadow 'net.kyori:adventure-text-minimessage:4.10.1'
-
-        // Events
-        api 'net.kyori:event-api:3.0.0'
-        api 'net.kyori:event-method:3.0.0'
-        api 'net.kyori:event-method-asm:3.0.0'
-
         // Netty
         shadow 'io.netty:netty-all:4.1.25.Final'
-
-        // Misc
-        shadow 'org.reflections:reflections:0.10.2'
-        shadow group: 'org.spongepowered', name: 'math', version: '2.0.1'
-
-        // Testing
-        testImplementation group: 'junit', name: 'junit', version: '4.12'
     }
 
     shadowJar {
@@ -178,38 +154,6 @@ publishing {
             artifactId "launcher"
             version project.version
         }
-
-//        common(MavenPublication) {
-//            def project = project(':common')
-//            from project.components.java
-//            groupId project.group
-//            artifactId "common"
-//            version project.version
-//        }
-
-//        bungee(MavenPublication) {
-//            def project = project(':bungee')
-//            from project.components.java
-//            groupId project.group
-//            artifactId "bungee"
-//            version project.version
-//        }
-
-//        velocity(MavenPublication) {
-//            def project = project(':velocity')
-//            from project.components.java
-//            groupId project.group
-//            artifactId "velocity"
-//            version project.version
-//        }
-
-//        sponge(MavenPublication) {
-//            def project = project(':sponge')
-//            from project.components.java
-//            groupId project.group
-//            artifactId "sponge"
-//            version project.version
-//        }
     }
 }
 

@@ -25,19 +25,21 @@
 
 package net.impactdev.impactor.api.platform.players;
 
-import net.impactdev.impactor.api.Impactor;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
 
-public interface PlatformPlayer {
+public interface PlatformPlayer extends Audience {
 
     UUID uuid();
 
     Component name();
 
-    static PlatformPlayer from(Object instance) {
-        return Impactor.getInstance().getPlatform().playerManager().from(instance);
+    interface Factory {
+
+        PlatformPlayer create(UUID uuid);
+
     }
 
 }

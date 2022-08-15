@@ -34,4 +34,10 @@ public interface Builder<T> {
 
     T build();
 
+    interface Child<T> {
+
+        T complete();
+
+    }
+
 }

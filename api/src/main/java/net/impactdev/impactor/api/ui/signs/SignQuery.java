@@ -50,7 +50,7 @@ public interface SignQuery {
 
     @SuppressWarnings("unchecked")
     static SignQueryBuilder builder() {
-        return Impactor.getInstance().getRegistry().createBuilder(SignQueryBuilder.class);
+        return Impactor.instance().builders().provide(SignQueryBuilder.class);
     }
 
     interface SignQueryBuilder extends Builder<SignQuery> {

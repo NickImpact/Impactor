@@ -63,7 +63,7 @@ public interface ScoreboardObjective extends ScoreboardComponent<ScoreboardObjec
      * @return A builder representing a constant objective
      */
     static ConstantObjective.ConstantObjectiveBuilder constant() {
-        return Impactor.getInstance().getRegistry().createBuilder(ConstantObjective.ConstantObjectiveBuilder.class);
+        return Impactor.instance().builders().provide(ConstantObjective.ConstantObjectiveBuilder.class);
     }
 
     /**
@@ -72,7 +72,7 @@ public interface ScoreboardObjective extends ScoreboardComponent<ScoreboardObjec
      * @return A builder representing a refreshing objective
      */
     static RefreshingObjective.RefreshingObjectiveBuilder refreshing() {
-        return Impactor.getInstance().getRegistry().createBuilder(RefreshingObjective.RefreshingObjectiveBuilder.class);
+        return Impactor.instance().builders().provide(RefreshingObjective.RefreshingObjectiveBuilder.class);
     }
 
     /**
@@ -81,7 +81,7 @@ public interface ScoreboardObjective extends ScoreboardComponent<ScoreboardObjec
      * @return A builder representing a listening objective
      */
     static ListeningObjective.ListeningObjectiveBuilder listening() {
-        return Impactor.getInstance().getRegistry().createBuilder(ListeningObjective.ListeningObjectiveBuilder.class);
+        return Impactor.instance().builders().provide(ListeningObjective.ListeningObjectiveBuilder.class);
     }
 
     /**
@@ -90,7 +90,7 @@ public interface ScoreboardObjective extends ScoreboardComponent<ScoreboardObjec
      * @return A builder representing an animated objective
      */
     static AnimatedObjective.AnimatedObjectiveBuilder animated() {
-        return Impactor.getInstance().getRegistry().createBuilder(AnimatedObjective.AnimatedObjectiveBuilder.class);
+        return Impactor.instance().builders().provide(AnimatedObjective.AnimatedObjectiveBuilder.class);
     }
 
 }

@@ -37,7 +37,7 @@ public class JavaLogger implements PluginLogger {
 
     private final ImpactorPlugin plugin;
     private final Logger delegate;
-    private final Function<String, String> colorizer = in -> in.replaceAll("[&]", "\u00a7");
+    private final Function<String, String> colorizer = in -> in.replaceAll("&", "\u00a7");
     private final BiFunction<String, String, String> preprocessor = (marker, input) -> "[" + marker + "] " + input;
 
     public JavaLogger(ImpactorPlugin plugin, Logger delegate) {

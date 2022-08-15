@@ -25,8 +25,6 @@
 
 package net.impactdev.impactor.api.scoreboard.frames;
 
-
-import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.scoreboard.components.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
@@ -42,15 +40,15 @@ public interface ScoreboardFrame extends ScoreboardComponent<ScoreboardFrame> {
     boolean shouldUpdateOnTick();
 
     static ConstantFrame.ConstantFrameBuilder constant() {
-        return Impactor.getInstance().getRegistry().createBuilder(ConstantFrame.ConstantFrameBuilder.class);
+        return Impactor.instance().builders().provide(ConstantFrame.ConstantFrameBuilder.class);
     }
 
     static RefreshingFrame.RefreshingFrameBuilder refreshing() {
-        return Impactor.getInstance().getRegistry().createBuilder(RefreshingFrame.RefreshingFrameBuilder.class);
+        return Impactor.instance().builders().provide(RefreshingFrame.RefreshingFrameBuilder.class);
     }
 
     static <L> ListeningFrame.ListeningFrameBuilder<L> listening(Class<L> type) {
-        return Impactor.getInstance().getRegistry().createBuilder(ListeningFrame.ListeningFrameBuilder.class).type(type);
+        return Impactor.instance().builders().provide(ListeningFrame.ListeningFrameBuilder.class).type(type);
     }
 
     interface UpdatableFrame extends ScoreboardFrame {

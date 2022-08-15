@@ -27,22 +27,27 @@ package net.impactdev.impactor.api;
 
 import net.impactdev.impactor.api.event.EventBus;
 import net.impactdev.impactor.api.platform.Platform;
-import net.impactdev.impactor.api.registry.Registry;
+import net.impactdev.impactor.api.providers.BuilderProvider;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.scheduler.SchedulerAdapter;
-import net.impactdev.impactor.api.scoreboard.events.PlatformBus;
 
 public interface Impactor {
 
-    static Impactor getInstance() {
+    static Impactor instance() {
         return ImpactorServiceProvider.get();
     }
 
-    Platform<?> getPlatform();
+    Platform platform();
 
-    Registry getRegistry();
+    FactoryProvider factories();
 
-    EventBus getEventBus();
+    BuilderProvider builders();
 
-    SchedulerAdapter getScheduler();
+    ServiceProvider services();
+
+    EventBus events();
+
+    SchedulerAdapter scheduler();
 
 }

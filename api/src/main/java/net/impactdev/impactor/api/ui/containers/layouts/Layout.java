@@ -43,7 +43,7 @@ public interface Layout {
 	Vector2i dimensions();
 
 	static LayoutBuilder builder() {
-		return Impactor.getInstance().getRegistry().createBuilder(LayoutBuilder.class);
+		return Impactor.instance().builders().provide(LayoutBuilder.class);
 	}
 
 	interface LayoutBuilder extends Builder<Layout> {

@@ -26,7 +26,6 @@
 package net.impactdev.impactor.api.plugin;
 
 import net.impactdev.impactor.api.configuration.Config;
-import net.impactdev.impactor.api.dependencies.Dependency;
 import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.plugin.registry.PluginRegistry;
 import net.impactdev.impactor.api.storage.StorageType;
@@ -40,14 +39,25 @@ import java.util.Set;
  * Represents a basic plugin style that'll surround the basis to a plugin that can be deployed off
  * Impactor. Functionality of a plugin can be extended using the additional components available
  * within this containing package.
- *
+ * <p>
  * By default, a plugin implementing this interface is expected to provide a set of metadata that'll
  * be used to identify the plugin.
  */
 public interface ImpactorPlugin {
 
+	/**
+	 * Specifies a set of metadata describing the plugin. This data contains information such
+	 * as its actual ID, the display name, its current version, as well as a description of
+	 * its purpose.
+	 *
+	 * @return Metadata describing the plugin
+	 */
 	PluginMetadata metadata();
 
+	/**
+	 *
+	 * @return
+	 */
 	PluginLogger logger();
 
 	void construct() throws Exception;
@@ -70,22 +80,6 @@ public interface ImpactorPlugin {
 
 	default Optional<Config> config() {
 		return Optional.empty();
-	}
-
-	/**
-	 * Specifies the set of dependencies a plugin might require at runtime. By default,
-	 * a plugin is assumed to require no dependencies, and this returns an empty set
-	 * to suggest such.
-	 *
-	 * <p>The use of this feature is to accommodate a smaller jar by not shading every
-	 * package into the target jar. A jar handling these properties should still
-	 * make use of the Gradle shadow plugin to apply any necessary relocations a dependency
-	 * might require.
-	 *
-	 * @return A set of dependencies a plugin will require at runtime.
-	 */
-	default Set<Dependency> dependencies() {
-		return Collections.emptySet();
 	}
 
 	/**

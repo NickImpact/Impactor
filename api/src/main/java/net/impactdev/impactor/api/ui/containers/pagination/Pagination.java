@@ -179,7 +179,7 @@ public interface Pagination {
     }
 
     static PaginationBuilder builder() {
-        return Impactor.getInstance().getRegistry().createBuilder(PaginationBuilder.class);
+        return Impactor.instance().builders().provide(PaginationBuilder.class);
     }
 
     interface Generic<T> extends Pagination {

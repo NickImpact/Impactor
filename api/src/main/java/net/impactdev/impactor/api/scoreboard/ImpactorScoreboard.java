@@ -177,7 +177,7 @@ public interface ImpactorScoreboard<P> {
      * @return A newly constructed scoreboard builder.
      */
     static <P> ScoreboardBuilder<P> builder() {
-        return Impactor.getInstance().getRegistry().createBuilder(ScoreboardBuilder.class);
+        return Impactor.instance().builders().provide(ScoreboardBuilder.class);
     }
 
     /**

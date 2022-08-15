@@ -28,7 +28,6 @@ package net.impactdev.impactor.api.ui.containers.icons;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.builders.Required;
-import net.impactdev.impactor.api.items.ViewableItem;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -69,7 +68,7 @@ public interface Icon {
 	Icon listener(ClickProcessor processor);
 
 	static IconBuilder builder() {
-		return Impactor.getInstance().getRegistry().createBuilder(IconBuilder.class);
+		return Impactor.instance().builders().provide(IconBuilder.class);
 	}
 
 	/**
@@ -98,7 +97,7 @@ public interface Icon {
 
 		/**
 		 * Sets the display of the icon to the following platform-based ItemStack.
-		 *
+		 * <p>
 		 * This field is required. Omitting this at request of build will invoke an {@link IllegalStateException}.
 		 *
 		 * @param display A provider of the viewable ItemStack to act as the icons client-facing display

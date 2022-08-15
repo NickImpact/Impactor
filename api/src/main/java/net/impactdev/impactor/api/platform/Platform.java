@@ -25,13 +25,14 @@
 
 package net.impactdev.impactor.api.platform;
 
-import net.impactdev.impactor.api.platform.players.PlatformPlayerManager;
-import net.impactdev.impactor.api.scoreboard.events.PlatformBus;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 
-public interface Platform<P> {
+import java.util.UUID;
 
-    PlatformPlayerManager<P> playerManager();
+public interface Platform {
 
-    <L> PlatformBus<L> createPlatformBus();
+    PlatformInfo info();
+
+    PlatformPlayer player(final UUID target);
 
 }

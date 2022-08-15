@@ -75,7 +75,7 @@ public interface ScoreboardLine extends ScoreboardComponent<ScoreboardLine> {
      * @return A builder for a line that makes no attempts to update its contents
      */
     static ConstantLine.ConstantLineBuilder constant() {
-        return Impactor.getInstance().getRegistry().createBuilder(ConstantLine.ConstantLineBuilder.class);
+        return Impactor.instance().builders().provide(ConstantLine.ConstantLineBuilder.class);
     }
 
     /**
@@ -85,7 +85,7 @@ public interface ScoreboardLine extends ScoreboardComponent<ScoreboardLine> {
      * @return A builder for a line that will refresh its text over an interval rate
      */
     static RefreshingLine.RefreshingLineBuilder refreshing() {
-        return Impactor.getInstance().getRegistry().createBuilder(RefreshingLine.RefreshingLineBuilder.class);
+        return Impactor.instance().builders().provide(RefreshingLine.RefreshingLineBuilder.class);
     }
 
     /**
@@ -96,7 +96,7 @@ public interface ScoreboardLine extends ScoreboardComponent<ScoreboardLine> {
      * @return A builder for a line that will cycle through a series of {@link ScoreboardFrame ScoreboardFrames}.
      */
     static AnimatedLine.AnimatedBuilder animated() {
-        return Impactor.getInstance().getRegistry().createBuilder(AnimatedLine.AnimatedBuilder.class);
+        return Impactor.instance().builders().provide(AnimatedLine.AnimatedBuilder.class);
     }
 
     /**
@@ -107,7 +107,7 @@ public interface ScoreboardLine extends ScoreboardComponent<ScoreboardLine> {
      * @return A builder for a line that listens to a particular event in order to update
      */
     static ListeningLine.ListeningBuilder listening() {
-        return Impactor.getInstance().getRegistry().createBuilder(ListeningLine.ListeningBuilder.class);
+        return Impactor.instance().builders().provide(ListeningLine.ListeningBuilder.class);
     }
 
 }

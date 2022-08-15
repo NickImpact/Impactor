@@ -25,14 +25,9 @@
 
 package net.impactdev.impactor.api.ui.containers.icons;
 
-import net.impactdev.impactor.api.items.ViewableItem;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.Style;
+import net.impactdev.impactor.api.items.ImpactorItemStack;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * An IconProvider is simply a layer for providing an Icon to a UI. The purpose for this
@@ -82,11 +77,7 @@ public interface DisplayProvider {
      *
      * @return An icon for the particular display
      */
-    ViewableItem provide();
-
-    default DisplayProvider manipulate(Function<ViewableItem, ViewableItem> manipulator) {
-        return () -> manipulator.apply(this.provide());
-    }
+    ImpactorItemStack provide();
 
     /**
      * An implementation of the {@link DisplayProvider} which features an icon that is expected to never
@@ -96,14 +87,14 @@ public interface DisplayProvider {
      */
     class Constant implements DisplayProvider {
 
-        private final ViewableItem display;
+        private final ImpactorItemStack display;
 
-        public Constant(ViewableItem display) {
+        public Constant(ImpactorItemStack display) {
             this.display = display;
         }
 
         @Override
-        public ViewableItem provide() {
+        public ImpactorItemStack provide() {
             return this.display;
         }
 
