@@ -12,5 +12,7 @@ include (
         'api',
         'common',
         'launcher',
+        'bukkit',
+        'forge'
 )
 

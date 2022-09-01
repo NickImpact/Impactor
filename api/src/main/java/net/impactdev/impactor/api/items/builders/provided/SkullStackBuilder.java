@@ -31,7 +31,7 @@ import net.impactdev.impactor.api.items.extensions.SkullStack;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-public interface SkullStackBuilder extends ImpactorItemStackBuilder<SkullStackBuilder> {
+public interface SkullStackBuilder extends ImpactorItemStackBuilder<SkullStack, SkullStackBuilder> {
 
     @Contract("-> !null")
     Mob mob();

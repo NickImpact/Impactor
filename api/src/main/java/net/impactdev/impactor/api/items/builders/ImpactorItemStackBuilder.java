@@ -35,8 +35,8 @@ import org.jetbrains.annotations.Contract;
 
 import java.util.Collection;
 
-public interface ImpactorItemStackBuilder<B extends ImpactorItemStackBuilder<B>>
-        extends Builder<ImpactorItemStack> {
+public interface ImpactorItemStackBuilder<I extends ImpactorItemStack, B extends ImpactorItemStackBuilder<I, B>>
+        extends Builder<I> {
 
     /**
      * Sets the quantity of the stack for this item.

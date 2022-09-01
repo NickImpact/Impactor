@@ -26,47 +26,27 @@
 package net.impactdev.impactor.testing.item;
 
 import com.google.common.collect.Lists;
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
-import net.impactdev.impactor.api.items.builders.provided.BasicItemStackBuilder;
-import net.impactdev.impactor.api.items.builders.provided.SkullStackBuilder;
 import net.impactdev.impactor.api.items.extensions.BookStack;
 import net.impactdev.impactor.api.items.extensions.SkullStack;
 import net.impactdev.impactor.api.items.properties.MetaFlag;
-import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.impactdev.impactor.api.items.types.ItemType;
 import net.impactdev.impactor.api.items.types.ItemTypes;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.items.ImpactorItemTypeFactory;
-import net.impactdev.impactor.items.stacks.builders.BasicItemStackBuilderImpl;
-import net.impactdev.impactor.items.stacks.builders.SkullItemStackBuilderImpl;
-import net.impactdev.impactor.items.stacks.properties.ImpactorEnchantment;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ImpactorItemStackTests {
-
-    @BeforeAll
-    public static void init() {
-        FactoryProvider factories = Impactor.instance().factories();
-        BuilderProvider builders = Impactor.instance().builders();
-
-        factories.register(ItemType.Factory.class, new ImpactorItemTypeFactory());
-        factories.register(Enchantment.Factory.class, new ImpactorEnchantment.EnchantmentFactory());
-
-        builders.register(BasicItemStackBuilder.class, BasicItemStackBuilderImpl::new);
-        builders.register(SkullStackBuilder.class, SkullItemStackBuilderImpl::new);
-    }
 
     @Test
     public void itemTypes() {
@@ -107,14 +87,22 @@ public class ImpactorItemStackTests {
 
     @Test
     public void skullItemStack() {
-        ImpactorItemStack skeleton = ImpactorItemStack.skull()
+        SkullStack skeleton = ImpactorItemStack.skull()
                 .mob()
                 .type(SkullStack.SkullType.SKELETON)
                 .title(Component.text("A skeleton skull").color(NamedTextColor.YELLOW))
                 .quantity(1)
                 .build();
+        assertEquals(1, skeleton.quantity());
+        assertEquals(ItemTypes.SKELETON_SKULL, skeleton.type());
+        assertEquals(0, skeleton.enchantments().size());
 
-        ImpactorItemStack player = ImpactorItemStack.skull()
+        ItemStack sSkull = skeleton.toNative();
+        assertEquals(1, sSkull.getCount());
+        assertEquals(Items.SKELETON_SKULL, sSkull.getItem());
+        assertFalse(sSkull.getOrCreateTag().contains("SkullOwner"));
+
+        SkullStack player = ImpactorItemStack.skull()
                 .player()
                 .of("NickImpact")
                 .complete()
@@ -125,18 +113,41 @@ public class ImpactorItemStackTests {
                 .unbreakable()
                 .quantity(1)
                 .build();
+        assertTrue(player.supportsTextures());
+        assertTrue(player.skullType().isEmpty());
+        assertEquals(1, player.quantity());
+        assertTrue(player.owner().filter(username -> username.equals("NickImpact")).isPresent());
+        assertTrue(player.unbreakable());
+
+        ItemStack pSkull = player.toNative();
+        assertTrue(pSkull.getOrCreateTag().contains("SkullOwner"));
+        assertNotNull(pSkull.getOrCreateTag().get("SkullOwner"));
+        assertEquals("NickImpact", pSkull.getOrCreateTag().getString("SkullOwner"));
+        assertTrue(pSkull.getOrCreateTag().getBoolean("Unbreakable"));
     }
 
-//    @Test
-//    public void bookItemStack() {
-//        ImpactorItemStack book = ImpactorItemStack.book()
-//                .title(Component.text("A Very Neat Book").color(NamedTextColor.GOLD))
-//                .author(Component.text("NickImpact"))
-//                .generation(BookStack.Generation.ORIGINAL)
-//                .page(1, Component.text("A set of text that makes up").append(Component.text("page 1")))
-//                .page(3, Component.text("Hello World!").color(NamedTextColor.RED))
-//                .build();
-//    }
+    @Test
+    public void bookItemStack() {
+        BookStack book = ImpactorItemStack.book()
+                .type(BookStack.BookType.WRITTEN)
+                .title(Component.text("A Very Neat Book").color(NamedTextColor.GOLD))
+                .author(Component.text("NickImpact"))
+                .generation(BookStack.Generation.ORIGINAL)
+                .page(1, Component.text("A set of text that makes up").append(Component.text(" page 1")))
+                .page(3, Component.text("Hello World!").color(NamedTextColor.RED))
+                .build();
+
+        assertEquals(BookStack.BookType.WRITTEN, book.bookType());
+        assertEquals(2, book.pages());
+        assertEquals(BookStack.Generation.ORIGINAL, book.generation());
+
+        ItemStack minecraft = book.toNative();
+        CompoundTag nbt = minecraft.getOrCreateTag();
+        assertEquals(Items.WRITTEN_BOOK, minecraft.getItem());
+        assertEquals(0, nbt.getInt("generation"));
+        assertEquals(3, nbt.getList("pages", 8).size());
+        assertEquals(Component.text("NickImpact"), GsonComponentSerializer.gson().deserialize(nbt.getString("author")));
+    }
 
     private static Component mini(String input) {
         return MiniMessage.miniMessage().deserialize(input);

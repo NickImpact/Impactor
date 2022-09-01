@@ -54,7 +54,7 @@ public abstract class AbstractedItemStack implements ImpactorItemStack {
     protected final Set<MetaFlag> flags;
     protected final boolean unbreakable;
 
-    public AbstractedItemStack(ItemType type, AbstractStackBuilder<?> builder) {
+    public AbstractedItemStack(ItemType type, AbstractStackBuilder<?, ?> builder) {
         this.type = type;
         this.title = builder.title;
         this.lore = ImmutableList.copyOf(builder.lore);
@@ -103,17 +103,25 @@ public abstract class AbstractedItemStack implements ImpactorItemStack {
         ItemLike like = this.type().minecraft().orElse(null);
         ItemStack result = new ItemStack(like);
         result.setCount(this.quantity());
-        result.setHoverName(AdventureTranslator.toNative(this.title()));
-
-        ListTag lore = new ListTag();
-        for(Component line : this.lore()) {
-            lore.add(StringTag.valueOf(GsonComponentSerializer.gson().serialize(line)));
+        if(this.title != null) {
+            result.getOrCreateTagElement("display").putString("Name", GsonComponentSerializer.gson().serialize(this.title));
         }
-        result.getOrCreateTagElement("display").put("Lore", lore);
+
+        if(!this.lore.isEmpty()) {
+            ListTag lore = new ListTag();
+            for (Component line : this.lore()) {
+                lore.add(StringTag.valueOf(GsonComponentSerializer.gson().serialize(line)));
+            }
+            result.getOrCreateTagElement("display").put("Lore", lore);
+        }
 
         for(Enchantment enchantment : this.enchantments()) {
             net.minecraft.world.item.enchantment.Enchantment target = Registry.ENCHANTMENT.get(ResourceKeyTranslator.asResourceLocation(enchantment.type()));
             result.enchant(target, enchantment.level());
+        }
+
+        if(this.unbreakable) {
+            result.getOrCreateTag().putBoolean("Unbreakable", true);
         }
 
         return result;

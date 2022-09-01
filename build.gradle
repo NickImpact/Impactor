@@ -126,35 +126,4 @@ task copyJars(type: Copy) {
     exclude '*.jarinjar'
 }
 
-publishing {
-    repositories {
-        maven {
-            name = "ImpactDev-Public"
-            url = "https://maven.impactdev.net/repository/development/"
-            credentials {
-                username System.getenv('NEXUS_USER')
-                password System.getenv('NEXUS_PW')
-            }
-        }
-    }
-
-    publications {
-        api(MavenPublication) {
-            def project = project(':api')
-            from project.components.java
-            groupId project.group
-            artifactId "api"
-            version project.version
-        }
-
-        launcher(MavenPublication) {
-            def project = project(':launcher')
-            from project.components.java
-            groupId project.group
-            artifactId "launcher"
-            version project.version
-        }
-    }
-}
-
 build.dependsOn copyJars

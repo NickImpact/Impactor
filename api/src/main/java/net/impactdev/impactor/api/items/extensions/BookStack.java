@@ -26,12 +26,17 @@
 package net.impactdev.impactor.api.items.extensions;
 
 import net.impactdev.impactor.api.items.ImpactorItemStack;
+import net.impactdev.impactor.api.items.types.ItemType;
+import net.impactdev.impactor.api.items.types.ItemTypes;
 import net.kyori.adventure.text.Component;
 
 import java.util.List;
 
 public interface BookStack extends ImpactorItemStack {
 
+    BookType bookType();
+
+    @Override
     Component title();
 
     Component author();
@@ -43,6 +48,22 @@ public interface BookStack extends ImpactorItemStack {
     Component contentAt(int index);
 
     List<Component> contents();
+
+    enum BookType {
+
+        WRITABLE(ItemTypes.WRITABLE_BOOK),
+        WRITTEN(ItemTypes.WRITTEN_BOOK);
+
+        private final ItemType type;
+
+        BookType(ItemType type) {
+            this.type = type;
+        }
+
+        public ItemType resolve() {
+            return this.type;
+        }
+    }
 
     enum Generation {
 

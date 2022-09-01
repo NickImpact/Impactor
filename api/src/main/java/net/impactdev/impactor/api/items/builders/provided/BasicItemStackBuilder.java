@@ -25,11 +25,12 @@
 
 package net.impactdev.impactor.api.items.builders.provided;
 
+import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
 import net.impactdev.impactor.api.items.types.ItemType;
 import org.jetbrains.annotations.Contract;
 
-public interface BasicItemStackBuilder extends ImpactorItemStackBuilder<BasicItemStackBuilder> {
+public interface BasicItemStackBuilder extends ImpactorItemStackBuilder<ImpactorItemStack, BasicItemStackBuilder> {
 
     @Contract("_ -> this")
     BasicItemStackBuilder type(final ItemType type);

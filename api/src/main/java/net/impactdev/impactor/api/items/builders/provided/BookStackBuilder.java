@@ -33,7 +33,10 @@ import org.jetbrains.annotations.Range;
 
 import java.util.Collection;
 
-public interface BookStackBuilder extends ImpactorItemStackBuilder<BookStackBuilder> {
+public interface BookStackBuilder extends ImpactorItemStackBuilder<BookStack, BookStackBuilder> {
+
+    @Contract
+    BookStackBuilder type(BookStack.BookType type);
 
     /**
      * Sets the title of the book. Note that a title for a book in Minecraft is limited

@@ -28,8 +28,12 @@ package net.impactdev.impactor.testing;
 import net.impactdev.impactor.api.APIRegister;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.ImpactorService;
+import net.impactdev.impactor.modules.ImpactorModule;
+import net.impactdev.impactor.util.ExceptionPrinter;
+import net.impactdev.impactor.util.ProvidedExceptionHeaders;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.reflections.Reflections;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -56,6 +60,19 @@ public class TestInitializer implements BeforeAllCallback, ExtensionContext.Stor
                 // Initialization
                 Impactor impactor = new ImpactorService();
                 APIRegister.register(impactor);
+
+                new Reflections("net.impactdev.impactor")
+                        .getSubTypesOf(ImpactorModule.class)
+                        .forEach(m -> {
+                            try {
+                                ImpactorModule module = m.getDeclaredConstructor().newInstance();
+                                module.factories(impactor.factories());
+                                module.builders(impactor.builders());
+                                module.services(impactor.services());
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
             }
         } finally {
             LOCK.unlock();

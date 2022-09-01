@@ -40,8 +40,24 @@ public interface Impactor {
 
     Platform platform();
 
+    /**
+     * Provides access to a set of factories responsible for creating a particular object.
+     * Outside of builders, these methods are meant to effectively act as constructors
+     * while not maintaining the style of a builder.
+     *
+     * @return A provider of factories, allowing registration and location of particular
+     * factories
+     */
     FactoryProvider factories();
 
+    /**
+     * Provides access to a set of builders responsible for creating a particular object.
+     * These builders are expected to extend from the {@link net.impactdev.impactor.api.builders.Builder}
+     * interface, and can both be registered and located from this particular provider.
+     *
+     * @return A provider of builders, allowing registration and location of particular
+     * builders
+     */
     BuilderProvider builders();
 
     ServiceProvider services();

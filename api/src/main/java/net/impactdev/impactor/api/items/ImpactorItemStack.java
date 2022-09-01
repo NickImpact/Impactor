@@ -59,6 +59,19 @@ public interface ImpactorItemStack {
         return Impactor.instance().builders().provide(BookStackBuilder.class);
     }
 
+    /**
+     * Provides a native Minecraft ItemStack representation matching this particular Impactor ItemStack.
+     * Effectively, all values assigned through this typing should match 1:1 on the native stack.
+     *
+     * <p>Implementations are expected to provide their means of creating the ItemStack correctly, such
+     * as applying NBT tags or general fields. To simplify the process, {@link AbstractedItemStack#toNative()}
+     * provides the basic support to assign the fields present at minimum with this interface
+     * to the target ItemStack. Implementations can extend this to simplify the code they
+     * need to write to complete their translation.
+     *
+     * @return A native Minecraft ItemStack with a 1:1 mapping of all the particular fields
+     * of an extension to this interface.
+     */
     ItemStack toNative();
 
     /**
@@ -140,6 +153,6 @@ public interface ImpactorItemStack {
      * @return A builder composed of the values making up this particular item stack
      * @param <B> The type of builder responsible for manipulating the item stack
      */
-    <B extends ImpactorItemStackBuilder<B>> B asBuilder();
+    <I extends ImpactorItemStack, B extends ImpactorItemStackBuilder<I, B>> B asBuilder();
 
 }

@@ -27,6 +27,8 @@ package net.impactdev.impactor.api.items.builders;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import net.impactdev.impactor.api.items.AbstractedItemStack;
+import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.impactdev.impactor.api.items.properties.MetaFlag;
 import net.impactdev.impactor.api.items.properties.enchantments.Enchantments;
@@ -37,7 +39,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-public abstract class AbstractStackBuilder<B extends ImpactorItemStackBuilder<B>> implements ImpactorItemStackBuilder<B> {
+public abstract class AbstractStackBuilder<I extends ImpactorItemStack, B extends ImpactorItemStackBuilder<I, B>> implements ImpactorItemStackBuilder<I, B> {
 
     public Component title;
     public List<Component> lore = Lists.newArrayList();
