@@ -31,6 +31,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import org.intellij.lang.annotations.Pattern;
+import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -41,7 +42,7 @@ public record ItemType(Key key) {
         return Impactor.instance().factories().provide(Factory.class).from(key);
     }
 
-    public static ItemType from(@NotNull @Pattern("[a-z0-9_\\-.]+") final String root, @NotNull @Pattern("[a-z0-9_\\-./]+") final String location) {
+    public static ItemType from(@NotNull @Subst("minecraft") @Pattern("[a-z0-9_\\-.]+") final String root, @NotNull @Subst("air") @Pattern("[a-z0-9_\\-./]+") final String location) {
         return Impactor.instance().factories().provide(Factory.class).from(Key.key(root, location));
     }
 
