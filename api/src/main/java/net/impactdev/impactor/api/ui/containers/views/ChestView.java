@@ -26,20 +26,10 @@
 package net.impactdev.impactor.api.ui.containers.views;
 
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.builders.Required;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.builders.Builder;
-import net.impactdev.impactor.api.ui.containers.Icon;
-import net.impactdev.impactor.api.ui.containers.Layout;
 import net.impactdev.impactor.api.ui.containers.View;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
-import org.checkerframework.common.value.qual.IntRange;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
-import org.spongepowered.math.vector.Vector2i;
-
-import java.util.Arrays;
 
 /**
  * Represents the forward facing UI construct that allows a player to view the contents of a given

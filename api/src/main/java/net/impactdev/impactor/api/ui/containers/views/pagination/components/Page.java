@@ -26,12 +26,8 @@
 package net.impactdev.impactor.api.ui.containers.views.pagination.components;
 
 import net.impactdev.impactor.api.ui.containers.Icon;
-import net.impactdev.impactor.api.ui.containers.Layout;
-import net.impactdev.impactor.api.ui.containers.views.pagination.Pagination;
-import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
 
 import java.util.List;
-import java.util.Map;
 
 public interface Page {
 
