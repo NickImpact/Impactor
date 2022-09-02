@@ -27,9 +27,11 @@ package net.impactdev.impactor.api.providers;
 
 import net.impactdev.impactor.api.services.Service;
 
+import java.util.NoSuchElementException;
+
 public interface ServiceProvider {
 
-    <T extends Service> T provide(Class<T> type);
+    <T extends Service> T provide(Class<T> type) throws NoSuchElementException;
 
     <T extends Service> boolean register(Class<T> type, T instance);
 

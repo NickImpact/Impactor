@@ -25,14 +25,28 @@
 
 package net.impactdev.impactor.api.ui.containers.views;
 
+import net.impactdev.impactor.api.builders.Required;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.Layout;
 import net.impactdev.impactor.api.ui.containers.processors.ClickProcessor;
 import net.impactdev.impactor.api.ui.containers.processors.CloseProcessor;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Contract;
 
 public interface BaseViewBuilder<T extends BaseViewBuilder<T>> {
+
+    /**
+     * Sets the key referencing the provider of this pagination. This key provides both a namespace
+     * and a value to identity the type of pagination, as well as a means of reference to a particular
+     * pagination in the event an error occurs during its processing.
+     *
+     * @param key The key containing the namespace and value information of a provider.
+     * @return The updated builder
+     */
+    @Required
+    @Contract("_ -> this")
+    T provider(Key key);
 
     /**
      * Sets the title of the viewable interface to the following component.

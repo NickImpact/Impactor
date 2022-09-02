@@ -27,26 +27,27 @@ package net.impactdev.impactor.providers;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.providers.ServiceProvider;
+import net.impactdev.impactor.api.services.Service;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-public class FactoryProviderImplementation implements FactoryProvider {
+public class ServiceProviderImplementation implements ServiceProvider {
 
-    private final Cache<Class<?>, Object> factories = Caffeine.newBuilder().build();
+    private final Cache<Class<?>, Service> services = Caffeine.newBuilder().build();
 
     @Override
     @SuppressWarnings("OptionalGetWithoutIsPresent")
-    public <T> T provide(Class<T> type) throws NoSuchElementException {
-        return Optional.ofNullable(this.factories.getIfPresent(type))
+    public <T extends Service> T provide(Class<T> type) throws NoSuchElementException {
+        return Optional.ofNullable(this.services.getIfPresent(type))
                 .map(value -> (T) value)
                 .get();
     }
 
     @Override
-    public <T> boolean register(Class<T> type, T instance) {
-        this.factories.put(type, instance);
+    public <T extends Service> boolean register(Class<T> type, T instance) {
+        this.services.put(type, instance);
         return true;
     }
 

@@ -23,31 +23,34 @@
  *
  */
 
-package net.impactdev.impactor.providers;
+package net.impactdev.impactor.testing.ui.provided;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.ui.containers.Icon;
+import net.impactdev.impactor.api.ui.containers.View;
+import net.impactdev.impactor.ui.containers.views.service.ViewingService;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.NoSuchElementException;
-import java.util.Optional;
-
-public class FactoryProviderImplementation implements FactoryProvider {
-
-    private final Cache<Class<?>, Object> factories = Caffeine.newBuilder().build();
+public class TestViewProvider implements ViewingService {
 
     @Override
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
-    public <T> T provide(Class<T> type) throws NoSuchElementException {
-        return Optional.ofNullable(this.factories.getIfPresent(type))
-                .map(value -> (T) value)
-                .get();
+    public String getServiceName() {
+        return "Test View Providing Service";
     }
 
     @Override
-    public <T> boolean register(Class<T> type, T instance) {
-        this.factories.put(type, instance);
-        return true;
+    public void open(View view, PlatformPlayer target) {
+        throw new UnsupportedOperationException("Test environment not supported");
+    }
+
+    @Override
+    public void close(PlatformPlayer target) {
+        throw new UnsupportedOperationException("Test environment not supported");
+    }
+
+    @Override
+    public boolean set(@Nullable Icon icon, int slot) {
+        throw new UnsupportedOperationException("Test environment not supported");
     }
 
 }

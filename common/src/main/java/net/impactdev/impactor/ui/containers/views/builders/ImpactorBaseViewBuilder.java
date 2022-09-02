@@ -23,51 +23,58 @@
  *
  */
 
-package net.impactdev.impactor.api;
+package net.impactdev.impactor.ui.containers.views.builders;
 
-import net.impactdev.impactor.api.event.EventBus;
-import net.impactdev.impactor.api.platform.Platform;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.api.scheduler.SchedulerAdapter;
-import net.impactdev.impactor.providers.BuilderProviderImplementation;
-import net.impactdev.impactor.providers.FactoryProviderImplementation;
-import net.impactdev.impactor.providers.ServiceProviderImplementation;
+import net.impactdev.impactor.api.ui.containers.Layout;
+import net.impactdev.impactor.api.ui.containers.processors.ClickProcessor;
+import net.impactdev.impactor.api.ui.containers.processors.CloseProcessor;
+import net.impactdev.impactor.api.ui.containers.views.BaseViewBuilder;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
 
-public class ImpactorService implements Impactor {
+public class ImpactorBaseViewBuilder<T extends BaseViewBuilder<T>> implements BaseViewBuilder<T> {
 
-    private final FactoryProvider factories = new FactoryProviderImplementation();
-    private final BuilderProvider builders = new BuilderProviderImplementation();
-    private final ServiceProvider services = new ServiceProviderImplementation();
+    public Key namespace;
+    public Component title;
+    public Layout layout;
+    public boolean readonly = true;
+
+    public ClickProcessor click = context -> true;
+    public CloseProcessor close = context -> true;
 
     @Override
-    public Platform platform() {
-        return null;
+    public T provider(Key key) {
+        this.namespace = key;
+        return (T) this;
     }
 
     @Override
-    public FactoryProvider factories() {
-        return this.factories;
+    public T title(Component title) {
+        this.title = title;
+        return (T) this;
     }
 
     @Override
-    public BuilderProvider builders() {
-        return this.builders;
+    public T layout(Layout layout) {
+        this.layout = layout;
+        return (T) this;
     }
 
     @Override
-    public ServiceProvider services() {
-        return this.services;
+    public T readonly(boolean state) {
+        this.readonly = state;
+        return (T) this;
     }
 
     @Override
-    public EventBus events() {
-        return null;
+    public T onClick(ClickProcessor processor) {
+        this.click = processor;
+        return (T) this;
     }
 
     @Override
-    public SchedulerAdapter scheduler() {
-        return null;
+    public T onClose(CloseProcessor processor) {
+        this.close = processor;
+        return (T) this;
     }
 }

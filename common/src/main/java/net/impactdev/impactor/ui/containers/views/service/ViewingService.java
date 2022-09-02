@@ -23,31 +23,20 @@
  *
  */
 
-package net.impactdev.impactor.providers;
+package net.impactdev.impactor.ui.containers.views.service;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.services.Service;
+import net.impactdev.impactor.api.ui.containers.Icon;
+import net.impactdev.impactor.api.ui.containers.View;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.NoSuchElementException;
-import java.util.Optional;
+public interface ViewingService extends Service {
 
-public class FactoryProviderImplementation implements FactoryProvider {
+    void open(View view, PlatformPlayer target);
 
-    private final Cache<Class<?>, Object> factories = Caffeine.newBuilder().build();
+    void close(PlatformPlayer target);
 
-    @Override
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
-    public <T> T provide(Class<T> type) throws NoSuchElementException {
-        return Optional.ofNullable(this.factories.getIfPresent(type))
-                .map(value -> (T) value)
-                .get();
-    }
-
-    @Override
-    public <T> boolean register(Class<T> type, T instance) {
-        this.factories.put(type, instance);
-        return true;
-    }
+    boolean set(@Nullable Icon icon, int slot);
 
 }

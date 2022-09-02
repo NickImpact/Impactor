@@ -25,13 +25,13 @@
 
 package net.impactdev.impactor.api.ui.containers.views.pagination.builders;
 
-import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.builders.Required;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.ui.containers.views.BaseViewBuilder;
 import net.impactdev.impactor.api.ui.containers.Icon;
+import net.impactdev.impactor.api.ui.containers.views.BaseViewBuilder;
 import net.impactdev.impactor.api.ui.containers.views.pagination.Pagination;
+import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRuleset;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdaterType;
 import net.kyori.adventure.key.Key;
@@ -40,11 +40,7 @@ import net.kyori.adventure.util.TriState;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
+import java.util.Collection;
 
 public interface PaginationBuilder extends BaseViewBuilder<PaginationBuilder>, Builder<Pagination> {
 
@@ -72,12 +68,14 @@ public interface PaginationBuilder extends BaseViewBuilder<PaginationBuilder>, B
     @Required
     PaginationBuilder viewer(PlatformPlayer viewer);
 
+    PaginationBuilder contents(Collection<Icon> icons);
+
     /**
      * Indicates the section that a page will draw its contents in. If this section overlaps with the layout,
      * the content zone will override the affected slots of the layout. This will draw the content zone in the
      * top left corner of the interface. If you wish to move this section around, consider using
      * {@link #zone(Vector2i, Vector2i)} instead.
-     *
+     * <p>
      * If the given dimensions cannot fit within the viewable interface, an {@link IllegalArgumentException}
      * will be invoked to identify the issue.
      *
@@ -91,7 +89,7 @@ public interface PaginationBuilder extends BaseViewBuilder<PaginationBuilder>, B
     /**
      * Indicates the section that a page will draw its contents in. If this section overlaps with the layout,
      * the content zone will override the affected slots of the layout.
-     *
+     * <p>
      * If the given dimensions cannot fit within the viewable interface, an {@link IllegalArgumentException}
      * will be invoked to identify the issue.
      *
@@ -143,75 +141,12 @@ public interface PaginationBuilder extends BaseViewBuilder<PaginationBuilder>, B
      */
     PaginationBuilder style(TriState state);
 
-    default <T> Synchronous.Generic<T> synchronous(Class<T> type) {
-        return this.synchronous(TypeToken.get(type));
-    }
-
-    <T> Synchronous.Generic<T> synchronous(TypeToken<T> type);
-
-    default <T> Asynchronous.Generic<T> asynchronous(Class<T> type) {
-        return this.asynchronous(TypeToken.get(type));
-    }
-
-    <T> Asynchronous.Generic<T> asynchronous(TypeToken<T> type);
-
     /**
-     * This method, despite its name, will simply throw an exception in favor of the sub-builders
-     * build method. This method is only provided as its a requirement of the builder interface, but
-     * in this use case, has no function.
      *
-     * @return Nothing
-     * @throws UnsupportedOperationException Indicates that you should not use this method at all
+     *
+     * @param ruleset
+     * @return
      */
-    @Override
-    default Pagination build() {
-        throw new UnsupportedOperationException("Must be built from an implementor of PaginationBase");
-    }
-
-    interface PaginationCompleter<T extends Pagination> {
-
-        T build();
-
-    }
-
-    interface Synchronous<T extends Pagination> extends PaginationCompleter<T> {
-
-        Synchronous<T> contents(List<Icon> icons);
-
-        interface Generic<T> extends Synchronous<Pagination.Generic<T>> {
-
-            Generic<T> filter(Predicate<T> filter);
-
-            Generic<T> sort(Comparator<T> sorter);
-
-        }
-
-    }
-
-    interface Asynchronous<T extends Pagination, B extends Asynchronous<T, B>> extends PaginationCompleter<T> {
-
-        B accumulator(CompletableFuture<List<Icon>> provider);
-
-        /**
-         * Indicates the timeframe this pagination will allow before timing out
-         *
-         * @param time The amount of time before the accumulator can time out
-         * @param unit The unit of time for the time measurement
-         * @param icon The icon to fill the pagination with if the accumulator times out
-         * @return The updated builder
-         */
-        B timeout(long time, TimeUnit unit, Icon icon);
-
-        B waiting(Icon icon);
-
-        interface Generic<T> extends Asynchronous<Pagination.Generic<T>, Generic<T>> {
-
-            Generic<T> filter(Predicate<T> filter);
-
-            Generic<T> sort(Comparator<T> sorter);
-
-        }
-
-    }
+    PaginationBuilder ruleset(ContextRuleset ruleset);
 
 }

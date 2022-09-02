@@ -33,14 +33,15 @@ import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUp
 import java.util.List;
 import java.util.Map;
 
-public interface Page<T> {
+public interface Page {
 
-    T view();
+    /**
+     * Represents the actual numerical page of a pagination.
+     *
+     * @return
+     */
+    int index();
 
-    Layout toLayout();
-
-    Map<Integer, Icon> icons();
-
-    void draw(Pagination parent, Layout layout, List<PageUpdater> updaters, int page, int maxPages);
+    List<Icon> icons();
 
 }

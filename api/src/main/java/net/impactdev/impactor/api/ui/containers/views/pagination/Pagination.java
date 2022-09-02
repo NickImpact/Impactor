@@ -26,72 +26,54 @@
 package net.impactdev.impactor.api.ui.containers.views.pagination;
 
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.ui.containers.Icon;
-import net.impactdev.impactor.api.ui.containers.Layout;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.ui.containers.View;
+import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.api.ui.containers.views.pagination.builders.PaginationBuilder;
 import net.impactdev.impactor.api.ui.containers.views.pagination.components.Page;
+import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRuleset;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.util.TriState;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * Represents a UI which features a set of pages of contents loaded dynamically based on the viewer's
  * perspective.
- *
+ * <p>
  * By nature of a pagination, each pagination should be considered a unique instance of itself. In other
  * words, it can only be bound to one player at a time.
  */
-public interface Pagination {
+public interface Pagination extends View {
 
     /**
-     * Represents the provider of this pagination through a {@link Key}. This Key is meant to help
-     * identify the provider of a pagination in the event an error occurs during processing
-     * of the view.
-     *
-     * @return A {@link Key} representing the provider of the pagination
-     */
-    Key provider();
-
-    /**
-     * Opens the view for the configured viewer, closing any currently opened view the player
-     * might be viewing.
+     * Opens the view for the specified player.
      */
     void open();
 
     /**
-     * Closes the view for the configured viewer, only if the view they have open, if one at all,
-     * is this view. Otherwise, this call will result in a no-op.
+     * Closes the view of the inventory, only if the viewer's open inventory is this inventory.
+     * If the view they currently have open is not this view, then this call is ignored
      */
     void close();
 
     /**
-     * Specifies the title to this pagination.
+     * A set of rules that apply to the pagination with the goal of focusing on an icon's
+     * context. These rules would be used to filter the pagination results, as well as
+     * sort them per respective rules.
      *
-     * @return The title of the pagination
+     * @return A set of rules meant to target an icon's provided context
      */
-    Component title();
-
-    /**
-     * Specifies the layout used to create this view.
-     *
-     * @return The layout of the view
-     */
-    Layout layout();
+    ContextRuleset ruleset();
 
     /**
      * Represents the list of pages that this pagination is composed of.
      *
      * @return The circularly linked list of pages
      */
-    CircularLinkedList<Page<?>> pages();
+    CircularLinkedList<Page> pages();
 
     /**
      * Indicates the size of the overall grid that this pagination can draw contents within.
@@ -141,17 +123,6 @@ public interface Pagination {
     TriState style();
 
     /**
-     * Attempts to place the icon in the following slot location. If the intended slot exists inside
-     * the pagination zone, the action will be rejected, and a return value of <code>false</code> will be
-     * given to indicate such.
-     *
-     * @param icon The icon to place at the target slot position
-     * @param slot The slot inside the view that should be modified
-     * @return <code>true</code> if the action was accepted, <code>false</code> if rejected
-     */
-    boolean set(@Nullable Icon icon, int slot);
-
-    /**
      * Calculates the location an icon should be placed based on the target index,
      * alongside the content zone with grid and its offsets. Note that the target is not
      * the slot, but rather the index from 0.
@@ -171,19 +142,6 @@ public interface Pagination {
 
     static PaginationBuilder builder() {
         return Impactor.instance().builders().provide(PaginationBuilder.class);
-    }
-
-    /**
-     * Represents a pagination that requires icons with a specific context attachment.
-     *
-     * @param <T> The type this pagination should require from an icon's context
-     */
-    interface Contextual<T> extends Pagination {
-
-        void filter(Predicate<T> predicate);
-
-        void sort(Comparator<T> comparator);
-
     }
 
 }

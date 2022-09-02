@@ -30,21 +30,29 @@ import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.Layout;
+import net.impactdev.impactor.api.ui.containers.views.ChestView;
+import net.impactdev.impactor.api.ui.containers.views.pagination.builders.PaginationBuilder;
+import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRuleset;
 import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.ui.containers.ImpactorIcon;
 import net.impactdev.impactor.ui.containers.ImpactorLayout;
+import net.impactdev.impactor.ui.containers.views.ImpactorChestView;
+import net.impactdev.impactor.ui.containers.views.pagination.ImpactorContextRuleset;
+import net.impactdev.impactor.ui.containers.views.pagination.ImpactorPagination;
 
 public class UIModule implements ImpactorModule {
 
     @Override
     public void factories(FactoryProvider provider) {
-
+        provider.register(ContextRuleset.Factory.class, new ImpactorContextRuleset.ContextRulesetFactory());
     }
 
     @Override
     public void builders(BuilderProvider provider) {
         provider.register(Icon.IconBuilder.class, ImpactorIcon.ImpactorIconBuilder::new);
         provider.register(Layout.LayoutBuilder.class, ImpactorLayout.ImpactorLayoutBuilder::new);
+        provider.register(ChestView.ChestViewBuilder.class, ImpactorChestView.ImpactorChestViewBuilder::new);
+        provider.register(PaginationBuilder.class, ImpactorPagination.ImpactorPaginationBuilder::new);
     }
 
     @Override

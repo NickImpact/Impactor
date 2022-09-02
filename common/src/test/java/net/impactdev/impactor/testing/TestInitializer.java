@@ -80,8 +80,6 @@ public class TestInitializer implements BeforeAllCallback, ExtensionContext.Stor
     }
 
     @Override
-    public void close() throws Throwable {
-
-    }
+    public void close() throws Throwable {}
 
 }

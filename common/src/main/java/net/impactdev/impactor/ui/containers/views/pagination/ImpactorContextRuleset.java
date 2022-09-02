@@ -23,31 +23,52 @@
  *
  */
 
-package net.impactdev.impactor.providers;
+package net.impactdev.impactor.ui.containers.views.pagination;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.ui.containers.Icon;
+import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRuleset;
 
-import java.util.NoSuchElementException;
+import java.util.Comparator;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-public class FactoryProviderImplementation implements FactoryProvider {
+public class ImpactorContextRuleset implements ContextRuleset {
 
-    private final Cache<Class<?>, Object> factories = Caffeine.newBuilder().build();
+    private Predicate<Icon> filter = null;
+    private Comparator<Icon> sorter = null;
 
     @Override
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
-    public <T> T provide(Class<T> type) throws NoSuchElementException {
-        return Optional.ofNullable(this.factories.getIfPresent(type))
-                .map(value -> (T) value)
-                .get();
+    public Stream<Icon> filter(Stream<Icon> stream) {
+        return Optional.ofNullable(this.filter)
+                .map(stream::filter)
+                .orElse(stream);
     }
 
     @Override
-    public <T> boolean register(Class<T> type, T instance) {
-        this.factories.put(type, instance);
-        return true;
+    public void setFilter(Predicate<Icon> filter) {
+        this.filter = filter;
+    }
+
+    @Override
+    public Stream<Icon> sort(Stream<Icon> stream) {
+        return Optional.ofNullable(this.sorter)
+                .map(stream::sorted)
+                .orElse(stream);
+    }
+
+    @Override
+    public void setSorter(Comparator<Icon> sorter) {
+        this.sorter = sorter;
+    }
+
+    public static class ContextRulesetFactory implements Factory {
+
+        @Override
+        public ContextRuleset create() {
+            return new ImpactorContextRuleset();
+        }
+
     }
 
 }

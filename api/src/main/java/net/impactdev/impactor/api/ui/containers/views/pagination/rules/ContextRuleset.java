@@ -23,6 +23,33 @@
  *
  */
 
-package net.impactdev.impactor.providers;
+package net.impactdev.impactor.api.ui.containers.views.pagination.rules;
 
-public record Provider<T>(T instance) {}
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.ui.containers.Icon;
+
+import java.util.Comparator;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+public interface ContextRuleset {
+
+    static ContextRuleset create() {
+        return Impactor.instance().factories().provide(Factory.class).create();
+    }
+
+    Stream<Icon> filter(Stream<Icon> stream);
+
+    void setFilter(Predicate<Icon> filter);
+
+    Stream<Icon> sort(Stream<Icon> stream);
+
+    void setSorter(Comparator<Icon> sorter);
+
+    interface Factory {
+
+        ContextRuleset create();
+
+    }
+
+}

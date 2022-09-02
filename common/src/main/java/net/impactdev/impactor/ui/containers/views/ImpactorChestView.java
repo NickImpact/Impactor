@@ -25,53 +25,46 @@
 
 package net.impactdev.impactor.ui.containers.views;
 
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.views.ChestView;
-import net.impactdev.impactor.api.ui.containers.Layout;
-import net.impactdev.impactor.api.ui.containers.processors.ClickProcessor;
-import net.impactdev.impactor.api.ui.containers.processors.CloseProcessor;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
 import net.impactdev.impactor.api.utilities.context.Context;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
+import net.impactdev.impactor.ui.containers.views.builders.ImpactorBaseViewBuilder;
+import net.impactdev.impactor.ui.containers.views.layers.ImpactorView;
+import net.impactdev.impactor.ui.containers.views.service.ViewingService;
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.math.vector.Vector2i;
 
-public abstract class ImpactorChestView implements ChestView {
+public class ImpactorChestView extends ImpactorView implements ChestView {
 
-    private final Key namespace;
-    private final Component title;
-    private final Layout layout;
-    private final boolean readonly;
-
-    protected final ClickProcessor click;
-    protected final CloseProcessor close;
+    private final ViewingService provider;
 
     protected ImpactorChestView(ImpactorChestViewBuilder builder) {
-        this.namespace = builder.namespace;
-        this.title = builder.title;
-        this.layout = builder.layout;
-        this.readonly = builder.readonly;
-        this.click = builder.click;
-        this.close = builder.close;
+        super(builder.namespace, builder.title, builder.layout, builder.readonly, builder.click, builder.close);
+        this.provider = Impactor.instance().services().provide(ViewingService.class);
     }
 
     @Override
-    public Key namespace() {
-        return this.namespace;
+    public void set(@Nullable Icon icon, int slot) {
+        this.provider.set(icon, slot);
     }
 
     @Override
-    public Component title() {
-        return this.title;
+    public void open(PlatformPlayer viewer) {
+        this.provider.open(this, viewer);
     }
 
     @Override
-    public Layout layout() {
-        return this.layout;
+    public void close(PlatformPlayer viewer) {
+        this.provider.close(viewer);
     }
 
     @Override
-    public boolean readonly() {
-        return this.readonly;
+    public void refresh(Vector2i dimensions, Vector2i offsets) {
+
     }
 
     protected void writeException(Context context) {
@@ -84,51 +77,7 @@ public abstract class ImpactorChestView implements ChestView {
         context.print(printer);
     }
 
-    public abstract static class ImpactorChestViewBuilder implements ChestViewBuilder {
-
-        private Key namespace;
-        private Component title;
-        private Layout layout;
-        private boolean readonly = true;
-
-        private ClickProcessor click = context -> true;
-        private CloseProcessor close = context -> true;
-
-        @Override
-        public ChestViewBuilder provider(Key key) {
-            this.namespace = key;
-            return this;
-        }
-
-        @Override
-        public ChestViewBuilder title(Component title) {
-            this.title = title;
-            return this;
-        }
-
-        @Override
-        public ChestViewBuilder layout(Layout layout) {
-            this.layout = layout;
-            return this;
-        }
-
-        @Override
-        public ChestViewBuilder readonly(boolean state) {
-            this.readonly = state;
-            return this;
-        }
-
-        @Override
-        public ChestViewBuilder onClick(ClickProcessor processor) {
-            this.click = processor;
-            return this;
-        }
-
-        @Override
-        public ChestViewBuilder onClose(CloseProcessor processor) {
-            this.close = processor;
-            return this;
-        }
+    public static class ImpactorChestViewBuilder extends ImpactorBaseViewBuilder<ChestViewBuilder> implements ChestViewBuilder {
 
         @Override
         public ChestViewBuilder from(ChestView parent) {
@@ -138,6 +87,11 @@ public abstract class ImpactorChestView implements ChestView {
                     .readonly(parent.readonly())
                     .onClick(((ImpactorChestView) parent).click)
                     .onClose(((ImpactorChestView) parent).close);
+        }
+
+        @Override
+        public ChestView build() {
+            return new ImpactorChestView(this);
         }
     }
 
