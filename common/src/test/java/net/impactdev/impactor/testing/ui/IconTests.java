@@ -71,7 +71,7 @@ public class IconTests {
                 .unbreakable()
                 .build();
 
-        final TypeToken<List<Boolean>> KEY = new TypeToken<>() {};
+        final TypeToken<List<Boolean>> KEY = new TypeToken<List<Boolean>>() {};
         Icon icon = Icon.builder()
                 .display(() -> stack)
                 .constant()

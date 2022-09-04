@@ -23,24 +23,26 @@
  *
  */
 
-package net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.sections;
+package net.impactdev.impactor.api.ui.containers.views.pagination;
 
 import net.impactdev.impactor.api.ui.containers.Icon;
-import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
-import net.kyori.adventure.util.TriState;
 
-import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.Optional;
 
-public interface SectionedPage {
+public interface Page {
+
+    /**
+     * Represents the actual numerical page of a pagination.
+     *
+     * @return
+     */
+    int index();
+
+    default Optional<Icon> at(int slot) {
+        return Optional.ofNullable(this.icons().get(slot));
+    }
 
     Map<Integer, Icon> icons();
-
-    Map<Integer, Icon> drawn();
-
-    void draw(Section parent, List<PageUpdater> updaters, TriState style, int page, int maxPages);
-
-    void refresh(BiConsumer<Integer, Icon> consumer);
 
 }

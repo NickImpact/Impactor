@@ -36,7 +36,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public record ItemType(Key key) {
+public class ItemType {
+
+    private final Key key;
+
+    public ItemType(Key key) {
+        this.key = key;
+    }
 
     public static ItemType from(Key key) {
         return Impactor.instance().factories().provide(Factory.class).from(key);
@@ -44,6 +50,10 @@ public record ItemType(Key key) {
 
     public static ItemType from(@NotNull @Subst("minecraft") @Pattern("[a-z0-9_\\-.]+") final String root, @NotNull @Subst("air") @Pattern("[a-z0-9_\\-./]+") final String location) {
         return Impactor.instance().factories().provide(Factory.class).from(Key.key(root, location));
+    }
+
+    public Key key() {
+        return this.key;
     }
 
     public Optional<Item> minecraft() {

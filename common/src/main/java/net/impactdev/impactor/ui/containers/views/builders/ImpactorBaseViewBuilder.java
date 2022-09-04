@@ -25,7 +25,6 @@
 
 package net.impactdev.impactor.ui.containers.views.builders;
 
-import net.impactdev.impactor.api.ui.containers.Layout;
 import net.impactdev.impactor.api.ui.containers.processors.ClickProcessor;
 import net.impactdev.impactor.api.ui.containers.processors.CloseProcessor;
 import net.impactdev.impactor.api.ui.containers.views.BaseViewBuilder;
@@ -36,7 +35,6 @@ public class ImpactorBaseViewBuilder<T extends BaseViewBuilder<T>> implements Ba
 
     public Key namespace;
     public Component title;
-    public Layout layout;
     public boolean readonly = true;
 
     public ClickProcessor click = context -> true;
@@ -51,12 +49,6 @@ public class ImpactorBaseViewBuilder<T extends BaseViewBuilder<T>> implements Ba
     @Override
     public T title(Component title) {
         this.title = title;
-        return (T) this;
-    }
-
-    @Override
-    public T layout(Layout layout) {
-        this.layout = layout;
         return (T) this;
     }
 

@@ -23,34 +23,30 @@
  *
  */
 
-package net.impactdev.impactor.api.ui.containers.views.pagination.components;
+package net.impactdev.impactor.ui.containers.views.pagination;
 
 import net.impactdev.impactor.api.ui.containers.Icon;
+import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRuleset;
+import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
+import org.spongepowered.math.vector.Vector2i;
 
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.Set;
 
-public class TimeoutDetails {
+public interface PaginatedView {
 
-    private final Icon filler;
+    List<Icon> contents();
 
-    private final long time;
-    private final TimeUnit unit;
+    Vector2i zone();
 
-    public TimeoutDetails(Icon filler, long time, TimeUnit unit) {
-        this.filler = filler;
-        this.time = time;
-        this.unit = unit;
-    }
+    Vector2i offsets();
 
-    public Icon filler() {
-        return this.filler;
-    }
+    ContextRuleset ruleset();
 
-    public long time() {
-        return this.time;
-    }
+    Set<PageUpdater> updaters();
 
-    public TimeUnit unit() {
-        return this.unit;
-    }
+    void update();
+
+    void page(int target);
+
 }

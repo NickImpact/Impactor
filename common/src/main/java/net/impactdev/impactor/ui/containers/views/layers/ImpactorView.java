@@ -25,28 +25,24 @@
 
 package net.impactdev.impactor.ui.containers.views.layers;
 
-import net.impactdev.impactor.api.ui.containers.Layout;
 import net.impactdev.impactor.api.ui.containers.View;
 import net.impactdev.impactor.api.ui.containers.processors.ClickProcessor;
 import net.impactdev.impactor.api.ui.containers.processors.CloseProcessor;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import org.checkerframework.common.value.qual.IntRange;
 
 public abstract class ImpactorView implements View {
 
     protected final Key namespace;
     protected final Component title;
-    protected final Layout layout;
     protected final boolean readonly;
 
     protected final ClickProcessor click;
     protected final CloseProcessor close;
 
-    protected ImpactorView(Key namespace, Component title, Layout layout, boolean readonly, ClickProcessor click, CloseProcessor close) {
+    protected ImpactorView(Key namespace, Component title, boolean readonly, ClickProcessor click, CloseProcessor close) {
         this.namespace = namespace;
         this.title = title;
-        this.layout = layout;
         this.readonly = readonly;
         this.click = click;
         this.close = close;
@@ -60,16 +56,6 @@ public abstract class ImpactorView implements View {
     @Override
     public Component title() {
         return this.title;
-    }
-
-    @Override
-    public Layout layout() {
-        return this.layout;
-    }
-
-    @Override
-    public @IntRange(from = 1, to = 6) int rows() {
-        return this.layout.dimensions().y();
     }
 
     @Override

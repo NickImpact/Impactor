@@ -26,10 +26,12 @@
 package net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.builders;
 
 import net.impactdev.impactor.api.ui.containers.Icon;
+import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRuleset;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdaterType;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.util.TriState;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
 
@@ -39,7 +41,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
-public interface SectionBuilder<T extends SectionBuilder<T>> {
+public interface SectionBuilder {
+
+    @Contract("_ -> this")
+    SectionBuilder contents(List<Icon> icons);
+
+    @Contract("_ -> this")
+    SectionBuilder ruleset(ContextRuleset ruleset);
 
     /**
      * Specifies the dimensions of this section. This is simply the length and width of the section, but not
@@ -53,7 +61,8 @@ public interface SectionBuilder<T extends SectionBuilder<T>> {
      * @see #offset(Vector2i)
      * @return The updated builder
      */
-    default T dimensions(int columns, int rows) {
+    @Contract("_,_ -> this")
+    default SectionBuilder dimensions(int columns, int rows) {
         return this.dimensions(Vector2i.from(columns, rows));
     }
 
@@ -68,7 +77,8 @@ public interface SectionBuilder<T extends SectionBuilder<T>> {
      * @see #offset(Vector2i)
      * @return The updated builder
      */
-    T dimensions(Vector2i dimensions);
+    @Contract("_ -> this")
+    SectionBuilder dimensions(Vector2i dimensions);
 
     /**
      * Specifies the relocation of the section. This controls where the initial dimension
@@ -79,7 +89,8 @@ public interface SectionBuilder<T extends SectionBuilder<T>> {
      * @param rows The number of rows to offset by
      * @return The updated builder
      */
-    default T offset(int columns, int rows) {
+    @Contract("_,_ -> this")
+    default SectionBuilder offset(int columns, int rows) {
         return this.offset(Vector2i.from(columns, rows));
     }
 
@@ -91,7 +102,8 @@ public interface SectionBuilder<T extends SectionBuilder<T>> {
      * @param offset The offset from (0, 0)
      * @return The updated builder
      */
-    T offset(Vector2i offset);
+    @Contract("_ -> this")
+    SectionBuilder offset(Vector2i offset);
 
     /**
      * Supplies an icon that controls interactions among pages within the pagination. These buttons act
@@ -108,7 +120,8 @@ public interface SectionBuilder<T extends SectionBuilder<T>> {
      * @param updater The updater that will be used for the inventory interaction
      * @return The updated builder
      */
-    T updater(PageUpdater updater);
+    @Contract("_ -> this")
+    SectionBuilder updater(PageUpdater updater);
 
     /**
      * Indicates whether any {@link PageUpdater PageUpdaters} with typings of {@link PageUpdaterType#PREVIOUS}
@@ -133,7 +146,8 @@ public interface SectionBuilder<T extends SectionBuilder<T>> {
      * @param state The state to apply to updaters and how they appear and act within the Pagination
      * @return The updated builder
      */
-    T style(TriState state);
+    @Contract("_ -> this")
+    SectionBuilder style(TriState state);
 
     /**
      * Marks the section configuration as complete and sound, and returns to the parent builder
@@ -142,97 +156,5 @@ public interface SectionBuilder<T extends SectionBuilder<T>> {
      * @return The parent builder that created this builder
      */
     SectionedPaginationBuilder complete();
-
-    /**
-     * Represents a set of builders that create a synchronous section. These
-     */
-    interface Synchronous<B extends Synchronous<B>> extends SectionBuilder<B> {
-
-        interface Basic extends Synchronous<Basic> {
-
-            /**
-             * Sets the contents of the pagination to the following icons. If the list of icons is more
-             * than can be carried in a singular page, the following icons will be associated with further
-             * pages until no more pages become necessary.
-             *
-             * @param contents The icons to associate with the pagination
-             * @return The updated builder
-             */
-            Basic contents(List<Icon> contents);
-
-        }
-
-        interface Generic<T> extends Synchronous<Generic<T>> {
-
-
-            Generic<T> filter(Predicate<T> filter);
-
-            Generic<T> sort(Comparator<T> sorter);
-
-        }
-
-    }
-
-    interface Asynchronous<B extends Asynchronous<B>> extends SectionBuilder<B> {
-
-        /**
-         * Specifies the icon that will fill the section whilst waiting on the accumulator
-         * to complete its collection of icons.
-         *
-         * @param filler The icon to fill the section with
-         * @return The updated builder
-         */
-        B waiting(Icon filler);
-
-        /**
-         * Specifies the amount of time the accumulator is permitted to wait before
-         * timing out, and ultimately filling the section with the filler icon specified.
-         *
-         * <p>By default, this will resolve to a 5-second limit, with an Impactor
-         * specified icon.
-         *
-         * @param amount The amount of time to wait, paired with the given unit
-         * @param unit The unit to indicate the actual unit of time to wait
-         * @param filler The icon to fill the section with, or null to allow Impactor
-         *               to substitute its own icon.
-         * @return The updated builder
-         */
-        B timeout(long amount, TimeUnit unit, @Nullable Icon filler);
-
-        interface Basic extends Asynchronous<Basic> {
-
-            /**
-             * Accumulates the icons for the section over time, where they might not necessarily be
-             * immediately ready at time of UI opening. Once available, the section will then be
-             * populated with the resulting icons.
-             *
-             * <p>The accumulator given will be bound to a function to control the amount of time
-             * the UI will wait before suggesting that the icons could not be received in time.
-             * By default, sections are expected to allow only 5 seconds before indicating this
-             * result. If you wish to control these details, you can make use of
-             * {@link #timeout(long, TimeUnit, Icon)}, which will fill the section with the given
-             * replacement icon after the amount of time elapses.
-             *
-             * <p>This method may not necessarily be supplied. If not supplied, the builder
-             * will substitute the future with {@link CompletableFuture#completedFuture(Object)
-             * a completed future}, which will use an empty list to indicate its contents.
-             *
-             * @param accumulator The function responsible for providing the set of icons to
-             *                    fill the pagination over time.
-             * @return The updated builder
-             */
-            Basic accumulator(CompletableFuture<List<Icon>> accumulator);
-
-        }
-
-        interface Generic<T> extends Asynchronous<Generic<T>> {
-
-            Generic<T> filter(Predicate<T> filter);
-
-            Generic<T> sort(Comparator<T> sorter);
-
-        }
-
-    }
 
 }

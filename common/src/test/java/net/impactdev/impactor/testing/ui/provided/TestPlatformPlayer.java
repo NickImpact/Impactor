@@ -23,21 +23,21 @@
  *
  */
 
-package net.impactdev.impactor.api.ui.containers.views.pagination.components;
+package net.impactdev.impactor.testing.ui.provided;
 
-import net.impactdev.impactor.api.ui.containers.Icon;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.kyori.adventure.text.Component;
 
-import java.util.List;
+import java.util.UUID;
 
-public interface Page {
+public class TestPlatformPlayer implements PlatformPlayer {
+    @Override
+    public UUID uuid() {
+        return UUID.randomUUID();
+    }
 
-    /**
-     * Represents the actual numerical page of a pagination.
-     *
-     * @return
-     */
-    int index();
-
-    List<Icon> icons();
-
+    @Override
+    public Component name() {
+        return Component.text("Test Environment Player");
+    }
 }

@@ -44,9 +44,8 @@ public class LineIdentifier {
 
 	private static final CircularLinkedList<NamedTextColor> colors = CircularLinkedList.of(BLACK, DARK_BLUE, DARK_GREEN, DARK_AQUA, DARK_RED, DARK_PURPLE, GOLD, GRAY, DARK_GRAY, BLUE, GREEN, AQUA, RED, LIGHT_PURPLE, YELLOW, WHITE);
 
-	@SuppressWarnings("OptionalGetWithoutIsPresent")
 	public static Component generate() {
-		return Component.text(" ").color(colors.next().get());
+		return Component.text(" ").color(colors.currentThenAdvance());
 	}
 
 }

@@ -35,31 +35,35 @@ import java.util.stream.Stream;
 
 public class ImpactorContextRuleset implements ContextRuleset {
 
+    private PaginatedView parent;
     private Predicate<Icon> filter = null;
     private Comparator<Icon> sorter = null;
 
-    @Override
-    public Stream<Icon> filter(Stream<Icon> stream) {
-        return Optional.ofNullable(this.filter)
-                .map(stream::filter)
-                .orElse(stream);
+    public ImpactorContextRuleset with(PaginatedView parent) {
+        this.parent = parent;
+        return this;
     }
 
     @Override
-    public void setFilter(Predicate<Icon> filter) {
+    public void filter(Predicate<Icon> filter) {
         this.filter = filter;
+        if(this.parent != null) {
+            this.parent.update();
+        }
     }
 
     @Override
-    public Stream<Icon> sort(Stream<Icon> stream) {
-        return Optional.ofNullable(this.sorter)
-                .map(stream::sorted)
-                .orElse(stream);
-    }
-
-    @Override
-    public void setSorter(Comparator<Icon> sorter) {
+    public void sorter(Comparator<Icon> sorter) {
         this.sorter = sorter;
+        if(this.parent != null) {
+            this.parent.update();
+        }
+    }
+
+    @Override
+    public Stream<Icon> apply(Stream<Icon> stream) {
+        stream = Optional.ofNullable(this.filter).map(stream::filter).orElse(stream);
+        return Optional.ofNullable(this.sorter).map(stream::sorted).orElse(stream);
     }
 
     public static class ContextRulesetFactory implements Factory {

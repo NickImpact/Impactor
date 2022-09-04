@@ -25,42 +25,28 @@
 
 package net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.builders;
 
-import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.builders.Required;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.BaseViewBuilder;
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.SectionedPagination;
 import net.kyori.adventure.key.Key;
+import org.jetbrains.annotations.Contract;
 
 public interface SectionedPaginationBuilder extends BaseViewBuilder<SectionedPaginationBuilder>, Builder<SectionedPagination> {
 
     @Required
+    @Contract("_ -> this")
     SectionedPaginationBuilder provider(Key provider);
 
     @Required
+    @Contract("_ -> this")
     SectionedPaginationBuilder viewer(PlatformPlayer viewer);
 
-    SectionSelector section();
+    @Contract("_ -> this")
+    SectionedPaginationBuilder layout(ChestLayout layout);
 
-    interface SectionSelector {
-
-        SectionBuilder.Synchronous.Basic synchronous();
-
-        default <T> SectionBuilder.Synchronous.Generic<T> synchronous(Class<T> type) {
-            return this.synchronous(TypeToken.get(type));
-        }
-
-        <T> SectionBuilder.Synchronous.Generic<T> synchronous(TypeToken<T> type);
-
-        SectionBuilder.Asynchronous.Basic asynchronous();
-
-        default <T> SectionBuilder.Asynchronous.Generic<T> asynchronous(Class<T> type) {
-            return this.asynchronous(TypeToken.get(type));
-        }
-
-        <T> SectionBuilder.Asynchronous.Generic<T> asynchronous(TypeToken<T> type);
-
-    }
+    SectionBuilder section();
 
 }

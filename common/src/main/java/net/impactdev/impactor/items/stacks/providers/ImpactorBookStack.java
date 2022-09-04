@@ -44,6 +44,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TreeMap;
 
 public class ImpactorBookStack extends AbstractedItemStack implements BookStack {
@@ -128,7 +129,9 @@ public class ImpactorBookStack extends AbstractedItemStack implements BookStack 
         ListTag pages = new ListTag();
         for(int i = 1; i <= max; i++) {
             @Nullable Component result = this.pages.get(i);
-            pages.add(StringTag.valueOf(GsonComponentSerializer.gson().serialize(Objects.requireNonNullElseGet(result, Component::empty))));
+            pages.add(StringTag.valueOf(GsonComponentSerializer.gson().serialize(
+                    Optional.ofNullable(result).orElse(Component.empty())
+            )));
         }
 
         nbt.put("pages", pages);

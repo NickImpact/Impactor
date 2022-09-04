@@ -26,14 +26,15 @@
 package net.impactdev.impactor.api.ui.containers.views.pagination.updaters;
 
 import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.items.ImpactorItemStack;
 
 public final class PageUpdater {
 
     private final PageUpdaterType type;
     private final int slot;
-    private final UpdaterProvider<?> provider;
+    private final UpdaterProvider provider;
 
-    private PageUpdater(PageUpdaterType type, int slot, UpdaterProvider<?> provider) {
+    private PageUpdater(PageUpdaterType type, int slot, UpdaterProvider provider) {
         this.type = type;
         this.slot = slot;
         this.provider = provider;
@@ -47,7 +48,7 @@ public final class PageUpdater {
         return this.slot;
     }
 
-    public UpdaterProvider<?> provider() {
+    public UpdaterProvider provider() {
         return this.provider;
     }
 
@@ -59,7 +60,7 @@ public final class PageUpdater {
 
         private PageUpdaterType type;
         private int slot;
-        private UpdaterProvider<?> provider;
+        private UpdaterProvider provider;
 
         public PageUpdaterBuilder type(PageUpdaterType type) {
             this.type = type;
@@ -71,7 +72,7 @@ public final class PageUpdater {
             return this;
         }
 
-        public PageUpdaterBuilder provider(UpdaterProvider<?> provider) {
+        public PageUpdaterBuilder provider(UpdaterProvider provider) {
             this.provider = provider;
             return this;
         }
@@ -83,7 +84,7 @@ public final class PageUpdater {
     }
 
     @FunctionalInterface
-    public interface UpdaterProvider<T> {
+    public interface UpdaterProvider {
 
         /**
          * Provides a platform based ItemStack that will act as the client-facing
@@ -92,7 +93,7 @@ public final class PageUpdater {
          * @param target The intended target page of the updater if clicked
          * @return A displayable item that will be placed within an Icon
          */
-        T provide(int target);
+        ImpactorItemStack provide(int target);
 
     }
 }

@@ -34,19 +34,19 @@ public class Node<E> {
 		this.value = value;
 	}
 
-	public E getValue() {
+	public E value() {
 		return this.value;
 	}
 
-	public Node<E> getNext() {
+	public Node<E> next() {
 		return this.next;
 	}
 
-	public void setValue(E value) {
+	public void value(E value) {
 		this.value = value;
 	}
 
-	public void setNext(Node<E> next) {
+	public void next(Node<E> next) {
 		this.next = next;
 	}
 }

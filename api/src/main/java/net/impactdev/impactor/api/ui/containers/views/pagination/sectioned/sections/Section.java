@@ -25,15 +25,11 @@
 
 package net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.sections;
 
-import io.leangen.geantyref.TypeToken;
-import net.impactdev.impactor.api.ui.containers.Icon;
+import net.impactdev.impactor.api.ui.containers.views.pagination.Page;
+import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRuleset;
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import org.spongepowered.math.vector.Vector2i;
-
-import java.util.Comparator;
-import java.util.function.BiConsumer;
-import java.util.function.Predicate;
 
 /**
  * A section is the internal pagination that a {@link SectionedPagination} maintains. Each section is expected
@@ -41,27 +37,22 @@ import java.util.function.Predicate;
  */
 public interface Section {
 
-    /**
-     * Represents the minimum slot grid location that this section begins at.
-     *
-     * @return A {@link Vector2i} representing the minimum grid location of this section.
-     */
-    Vector2i minimum();
+    ContextRuleset ruleset();
 
-    /**
-     * Represents the maximum slot grid location that this section begins at.
-     *
-     * @return A {@link Vector2i} representing the maximum grid location of this section.
-     */
-    Vector2i maximum();
+    Vector2i zone();
+
+    Vector2i offsets();
 
     default boolean within(int slot) {
         return this.within(Vector2i.from(slot % 9, slot / 9));
     }
 
     default boolean within(Vector2i coordinates) {
-        Vector2i x = coordinates.sub(this.minimum());
-        Vector2i y = this.maximum().sub(coordinates);
+        Vector2i min = this.offsets();
+        Vector2i max = this.offsets().add(this.zone());
+
+        Vector2i x = coordinates.sub(min);
+        Vector2i y = max.sub(coordinates);
 
         return x.x() >= 0 && x.y() >= 0 && y.x() >= 0 && y.y() >= 0;
     }
@@ -71,7 +62,7 @@ public interface Section {
      *
      * @return The circularly linked list of pages
      */
-    CircularLinkedList<SectionedPage> pages();
+    CircularLinkedList<Page> pages();
 
     /**
      * Specifies the current page of the section.
@@ -86,37 +77,5 @@ public interface Section {
      * @param target The target page to view for this section
      */
     void page(int target);
-
-    /**
-     * Calculates the location an icon should be placed based on the target index,
-     * alongside the content zone with grid and its offsets. Note that the target is not
-     * the slot, but rather the index from 0.
-     *
-     * @param target The index of the content being placed into the pagination
-     * @param zone The grid size for the pagination zone
-     * @param offsets The offsets of the pagination zone
-     * @return The calculated slot position in the pagination zone
-     */
-    default int calculateTargetSlot(int target, Vector2i zone, Vector2i offsets) {
-        int x = target % zone.x();
-        int y = target / zone.x();
-
-        Vector2i result = Vector2i.from(x, y).add(offsets);
-        return result.x() + (9 * result.y());
-    }
-
-    void refresh(BiConsumer<Integer, Icon> consumer);
-
-    interface Generic<T> extends Section {
-
-        default TypeToken<T> type() {
-            return new TypeToken<T>() {};
-        }
-
-        void filter(Predicate<T> filter);
-
-        void sorter(Comparator<T> comparator);
-
-    }
 
 }

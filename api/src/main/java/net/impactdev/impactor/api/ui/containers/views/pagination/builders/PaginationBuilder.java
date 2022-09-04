@@ -29,6 +29,7 @@ import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.builders.Required;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.Icon;
+import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.BaseViewBuilder;
 import net.impactdev.impactor.api.ui.containers.views.pagination.Pagination;
 import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRuleset;
@@ -67,6 +68,8 @@ public interface PaginationBuilder extends BaseViewBuilder<PaginationBuilder>, B
      */
     @Required
     PaginationBuilder viewer(PlatformPlayer viewer);
+
+    PaginationBuilder layout(ChestLayout layout);
 
     PaginationBuilder contents(Collection<Icon> icons);
 

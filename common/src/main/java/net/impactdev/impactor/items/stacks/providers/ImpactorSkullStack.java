@@ -54,7 +54,7 @@ public class ImpactorSkullStack extends AbstractedItemStack implements SkullStac
 
     @Override
     public boolean supportsTextures() {
-        return this.skullType().isEmpty();
+        return !this.skullType().isPresent();
     }
 
     @Override
@@ -81,7 +81,7 @@ public class ImpactorSkullStack extends AbstractedItemStack implements SkullStac
     public ItemStack toNative() {
         ItemStack result = super.toNative();
         if(this.owner().isPresent()) {
-            if(this.texture().isEmpty()) {
+            if(!this.texture().isPresent()) {
                 result.getOrCreateTag().putString("SkullOwner", this.owner().get());
             } else {
                 CompoundTag nbt = result.getOrCreateTagElement("SkullOwner");

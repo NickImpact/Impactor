@@ -29,16 +29,19 @@ import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.ui.containers.Icon;
-import net.impactdev.impactor.api.ui.containers.Layout;
+import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.api.ui.containers.views.pagination.builders.PaginationBuilder;
 import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRuleset;
+import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.builders.SectionedPaginationBuilder;
 import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.ui.containers.ImpactorIcon;
-import net.impactdev.impactor.ui.containers.ImpactorLayout;
+import net.impactdev.impactor.ui.containers.layouts.ImpactorChestLayout;
 import net.impactdev.impactor.ui.containers.views.ImpactorChestView;
 import net.impactdev.impactor.ui.containers.views.pagination.ImpactorContextRuleset;
-import net.impactdev.impactor.ui.containers.views.pagination.ImpactorPagination;
+import net.impactdev.impactor.ui.containers.views.pagination.layers.ImpactorPage;
+import net.impactdev.impactor.ui.containers.views.pagination.views.ImpactorPagination;
+import net.impactdev.impactor.ui.containers.views.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
 
 public class UIModule implements ImpactorModule {
 
@@ -50,9 +53,13 @@ public class UIModule implements ImpactorModule {
     @Override
     public void builders(BuilderProvider provider) {
         provider.register(Icon.IconBuilder.class, ImpactorIcon.ImpactorIconBuilder::new);
-        provider.register(Layout.LayoutBuilder.class, ImpactorLayout.ImpactorLayoutBuilder::new);
         provider.register(ChestView.ChestViewBuilder.class, ImpactorChestView.ImpactorChestViewBuilder::new);
         provider.register(PaginationBuilder.class, ImpactorPagination.ImpactorPaginationBuilder::new);
+        provider.register(ImpactorPage.ImpactorPageBuilder.class, ImpactorPage.ImpactorPageBuilder::new);
+        provider.register(SectionedPaginationBuilder.class, ImpactorSectionedPaginationBuilder::new);
+
+        // Layouts
+        provider.register(ChestLayout.ChestLayoutBuilder.class, ImpactorChestLayout.ImpactorChestLayoutBuilder::new);
     }
 
     @Override

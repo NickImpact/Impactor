@@ -27,15 +27,15 @@ package net.impactdev.impactor.api.ui.containers.views.pagination;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.ui.containers.View;
+import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.pagination.builders.PaginationBuilder;
-import net.impactdev.impactor.api.ui.containers.views.pagination.components.Page;
 import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRuleset;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 import net.kyori.adventure.util.TriState;
 import org.spongepowered.math.vector.Vector2i;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a UI which features a set of pages of contents loaded dynamically based on the viewer's
@@ -45,6 +45,9 @@ import java.util.List;
  * words, it can only be bound to one player at a time.
  */
 public interface Pagination extends View {
+
+    @Override
+    ChestLayout layout();
 
     /**
      * Opens the view for the specified player.
@@ -110,7 +113,7 @@ public interface Pagination extends View {
      *
      * @return A list of updaters for the pagination
      */
-    List<PageUpdater> updaters();
+    Set<PageUpdater> updaters();
 
     /**
      * Indicates the style for the pagination updaters. See {@link PaginationBuilder#style(TriState)}

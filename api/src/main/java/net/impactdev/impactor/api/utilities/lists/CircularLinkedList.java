@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class CircularLinkedList<E> implements Iterable<E> {
+
 	private Node<E> head;
 	private Node<E> tail;
 
@@ -56,12 +57,28 @@ public class CircularLinkedList<E> implements Iterable<E> {
 		return result;
 	}
 
-	@SuppressWarnings("UnusedAssignment")
+	public E current() {
+		return this.current.value();
+	}
+
+	public E currentThenAdvance() {
+		Node<E> node = this.current;
+		this.current = this.current.next;
+		return node.value();
+	}
+
+	public E next() {
+		this.current = this.current.next;
+		return this.current.value();
+	}
+
 	public void append(E value) {
 		Node<E> node = new Node<>(value);
 
 		if(this.head == null) {
 			this.head = node;
+			this.head.next = this.head;
+			this.current = node;
 		} else {
 			this.tail.next = node;
 		}
@@ -70,50 +87,14 @@ public class CircularLinkedList<E> implements Iterable<E> {
 		this.tail.next = this.head;
 	}
 
-	public Optional<E> getCurrent() {
-		return Optional.ofNullable(this.current).map(Node::getValue);
-	}
-
-	public Optional<E> next() {
-		if(this.current == null) {
-			this.current = this.head;
-		} else {
-			if(this.current == this.tail) {
-				this.current = this.head;
-			} else {
-				this.current = this.current.next;
-			}
-		}
-
-		return Optional.ofNullable(this.current.getValue());
-	}
-
-	public E nextOrThrow() {
-		if(this.current == null) {
-			this.current = this.head;
-		} else {
-			if(this.current == this.tail) {
-				this.current = this.head;
-			} else {
-				this.current = this.current.next;
-			}
-		}
-
-		if(this.current == null) {
-			throw new IllegalStateException("No available element");
-		}
-
-		return this.current.getValue();
-	}
-
-	public List<E> getFramesNonCircular() {
+	public List<E> asList() {
 		List<E> output = Lists.newArrayList();
 		Node<E> working = this.head;
 		while(working != null) {
-			output.add(working.getValue());
+			output.add(working.value());
 			working = working.next;
 
-			if(Objects.equals(this.head.getValue(), working.getValue())) {
+			if(Objects.equals(this.head.value(), working.value())) {
 				break;
 			}
 		}
@@ -122,11 +103,11 @@ public class CircularLinkedList<E> implements Iterable<E> {
 	}
 
 	public boolean empty() {
-		return this.getFramesNonCircular().isEmpty();
+		return this.asList().isEmpty();
 	}
 
 	public int size() {
-		return this.getFramesNonCircular().size();
+		return this.asList().size();
 	}
 
 	public E at(int index) throws IndexOutOfBoundsException {
@@ -139,13 +120,13 @@ public class CircularLinkedList<E> implements Iterable<E> {
 			node = node.next;
 		}
 
-		return node.getValue();
+		return node.value();
 	}
 
 	@NotNull
 	@Override
 	public Iterator<E> iterator() {
-		return this.getFramesNonCircular().iterator();
+		return this.asList().iterator();
 	}
 
 }

@@ -38,13 +38,11 @@ public interface ContextRuleset {
         return Impactor.instance().factories().provide(Factory.class).create();
     }
 
-    Stream<Icon> filter(Stream<Icon> stream);
+    void filter(Predicate<Icon> filter);
 
-    void setFilter(Predicate<Icon> filter);
+    void sorter(Comparator<Icon> sorter);
 
-    Stream<Icon> sort(Stream<Icon> stream);
-
-    void setSorter(Comparator<Icon> sorter);
+    Stream<Icon> apply(Stream<Icon> input);
 
     interface Factory {
 

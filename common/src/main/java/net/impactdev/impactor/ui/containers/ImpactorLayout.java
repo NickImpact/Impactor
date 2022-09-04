@@ -25,25 +25,20 @@
 
 package net.impactdev.impactor.ui.containers;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.Layout;
-import org.spongepowered.math.vector.Vector2i;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
-public class ImpactorLayout implements Layout {
+public abstract class ImpactorLayout implements Layout {
 
     private final Map<Integer, Icon> slots;
-    private final Vector2i dimensions;
 
-    private ImpactorLayout(ImpactorLayoutBuilder builder) {
-        this.slots = builder.icons;
-        this.dimensions = new Vector2i(9, builder.rows);
+    protected ImpactorLayout(Map<Integer, Icon> slots) {
+        this.slots = slots;
     }
 
     @Override
@@ -56,127 +51,18 @@ public class ImpactorLayout implements Layout {
         return Optional.ofNullable(this.slots.get(slot));
     }
 
-    @Override
-    public Vector2i dimensions() {
-        return this.dimensions;
-    }
+    public static abstract class IconHolder {
 
-    public static class ImpactorLayoutBuilder implements LayoutBuilder {
+        protected Map<Integer, Icon> icons = Maps.newHashMap();
 
-        private int rows = 6;
-        private final Map<Integer, Icon> icons = Maps.newHashMap();
-
-        @Override
-        public LayoutBuilder size(int rows) {
-            this.rows = rows;
-            return this;
+        public Map<Integer, Icon> icons() {
+            return this.icons;
         }
 
-        @Override
-        public LayoutBuilder slot(Icon icon, int slot) {
+        protected void set(int slot, Icon icon) {
             this.icons.put(slot, icon);
-            return this;
         }
 
-        @Override
-        public LayoutBuilder fill(Icon icon) {
-            for(int i = 1; i < (9 * this.rows); i++) {
-                if(!this.icons.containsKey(i)) {
-                    this.slot(icon, i);
-                }
-            }
-            return this;
-        }
-
-        @Override
-        public LayoutBuilder border(Icon icon) {
-            this.column(icon, 1);
-            this.column(icon, 9);
-            this.row(icon, 1);
-            this.row(icon, this.rows);
-
-            return this;
-        }
-
-        @Override
-        public LayoutBuilder row(Icon icon, int row) {
-            Preconditions.checkArgument(row >= 1 && row <= 6, "Row outside boundaries");
-            int start = 9 * (row - 1);
-            for(int i = 0; i < 9; i++) {
-                this.slot(icon, start + i);
-            }
-
-            return this;
-        }
-
-        @Override
-        public LayoutBuilder column(Icon icon, int column) {
-            Preconditions.checkArgument(column >= 1 && column <= 9, "Column outside boundaries");
-
-            for(int i = (column - 1); i < (9 * this.rows); i += 9) {
-                this.slot(icon, i);
-            }
-            return this;
-        }
-
-        @Override
-        public LayoutBuilder center(Icon icon) {
-            if(this.rows % 2 == 0) {
-                this.slot(icon, (this.rows * 9) / 2 - 4);
-                this.slot(icon, (this.rows * 9) / 2 + 5);
-            } else {
-                this.slot(icon, (this.rows * 9) / 2 + 1);
-            }
-
-            return this;
-        }
-
-        @Override
-        public LayoutBuilder square(Icon icon, int center, int radius, boolean hollow) {
-            Vector2i size = Vector2i.from(radius);
-            Vector2i offsets = Vector2i.from(center % 9, center / 9).sub(size);
-            return this.rectangle(icon, size, offsets, hollow);
-        }
-
-        @Override
-        public LayoutBuilder rectangle(Icon icon, Vector2i size, Vector2i offset, boolean hollow) {
-            for(int x = offset.x(); x < size.x() + offset.x(); x++) {
-                this.slot(icon, x + (9 * offset.y()));
-            }
-
-            for(int x = offset.x(); x < size.x() + offset.x(); x++) {
-                for(int y = offset.y() + 1; y < size.y() + offset.y() - 1; y++) {
-                    if(hollow && x != offset.x() && x != size.x() + offset.x()) {
-                        continue;
-                    }
-
-                    this.slot(icon, x + (9 * y));
-                }
-            }
-
-            for(int x = offset.x(); x < size.x() + offset.x(); x++) {
-                this.slot(icon, x + (9 * (size.y() + offset.y() - 1)));
-            }
-
-            return this;
-        }
-
-        @Override
-        public LayoutBuilder custom(Consumer<LayoutBuilder> consumer) {
-            consumer.accept(this);
-            return this;
-        }
-
-        @Override
-        public LayoutBuilder from(Layout input) {
-            this.size(input.dimensions().y());
-            input.elements().forEach((key, value) -> this.slot(value, key));
-            return this;
-        }
-
-        @Override
-        public Layout build() {
-            return new ImpactorLayout(this);
-        }
     }
+
 }

@@ -28,6 +28,7 @@ package net.impactdev.impactor.ui.containers.views;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.Icon;
+import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
 import net.impactdev.impactor.api.utilities.context.Context;
@@ -35,16 +36,29 @@ import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.ui.containers.views.builders.ImpactorBaseViewBuilder;
 import net.impactdev.impactor.ui.containers.views.layers.ImpactorView;
 import net.impactdev.impactor.ui.containers.views.service.ViewingService;
+import org.checkerframework.common.value.qual.IntRange;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
 
 public class ImpactorChestView extends ImpactorView implements ChestView {
 
+    private final ChestLayout layout;
     private final ViewingService provider;
 
     protected ImpactorChestView(ImpactorChestViewBuilder builder) {
-        super(builder.namespace, builder.title, builder.layout, builder.readonly, builder.click, builder.close);
+        super(builder.namespace, builder.title, builder.readonly, builder.click, builder.close);
+        this.layout = builder.layout;
         this.provider = Impactor.instance().services().provide(ViewingService.class);
+    }
+
+    @Override
+    public ChestLayout layout() {
+        return this.layout;
+    }
+
+    @Override
+    public @IntRange(from = 1, to = 6) int rows() {
+        return this.layout().dimensions().y();
     }
 
     @Override
@@ -78,6 +92,14 @@ public class ImpactorChestView extends ImpactorView implements ChestView {
     }
 
     public static class ImpactorChestViewBuilder extends ImpactorBaseViewBuilder<ChestViewBuilder> implements ChestViewBuilder {
+
+        private ChestLayout layout;
+
+        @Override
+        public ChestViewBuilder layout(ChestLayout layout) {
+            this.layout = layout;
+            return this;
+        }
 
         @Override
         public ChestViewBuilder from(ChestView parent) {

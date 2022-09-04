@@ -114,7 +114,7 @@ public class ImpactorItemStackTests {
                 .quantity(1)
                 .build();
         assertTrue(player.supportsTextures());
-        assertTrue(player.skullType().isEmpty());
+        assertFalse(player.skullType().isPresent());
         assertEquals(1, player.quantity());
         assertTrue(player.owner().filter(username -> username.equals("NickImpact")).isPresent());
         assertTrue(player.unbreakable());

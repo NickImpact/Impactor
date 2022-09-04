@@ -28,7 +28,9 @@ package net.impactdev.impactor.api.ui.containers.views;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.ui.containers.Layout;
 import net.impactdev.impactor.api.ui.containers.View;
+import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import org.jetbrains.annotations.Contract;
 
 /**
@@ -38,6 +40,9 @@ import org.jetbrains.annotations.Contract;
  *
  */
 public interface ChestView extends View {
+
+	@Override
+	ChestLayout layout();
 
 	/**
 	 * Opens the view for the specified player.
@@ -59,6 +64,15 @@ public interface ChestView extends View {
 	}
 
 	interface ChestViewBuilder extends BaseViewBuilder<ChestViewBuilder>, Builder<ChestView> {
+
+		/**
+		 * Defines the layout of the UI.
+		 *
+		 * @param layout The layout that'll be used for the UI
+		 * @return The updated builder
+		 */
+		@Contract("_ -> this")
+		ChestViewBuilder layout(ChestLayout layout);
 
 		@Contract("_ -> this")
 		ChestViewBuilder from(ChestView parent);

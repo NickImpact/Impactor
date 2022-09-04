@@ -27,7 +27,6 @@ package net.impactdev.impactor.api.ui.containers.views;
 
 import net.impactdev.impactor.api.builders.Required;
 import net.impactdev.impactor.api.ui.containers.Icon;
-import net.impactdev.impactor.api.ui.containers.Layout;
 import net.impactdev.impactor.api.ui.containers.processors.ClickProcessor;
 import net.impactdev.impactor.api.ui.containers.processors.CloseProcessor;
 import net.kyori.adventure.key.Key;
@@ -56,15 +55,6 @@ public interface BaseViewBuilder<T extends BaseViewBuilder<T>> {
      */
     @Contract("_ -> this")
     T title(Component title);
-
-    /**
-     * Defines the layout of the UI.
-     *
-     * @param layout The layout that'll be used for the UI
-     * @return The updated builder
-     */
-    @Contract("_ -> this")
-    T layout(Layout layout);
 
     /**
      * Marks whether a pagination will be considered readonly. In this state, any changes to the inventory
