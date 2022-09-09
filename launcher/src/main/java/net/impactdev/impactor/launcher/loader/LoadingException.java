@@ -23,15 +23,19 @@
  *
  */
 
-package net.impactdev.impactor.api.utilities;
+package net.impactdev.impactor.launcher.loader;
 
-import net.kyori.adventure.key.Key;
-import net.minecraft.resources.ResourceLocation;
+/**
+ * Runtime exception used if there is a problem during loading
+ */
+public class LoadingException extends RuntimeException {
 
-public class ResourceKeyTranslator {
+    public LoadingException(String message) {
+        super(message);
+    }
 
-    public static ResourceLocation asResourceLocation(Key key) {
-        return new ResourceLocation(key.namespace(), key.value());
+    public LoadingException(String message, Throwable cause) {
+        super(message, cause);
     }
 
 }

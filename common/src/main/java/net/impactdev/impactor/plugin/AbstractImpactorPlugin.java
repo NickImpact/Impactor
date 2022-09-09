@@ -25,7 +25,9 @@
 
 package net.impactdev.impactor.plugin;
 
+import net.impactdev.impactor.api.APIRegister;
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.ImpactorService;
 import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.plugin.PluginMetadata;
@@ -38,16 +40,16 @@ public class AbstractImpactorPlugin implements ImpactorPlugin {
 
     private static ImpactorPlugin instance;
 
+    private final ImpactorBootstrapper bootstrapper;
     private final PluginMetadata metadata = PluginMetadata.builder()
             .id("impactor")
             .name("Impactor")
             .version("@version@")
             .build();
-    private final PluginLogger logger;
 
-    public AbstractImpactorPlugin(PluginLogger logger) {
+    public AbstractImpactorPlugin(ImpactorBootstrapper bootstrapper) {
         instance = this;
-        this.logger = logger;
+        this.bootstrapper = bootstrapper;
     }
 
     public static ImpactorPlugin instance() {
@@ -61,12 +63,15 @@ public class AbstractImpactorPlugin implements ImpactorPlugin {
 
     @Override
     public PluginLogger logger() {
-        return this.logger;
+        return this.bootstrapper.logger();
     }
 
     @Override
     public void construct() throws Exception {
-        Impactor service = Impactor.instance();
+        this.bootstrapper.logger().info("Initializing API...");
+        Impactor service = new ImpactorService();
+        APIRegister.register(service);
+
         new Reflections("net.impactdev.impactor")
                 .getSubTypesOf(ImpactorModule.class)
                 .forEach(m -> {

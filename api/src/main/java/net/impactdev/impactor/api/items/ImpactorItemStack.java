@@ -36,7 +36,6 @@ import net.impactdev.impactor.api.items.types.ItemType;
 import net.impactdev.impactor.api.items.types.ItemTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Set;
@@ -58,21 +57,6 @@ public interface ImpactorItemStack {
     static BookStackBuilder book() {
         return Impactor.instance().builders().provide(BookStackBuilder.class);
     }
-
-    /**
-     * Provides a native Minecraft ItemStack representation matching this particular Impactor ItemStack.
-     * Effectively, all values assigned through this typing should match 1:1 on the native stack.
-     *
-     * <p>Implementations are expected to provide their means of creating the ItemStack correctly, such
-     * as applying NBT tags or general fields. To simplify the process, {@link AbstractedItemStack#toNative()}
-     * provides the basic support to assign the fields present at minimum with this interface
-     * to the target ItemStack. Implementations can extend this to simplify the code they
-     * need to write to complete their translation.
-     *
-     * @return A native Minecraft ItemStack with a 1:1 mapping of all the particular fields
-     * of an extension to this interface.
-     */
-    ItemStack toNative();
 
     /**
      * Specifies the type of item this viewable item is based on. Effectively, this represents

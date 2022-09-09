@@ -25,6 +25,7 @@
 
 package net.impactdev.impactor.api.items.types;
 
+import net.impactdev.impactor.api.services.adventure.KeyService;
 import net.kyori.adventure.key.Key;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
@@ -1011,6 +1012,6 @@ public class ItemTypes {
     public static final ItemType ZOMBIFIED_PIGLIN_SPAWN_EGG = ItemTypes.minecraft("zombified_piglin_spawn_egg");
 
     private static ItemType minecraft(@Subst("air") @NotNull @Pattern("[a-z0-9_\\-./]+") final String location) {
-        return ItemType.from(Key.key(Key.MINECRAFT_NAMESPACE, location));
+        return ItemType.from(KeyService.create(Key.MINECRAFT_NAMESPACE, location));
     }
 }

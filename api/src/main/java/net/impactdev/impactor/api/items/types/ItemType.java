@@ -27,42 +27,23 @@ package net.impactdev.impactor.api.items.types;
 
 import net.impactdev.impactor.api.Impactor;
 import net.kyori.adventure.key.Key;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
+public interface ItemType {
 
-public class ItemType {
-
-    private final Key key;
-
-    public ItemType(Key key) {
-        this.key = key;
-    }
-
-    public static ItemType from(Key key) {
+    static ItemType from(Key key) {
         return Impactor.instance().factories().provide(Factory.class).from(key);
     }
 
-    public static ItemType from(@NotNull @Subst("minecraft") @Pattern("[a-z0-9_\\-.]+") final String root, @NotNull @Subst("air") @Pattern("[a-z0-9_\\-./]+") final String location) {
+    static ItemType from(@NotNull @Subst("minecraft") @Pattern("[a-z0-9_\\-.]+") final String root, @NotNull @Subst("air") @Pattern("[a-z0-9_\\-./]+") final String location) {
         return Impactor.instance().factories().provide(Factory.class).from(Key.key(root, location));
     }
 
-    public Key key() {
-        return this.key;
-    }
+    Key key();
 
-    public Optional<Item> minecraft() {
-        Registry<Item> registry = Registry.ITEM;
-        ResourceLocation location = new ResourceLocation(this.key.namespace() + ":" + this.key.value());
-        return registry.getOptional(location);
-    }
-
-    public interface Factory {
+    interface Factory {
 
         ItemType from(Key key);
 

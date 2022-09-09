@@ -26,10 +26,16 @@
 package net.impactdev.impactor.api.platform;
 
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.services.Service;
 
 import java.util.UUID;
 
-public interface Platform {
+public interface Platform extends Service {
+
+    @Override
+    default String getServiceName() {
+        return "Platform";
+    }
 
     PlatformInfo info();
 

@@ -25,6 +25,7 @@
 
 package net.impactdev.impactor.api.items.properties.enchantments;
 
+import net.impactdev.impactor.api.services.adventure.KeyService;
 import net.kyori.adventure.key.Key;
 
 public class Enchantments {
@@ -79,7 +80,7 @@ public class Enchantments {
 
     @SuppressWarnings("PatternValidation")
     private static Key minecraft(final String id) {
-        return Key.key(Key.MINECRAFT_NAMESPACE, id);
+        return KeyService.create(Key.MINECRAFT_NAMESPACE, id);
     }
 
 }

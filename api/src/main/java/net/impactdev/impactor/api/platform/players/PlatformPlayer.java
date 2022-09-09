@@ -25,12 +25,17 @@
 
 package net.impactdev.impactor.api.platform.players;
 
+import net.impactdev.impactor.api.Impactor;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
 
-public interface PlatformPlayer extends Audience {
+public interface PlatformPlayer {
+
+    static PlatformPlayer create(final UUID uuid) {
+        return Impactor.instance().factories().provide(Factory.class).create(uuid);
+    }
 
     UUID uuid();
 
@@ -38,7 +43,7 @@ public interface PlatformPlayer extends Audience {
 
     interface Factory {
 
-        PlatformPlayer create(UUID uuid);
+        PlatformPlayer create(final UUID uuid);
 
     }
 

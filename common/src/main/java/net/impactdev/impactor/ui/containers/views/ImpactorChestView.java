@@ -35,7 +35,7 @@ import net.impactdev.impactor.api.utilities.context.Context;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.ui.containers.views.builders.ImpactorBaseViewBuilder;
 import net.impactdev.impactor.ui.containers.views.layers.ImpactorView;
-import net.impactdev.impactor.ui.containers.views.service.ViewingService;
+import net.impactdev.impactor.ui.containers.views.service.ChestViewService;
 import org.checkerframework.common.value.qual.IntRange;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
@@ -43,12 +43,12 @@ import org.spongepowered.math.vector.Vector2i;
 public class ImpactorChestView extends ImpactorView implements ChestView {
 
     private final ChestLayout layout;
-    private final ViewingService provider;
+    private final ChestViewService provider;
 
     protected ImpactorChestView(ImpactorChestViewBuilder builder) {
         super(builder.namespace, builder.title, builder.readonly, builder.click, builder.close);
         this.layout = builder.layout;
-        this.provider = Impactor.instance().services().provide(ViewingService.class);
+        this.provider = Impactor.instance().services().provide(ChestViewService.class);
     }
 
     @Override

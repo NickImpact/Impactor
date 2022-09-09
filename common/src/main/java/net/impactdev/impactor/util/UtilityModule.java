@@ -23,15 +23,28 @@
  *
  */
 
-package net.impactdev.impactor.api.adventure;
+package net.impactdev.impactor.util;
 
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.minecraft.network.chat.Component;
+import net.impactdev.impactor.api.providers.BuilderProvider;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.providers.ServiceProvider;
+import net.impactdev.impactor.api.utilities.context.TypeTokenFactory;
+import net.impactdev.impactor.modules.ImpactorModule;
+import net.impactdev.impactor.util.factories.ImpactorTypeTokenFactory;
 
-public class AdventureTranslator {
-
-    public static Component toNative(net.kyori.adventure.text.Component component) {
-        return Component.Serializer.fromJson(GsonComponentSerializer.gson().serialize(component));
+public class UtilityModule implements ImpactorModule {
+    @Override
+    public void factories(FactoryProvider provider) {
+        provider.register(TypeTokenFactory.class, new ImpactorTypeTokenFactory());
     }
 
+    @Override
+    public void builders(BuilderProvider provider) {
+
+    }
+
+    @Override
+    public void services(ServiceProvider provider) {
+
+    }
 }

@@ -23,36 +23,15 @@
  *
  */
 
-package net.impactdev.impactor.launcher;
+package net.impactdev.impactor.util.factories;
 
-import java.net.URL;
+import io.leangen.geantyref.TypeToken;
+import net.impactdev.impactor.api.utilities.context.TypeTokenFactory;
 
-public class ImpactorPluginLauncher {
+public final class ImpactorTypeTokenFactory implements TypeTokenFactory {
 
-    private static ImpactorPluginLauncher launcher;
-    private final JarInJarClassLoader loader;
-
-    public static void initialize(JarInJarClassLoader loader) {
-        if(launcher != null) {
-            throw new LoadingException("Plugin Launcher already initialized");
-        }
-
-        launcher = new ImpactorPluginLauncher(loader);
-    }
-
-    public static ImpactorPluginLauncher get() {
-        return launcher;
-    }
-
-    private ImpactorPluginLauncher(JarInJarClassLoader loader) {
-        this.loader = loader;
-    }
-
-    public LauncherBootstrap bootstrap(ClassLoader loader, LaunchablePlugin plugin) {
-        URL url = JarInJarClassLoader.extractJar(loader, plugin.path());
-        this.loader.addJarToClasspath(url);
-
-        return plugin.create(this.loader);
+    public <T> TypeToken<T> get(Class<T> type) {
+        return TypeToken.get(type);
     }
 
 }

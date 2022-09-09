@@ -43,7 +43,7 @@ import net.impactdev.impactor.ui.containers.views.layers.ImpactorView;
 import net.impactdev.impactor.ui.containers.views.pagination.ImpactorContextRuleset;
 import net.impactdev.impactor.ui.containers.views.pagination.PaginatedView;
 import net.impactdev.impactor.ui.containers.views.pagination.layers.PageManager;
-import net.impactdev.impactor.ui.containers.views.service.ViewingService;
+import net.impactdev.impactor.ui.containers.views.service.PaginationService;
 import net.kyori.adventure.util.TriState;
 import org.checkerframework.common.value.qual.IntRange;
 import org.jetbrains.annotations.Nullable;
@@ -65,7 +65,7 @@ public class ImpactorPagination extends ImpactorView implements Pagination, Pagi
     private final TriState style;
 
     private final ContextRuleset ruleset;
-    private final ViewingService provider;
+    private final PaginationService provider;
 
     private final List<Icon> contents;
     private final PageManager manager;
@@ -83,7 +83,7 @@ public class ImpactorPagination extends ImpactorView implements Pagination, Pagi
         this.ruleset = Optional.ofNullable(((ImpactorContextRuleset) builder.ruleset))
                 .map(rules -> rules.with(this))
                 .orElse(new ImpactorContextRuleset());
-        this.provider = Impactor.instance().services().provide(ViewingService.class);
+        this.provider = Impactor.instance().services().provide(PaginationService.class);
         this.manager = new PageManager(this);
     }
 

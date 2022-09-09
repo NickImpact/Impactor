@@ -25,14 +25,19 @@
 
 package net.impactdev.impactor.items;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.impactdev.impactor.api.items.types.ItemType;
 import net.kyori.adventure.key.Key;
 
 public class ImpactorItemTypeFactory implements ItemType.Factory {
 
+    private final LoadingCache<Key, ItemType> cache = Caffeine.newBuilder()
+            .build(ImpactorItemType::new);
+
     @Override
     public ItemType from(Key key) {
-        return new ItemType(key);
+        return this.cache.get(key);
     }
 
 }

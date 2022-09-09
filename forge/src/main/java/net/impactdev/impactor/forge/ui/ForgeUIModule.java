@@ -23,14 +23,25 @@
  *
  */
 
-package net.impactdev.impactor.launcher;
+package net.impactdev.impactor.forge.ui;
 
-public interface LaunchablePlugin {
+import net.impactdev.impactor.api.providers.BuilderProvider;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.providers.ServiceProvider;
+import net.impactdev.impactor.modules.ImpactorModule;
+import net.impactdev.impactor.ui.containers.views.service.ChestViewService;
 
-    String path();
+public class ForgeUIModule implements ImpactorModule {
 
-    String bootstrapper();
+    @Override
+    public void factories(FactoryProvider provider) {}
 
-    LauncherBootstrap create(JarInJarClassLoader loader);
+    @Override
+    public void builders(BuilderProvider provider) {}
+
+    @Override
+    public void services(ServiceProvider provider) {
+        provider.register(ChestViewService.class, new ForgeChestViewingService());
+    }
 
 }

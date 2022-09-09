@@ -23,19 +23,15 @@
  *
  */
 
-package net.impactdev.impactor.launcher;
+package net.impactdev.impactor.ui.containers.views.service;
 
-/**
- * Runtime exception used if there is a problem during loading
- */
-public class LoadingException extends RuntimeException {
+import net.impactdev.impactor.api.ui.containers.views.ChestView;
 
-    public LoadingException(String message) {
-        super(message);
-    }
+public interface ChestViewService extends ViewingService<ChestView> {
 
-    public LoadingException(String message, Throwable cause) {
-        super(message, cause);
+    @Override
+    default String getServiceName() {
+        return "Chest View Manager";
     }
 
 }

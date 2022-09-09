@@ -111,7 +111,7 @@ public class ImpactorChestLayout extends ImpactorLayout implements ChestLayout {
                 this.slot(icon, (this.rows * 9) / 2 - 4);
                 this.slot(icon, (this.rows * 9) / 2 + 5);
             } else {
-                this.slot(icon, (this.rows * 9) / 2 + 1);
+                this.slot(icon, (this.rows * 9) / 2);
             }
 
             return this;

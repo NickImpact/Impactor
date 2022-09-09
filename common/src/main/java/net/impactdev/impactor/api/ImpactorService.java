@@ -43,7 +43,7 @@ public class ImpactorService implements Impactor {
 
     @Override
     public Platform platform() {
-        return null;
+        return services.provide(Platform.class);
     }
 
     @Override

@@ -23,7 +23,9 @@
  *
  */
 
-package net.impactdev.impactor.launcher;
+package net.impactdev.impactor.launcher.loader;
+
+import net.impactdev.impactor.launcher.LauncherBootstrap;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -133,7 +135,6 @@ public class JarInJarClassLoader extends URLClassLoader {
         Path path;
         try {
             path = Files.createTempFile(jarResourcePath.replace(".", "-"), ".jar.tmp");
-            System.out.println(path);
         } catch (IOException e) {
             throw new LoadingException("Unable to create a temporary file", e);
         }

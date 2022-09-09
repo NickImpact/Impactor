@@ -31,9 +31,9 @@ import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.View;
 import org.jetbrains.annotations.Nullable;
 
-public interface ViewingService extends Service {
+public interface ViewingService<V extends View> extends Service {
 
-    void open(View view, PlatformPlayer target);
+    void open(V view, PlatformPlayer target);
 
     void close(PlatformPlayer target);
 

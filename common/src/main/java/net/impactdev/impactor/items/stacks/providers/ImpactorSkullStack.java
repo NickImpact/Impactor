@@ -30,6 +30,7 @@ import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
 import net.impactdev.impactor.api.items.extensions.SkullStack;
 import net.impactdev.impactor.api.items.types.ItemTypes;
+import net.impactdev.impactor.items.stacks.ImpactorAbstractedItemStack;
 import net.impactdev.impactor.items.stacks.builders.ImpactorSkullStackBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -38,7 +39,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.Optional;
 
-public class ImpactorSkullStack extends AbstractedItemStack implements SkullStack {
+public class ImpactorSkullStack extends ImpactorAbstractedItemStack implements SkullStack {
 
     private final SkullType type;
     private final String target;

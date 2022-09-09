@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.ui.containers.views.pagination.views.sectioned;
 
-import com.google.common.collect.Sets;
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
@@ -33,6 +33,7 @@ import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.Secti
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.sections.Section;
 import net.impactdev.impactor.ui.containers.views.layers.ImpactorView;
 import net.impactdev.impactor.ui.containers.views.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
+import net.impactdev.impactor.ui.containers.views.service.SectionedPaginationViewService;
 import org.checkerframework.common.value.qual.IntRange;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
@@ -45,21 +46,24 @@ public class ImpactorSectionedPagination extends ImpactorView implements Section
     private final ChestLayout background;
     private final List<Section> sections;
 
+    private final SectionedPaginationViewService provider;
+
     public ImpactorSectionedPagination(ImpactorSectionedPaginationBuilder builder) {
         super(builder.namespace, builder.title, builder.readonly, builder.click, builder.close);
         this.viewer = builder.viewer;
         this.background = builder.background;
         this.sections = builder.sections;
+        this.provider = Impactor.instance().services().provide(SectionedPaginationViewService.class);
     }
 
     @Override
     public void open() {
-
+        this.provider.open(this, this.viewer);
     }
 
     @Override
     public void close() {
-
+        this.provider.close(this.viewer);
     }
 
     @Override
@@ -84,9 +88,9 @@ public class ImpactorSectionedPagination extends ImpactorView implements Section
 
     @Override
     public void set(@Nullable Icon icon, int slot) {
-
+        // TODO - Verify requirements for set are met
+        this.provider.set(icon, slot);
     }
-
 
     @Override
     public void refresh(Vector2i dimensions, Vector2i offsets) {

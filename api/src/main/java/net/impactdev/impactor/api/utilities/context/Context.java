@@ -27,6 +27,7 @@ package net.impactdev.impactor.api.utilities.context;
 
 import com.google.common.collect.Maps;
 import io.leangen.geantyref.TypeToken;
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 
 import java.util.Map;
@@ -56,7 +57,7 @@ public final class Context implements PrettyPrinter.IPrettyPrintable {
      * @return The updated context
      */
     public <T> Context append(Class<T> type, T value) {
-        return this.append(TypeToken.get(type), value);
+        return this.append(Impactor.instance().factories().provide(TypeTokenFactory.class).get(type), value);
     }
 
     /**
@@ -81,7 +82,7 @@ public final class Context implements PrettyPrinter.IPrettyPrintable {
      * @return <code>true</code> if the value is available in this context, <code>false</code> otherwise
      */
     public boolean has(Class<?> type) {
-        return this.has(TypeToken.get(type));
+        return this.has(Impactor.instance().factories().provide(TypeTokenFactory.class).get(type));
     }
 
     /**
@@ -104,7 +105,7 @@ public final class Context implements PrettyPrinter.IPrettyPrintable {
      * @return An optionally wrapped instance representing the provided type, or empty if not available
      */
     public <T> Optional<T> request(Class<T> type) {
-        return this.request(TypeToken.get(type));
+        return this.request(Impactor.instance().factories().provide(TypeTokenFactory.class).get(type));
     }
 
     /**
@@ -129,7 +130,7 @@ public final class Context implements PrettyPrinter.IPrettyPrintable {
      * @throws NoSuchElementException If no value actually exists for the required typing.
      */
     public <T> T require(Class<T> type) throws NoSuchElementException {
-        return this.require(TypeToken.get(type));
+        return this.require(Impactor.instance().factories().provide(TypeTokenFactory.class).get(type));
     }
 
     /**
