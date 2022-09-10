@@ -42,28 +42,26 @@ import java.util.List;
 
 public class ImpactorSectionedPagination extends ImpactorView implements SectionedPagination {
 
-    private final PlatformPlayer viewer;
+    protected final PlatformPlayer viewer;
     private final ChestLayout background;
     private final List<Section> sections;
 
-    private final SectionedPaginationViewService provider;
 
     public ImpactorSectionedPagination(ImpactorSectionedPaginationBuilder builder) {
         super(builder.namespace, builder.title, builder.readonly, builder.click, builder.close);
         this.viewer = builder.viewer;
         this.background = builder.background;
         this.sections = builder.sections;
-        this.provider = Impactor.instance().services().provide(SectionedPaginationViewService.class);
     }
 
     @Override
     public void open() {
-        this.provider.open(this, this.viewer);
+
     }
 
     @Override
     public void close() {
-        this.provider.close(this.viewer);
+
     }
 
     @Override
@@ -89,7 +87,6 @@ public class ImpactorSectionedPagination extends ImpactorView implements Section
     @Override
     public void set(@Nullable Icon icon, int slot) {
         // TODO - Verify requirements for set are met
-        this.provider.set(icon, slot);
     }
 
     @Override

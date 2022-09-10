@@ -36,7 +36,7 @@ import net.impactdev.impactor.util.ExceptionPrinter;
 import net.impactdev.impactor.util.ProvidedExceptionHeaders;
 import org.reflections.Reflections;
 
-public class AbstractImpactorPlugin implements ImpactorPlugin {
+public class BaseImpactorPlugin implements ImpactorPlugin {
 
     private static ImpactorPlugin instance;
 
@@ -47,7 +47,7 @@ public class AbstractImpactorPlugin implements ImpactorPlugin {
             .version("@version@")
             .build();
 
-    public AbstractImpactorPlugin(ImpactorBootstrapper bootstrapper) {
+    public BaseImpactorPlugin(ImpactorBootstrapper bootstrapper) {
         instance = this;
         this.bootstrapper = bootstrapper;
     }

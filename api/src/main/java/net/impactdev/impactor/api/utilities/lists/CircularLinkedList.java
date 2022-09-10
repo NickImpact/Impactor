@@ -25,6 +25,7 @@
 
 package net.impactdev.impactor.api.utilities.lists;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,6 +71,16 @@ public class CircularLinkedList<E> implements Iterable<E> {
 	public E next() {
 		this.current = this.current.next;
 		return this.current.value();
+	}
+
+	public void advanceTo(int index) {
+		Preconditions.checkArgument(index >= 0 && index < this.size(), "Invalid index position");
+		Node<E> target = this.head;
+		for(int i = 1; i <= index; i++) {
+			target = target.next;
+		}
+
+		this.current = target;
 	}
 
 	public void append(E value) {

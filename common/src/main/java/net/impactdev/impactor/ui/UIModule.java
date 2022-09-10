@@ -53,10 +53,7 @@ public class UIModule implements ImpactorModule {
     @Override
     public void builders(BuilderProvider provider) {
         provider.register(Icon.IconBuilder.class, ImpactorIcon.ImpactorIconBuilder::new);
-        provider.register(ChestView.ChestViewBuilder.class, ImpactorChestView.ImpactorChestViewBuilder::new);
-        provider.register(PaginationBuilder.class, ImpactorPagination.ImpactorPaginationBuilder::new);
         provider.register(ImpactorPage.ImpactorPageBuilder.class, ImpactorPage.ImpactorPageBuilder::new);
-        provider.register(SectionedPaginationBuilder.class, ImpactorSectionedPaginationBuilder::new);
 
         // Layouts
         provider.register(ChestLayout.ChestLayoutBuilder.class, ImpactorChestLayout.ImpactorChestLayoutBuilder::new);

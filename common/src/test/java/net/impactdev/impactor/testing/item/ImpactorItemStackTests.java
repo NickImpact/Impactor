@@ -132,7 +132,7 @@ public class ImpactorItemStackTests {
         BookStack book = ImpactorItemStack.book()
                 .type(BookStack.BookType.WRITTEN)
                 .title(Component.text("A Very Neat Book").color(NamedTextColor.GOLD))
-                .author(Component.text("NickImpact"))
+                .author("NickImpact")
                 .generation(BookStack.Generation.ORIGINAL)
                 .page(1, Component.text("A set of text that makes up").append(Component.text(" page 1")))
                 .page(3, Component.text("Hello World!").color(NamedTextColor.RED))

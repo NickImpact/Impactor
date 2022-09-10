@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.forge.ui;
+package net.impactdev.impactor.forge.ui.containers;
 
 import ca.landonjw.gooeylibs2.api.UIManager;
 import ca.landonjw.gooeylibs2.api.page.GooeyPage;
@@ -33,41 +33,55 @@ import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.forge.ui.gooey.GooeyIcon;
-import net.impactdev.impactor.ui.containers.views.service.ChestViewService;
+import net.impactdev.impactor.ui.containers.views.ImpactorChestView;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.Optional;
 
-public class ForgeChestViewingService implements ChestViewService {
+public final class ForgeImpactorChestView extends ImpactorChestView {
 
-    @Override
-    public void open(ChestView view, PlatformPlayer target) {
-        ChestTemplate.Builder template = ChestTemplate.builder(view.rows());
-        view.layout().elements().forEach((slot, icon) -> {
+    private final ChestTemplate template;
+    private final GooeyPage delegate;
+
+    private ForgeImpactorChestView(ImpactorChestViewBuilder builder) {
+        super(builder);
+        ChestTemplate.Builder template = ChestTemplate.builder(this.rows());
+        this.layout().elements().forEach((slot, icon) -> {
             template.set(slot, new GooeyIcon(icon));
         });
 
-        // TODO - io/leangen/geantyref/TypeToken required for listeners
-
-        GooeyPage page = GooeyPage.builder()
-                .template(template.build())
-                .title(AdventureTranslator.toNative(view.title()))
+        this.delegate = GooeyPage.builder()
+                .template(this.template = template.build())
+                .title(AdventureTranslator.toNative(this.title()))
 //                .onClose(action -> view.) // TODO - Add this back to Impactor API, add onClick to Gooey
                 .build();
-        @Nullable ServerPlayer forge = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(target.uuid());
-        UIManager.openUIForcefully(Objects.requireNonNull(forge), page);
     }
 
     @Override
-    public void close(PlatformPlayer target) {
+    public void set(@Nullable Icon icon, int slot) {
+        this.template.set(slot, Optional.ofNullable(icon).map(GooeyIcon::new).orElse(null));
 
     }
 
     @Override
-    public boolean set(@Nullable Icon icon, int slot) {
-        return false;
+    public void open(PlatformPlayer viewer) {
+        @Nullable ServerPlayer forge = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(viewer.uuid());
+        UIManager.openUIForcefully(Objects.requireNonNull(forge), this.delegate);
     }
 
+    @Override
+    public void close(PlatformPlayer viewer) {
+        @Nullable ServerPlayer forge = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(viewer.uuid());
+        UIManager.closeUI(Objects.requireNonNull(forge));
+    }
+
+    public static final class ForgeImpactorChestViewBuilder extends ImpactorChestViewBuilder {
+        @Override
+        public ChestView build() {
+            return new ForgeImpactorChestView(this);
+        }
+    }
 }

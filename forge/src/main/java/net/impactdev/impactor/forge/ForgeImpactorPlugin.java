@@ -26,10 +26,10 @@
 package net.impactdev.impactor.forge;
 
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.plugin.AbstractImpactorPlugin;
+import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
 
-public class ForgeImpactorPlugin extends AbstractImpactorPlugin implements ImpactorPlugin {
+public class ForgeImpactorPlugin extends BaseImpactorPlugin implements ImpactorPlugin {
 
     public ForgeImpactorPlugin(ImpactorBootstrapper bootstrapper) {
         super(bootstrapper);

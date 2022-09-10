@@ -30,12 +30,12 @@ import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
-import net.impactdev.impactor.plugin.AbstractImpactorPlugin;
+import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 
 public class ProvidedExceptionHeaders {
 
     public static final PrettyPrinter.IPrettyPrintable METADATA = printer -> {
-        ImpactorPlugin plugin = AbstractImpactorPlugin.instance();
+        ImpactorPlugin plugin = BaseImpactorPlugin.instance();
         PluginMetadata metadata = plugin.metadata();
         Platform platform = Impactor.instance().platform();
 

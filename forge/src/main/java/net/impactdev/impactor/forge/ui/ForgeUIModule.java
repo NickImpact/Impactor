@@ -28,8 +28,13 @@ package net.impactdev.impactor.forge.ui;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
+import net.impactdev.impactor.api.ui.containers.views.ChestView;
+import net.impactdev.impactor.api.ui.containers.views.pagination.builders.PaginationBuilder;
+import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.builders.SectionedPaginationBuilder;
+import net.impactdev.impactor.forge.ui.containers.ForgeImpactorChestView;
+import net.impactdev.impactor.forge.ui.containers.ForgePaginationView;
 import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.ui.containers.views.service.ChestViewService;
+import net.impactdev.impactor.ui.containers.views.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
 
 public class ForgeUIModule implements ImpactorModule {
 
@@ -37,11 +42,13 @@ public class ForgeUIModule implements ImpactorModule {
     public void factories(FactoryProvider provider) {}
 
     @Override
-    public void builders(BuilderProvider provider) {}
+    public void builders(BuilderProvider provider) {
+        provider.register(ChestView.ChestViewBuilder.class, ForgeImpactorChestView.ForgeImpactorChestViewBuilder::new);
+        provider.register(PaginationBuilder.class, ForgePaginationView.ForgePaginationViewBuilder::new);
+//        provider.register(SectionedPaginationBuilder.class, ImpactorSectionedPaginationBuilder::new);
+    }
 
     @Override
-    public void services(ServiceProvider provider) {
-        provider.register(ChestViewService.class, new ForgeChestViewingService());
-    }
+    public void services(ServiceProvider provider) {}
 
 }

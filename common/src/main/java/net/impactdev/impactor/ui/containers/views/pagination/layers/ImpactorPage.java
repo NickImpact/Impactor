@@ -94,12 +94,16 @@ public class ImpactorPage implements Page {
                         return false;
                     })
                     .build();
-            results.put(target, icon);
+            results.put(updater.slot(), icon);
         });
 
         int slot = 0;
         for(Icon icon : builder.contents) {
             results.put(this.calculateTargetSlot(slot++, builder.zone, builder.offsets), icon);
+        }
+
+        for(; slot < builder.zone.x() * builder.zone.y(); slot++) {
+            results.put(this.calculateTargetSlot(slot, builder.zone, builder.offsets), null);
         }
 
         return results;

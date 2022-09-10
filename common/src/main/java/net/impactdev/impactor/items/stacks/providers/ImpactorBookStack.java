@@ -25,7 +25,6 @@
 
 package net.impactdev.impactor.items.stacks.providers;
 
-import net.impactdev.impactor.api.items.AbstractedItemStack;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
 import net.impactdev.impactor.api.items.builders.provided.BookStackBuilder;
@@ -44,14 +43,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 
 public class ImpactorBookStack extends ImpactorAbstractedItemStack implements BookStack {
 
     private final BookType bookType;
-    private final Component author;
+    private final String author;
     private final Generation generation;
     private final TreeMap<Integer, Component> pages;
 
@@ -69,7 +67,7 @@ public class ImpactorBookStack extends ImpactorAbstractedItemStack implements Bo
     }
 
     @Override
-    public Component author() {
+    public String author() {
         return this.author;
     }
 
@@ -123,7 +121,7 @@ public class ImpactorBookStack extends ImpactorAbstractedItemStack implements Bo
     public ItemStack toNative() {
         ItemStack stack = super.toNative();
         CompoundTag nbt = stack.getOrCreateTag();
-        nbt.putString("author", GsonComponentSerializer.gson().serialize(this.author));
+        nbt.putString("author", this.author);
         nbt.putInt("generation", this.generation.ordinal());
 
         int max = this.pages.lastKey();
@@ -135,6 +133,7 @@ public class ImpactorBookStack extends ImpactorAbstractedItemStack implements Bo
             )));
         }
 
+        nbt.putString("title", "Impactor Generated Book");
         nbt.put("pages", pages);
         return stack;
     }

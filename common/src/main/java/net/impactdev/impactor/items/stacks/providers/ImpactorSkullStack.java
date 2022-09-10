@@ -25,7 +25,6 @@
 
 package net.impactdev.impactor.items.stacks.providers;
 
-import net.impactdev.impactor.api.items.AbstractedItemStack;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
 import net.impactdev.impactor.api.items.extensions.SkullStack;
@@ -38,6 +37,7 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class ImpactorSkullStack extends ImpactorAbstractedItemStack implements SkullStack {
 
@@ -87,15 +87,28 @@ public class ImpactorSkullStack extends ImpactorAbstractedItemStack implements S
             } else {
                 CompoundTag nbt = result.getOrCreateTagElement("SkullOwner");
                 nbt.putString("Name", this.owner().orElse("Impactor"));
-
-                CompoundTag properties = new CompoundTag();
-                ListTag textures = new ListTag();
-                textures.add(StringTag.valueOf(this.texture().get()));
-
-                nbt.put("properties", properties.put("textures", textures));
+                this.properties(nbt);
+            }
+        } else {
+            if(this.texture().isPresent()) {
+                CompoundTag nbt = result.getOrCreateTagElement("SkullOwner");
+                nbt.putUUID("Id", UUID.randomUUID());
+                this.properties(nbt);
             }
         }
 
         return result;
+    }
+
+    private void properties(CompoundTag nbt) {
+        CompoundTag properties = new CompoundTag();
+        ListTag textures = new ListTag();
+
+        CompoundTag value = new CompoundTag();
+        value.put("Value", StringTag.valueOf(this.texture().get()));
+        textures.add(value);
+        properties.put("textures", textures);
+
+        nbt.put("Properties", properties);
     }
 }

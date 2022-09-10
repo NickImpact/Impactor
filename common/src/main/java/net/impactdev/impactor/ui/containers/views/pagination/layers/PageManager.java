@@ -28,6 +28,7 @@ package net.impactdev.impactor.ui.containers.views.pagination.layers;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.views.pagination.Page;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
+import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.ui.containers.views.pagination.PaginatedView;
 
 import java.util.Collections;
@@ -55,6 +56,7 @@ public class PageManager {
 
     public void page(int page) {
         this.page = page;
+        this.pages.advanceTo(page - 1);
     }
 
     public void update() {
@@ -70,8 +72,9 @@ public class PageManager {
         CircularLinkedList<Page> results = CircularLinkedList.of();
         for(int i = 0; i < pages; i++) {
             ImpactorPage page = ImpactorPage.builder()
+                    .parent(this.parent)
                     .contents(focus.subList(i * zone, Math.min(focus.size(), (i + 1) * zone)))
-                    .index(i)
+                    .index(i + 1)
                     .updaters(this.parent.updaters())
                     .pages(pages)
                     .zone(this.parent.zone())
@@ -82,6 +85,7 @@ public class PageManager {
 
         if(results.empty()) {
             ImpactorPage page = ImpactorPage.builder()
+                    .parent(this.parent)
                     .contents(Collections.EMPTY_LIST)
                     .index(1)
                     .updaters(this.parent.updaters())

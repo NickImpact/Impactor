@@ -25,10 +25,8 @@
 
 package net.impactdev.impactor.ui.containers.views.pagination.views;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
@@ -43,21 +41,20 @@ import net.impactdev.impactor.ui.containers.views.layers.ImpactorView;
 import net.impactdev.impactor.ui.containers.views.pagination.ImpactorContextRuleset;
 import net.impactdev.impactor.ui.containers.views.pagination.PaginatedView;
 import net.impactdev.impactor.ui.containers.views.pagination.layers.PageManager;
-import net.impactdev.impactor.ui.containers.views.service.PaginationService;
 import net.kyori.adventure.util.TriState;
 import org.checkerframework.common.value.qual.IntRange;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class ImpactorPagination extends ImpactorView implements Pagination, PaginatedView {
+public abstract class ImpactorPagination extends ImpactorView implements Pagination, PaginatedView {
 
-    private final PlatformPlayer viewer;
+    protected final PlatformPlayer viewer;
     private final ChestLayout layout;
     private final Vector2i zone;
     private final Vector2i offsets;
@@ -65,12 +62,11 @@ public class ImpactorPagination extends ImpactorView implements Pagination, Pagi
     private final TriState style;
 
     private final ContextRuleset ruleset;
-    private final PaginationService provider;
 
     private final List<Icon> contents;
     private final PageManager manager;
 
-    private ImpactorPagination(ImpactorPaginationBuilder builder) {
+    protected ImpactorPagination(ImpactorPaginationBuilder builder) {
         super(builder.namespace, builder.title, builder.readonly, builder.click, builder.close);
         this.viewer = builder.viewer;
         this.layout = builder.layout;
@@ -83,7 +79,6 @@ public class ImpactorPagination extends ImpactorView implements Pagination, Pagi
         this.ruleset = Optional.ofNullable(((ImpactorContextRuleset) builder.ruleset))
                 .map(rules -> rules.with(this))
                 .orElse(new ImpactorContextRuleset());
-        this.provider = Impactor.instance().services().provide(PaginationService.class);
         this.manager = new PageManager(this);
     }
 
@@ -103,11 +98,6 @@ public class ImpactorPagination extends ImpactorView implements Pagination, Pagi
     }
 
     @Override
-    public void set(@Nullable Icon icon, int slot) {
-        this.provider.set(icon, slot);
-    }
-
-    @Override
     public void refresh(Vector2i dimensions, Vector2i offsets) {
         Page current = this.manager.pages().current();
 
@@ -119,16 +109,6 @@ public class ImpactorPagination extends ImpactorView implements Pagination, Pagi
 //                this.set(current.icons().get());
             }
         }
-    }
-
-    @Override
-    public void open() {
-        this.provider.open(this, this.viewer);
-    }
-
-    @Override
-    public void close() {
-        this.provider.close(this.viewer);
     }
 
     @Override
@@ -164,7 +144,8 @@ public class ImpactorPagination extends ImpactorView implements Pagination, Pagi
     @Override
     public void page(int target) {
         this.manager.page(target);
-        // TODO - Apply page
+        Page current = this.pages().current();
+        current.icons().forEach((slot, icon) -> this.set(icon, slot));
     }
 
     @Override
@@ -177,17 +158,17 @@ public class ImpactorPagination extends ImpactorView implements Pagination, Pagi
         return this.style;
     }
 
-    public static class ImpactorPaginationBuilder extends ImpactorBaseViewBuilder<PaginationBuilder> implements PaginationBuilder {
+    public static abstract class ImpactorPaginationBuilder extends ImpactorBaseViewBuilder<PaginationBuilder> implements PaginationBuilder {
 
-        private List<Icon> contents;
-        private PlatformPlayer viewer;
-        private ChestLayout layout;
-        private Vector2i zone;
-        private Vector2i offset = Vector2i.ZERO;
-        private final Set<PageUpdater> updaters = Sets.newHashSet();
-        private TriState style = TriState.NOT_SET;
+        protected List<Icon> contents;
+        protected PlatformPlayer viewer;
+        protected ChestLayout layout;
+        protected Vector2i zone;
+        protected Vector2i offset = Vector2i.ZERO;
+        protected final Set<PageUpdater> updaters = Sets.newHashSet();
+        protected TriState style = TriState.NOT_SET;
 
-        private ContextRuleset ruleset;
+        protected ContextRuleset ruleset;
 
         @Override
         public PaginationBuilder viewer(PlatformPlayer viewer) {
@@ -230,17 +211,6 @@ public class ImpactorPagination extends ImpactorView implements Pagination, Pagi
         public PaginationBuilder ruleset(ContextRuleset ruleset) {
             this.ruleset = ruleset;
             return this;
-        }
-
-        @Override
-        public Pagination build() {
-            Preconditions.checkNotNull(this.namespace, "Provider was not specified");
-            Preconditions.checkNotNull(this.viewer, "Viewer was not specified");
-
-            if(this.contents == null) {
-                this.contents = Collections.emptyList();
-            }
-            return new ImpactorPagination(this);
         }
     }
 }

@@ -33,10 +33,10 @@ import org.jetbrains.annotations.Nullable;
 
 public interface ViewingService<V extends View> extends Service {
 
-    void open(V view, PlatformPlayer target);
+    void open(final V view, final PlatformPlayer target);
 
-    void close(PlatformPlayer target);
+    void close(final PlatformPlayer target);
 
-    boolean set(@Nullable Icon icon, int slot);
+    boolean set(final V view, final @Nullable Icon icon, final int slot);
 
 }

@@ -39,7 +39,6 @@ import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.secti
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdaterType;
 import net.impactdev.impactor.testing.ui.provided.TestPlatformPlayer;
-import net.impactdev.impactor.testing.ui.provided.TestViewProvider;
 import net.impactdev.impactor.ui.containers.views.service.ViewingService;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -62,11 +61,6 @@ public class PaginationTests {
 
     private static final Key TEST_KEY = Key.key("impactor", "test");
     private static final PlatformPlayer VIEWER = new TestPlatformPlayer();
-
-    @BeforeAll
-    public static void initialize() {
-        Impactor.instance().services().register(ViewingService.class, new TestViewProvider());
-    }
 
 //    @Test
 //    public void build() {

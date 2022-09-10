@@ -25,9 +25,6 @@
 
 package net.impactdev.impactor.ui.containers.views;
 
-import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.api.utilities.ComponentManipulator;
@@ -35,20 +32,16 @@ import net.impactdev.impactor.api.utilities.context.Context;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.ui.containers.views.builders.ImpactorBaseViewBuilder;
 import net.impactdev.impactor.ui.containers.views.layers.ImpactorView;
-import net.impactdev.impactor.ui.containers.views.service.ChestViewService;
 import org.checkerframework.common.value.qual.IntRange;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
 
-public class ImpactorChestView extends ImpactorView implements ChestView {
+public abstract class ImpactorChestView extends ImpactorView implements ChestView {
 
     private final ChestLayout layout;
-    private final ChestViewService provider;
 
     protected ImpactorChestView(ImpactorChestViewBuilder builder) {
         super(builder.namespace, builder.title, builder.readonly, builder.click, builder.close);
         this.layout = builder.layout;
-        this.provider = Impactor.instance().services().provide(ChestViewService.class);
     }
 
     @Override
@@ -59,21 +52,6 @@ public class ImpactorChestView extends ImpactorView implements ChestView {
     @Override
     public @IntRange(from = 1, to = 6) int rows() {
         return this.layout().dimensions().y();
-    }
-
-    @Override
-    public void set(@Nullable Icon icon, int slot) {
-        this.provider.set(icon, slot);
-    }
-
-    @Override
-    public void open(PlatformPlayer viewer) {
-        this.provider.open(this, viewer);
-    }
-
-    @Override
-    public void close(PlatformPlayer viewer) {
-        this.provider.close(viewer);
     }
 
     @Override
@@ -91,7 +69,7 @@ public class ImpactorChestView extends ImpactorView implements ChestView {
         context.print(printer);
     }
 
-    public static class ImpactorChestViewBuilder extends ImpactorBaseViewBuilder<ChestViewBuilder> implements ChestViewBuilder {
+    public static abstract class ImpactorChestViewBuilder extends ImpactorBaseViewBuilder<ChestViewBuilder> implements ChestViewBuilder {
 
         private ChestLayout layout;
 
@@ -111,10 +89,6 @@ public class ImpactorChestView extends ImpactorView implements ChestView {
                     .onClose(((ImpactorChestView) parent).close);
         }
 
-        @Override
-        public ChestView build() {
-            return new ImpactorChestView(this);
-        }
     }
 
 }

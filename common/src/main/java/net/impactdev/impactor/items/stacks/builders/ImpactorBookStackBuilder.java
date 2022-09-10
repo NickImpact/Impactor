@@ -43,7 +43,7 @@ public class ImpactorBookStackBuilder
 {
 
     public BookStack.BookType type;
-    public Component author;
+    public String author;
     public BookStack.Generation generation;
     public TreeMap<Integer, Component> pages = Maps.newTreeMap();
 
@@ -59,7 +59,7 @@ public class ImpactorBookStackBuilder
     }
 
     @Override
-    public BookStackBuilder author(Component author) {
+    public BookStackBuilder author(String author) {
         this.author = author;
         return this;
     }

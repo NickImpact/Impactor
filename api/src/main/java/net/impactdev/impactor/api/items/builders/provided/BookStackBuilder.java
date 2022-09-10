@@ -56,7 +56,7 @@ public interface BookStackBuilder extends ImpactorItemStackBuilder<BookStack, Bo
      * @return This builder
      */
     @Contract("_ -> this")
-    BookStackBuilder author(final Component author);
+    BookStackBuilder author(final String author);
 
     /**
      * Sets the generation of this book. In minecraft, the generation of a book indicates its source
