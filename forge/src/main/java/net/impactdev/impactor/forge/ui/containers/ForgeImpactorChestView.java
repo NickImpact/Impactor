@@ -33,6 +33,7 @@ import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.forge.ui.gooey.GooeyIcon;
+import net.impactdev.impactor.forge.ui.gooey.GooeyPageOpenCloser;
 import net.impactdev.impactor.ui.containers.views.ImpactorChestView;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
@@ -41,7 +42,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.Optional;
 
-public final class ForgeImpactorChestView extends ImpactorChestView {
+public final class ForgeImpactorChestView extends ImpactorChestView implements GooeyPageOpenCloser {
 
     private final ChestTemplate template;
     private final GooeyPage delegate;
@@ -68,15 +69,14 @@ public final class ForgeImpactorChestView extends ImpactorChestView {
 
     @Override
     public void open(PlatformPlayer viewer) {
-        @Nullable ServerPlayer forge = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(viewer.uuid());
-        UIManager.openUIForcefully(Objects.requireNonNull(forge), this.delegate);
+        this.openPage(this.delegate, viewer);
     }
 
     @Override
     public void close(PlatformPlayer viewer) {
-        @Nullable ServerPlayer forge = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(viewer.uuid());
-        UIManager.closeUI(Objects.requireNonNull(forge));
+        this.closePage(viewer);
     }
+
 
     public static final class ForgeImpactorChestViewBuilder extends ImpactorChestViewBuilder {
         @Override

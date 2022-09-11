@@ -33,14 +33,17 @@ import net.impactdev.impactor.api.items.types.ItemType;
 import net.impactdev.impactor.api.items.types.ItemTypes;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.Icon;
+import net.impactdev.impactor.api.ui.containers.Layout;
 import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.api.ui.containers.views.pagination.Pagination;
+import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdaterType;
 import net.impactdev.impactor.forge.ForgeImpactorPlugin;
 import net.impactdev.impactor.items.stacks.ImpactorAbstractedItemStack;
 import net.impactdev.impactor.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.util.ExceptionPrinter;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -244,6 +247,114 @@ public class ForgeRegistrationHandler {
                                     .build();
 
                             pagination.open();
+
+                            return 1;
+                        }))
+                        .then(literal("sectioned").executes(context -> {
+                            try {
+                                List<Icon> first = Lists.newArrayList();
+                                for (int i = 0; i < 35; i++) {
+                                    final int index = i;
+                                    first.add(Icon.builder().display(() -> ImpactorItemStack.basic()
+                                            .type(ItemTypes.GOLD_NUGGET)
+                                            .title(text(index + 1))
+                                            .quantity(index + 1)
+                                            .lore(text("Test Lore").color(NamedTextColor.GRAY))
+                                            .build()
+                                    ).build());
+                                }
+                                List<Icon> second = Lists.newArrayList();
+                                for (int i = 0; i < 15; i++) {
+                                    final int index = i;
+                                    second.add(Icon.builder().display(() -> ImpactorItemStack.basic()
+                                            .type(ItemTypes.DIAMOND)
+                                            .title(text("Hello World (" + index + ")"))
+                                            .quantity(index + 1)
+                                            .lore(text("Test Lore").color(NamedTextColor.GRAY))
+                                            .build()
+                                    ).build());
+                                }
+
+                                Icon border = Icon.builder().display(() -> ImpactorItemStack.basic()
+                                        .type(ItemTypes.BLACK_STAINED_GLASS_PANE)
+                                        .title(Component.empty())
+                                        .build()
+                                ).build();
+
+                                PlatformPlayer viewer = PlatformPlayer.create(context.getSource().getPlayerOrException()
+                                        .getUUID());
+                                SectionedPagination pagination = SectionedPagination.builder()
+                                        .provider(Key.key("impactor", "test"))
+                                        .viewer(viewer)
+                                        .title(text("Impactor/Gooey Sections Test").color(TextColor.color(0x42,
+                                                0x87,
+                                                0xf5)))
+                                        .layout(ChestLayout.builder()
+                                                .rows(border, 1, 4, 6)
+                                                .columns(border, 1, 7, 9)
+                                                .slots(border, 38, 42)
+                                                .build()
+                                        )
+                                        .section()
+                                        .contents(first)
+                                        .dimensions(Vector2i.from(5, 2))
+                                        .offset(Vector2i.ONE)
+                                        .updater(PageUpdater.builder()
+                                                .slot(16)
+                                                .type(PageUpdaterType.NEXT)
+                                                .provider(target -> ImpactorItemStack.basic()
+                                                        .type(ItemTypes.ARROW)
+                                                        .title(text("Next Page (" + target + ")"))
+                                                        .glow()
+                                                        .build()
+                                                )
+                                                .build()
+                                        )
+                                        .updater(PageUpdater.builder()
+                                                .slot(25)
+                                                .type(PageUpdaterType.PREVIOUS)
+                                                .provider(target -> ImpactorItemStack.basic()
+                                                        .type(ItemTypes.ARROW)
+                                                        .title(text("Previous Page (" + target + ")"))
+                                                        .glow()
+                                                        .build()
+                                                )
+                                                .build()
+                                        )
+                                        .complete()
+                                        .section()
+                                        .contents(second)
+                                        .dimensions(3, 1)
+                                        .offset(3, 4)
+                                        .updater(PageUpdater.builder()
+                                                .slot(43)
+                                                .type(PageUpdaterType.NEXT)
+                                                .provider(target -> ImpactorItemStack.basic()
+                                                        .type(ItemTypes.ARROW)
+                                                        .title(text("Next Page (" + target + ")"))
+                                                        .glow()
+                                                        .build()
+                                                )
+                                                .build()
+                                        )
+                                        .updater(PageUpdater.builder()
+                                                .slot(37)
+                                                .type(PageUpdaterType.PREVIOUS)
+                                                .provider(target -> ImpactorItemStack.basic()
+                                                        .type(ItemTypes.ARROW)
+                                                        .title(text("Previous Page (" + target + ")"))
+                                                        .glow()
+                                                        .build()
+                                                )
+                                                .build()
+                                        )
+                                        .complete()
+                                        .build();
+
+                                pagination.open();
+                            } catch (Exception e) {
+                                ExceptionPrinter.print(ForgeImpactorPlugin.instance(), e);
+                            }
 
                             return 1;
                         }))

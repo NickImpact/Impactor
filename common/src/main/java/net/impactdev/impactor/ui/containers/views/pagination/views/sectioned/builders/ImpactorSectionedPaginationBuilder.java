@@ -37,7 +37,7 @@ import net.impactdev.impactor.ui.containers.views.pagination.views.sectioned.Imp
 
 import java.util.List;
 
-public class ImpactorSectionedPaginationBuilder extends ImpactorBaseViewBuilder<SectionedPaginationBuilder> implements SectionedPaginationBuilder {
+public abstract class ImpactorSectionedPaginationBuilder extends ImpactorBaseViewBuilder<SectionedPaginationBuilder> implements SectionedPaginationBuilder {
 
     public PlatformPlayer viewer;
     public ChestLayout background;
@@ -65,8 +65,4 @@ public class ImpactorSectionedPaginationBuilder extends ImpactorBaseViewBuilder<
         return this;
     }
 
-    @Override
-    public SectionedPagination build() {
-        return new ImpactorSectionedPagination(this);
-    }
 }

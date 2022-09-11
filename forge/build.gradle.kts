@@ -30,6 +30,7 @@ tasks {
             exclude("forge-client-extra.jar")
         }
 
+        relocate ("org.spongepowered", "net.impactdev.impactor.relocations.spongepowered")
         relocate ("io.leangen.geantyref", "net.impactdev.impactor.relocations.geantyref")
         relocate ("org.slf4j", "net.impactdev.impactor.relocations.slf4j")
         relocate ("net.kyori", "net.impactdev.impactor.relocations.kyori")

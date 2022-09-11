@@ -98,7 +98,6 @@ public class ForgeImpactorLauncher extends AbstractLauncher implements PluginLau
         return Sets.newHashSet(
                 ProvidedDependencies.SLF4J_API,
                 ProvidedDependencies.CAFFEINE,
-                ProvidedDependencies.SPONGE_MATH,
                 Dependency.builder()
                         .from(ProvidedDependencies.REFLECTIONS)
                         .relocation(Relocation.of("org{}slf4j", "slf4j"))

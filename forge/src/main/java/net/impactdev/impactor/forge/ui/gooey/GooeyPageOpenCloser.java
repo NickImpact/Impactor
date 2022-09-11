@@ -25,25 +25,25 @@
 
 package net.impactdev.impactor.forge.ui.gooey;
 
-import ca.landonjw.gooeylibs2.api.button.ButtonClick;
-import ca.landonjw.gooeylibs2.api.button.GooeyButton;
+import ca.landonjw.gooeylibs2.api.UIManager;
+import ca.landonjw.gooeylibs2.api.page.GooeyPage;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.ui.containers.Icon;
-import net.impactdev.impactor.api.utilities.context.Context;
-import net.impactdev.impactor.items.stacks.ImpactorAbstractedItemStack;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import org.jetbrains.annotations.Nullable;
 
-public class GooeyIcon extends GooeyButton {
+import java.util.Objects;
 
-    public GooeyIcon(@NotNull Icon icon) {
-        super(((ImpactorAbstractedItemStack) icon.display().get()).toNative(), action -> {
-            Context context = Context.empty();
-            context.with(icon.context())
-//                    .append(PlatformPlayer.class, action.getPlayer()) // TODO - Forge platform player translator
-                    .append(ButtonClick.class, action.getClickType());
+public interface GooeyPageOpenCloser {
 
-            icon.listeners().forEach(processor -> processor.process(context));
-        });
+    default void openPage(GooeyPage page, PlatformPlayer viewer) {
+        @Nullable ServerPlayer forge = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(viewer.uuid());
+        UIManager.openUIForcefully(Objects.requireNonNull(forge), page);
+    }
+
+    default void closePage(PlatformPlayer viewer) {
+        @Nullable ServerPlayer forge = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(viewer.uuid());
+        UIManager.closeUI(Objects.requireNonNull(forge));
     }
 
 }

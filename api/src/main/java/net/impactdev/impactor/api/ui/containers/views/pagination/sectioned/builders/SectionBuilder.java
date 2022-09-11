@@ -32,14 +32,9 @@ import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUp
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.util.TriState;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 
 public interface SectionBuilder {
 

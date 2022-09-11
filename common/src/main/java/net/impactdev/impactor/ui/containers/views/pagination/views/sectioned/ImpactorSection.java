@@ -37,9 +37,12 @@ import net.impactdev.impactor.ui.containers.views.pagination.views.sectioned.bui
 import org.spongepowered.math.vector.Vector2i;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class ImpactorSection implements Section, PaginatedView {
+
+    private ImpactorSectionedPagination parent;
 
     private final Vector2i dimensions;
     private final Vector2i offsets;
@@ -53,10 +56,15 @@ public class ImpactorSection implements Section, PaginatedView {
         this.contents = builder.contents;
         this.dimensions = builder.dimensions;
         this.offsets = builder.offsets;
-        this.ruleset = builder.ruleset;
+        this.ruleset = Optional.ofNullable(builder.ruleset).orElse(ContextRuleset.create());
         this.updaters = builder.updaters;
 
         this.manager = new PageManager(this);
+    }
+
+    ImpactorSection with(ImpactorSectionedPagination parent) {
+        this.parent = parent;
+        return this;
     }
 
     @Override
@@ -102,6 +110,8 @@ public class ImpactorSection implements Section, PaginatedView {
     @Override
     public void page(int target) {
         this.manager.page(target);
+        Page current = this.pages().current();
+        current.icons().forEach((slot, icon) -> this.parent.set(icon, slot));
     }
 
 }

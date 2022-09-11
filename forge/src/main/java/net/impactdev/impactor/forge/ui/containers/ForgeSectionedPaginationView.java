@@ -27,31 +27,33 @@ package net.impactdev.impactor.forge.ui.containers;
 
 import ca.landonjw.gooeylibs2.api.page.GooeyPage;
 import ca.landonjw.gooeylibs2.api.template.types.ChestTemplate;
-import com.google.common.base.Preconditions;
 import net.impactdev.impactor.adventure.AdventureTranslator;
 import net.impactdev.impactor.api.ui.containers.Icon;
-import net.impactdev.impactor.api.ui.containers.views.pagination.Pagination;
+import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.forge.ui.gooey.GooeyIcon;
 import net.impactdev.impactor.forge.ui.gooey.GooeyPageOpenCloser;
-import net.impactdev.impactor.ui.containers.views.pagination.views.ImpactorPagination;
+import net.impactdev.impactor.ui.containers.views.pagination.views.sectioned.ImpactorSectionedPagination;
+import net.impactdev.impactor.ui.containers.views.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.Optional;
 
-public final class ForgePaginationView extends ImpactorPagination implements GooeyPageOpenCloser {
+public class ForgeSectionedPaginationView extends ImpactorSectionedPagination implements GooeyPageOpenCloser {
 
     private final ChestTemplate template;
     private final GooeyPage delegate;
 
-    private ForgePaginationView(ImpactorPaginationBuilder builder) {
+    public ForgeSectionedPaginationView(ImpactorSectionedPaginationBuilder builder) {
         super(builder);
+
         ChestTemplate.Builder template = ChestTemplate.builder(this.rows());
         this.layout().elements().forEach((slot, icon) -> {
             template.set(slot, new GooeyIcon(icon));
         });
-        this.pages().current().icons().forEach((slot, icon) -> {
-            template.set(slot, new GooeyIcon(icon));
+        this.sections().forEach(section -> {
+            section.pages().current().icons().forEach((slot, icon) -> {
+                template.set(slot, new GooeyIcon(icon));
+            });
         });
 
         this.delegate = GooeyPage.builder()
@@ -76,16 +78,12 @@ public final class ForgePaginationView extends ImpactorPagination implements Goo
         this.closePage(this.viewer);
     }
 
-    public static final class ForgePaginationViewBuilder extends ImpactorPaginationBuilder {
-        @Override
-        public Pagination build() {
-            Preconditions.checkNotNull(this.namespace, "Provider was not specified");
-            Preconditions.checkNotNull(this.viewer, "Viewer was not specified");
+    public static class ForgeSectionedPaginationBuilder extends ImpactorSectionedPaginationBuilder {
 
-            if(this.contents == null) {
-                this.contents = Collections.emptyList();
-            }
-            return new ForgePaginationView(this);
+        @Override
+        public SectionedPagination build() {
+            return new ForgeSectionedPaginationView(this);
         }
+
     }
 }

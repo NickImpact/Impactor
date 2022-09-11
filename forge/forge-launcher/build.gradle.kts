@@ -34,13 +34,11 @@ tasks {
             include(project(":launcher"))
             include(dependency("net.impactdev:json:.*"))
             include(dependency("net.kyori:.*:.*"))
-//            include(dependency("net.kyori:event-api:.*"))
-//            include(dependency("net.kyori:adventure-api:.*"))
-//            include(dependency("net.kyori:adventure-gson:.*"))
-//            include(dependency("net.kyori:adventure-minimessage:.*"))
+            include(dependency("org.spongepowered:math:.*"))
             exclude("forge-client-extra.jar")
         }
 
+        relocate ("org.spongepowered", "net.impactdev.impactor.relocations.spongepowered")
         relocate ("io.leangen.geantyref", "net.impactdev.impactor.relocations.geantyref")
         relocate ("org.slf4j", "net.impactdev.impactor.relocations.slf4j")
         relocate ("net.kyori", "net.impactdev.impactor.relocations.kyori")

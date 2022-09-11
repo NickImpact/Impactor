@@ -25,43 +25,29 @@
 
 package net.impactdev.impactor.ui.containers.views.pagination.views.sectioned;
 
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.sections.Section;
 import net.impactdev.impactor.ui.containers.views.layers.ImpactorView;
 import net.impactdev.impactor.ui.containers.views.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
-import net.impactdev.impactor.ui.containers.views.service.SectionedPaginationViewService;
 import org.checkerframework.common.value.qual.IntRange;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
 
 import java.util.List;
 
-public class ImpactorSectionedPagination extends ImpactorView implements SectionedPagination {
+public abstract class ImpactorSectionedPagination extends ImpactorView implements SectionedPagination {
 
     protected final PlatformPlayer viewer;
     private final ChestLayout background;
     private final List<Section> sections;
 
-
-    public ImpactorSectionedPagination(ImpactorSectionedPaginationBuilder builder) {
+    protected ImpactorSectionedPagination(ImpactorSectionedPaginationBuilder builder) {
         super(builder.namespace, builder.title, builder.readonly, builder.click, builder.close);
         this.viewer = builder.viewer;
         this.background = builder.background;
         this.sections = builder.sections;
-    }
-
-    @Override
-    public void open() {
-
-    }
-
-    @Override
-    public void close() {
-
+        this.sections.forEach(section -> ((ImpactorSection) section).with(this));
     }
 
     @Override
@@ -82,11 +68,6 @@ public class ImpactorSectionedPagination extends ImpactorView implements Section
     @Override
     public @IntRange(from = 1, to = 6) int rows() {
         return this.background.dimensions().y();
-    }
-
-    @Override
-    public void set(@Nullable Icon icon, int slot) {
-        // TODO - Verify requirements for set are met
     }
 
     @Override
