@@ -25,12 +25,13 @@
 
 package net.impactdev.impactor.api;
 
-import net.impactdev.impactor.api.event.EventBus;
+import net.impactdev.impactor.api.event.ImpactorEvent;
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.scheduler.SchedulerAdapter;
+import net.kyori.event.EventBus;
 
 public interface Impactor {
 
@@ -62,8 +63,8 @@ public interface Impactor {
 
     ServiceProvider services();
 
-    EventBus events();
-
     SchedulerAdapter scheduler();
+
+    EventBus<ImpactorEvent> events();
 
 }

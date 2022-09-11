@@ -23,18 +23,29 @@
  *
  */
 
-package net.impactdev.impactor.api.event.annotations;
+package net.impactdev.impactor.platform.components;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import net.impactdev.impactor.api.platform.PlatformComponent;
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Subscribe {
+public class JDKPlatformComponent implements PlatformComponent {
 
-    EventOrder order() default EventOrder.NORMAL;
+    @Override
+    public String name() {
+        return "Java JDK";
+    }
 
-    boolean ignoreCancelled() default false;
+    public String branding() {
+        return System.getProperty("java.vendor");
+    }
+
+    @Override
+    public String version() {
+        return System.getProperty("java.version");
+    }
+
+    @Override
+    public void print(PrettyPrinter printer) {
+        printer.add("%s - %s (%s)", this.name(), this.version(), this.branding());
+    }
 }

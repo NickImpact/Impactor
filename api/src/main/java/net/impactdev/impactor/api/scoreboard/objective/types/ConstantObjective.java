@@ -25,16 +25,16 @@
 
 package net.impactdev.impactor.api.scoreboard.objective.types;
 
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
 import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.text.Component;
 
 public interface ConstantObjective extends ScoreboardObjective {
 
     interface ConstantObjectiveBuilder extends Builder<ConstantObjective> {
 
-        ConstantObjectiveBuilder raw(String raw, PlaceholderSources sources);
+        ConstantObjectiveBuilder raw(String raw, Context context);
 
         ConstantObjectiveBuilder text(Component text);
 

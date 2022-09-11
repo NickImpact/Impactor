@@ -26,10 +26,8 @@
 package net.impactdev.impactor.api.scoreboard.lines;
 
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.components.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
-import net.impactdev.impactor.api.scoreboard.exceptions.ScoreAlreadySetException;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.scoreboard.lines.types.AnimatedLine;
 import net.impactdev.impactor.api.scoreboard.lines.types.ListeningLine;

@@ -59,11 +59,16 @@ public enum ProvidedRepositories implements DependencyRepository {
      *
      * <p>This is used to reduce the load on repo.maven.org</p>
      */
-    IMPACTDEV_SONATYPE_MIRROR(from("https://maven.impactdev.net/repository/Sonatype/"), 50),
+    IMPACTDEV_SONATYPE_MIRROR(from("https://maven.impactdev.net/repository/Sonatype/"), 40),
     /**
      * Maven Central.
      */
-    MAVEN_CENTRAL(from("https://repo1.maven.org/maven2/"), 50),
+    MAVEN_CENTRAL(from("https://repo1.maven.org/maven2/"), 30),
+    SONATYPE_SNAPSHOTS(
+            from("https://hub.spigotmc.org/nexus/content/groups/public/"),
+            resolver("https://hub.spigotmc.org/nexus/content/groups/public/", ((parent, dependency) -> from(parent))),
+            20
+    )
     ;
 
     private final URL releases;
@@ -88,6 +93,10 @@ public enum ProvidedRepositories implements DependencyRepository {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private static URL from(URL parent) {
+        return parent;
     }
 
     private static URL from(URL parent, String child) {

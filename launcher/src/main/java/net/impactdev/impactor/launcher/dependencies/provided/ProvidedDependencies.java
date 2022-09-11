@@ -118,6 +118,13 @@ public final class ProvidedDependencies {
             .relocation(Relocation.of("net{}kyori", "kyori"))
             .with(ADVENTURE, ADVENTURE_KEYS)
             .build();
+//    public static final Dependency KYORI_EVENTS = Dependency.builder()
+//            .name("Kyori - Event API")
+//            .group("net{}kyori")
+//            .artifact("event-api")
+//            .version("5.0.0-20220903.025242-5")
+//            .relocation(Relocation.of("net{}kyori", "kyori"))
+//            .build();
 
     // Configurate
     public static final Dependency CONFIGURATE_CORE = Dependency.builder()

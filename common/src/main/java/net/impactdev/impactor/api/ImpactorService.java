@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.api;
 
-import net.impactdev.impactor.api.event.EventBus;
+import net.impactdev.impactor.api.event.ImpactorEvent;
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
@@ -34,16 +34,18 @@ import net.impactdev.impactor.api.scheduler.SchedulerAdapter;
 import net.impactdev.impactor.providers.BuilderProviderImplementation;
 import net.impactdev.impactor.providers.FactoryProviderImplementation;
 import net.impactdev.impactor.providers.ServiceProviderImplementation;
+import net.kyori.event.EventBus;
 
 public class ImpactorService implements Impactor {
 
     private final FactoryProvider factories = new FactoryProviderImplementation();
     private final BuilderProvider builders = new BuilderProviderImplementation();
     private final ServiceProvider services = new ServiceProviderImplementation();
+    private final EventBus<ImpactorEvent> bus = EventBus.create(ImpactorEvent.class);
 
     @Override
     public Platform platform() {
-        return services.provide(Platform.class);
+        return this.services.provide(Platform.class);
     }
 
     @Override
@@ -62,12 +64,12 @@ public class ImpactorService implements Impactor {
     }
 
     @Override
-    public EventBus events() {
-        return null;
+    public EventBus<ImpactorEvent> events() {
+        return this.bus;
     }
 
     @Override
     public SchedulerAdapter scheduler() {
-        return null;
+        return this.factories.provide(SchedulerAdapter.class);
     }
 }

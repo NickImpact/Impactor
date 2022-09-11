@@ -30,8 +30,6 @@ package net.impactdev.impactor.api.utilities.printing;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import net.impactdev.impactor.api.logging.PluginLogger;
-import net.impactdev.impactor.api.utilities.functional.TriConsumer;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -50,23 +48,14 @@ import java.util.regex.Pattern;
  */
 public class PrettyPrinter {
 
-    private static final ImmutableMap<Level, BiConsumer<PluginLogger, String>> UNMARKED_LOGGER_LEVEL =
+    private static final ImmutableMap<Level, BiConsumer<PluginLogger, String>> LOGGER_LEVELS =
             ImmutableMap.<Level, BiConsumer<PluginLogger, String>>builder()
                     .put(Level.INFO, PluginLogger::info)
                     .put(Level.WARNING, PluginLogger::warn)
-                    .put(Level.ERROR, PluginLogger::error)
+                    .put(Level.ERROR, PluginLogger::severe)
                     .put(Level.DEBUG, PluginLogger::debug)
                     .build();
-    private static final BiConsumer<PluginLogger, String> DEFAULT_UNMARKED_LOGGER = PluginLogger::info;
-
-    private static final ImmutableMap<Level, TriConsumer<PluginLogger, String, String>> MARKED_LOGGER_LEVEL =
-            ImmutableMap.<Level, TriConsumer<PluginLogger, String, String>>builder()
-                    .put(Level.INFO, PluginLogger::info)
-                    .put(Level.WARNING, PluginLogger::warn)
-                    .put(Level.ERROR, PluginLogger::error)
-                    .put(Level.DEBUG, PluginLogger::debug)
-                    .build();
-    private static final TriConsumer<PluginLogger, String, String> DEFAULT_MARKED_LOGGER = PluginLogger::info;
+    private static final BiConsumer<PluginLogger, String> DEFAULT_LEVEL = PluginLogger::info;
 
     public enum Level {
         INFO,
@@ -1000,18 +989,14 @@ public class PrettyPrinter {
         }
     }
 
-    public PrettyPrinter log(PluginLogger logger, Level level) {
-        return this.log(logger, level, null);
-    }
-
     /**
      * Write this printer to the specified logger at {@link Level#INFO}
      *
      * @param logger logger to log to
      * @return fluent interface
      */
-    public PrettyPrinter log(PluginLogger logger, String marker) {
-        return this.log(logger, Level.INFO, marker);
+    public PrettyPrinter log(PluginLogger logger) {
+        return this.log(logger, Level.INFO);
     }
 
     /**
@@ -1021,39 +1006,30 @@ public class PrettyPrinter {
      * @param level log level
      * @return fluent interface
      */
-    public PrettyPrinter log(PluginLogger logger, Level level, String marker) {
+    public PrettyPrinter log(PluginLogger logger, Level level) {
         this.updateWidth();
-        this.logSpecial(logger, level, marker, this.horizontalRule);
+        this.logSpecial(logger, level, this.horizontalRule);
         for (Object line : this.lines) {
             if (line instanceof ISpecialEntry) {
-                this.logSpecial(logger, level, marker, (ISpecialEntry)line);
+                this.logSpecial(logger, level, (ISpecialEntry)line);
             } else {
-                this.logString(logger, level, marker, line.toString());
+                this.logString(logger, level, line.toString());
             }
         }
-        this.logSpecial(logger, level, marker, this.horizontalRule);
+        this.logSpecial(logger, level, this.horizontalRule);
         return this;
     }
 
-    private void logSpecial(PluginLogger logger, Level level, @Nullable String marker, ISpecialEntry line) {
-        if(marker == null) {
-            UNMARKED_LOGGER_LEVEL.getOrDefault(level, DEFAULT_UNMARKED_LOGGER).accept(logger,
-                    String.format("/*%s*/", line.toString()));
-        } else {
-            MARKED_LOGGER_LEVEL.getOrDefault(level, DEFAULT_MARKED_LOGGER).accept(logger, marker,
-                    String.format("/*%s*/", line.toString()));
-        }
+    private void logSpecial(PluginLogger logger, Level level, ISpecialEntry line) {
+        LOGGER_LEVELS.getOrDefault(level, DEFAULT_LEVEL).accept(logger,
+                String.format("/*%s*/", line.toString()));
+
     }
 
-    private void logString(PluginLogger logger, Level level, @Nullable String marker, String line) {
+    private void logString(PluginLogger logger, Level level, String line) {
         if (line != null) {
-            if(marker != null) {
-                MARKED_LOGGER_LEVEL.getOrDefault(level, DEFAULT_MARKED_LOGGER).accept(logger, marker,
-                        String.format("/* %-" + this.width + "s */", line));
-            } else {
-                UNMARKED_LOGGER_LEVEL.getOrDefault(level, DEFAULT_UNMARKED_LOGGER).accept(logger,
-                        String.format("/* %-" + this.width + "s */", line));
-            }
+            LOGGER_LEVELS.getOrDefault(level, DEFAULT_LEVEL).accept(logger,
+                    String.format("/* %-" + this.width + "s */", line));
         }
     }
 

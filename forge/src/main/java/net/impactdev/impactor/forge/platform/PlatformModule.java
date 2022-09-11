@@ -32,7 +32,9 @@ import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.forge.platform.players.ForgePlatformPlayer;
 import net.impactdev.impactor.modules.ImpactorModule;
+import net.impactdev.impactor.platform.ImpactorPlatform;
 
+@SuppressWarnings("unused")
 public class PlatformModule implements ImpactorModule {
 
     @Override
@@ -41,13 +43,11 @@ public class PlatformModule implements ImpactorModule {
     }
 
     @Override
-    public void builders(BuilderProvider provider) {
-
-    }
+    public void builders(BuilderProvider provider) {}
 
     @Override
     public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ForgePlatform());
+        provider.register(Platform.class, new ImpactorPlatform(new ForgePlatformInfo()));
     }
 
 }

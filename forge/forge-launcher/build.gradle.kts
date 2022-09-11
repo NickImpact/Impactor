@@ -32,6 +32,12 @@ tasks {
         dependencies {
             include(project(":api"))
             include(project(":launcher"))
+            include(dependency("net.impactdev:json:.*"))
+            include(dependency("net.kyori:.*:.*"))
+//            include(dependency("net.kyori:event-api:.*"))
+//            include(dependency("net.kyori:adventure-api:.*"))
+//            include(dependency("net.kyori:adventure-gson:.*"))
+//            include(dependency("net.kyori:adventure-minimessage:.*"))
             exclude("forge-client-extra.jar")
         }
 
@@ -40,6 +46,14 @@ tasks {
         relocate ("net.kyori", "net.impactdev.impactor.relocations.kyori")
         relocate ("com.github.benmanes.caffeine", "net.impactdev.impactor.relocations.caffeine")
         relocate ("org.reflections", "net.impactdev.impactor.relocations.reflections")
+    }
+
+    processResources {
+        inputs.property("version", rootProject.version)
+
+        filesMatching("META-INF/mods.toml") {
+            expand("version" to rootProject.version)
+        }
     }
 }
 

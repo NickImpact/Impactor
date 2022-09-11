@@ -23,20 +23,14 @@
  *
  */
 
-package net.impactdev.impactor.api.logging;
+package net.impactdev.impactor.api.platform;
 
-public interface PluginLogger {
+public enum PlatformType {
 
-    void info(String line);
-
-    void warn(String line);
-
-    void warn(String line, Throwable throwable);
-
-    void severe(String line);
-
-    void severe(String line, Throwable throwable);
-
-    void debug(String line);
+    FORGE,
+    FABRIC,
+    SPIGOT,
+    PAPER,
+    SPONGE,
 
 }

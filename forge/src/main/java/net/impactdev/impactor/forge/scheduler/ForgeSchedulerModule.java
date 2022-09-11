@@ -23,15 +23,26 @@
  *
  */
 
-package net.impactdev.impactor.api.event.type;
+package net.impactdev.impactor.forge.scheduler;
 
-import org.spongepowered.api.util.annotation.eventgen.PropertySettings;
+import net.impactdev.impactor.api.providers.BuilderProvider;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.providers.ServiceProvider;
+import net.impactdev.impactor.api.scheduler.SchedulerAdapter;
+import net.impactdev.impactor.forge.ForgeImpactorPlugin;
+import net.impactdev.impactor.modules.ImpactorModule;
 
-public interface Cancellable {
+public class ForgeSchedulerModule implements ImpactorModule {
 
-    @PropertySettings(requiredParameter = false)
-    boolean isCancelled();
+    @Override
+    public void factories(FactoryProvider provider) {
+        provider.register(SchedulerAdapter.class, new ForgeSchedulerAdapter((ForgeImpactorPlugin) ForgeImpactorPlugin.instance()));
+    }
 
-    void setCancelled(boolean state);
+    @Override
+    public void builders(BuilderProvider provider) {}
+
+    @Override
+    public void services(ServiceProvider provider) {}
 
 }

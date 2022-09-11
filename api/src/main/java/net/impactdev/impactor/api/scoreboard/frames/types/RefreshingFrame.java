@@ -25,10 +25,10 @@
 
 package net.impactdev.impactor.api.scoreboard.frames.types;
 
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.utilities.context.Context;
 
 public interface RefreshingFrame extends ScoreboardFrame.UpdatableFrame {
 
@@ -38,7 +38,7 @@ public interface RefreshingFrame extends ScoreboardFrame.UpdatableFrame {
 
         RefreshingFrameBuilder effects(FrameEffect... effect);
 
-        RefreshingFrameBuilder sources(PlaceholderSources sources);
+        RefreshingFrameBuilder context(Context context);
 
     }
 

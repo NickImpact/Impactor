@@ -28,7 +28,6 @@ package net.impactdev.impactor.launcher.dependencies;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.launcher.dependencies.relocations.Relocation;
 import net.impactdev.impactor.launcher.dependencies.relocations.RelocationHandler;
 import net.impactdev.impactor.launcher.dependencies.repositories.DependencyRepository;
@@ -36,10 +35,8 @@ import net.impactdev.impactor.launcher.dependencies.repositories.ProvidedReposit
 import net.impactdev.impactor.launcher.dependencies.runtime.appenders.ClassPathAppender;
 import net.impactdev.impactor.launcher.dependencies.runtime.loaders.IsolatedClassLoader;
 import net.impactdev.impactor.api.logging.PluginLogger;
-import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
-import net.impactdev.impactor.launcher.loader.JarInJarClassLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -187,7 +184,7 @@ public final class DependencyManager {
             try {
                 this.loadDependency(dependency);
             } catch (Throwable e) {
-                this.logger.error("Unable to load dependency " + dependency.name());
+                this.logger.severe("Unable to load dependency " + dependency.name());
                 e.printStackTrace();
             }
         }

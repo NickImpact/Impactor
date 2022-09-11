@@ -25,11 +25,11 @@
 
 package net.impactdev.impactor.api.scoreboard.frames.types;
 
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.events.Bus;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.utilities.context.Context;
 
 import java.util.UUID;
 
@@ -97,10 +97,10 @@ public interface ListeningFrame<L> extends ScoreboardFrame.UpdatableFrame {
         /**
          * Represents a list of sources that placeholders in the raw text will use for replacement
          *
-         * @param sources The set of sources
+         * @param context The set of sources
          * @return This builder
          */
-        ListeningFrameBuilder<L> sources(PlaceholderSources sources);
+        ListeningFrameBuilder<L> context(Context context);
 
     }
 

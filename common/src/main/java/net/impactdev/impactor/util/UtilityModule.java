@@ -32,6 +32,7 @@ import net.impactdev.impactor.api.utilities.context.TypeTokenFactory;
 import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.util.factories.ImpactorTypeTokenFactory;
 
+@SuppressWarnings("unused")
 public class UtilityModule implements ImpactorModule {
     @Override
     public void factories(FactoryProvider provider) {

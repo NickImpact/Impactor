@@ -26,11 +26,11 @@
 package net.impactdev.impactor.api.scoreboard;
 
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
 import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.utilities.context.Context;
 
 import java.util.List;
 import java.util.Map;
@@ -102,7 +102,7 @@ import java.util.Map;
  * <p>
  * <h2>Placeholder Parsing</h2>
  * Most components of the scoreboard API allows for placeholder sources to be provided for possible
- * placeholder parsing. These sources are provided through the {@link PlaceholderSources} interface,
+ * placeholder parsing. These sources are provided through the {@link Context} interface,
  * which allows for binding a class type with a supplier for the actual object. For all components,
  * the scoreboard will attempt to provide a source representing the viewing player, as long as no
  * currently provided player is already available for that line. So, you can have a line on a scoreboard

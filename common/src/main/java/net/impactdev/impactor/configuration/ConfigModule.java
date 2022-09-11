@@ -23,26 +23,26 @@
  *
  */
 
-package net.impactdev.impactor.forge.platform;
+package net.impactdev.impactor.configuration;
 
-import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.platform.Platform;
-import net.impactdev.impactor.api.platform.PlatformInfo;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.configuration.Config;
+import net.impactdev.impactor.api.providers.BuilderProvider;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.providers.ServiceProvider;
+import net.impactdev.impactor.modules.ImpactorModule;
 
-import java.util.UUID;
-
-// TODO - Make a majority of this common, including platform info and player
-public class ForgePlatform implements Platform {
+@SuppressWarnings("unused")
+public class ConfigModule implements ImpactorModule {
 
     @Override
-    public PlatformInfo info() {
-        return null;
+    public void factories(FactoryProvider provider) {}
+
+    @Override
+    public void builders(BuilderProvider provider) {
+        provider.register(Config.ConfigBuilder.class, ImpactorConfig.ImpactorConfigBuilder::new);
     }
 
     @Override
-    public PlatformPlayer player(UUID target) {
-        // TODO - Move to common
-        return PlatformPlayer.create(target);
-    }
+    public void services(ServiceProvider provider) {}
+
 }

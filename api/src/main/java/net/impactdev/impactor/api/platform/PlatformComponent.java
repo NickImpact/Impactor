@@ -23,20 +23,14 @@
  *
  */
 
-package net.impactdev.impactor.api.logging;
+package net.impactdev.impactor.api.platform;
 
-public interface PluginLogger {
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 
-    void info(String line);
+public interface PlatformComponent extends PrettyPrinter.IPrettyPrintable {
 
-    void warn(String line);
+    String name();
 
-    void warn(String line, Throwable throwable);
-
-    void severe(String line);
-
-    void severe(String line, Throwable throwable);
-
-    void debug(String line);
+    String version();
 
 }

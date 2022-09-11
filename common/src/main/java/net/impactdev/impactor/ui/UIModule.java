@@ -43,6 +43,7 @@ import net.impactdev.impactor.ui.containers.views.pagination.layers.ImpactorPage
 import net.impactdev.impactor.ui.containers.views.pagination.views.ImpactorPagination;
 import net.impactdev.impactor.ui.containers.views.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
 
+@SuppressWarnings("unused")
 public class UIModule implements ImpactorModule {
 
     @Override

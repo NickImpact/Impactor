@@ -26,9 +26,9 @@
 package net.impactdev.impactor.api.scoreboard.effects;
 
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 
@@ -40,11 +40,11 @@ import java.util.concurrent.TimeUnit;
 public class CountdownEffect implements FrameEffect {
 
     private final LocalDateTime target;
-    private final Component comlete;
+    private final Component complete;
 
     private CountdownEffect(CountdownEffectBuilder builder) {
         this.target = builder.target;
-        this.comlete = builder.complete;
+        this.complete = builder.complete;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class CountdownEffect implements FrameEffect {
     @Override
     public Component translate(Component parent) {
         if(LocalDateTime.now().isAfter(this.target)) {
-            return this.comlete;
+            return this.complete;
         }
 
         long seconds = Duration.between(LocalDateTime.now(), this.target).getSeconds();
@@ -99,10 +99,10 @@ public class CountdownEffect implements FrameEffect {
             return this;
         }
 
-        public CountdownEffectBuilder whenComplete(String raw, PlaceholderSources sources) {
+        public CountdownEffectBuilder whenComplete(String raw, Context context) {
             MessageService service = Impactor.instance().services().provide(MessageService.class);
 
-            this.complete = service.parse(raw, sources);
+            this.complete = service.parse(raw, context);
             return this;
         }
 

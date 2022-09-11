@@ -23,14 +23,27 @@
  *
  */
 
-package net.impactdev.impactor.api.event.annotations;
+package net.impactdev.impactor.platform.components;
 
-public enum EventOrder {
+import net.impactdev.impactor.api.platform.PlatformComponent;
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import net.minecraft.SharedConstants;
 
-    FIRST,
-    EARLY,
-    NORMAL,
-    LATE,
-    LAST
+public class MinecraftPlatformComponent implements PlatformComponent {
+
+    @Override
+    public String name() {
+        return "Minecraft";
+    }
+
+    @Override
+    public String version() {
+        return SharedConstants.getCurrentVersion().getName();
+    }
+
+    @Override
+    public void print(PrettyPrinter printer) {
+        printer.add("%s - %s", this.name(), this.version());
+    }
 
 }

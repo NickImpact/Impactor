@@ -23,10 +23,12 @@
  *
  */
 
-package net.impactdev.impactor.api.configuration;
+package net.impactdev.impactor.forge.scheduler;
 
-import net.impactdev.impactor.api.configuration.keys.BaseConfigKey;
-import net.impactdev.impactor.api.configuration.keys.FunctionalKey;
+import net.impactdev.impactor.api.scheduler.AbstractJavaScheduler;
+import net.impactdev.impactor.forge.ForgeImpactorPlugin;
+
+import java.util.concurrent.Executor;
 
 /*
  * This file is part of LuckPerms, licensed under the MIT License.
@@ -53,12 +55,16 @@ import net.impactdev.impactor.api.configuration.keys.FunctionalKey;
  *  SOFTWARE.
  */
 
-@FunctionalInterface
-public interface KeyFactory<T> {
+public class ForgeSchedulerAdapter extends AbstractJavaScheduler {
+    private final Executor sync;
 
-	T getValue(ConfigurationAdapter adapter, String path, T def);
+    public ForgeSchedulerAdapter(ForgeImpactorPlugin plugin) {
+        super(plugin);
+        this.sync = r -> plugin.server().orElseThrow(() -> new IllegalStateException("Server not ready")).executeBlocking(r);
+    }
 
-	default BaseConfigKey<T> createKey(String path, T def) {
-		return new FunctionalKey<>(this, path, def);
-	}
+    @Override
+    public Executor sync() {
+        return this.sync;
+    }
 }

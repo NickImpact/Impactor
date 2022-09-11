@@ -25,23 +25,48 @@
 
 package net.impactdev.impactor.forge;
 
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+
+import java.util.Optional;
 
 public class ForgeImpactorPlugin extends BaseImpactorPlugin implements ImpactorPlugin {
 
+    private MinecraftServer server;
+
     public ForgeImpactorPlugin(ImpactorBootstrapper bootstrapper) {
         super(bootstrapper);
+        MinecraftForge.EVENT_BUS.addListener(this::onServerAboutToStart);
     }
 
     @Override
     public void construct() throws Exception {
         super.construct();
+
+        PrettyPrinter printer = new PrettyPrinter(80);
+        printer.title("Platform Information");
+        Impactor.instance().platform().info().print(printer);
+        printer.log(this.logger(), PrettyPrinter.Level.INFO);
     }
 
     @Override
     public void shutdown() throws Exception {
 
     }
+
+    public Optional<MinecraftServer> server() {
+        return Optional.ofNullable(this.server);
+    }
+
+    private void onServerAboutToStart(FMLServerAboutToStartEvent event) {
+        this.server = event.getServer();
+    }
+
 }

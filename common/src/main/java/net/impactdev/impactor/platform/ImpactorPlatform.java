@@ -23,45 +23,30 @@
  *
  */
 
-package net.impactdev.impactor.api.event;
+package net.impactdev.impactor.platform;
 
-import net.impactdev.impactor.api.plugin.PluginMetadata;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import net.impactdev.impactor.api.platform.Platform;
+import net.impactdev.impactor.api.platform.PlatformInfo;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 
-import java.util.function.Consumer;
+import java.util.UUID;
 
-/**
- * Represents a subscription to a {@link ImpactorEvent}.
- *
- * @param <T> the event class
- */
-public interface EventSubscription<T extends ImpactorEvent> extends AutoCloseable {
+public class ImpactorPlatform implements Platform {
 
-    /**
-     * Gets the class this handler is listening to
-     *
-     * @return the event class
-     */
-    @NonNull Class<T> eventClass();
+    private final PlatformInfo info;
 
-    /**
-     * The plugin providing the subscription.
-     *
-     * @return The plugin providing the subscription
-     */
-    @NonNull PluginMetadata metadata();
+    public ImpactorPlatform(PlatformInfo info) {
+        this.info = info;
+    }
 
-    /**
-     * Returns true if this handler is active
-     *
-     * @return true if this handler is still active
-     */
-    boolean active();
+    @Override
+    public PlatformInfo info() {
+        return this.info;
+    }
 
-    /**
-     * Gets the event consumer responsible for handling the event
-     *
-     * @return the event consumer
-     */
-    @NonNull Consumer<? super T> handler();
+    @Override
+    public PlatformPlayer player(UUID target) {
+        return PlatformPlayer.create(target);
+    }
+
 }

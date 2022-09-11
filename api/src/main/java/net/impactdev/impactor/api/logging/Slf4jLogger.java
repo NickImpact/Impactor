@@ -53,121 +53,27 @@ public class Slf4jLogger implements PluginLogger {
     }
 
     @Override
-    public void info(Collection<String> lines) {
-        lines.forEach(this::info);
-    }
-
-    @Override
-    public void info(Supplier<String> supplier) {
-        this.info(supplier.get());
-    }
-
-    @Override
-    public void info(String marker, String line) {
-        Marker m = this.get(marker);
-        this.delegate.info(m, line);
-    }
-
-    @Override
-    public void info(String marker, Collection<String> lines) {
-        lines.forEach(line -> this.info(marker, line));
-    }
-
-    @Override
-    public void info(String marker, Supplier<String> supplier) {
-        this.info(marker, supplier.get());
-    }
-
-    @Override
     public void warn(String line) {
         this.delegate.warn(line);
     }
 
     @Override
-    public void warn(Collection<String> lines) {
-        lines.forEach(this::warn);
+    public void warn(String line, Throwable throwable) {
+        this.delegate.warn(line, throwable);
     }
 
     @Override
-    public void warn(Supplier<String> supplier) {
-        this.warn(supplier.get());
-    }
-
-    @Override
-    public void warn(String marker, String line) {
-        Marker m = this.get(marker);
-        this.delegate.warn(m, line);
-    }
-
-    @Override
-    public void warn(String marker, Collection<String> lines) {
-        lines.forEach(line -> this.warn(marker, line));
-    }
-
-    @Override
-    public void warn(String marker, Supplier<String> supplier) {
-        this.warn(marker, supplier.get());
-    }
-
-    @Override
-    public void error(String line) {
+    public void severe(String line) {
         this.delegate.error(line);
     }
 
     @Override
-    public void error(Collection<String> lines) {
-        lines.forEach(this::error);
-    }
-
-    @Override
-    public void error(Supplier<String> supplier) {
-        this.error(supplier.get());
-    }
-
-    @Override
-    public void error(String marker, String line) {
-        Marker m = this.get(marker);
-        this.delegate.error(m, line);
-    }
-
-    @Override
-    public void error(String marker, Collection<String> lines) {
-        lines.forEach(line -> this.error(marker, line));
-    }
-
-    @Override
-    public void error(String marker, Supplier<String> supplier) {
-        this.error(marker, supplier.get());
+    public void severe(String line, Throwable throwable) {
+        this.delegate.error(line, throwable);
     }
 
     @Override
     public void debug(String line) {
         this.delegate.debug(line);
-    }
-
-    @Override
-    public void debug(Collection<String> lines) {
-        lines.forEach(this::debug);
-    }
-
-    @Override
-    public void debug(Supplier<String> supplier) {
-        this.debug(supplier.get());
-    }
-
-    @Override
-    public void debug(String marker, String line) {
-        Marker m = this.get(marker);
-        this.delegate.debug(m, line);
-    }
-
-    @Override
-    public void debug(String marker, Collection<String> lines) {
-        lines.forEach(line -> this.debug(marker, line));
-    }
-
-    @Override
-    public void debug(String marker, Supplier<String> supplier) {
-        this.debug(marker, supplier.get());
     }
 }

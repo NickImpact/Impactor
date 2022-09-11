@@ -25,14 +25,12 @@
 
 package net.impactdev.impactor.api.services.text;
 
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.services.Service;
+import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -51,7 +49,7 @@ public interface MessageService extends Service {
 	 * @return The translated message
 	 */
 	default Component parse(@NonNull String message) {
-		return this.parse(message, PlaceholderSources.empty());
+		return this.parse(message, Context.empty());
 	}
 
 	/**
@@ -60,10 +58,10 @@ public interface MessageService extends Service {
 	 * are parsed, it's up to the implementation to decide how unfilled placeholders are demonstrated.
 	 *
 	 * @param message The message to translate
-	 * @param sources The sources made available via suppliers for any required contextual information
+	 * @param context The context made available via suppliers for any required contextual information
 	 * @return The translated message
 	 */
-	Component parse(@NonNull String message, PlaceholderSources sources);
+	Component parse(@NonNull String message, Context context);
 
 	/**
 	 * Translates a set of input messages with no associated sources. See {@link #parse(String)} to
@@ -73,19 +71,19 @@ public interface MessageService extends Service {
 	 * @return A translated list of messages based on the input
 	 */
 	default List<Component> parse(@NonNull List<String> input) {
-		return this.parse(input, PlaceholderSources.empty());
+		return this.parse(input, Context.empty());
 	}
 
 	/**
-	 * Translates a set of input messages with the provided source suppliers. See {@link #parse(String, PlaceholderSources)} to
+	 * Translates a set of input messages with the provided source suppliers. See {@link #parse(String, Context)} to
 	 * see how the supplied input will be translated.
 	 *
 	 * @param input
-	 * @param sources
+	 * @param context
 	 * @return
 	 */
-	default List<Component> parse(@NonNull List<String> input, @NonNull PlaceholderSources sources) {
-		return input.stream().map(s -> this.parse(s, sources)).collect(Collectors.toList());
+	default List<Component> parse(@NonNull List<String> input, @NonNull Context context) {
+		return input.stream().map(s -> this.parse(s, context)).collect(Collectors.toList());
 	}
 
 }

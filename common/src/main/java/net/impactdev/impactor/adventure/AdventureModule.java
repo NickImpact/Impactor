@@ -31,6 +31,7 @@ import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.services.adventure.KeyFactory;
 import net.impactdev.impactor.modules.ImpactorModule;
 
+@SuppressWarnings("unused")
 public final class AdventureModule implements ImpactorModule {
     @Override
     public void factories(FactoryProvider provider) {
@@ -38,12 +39,8 @@ public final class AdventureModule implements ImpactorModule {
     }
 
     @Override
-    public void builders(BuilderProvider provider) {
-
-    }
+    public void builders(BuilderProvider provider) {}
 
     @Override
-    public void services(ServiceProvider provider) {
-
-    }
+    public void services(ServiceProvider provider) {}
 }

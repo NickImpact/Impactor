@@ -25,13 +25,13 @@
 
 package net.impactdev.impactor.api.scoreboard.lines.types;
 
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.effects.FrameEffect;
 import net.impactdev.impactor.api.scoreboard.effects.RGBFadeEffect;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.text.Component;
 
 import java.util.concurrent.TimeUnit;
@@ -102,14 +102,14 @@ public interface RefreshingLine extends ScoreboardLine, Updatable {
 
         /**
          * Allows for providing a set of sources for the line that can be parsed. If not called,
-         * this will be substituted with {@link PlaceholderSources#empty()}. When assigned to a
+         * this will be substituted with {@link Context#empty()}. When assigned to a
          * player, these sources will append the viewing player to the source list, so long
          * as a player is not already provided in the source stack.
          *
-         * @param sources The sources placeholders should use outside of the viewing player
+         * @param context The sources placeholders should use outside of the viewing player
          * @return The builder
          */
-        RefreshingLineBuilder sources(PlaceholderSources sources);
+        RefreshingLineBuilder sources(Context context);
 
     }
 

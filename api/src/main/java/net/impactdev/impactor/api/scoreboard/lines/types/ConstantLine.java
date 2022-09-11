@@ -25,9 +25,9 @@
 
 package net.impactdev.impactor.api.scoreboard.lines.types;
 
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.text.Component;
 
 /**
@@ -46,7 +46,7 @@ public interface ConstantLine extends ScoreboardLine {
          * @return The builder
          */
         default ConstantLineBuilder text(String raw) {
-            return this.text(raw, PlaceholderSources.empty());
+            return this.text(raw, Context.empty());
         }
 
         /**
@@ -56,10 +56,10 @@ public interface ConstantLine extends ScoreboardLine {
          * should another source for a placeholder be necessary.
          *
          * @param raw The text to parse when assigned to a player
-         * @param sources A set of sources that can aid in placeholder parsing.
+         * @param context A set of context that can aid in placeholder parsing.
          * @return The builder
          */
-        ConstantLineBuilder text(String raw, PlaceholderSources sources);
+        ConstantLineBuilder text(String raw, Context context);
 
         /**
          * Creates a line that will do no parsing at all, but rather use the already generated

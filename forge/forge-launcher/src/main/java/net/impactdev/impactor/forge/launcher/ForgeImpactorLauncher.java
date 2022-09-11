@@ -36,10 +36,12 @@ import net.impactdev.impactor.launcher.dependencies.relocations.Relocation;
 import net.impactdev.impactor.launcher.dependencies.repositories.DependencyRepository;
 import net.impactdev.impactor.launcher.loader.JarInJarClassLoader;
 import net.impactdev.impactor.launcher.PluginLauncher;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 
@@ -53,21 +55,27 @@ public class ForgeImpactorLauncher extends AbstractLauncher implements PluginLau
     private static final String INTERNAL_JAR = "impactor-forge.jarinjar";
     private static final String BOOTSTRAP_CLASS = "net.impactdev.impactor.forge.ForgeImpactorBootstrap";
 
-    private final LauncherBootstrap plugin;
+    private final JarInJarClassLoader loader;
     private final ModContainer container;
+    private LauncherBootstrap plugin;
 
     public ForgeImpactorLauncher() {
         super(INTERNAL_JAR, BOOTSTRAP_CLASS, LOGGER);
         this.container = ModList.get().getModContainerByObject(this).orElse(null);
 
-        JarInJarClassLoader loader = new JarInJarClassLoader(this.getClass().getClassLoader(), INTERNAL_JAR);
-        this.download(loader);
-        this.plugin = this.create(loader);
+        this.loader = new JarInJarClassLoader(this.getClass().getClassLoader(), INTERNAL_JAR);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onSetup);
+        MinecraftForge.EVENT_BUS.addListener(this::onServerShutdown);
     }
 
     public void onSetup(FMLCommonSetupEvent event) {
+        this.download(this.loader);
+        this.plugin = this.create(this.loader);
         this.plugin.construct();
+    }
+
+    public void onServerShutdown(FMLServerStoppingEvent event) {
+        this.plugin.shutdown();
     }
 
     @Override
@@ -90,10 +98,6 @@ public class ForgeImpactorLauncher extends AbstractLauncher implements PluginLau
         return Sets.newHashSet(
                 ProvidedDependencies.SLF4J_API,
                 ProvidedDependencies.CAFFEINE,
-                ProvidedDependencies.ADVENTURE,
-                ProvidedDependencies.ADVENTURE_KEYS,
-                ProvidedDependencies.ADVENTURE_GSON_SERIALIZER,
-                ProvidedDependencies.ADVENTURE_MINIMESSAGE,
                 ProvidedDependencies.SPONGE_MATH,
                 Dependency.builder()
                         .from(ProvidedDependencies.REFLECTIONS)

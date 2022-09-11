@@ -25,11 +25,11 @@
 
 package net.impactdev.impactor.api.scoreboard.objective.types;
 
-import net.impactdev.impactor.api.placeholders.PlaceholderSources;
 import net.impactdev.impactor.api.scoreboard.components.TimeConfiguration;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
 import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.utilities.context.Context;
 
 import java.util.concurrent.TimeUnit;
 
@@ -47,7 +47,7 @@ public interface RefreshingObjective extends ScoreboardObjective, Updatable {
 
         RefreshingObjectiveBuilder async();
 
-        RefreshingObjectiveBuilder sources(PlaceholderSources sources);
+        RefreshingObjectiveBuilder context(Context context);
 
     }
 

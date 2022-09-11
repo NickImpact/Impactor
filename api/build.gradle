@@ -21,20 +21,16 @@ dependencies {
     api 'net.kyori:adventure-text-minimessage:4.11.0'
 
     // Kyori Events
-    api('net.kyori:event-api:3.0.0') {
-        exclude(group: 'com.google.guava', module: 'guava')
-    }
-    api 'net.kyori:event-method:3.0.0'
-    api 'net.kyori:event-method-asm:3.0.0'
+    api('net.kyori:event-api:5.0.0-SNAPSHOT')
 
     // Event Generation
     compileOnlyApi('org.spongepowered:event-impl-gen-annotations:8.0.0-SNAPSHOT')
 
     // Configurate
-    implementation 'org.spongepowered:configurate-core:4.1.2'
-    implementation 'org.spongepowered:configurate-gson:4.1.2'
-    implementation 'org.spongepowered:configurate-hocon:4.1.2'
-    implementation 'org.spongepowered:configurate-yaml:4.1.2'
+    api 'org.spongepowered:configurate-core:4.1.2'
+    api 'org.spongepowered:configurate-gson:4.1.2'
+    api 'org.spongepowered:configurate-hocon:4.1.2'
+    api 'org.spongepowered:configurate-yaml:4.1.2'
 
     // Google
 //    api 'com.google.inject:guice:5.1.0'

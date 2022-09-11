@@ -25,18 +25,10 @@
 
 package net.impactdev.impactor.api.event;
 
-import net.kyori.event.ReifiedEvent;
-
 /**
- * A super-interface for all Impactor events.
+ * Represents an event applicable to being pushed onto the Impactor
+ * {@link net.kyori.event.EventBus event bus}. Events of this nature are not cancellable
+ * by default, and are intended to inherit in some form from {@link net.kyori.event.Cancellable}
+ * in order to achieve this status.
  */
-public interface ImpactorEvent {
-
-    /**
-     * Represents an Impactor-based event that is also generically bound.
-     *
-     * @param <T>
-     */
-    interface Generic<T> extends ImpactorEvent, ReifiedEvent<T> {}
-
-}
+public interface ImpactorEvent {}

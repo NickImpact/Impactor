@@ -23,20 +23,14 @@
  *
  */
 
-package net.impactdev.impactor.api.logging;
+package net.impactdev.impactor.api.placeholders;
 
-public interface PluginLogger {
+import net.impactdev.impactor.api.utilities.context.Context;
+import net.kyori.adventure.text.Component;
 
-    void info(String line);
+@FunctionalInterface
+public interface PlaceholderParser {
 
-    void warn(String line);
-
-    void warn(String line, Throwable throwable);
-
-    void severe(String line);
-
-    void severe(String line, Throwable throwable);
-
-    void debug(String line);
+    Component parse(Context context);
 
 }

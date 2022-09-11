@@ -23,9 +23,32 @@
  *
  */
 
-package net.impactdev.impactor.api.event.listener;
+package net.impactdev.impactor.forge.platform.components;
 
-/**
- *
- */
-public interface ImpactorEventListener {}
+import net.impactdev.impactor.api.platform.PlatformComponent;
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import net.minecraftforge.versions.forge.ForgeVersion;
+import net.minecraftforge.versions.mcp.MCPVersion;
+
+public class ForgeComponent implements PlatformComponent {
+
+    @Override
+    public String name() {
+        return "Forge";
+    }
+
+    @Override
+    public String version() {
+        return ForgeVersion.getVersion();
+    }
+
+    private String mcp() {
+        return MCPVersion.getMCPVersion();
+    }
+
+    @Override
+    public void print(PrettyPrinter printer) {
+        printer.add("%s - %s (MCP %s)", this.name(), this.version(), this.mcp());
+    }
+
+}

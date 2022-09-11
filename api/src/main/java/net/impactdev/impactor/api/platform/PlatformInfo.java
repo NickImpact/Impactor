@@ -25,12 +25,14 @@
 
 package net.impactdev.impactor.api.platform;
 
-public interface PlatformInfo {
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 
-    String name();
+import java.util.Set;
 
-    String branding();
+public interface PlatformInfo extends PrettyPrinter.IPrettyPrintable {
 
-    String version();
+    PlatformType type();
+
+    Set<PlatformComponent> components();
 
 }

@@ -39,6 +39,7 @@ import net.impactdev.impactor.items.stacks.builders.ImpactorSkullStackBuilder;
 import net.impactdev.impactor.items.stacks.properties.ImpactorEnchantment;
 import net.impactdev.impactor.modules.ImpactorModule;
 
+@SuppressWarnings("unused")
 public class ItemsModule implements ImpactorModule {
 
     @Override

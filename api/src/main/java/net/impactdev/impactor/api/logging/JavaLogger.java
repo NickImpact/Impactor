@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class JavaLogger implements PluginLogger {
@@ -51,117 +52,27 @@ public class JavaLogger implements PluginLogger {
     }
 
     @Override
-    public void info(Collection<String> lines) {
-        lines.forEach(this::info);
-    }
-
-    @Override
-    public void info(Supplier<String> supplier) {
-        this.info(supplier.get());
-    }
-
-    @Override
-    public void info(String marker, String line) {
-        this.delegate.info(this.colorizer.apply(this.preprocessor.apply(marker, line)));
-    }
-
-    @Override
-    public void info(String marker, Collection<String> lines) {
-        lines.forEach(l -> this.info(marker, l));
-    }
-
-    @Override
-    public void info(String marker, Supplier<String> supplier) {
-        this.info(marker, supplier.get());
-    }
-
-    @Override
     public void warn(String line) {
         this.delegate.warning(this.colorizer.apply(line));
     }
 
     @Override
-    public void warn(Collection<String> lines) {
-        lines.forEach(this::info);
+    public void warn(String line, Throwable throwable) {
+        this.delegate.log(Level.WARNING, line, throwable);
     }
 
     @Override
-    public void warn(Supplier<String> supplier) {
-        this.warn(supplier.get());
-    }
-
-    @Override
-    public void warn(String marker, String line) {
-        this.delegate.warning(this.colorizer.apply(this.preprocessor.apply(marker, line)));
-    }
-
-    @Override
-    public void warn(String marker, Collection<String> lines) {
-        lines.forEach(l -> this.warn(marker, l));
-    }
-
-    @Override
-    public void warn(String marker, Supplier<String> supplier) {
-        this.warn(marker, supplier.get());
-    }
-
-    @Override
-    public void error(String line) {
+    public void severe(String line) {
         this.delegate.severe(this.colorizer.apply(line));
     }
 
     @Override
-    public void error(Collection<String> lines) {
-        lines.forEach(this::info);
-    }
-
-    @Override
-    public void error(Supplier<String> supplier) {
-        this.warn(supplier.get());
-    }
-
-    @Override
-    public void error(String marker, String line) {
-        this.delegate.severe(this.colorizer.apply(this.preprocessor.apply(marker, line)));
-    }
-
-    @Override
-    public void error(String marker, Collection<String> lines) {
-        lines.forEach(l -> this.error(marker, l));
-    }
-
-    @Override
-    public void error(String marker, Supplier<String> supplier) {
-        this.error(marker, supplier.get());
+    public void severe(String line, Throwable throwable) {
+        this.delegate.log(Level.SEVERE, line, throwable);
     }
 
     public void debug(String line) {
         this.delegate.info(this.colorizer.apply("Debug - " + line));
-    }
-
-    @Override
-    public void debug(Collection<String> lines) {
-        lines.forEach(this::debug);
-    }
-
-    @Override
-    public void debug(Supplier<String> supplier) {
-        this.debug(supplier.get());
-    }
-
-    @Override
-    public void debug(String marker, String line) {
-        this.delegate.info(this.colorizer.apply(this.preprocessor.apply("Debug - " + marker, line)));
-    }
-
-    @Override
-    public void debug(String marker, Collection<String> lines) {
-        lines.forEach(l -> this.debug(marker, l));
-    }
-
-    @Override
-    public void debug(String marker, Supplier<String> supplier) {
-        this.debug(marker, supplier.get());
     }
 
 }
