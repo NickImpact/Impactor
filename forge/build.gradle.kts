@@ -18,7 +18,7 @@ dependencies {
 
     implementation(project(":api"))
     implementation(project(":common"))
-    implementation(project(":launcher"))
+    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.18.0")
 
     modImplementation("ca.landonjw:GooeyLibs:1.16.5-2.3.3-SNAPSHOT")
 }
@@ -26,26 +26,39 @@ dependencies {
 tasks {
     shadowJar {
         dependencies {
+            include(project(":api"))
             include(project(":common"))
+            include(dependency("net.impactdev:json:.*"))
+            include(dependency("net.kyori:.*:.*"))
+            include(dependency("org.spongepowered:math:.*"))
+            include(dependency("com.github.ben-manes.caffeine:caffeine:.*"))
+            include(dependency("io.leangen.geantyref:geantyref:.*"))
             exclude("forge-client-extra.jar")
         }
 
         relocate ("org.spongepowered", "net.impactdev.impactor.relocations.spongepowered")
         relocate ("io.leangen.geantyref", "net.impactdev.impactor.relocations.geantyref")
-        relocate ("org.slf4j", "net.impactdev.impactor.relocations.slf4j")
         relocate ("net.kyori", "net.impactdev.impactor.relocations.kyori")
         relocate ("com.github.benmanes.caffeine", "net.impactdev.impactor.relocations.caffeine")
-        relocate ("org.reflections", "net.impactdev.impactor.relocations.reflections")
-        relocate ("ca.landonjw.gooeylibs2", "net.impactdev.impactor.relocations.gooeylibs")
     }
 
     remapJar {
-        archiveBaseName.set("impactor-forge")
+        val minecraft = rootProject.property("minecraft")
+        val forge = rootProject.property("forge")
+
+        archiveBaseName.set("Impactor-Forge")
         archiveClassifier.set("")
-        archiveVersion.set("")
-        archiveExtension.set("jarinjar")
+        archiveVersion.set("$minecraft-$forge-${rootProject.version}")
 
         dependsOn(shadowJar)
         inputFile.set(named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar").flatMap { it.archiveFile })
+    }
+
+    processResources {
+        inputs.property("version", rootProject.version)
+
+        filesMatching("META-INF/mods.toml") {
+            expand("version" to rootProject.version)
+        }
     }
 }

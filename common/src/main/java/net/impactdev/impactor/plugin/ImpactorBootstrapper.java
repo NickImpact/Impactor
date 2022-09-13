@@ -27,10 +27,9 @@ package net.impactdev.impactor.plugin;
 
 import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.launcher.LauncherBootstrap;
 import net.impactdev.impactor.util.ExceptionPrinter;
 
-public abstract class ImpactorBootstrapper implements LauncherBootstrap {
+public abstract class ImpactorBootstrapper {
 
     private final ImpactorPlugin plugin;
     private final PluginLogger logger;
@@ -46,10 +45,17 @@ public abstract class ImpactorBootstrapper implements LauncherBootstrap {
 
     protected abstract ImpactorPlugin createPlugin();
 
-    @Override
     public void construct() {
         try {
             this.plugin.construct();
+        } catch (Exception e) {
+            ExceptionPrinter.print(this.plugin, e);
+        }
+    }
+
+    public void shutdown() {
+        try {
+            this.plugin.shutdown();
         } catch (Exception e) {
             ExceptionPrinter.print(this.plugin, e);
         }

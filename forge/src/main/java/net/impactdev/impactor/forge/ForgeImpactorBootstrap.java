@@ -28,25 +28,30 @@ package net.impactdev.impactor.forge;
 import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.forge.bootstrap.ForgeRegistrationHandler;
-import net.impactdev.impactor.launcher.LauncherBootstrap;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 
-import java.util.function.Supplier;
+@Mod("impactor")
+public class ForgeImpactorBootstrap extends ImpactorBootstrapper {
 
-public class ForgeImpactorBootstrap extends ImpactorBootstrapper implements LauncherBootstrap {
+    private final ModContainer container;
 
-    private final Supplier<ModContainer> launcher;
-
-    public ForgeImpactorBootstrap(Supplier<ModContainer> launcher) {
+    public ForgeImpactorBootstrap() {
         super(new Log4jLogger(LogManager.getLogger("Impactor")));
-        this.launcher = launcher;
+        this.container = ModList.get().getModContainerById("impactor")
+                .orElseThrow(() -> new IllegalStateException("Impactor not found by forge"));
 
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onSetup);
+        MinecraftForge.EVENT_BUS.addListener(this::onServerShutdown);
         MinecraftForge.EVENT_BUS.addListener(ForgeRegistrationHandler::onCommandRegistration);
     }
 
@@ -55,9 +60,12 @@ public class ForgeImpactorBootstrap extends ImpactorBootstrapper implements Laun
         return new ForgeImpactorPlugin(this);
     }
 
-    @Override
-    public void shutdown() {
+    public void onSetup(FMLCommonSetupEvent event) {
+        this.construct();
+    }
 
+    public void onServerShutdown(FMLServerStoppingEvent event) {
+        this.shutdown();
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)

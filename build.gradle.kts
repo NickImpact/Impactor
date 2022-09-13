@@ -27,7 +27,7 @@ version = "5.0.0-SNAPSHOT"
 
 tasks {
     val collect by registering(Copy::class) {
-        val tasks = subprojects.filter { it.path.contains("-launcher") }.map { it.tasks.named("shadowJar") }
+        val tasks = subprojects.filter { it.path != ":api" && it.path != ":common" }.map { it.tasks.named("remapJar") }
         dependsOn(tasks)
         from(tasks)
         into(buildDir.resolve("deploy"))
@@ -48,15 +48,15 @@ subprojects {
     apply(plugin = "net.kyori.blossom")
     apply(plugin = "org.cadixdev.licenser")
 
-    extensions.configure<JavaPluginExtension> {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(8))
+        }
     }
 
     tasks {
         withType<JavaCompile> {
             options.encoding = "UTF-8"
-            options.release.set(8)
             dependsOn(updateLicenses)
             finalizedBy(test)
         }

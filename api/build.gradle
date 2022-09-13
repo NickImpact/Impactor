@@ -1,5 +1,10 @@
 plugins {
     id('maven-publish')
+    id('org.spongepowered.gradle.vanilla') version("0.2.1-SNAPSHOT")
+}
+
+minecraft {
+    version("1.16.5")
 }
 
 repositories {
@@ -65,7 +70,7 @@ publishing {
             from components.java
             groupId 'net.impactdev.impactor'
             artifactId 'api'
-            version project.version
+            version rootProject.version
         }
     }
 }

@@ -28,7 +28,9 @@ package net.impactdev.impactor.forge.platform.players;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.impactdev.impactor.adventure.AdventureTranslator;
+import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.transactions.ItemReceiptTransaction;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
@@ -52,6 +54,11 @@ public class ForgePlatformPlayer implements PlatformPlayer {
     @Override
     public Component name() {
         return this.toForge().map(player -> AdventureTranslator.fromNative(player.getDisplayName())).orElse(Component.empty());
+    }
+
+    @Override
+    public ItemReceiptTransaction offer(ImpactorItemStack stack) {
+        return null;
     }
 
     public Optional<ServerPlayer> toForge() {

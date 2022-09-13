@@ -25,18 +25,24 @@
 
 package net.impactdev.impactor.plugin;
 
+import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.APIRegister;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.ImpactorService;
 import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.plugin.PluginMetadata;
+import net.impactdev.impactor.configuration.ConfigModule;
+import net.impactdev.impactor.items.ItemsModule;
 import net.impactdev.impactor.modules.ImpactorModule;
+import net.impactdev.impactor.ui.UIModule;
 import net.impactdev.impactor.util.ExceptionPrinter;
 import net.impactdev.impactor.util.ProvidedExceptionHeaders;
-import org.reflections.Reflections;
+import net.impactdev.impactor.util.UtilityModule;
 
-public class BaseImpactorPlugin implements ImpactorPlugin {
+import java.util.Set;
+
+public abstract class BaseImpactorPlugin implements ImpactorPlugin {
 
     private static ImpactorPlugin instance;
 
@@ -72,22 +78,28 @@ public class BaseImpactorPlugin implements ImpactorPlugin {
         Impactor service = new ImpactorService();
         APIRegister.register(service);
 
-        new Reflections("net.impactdev.impactor")
-                .getSubTypesOf(ImpactorModule.class)
-                .forEach(m -> {
-                    try {
-                        ImpactorModule module = m.getDeclaredConstructor().newInstance();
-                        module.factories(service.factories());
-                        module.builders(service.builders());
-                        module.services(service.services());
-                    } catch (Exception e) {
-                        ExceptionPrinter.print(this, e, ProvidedExceptionHeaders.METADATA);
-                    }
-                });
+        Set<ImpactorModule> modules = Sets.newHashSet(
+                new ConfigModule(),
+                new ItemsModule(),
+                new UIModule(),
+                new UtilityModule()
+        );
+        modules.addAll(this.modules());
+        modules.forEach(module -> {
+            try {
+                module.factories(service.factories());
+                module.builders(service.builders());
+                module.services(service.services());
+            } catch (Exception e) {
+                ExceptionPrinter.print(this, e, ProvidedExceptionHeaders.METADATA);
+            }
+        });
     }
 
     @Override
     public void shutdown() throws Exception {
 
     }
+
+    protected abstract Set<ImpactorModule> modules();
 }

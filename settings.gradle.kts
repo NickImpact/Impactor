@@ -11,8 +11,5 @@ pluginManagement {
 rootProject.name = "Impactor"
 include("api")
 include("common")
-include("launcher")
 include("forge")
-//include("forge:forge-platform")
-include("forge:forge-launcher")
 //include("bukkit")

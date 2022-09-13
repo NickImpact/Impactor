@@ -70,19 +70,19 @@ public class ImpactorItemStackTests {
         assertEquals(1, basic.quantity());
 
         ImpactorItemStack basic2 = ImpactorItemStack.basic()
-                .type(ItemTypes.GRASS)
+                .type(ItemTypes.GRASS_BLOCK)
                 .glow()
                 .hide(MetaFlag.UNBREAKABLE)
                 .unbreakable()
                 .quantity(5)
                 .build();
         assertEquals(5, basic2.quantity());
-        assertEquals("grass", basic2.type().key().value());
+        assertEquals("grass_block", basic2.type().key().value());
         assertTrue(basic2.unbreakable());
         assertTrue(basic2.flags().contains(MetaFlag.ENCHANTMENTS));
 
         ItemStack test = ((ImpactorAbstractedItemStack) basic2).toNative();
-        assertEquals(Items.GRASS, test.getItem());
+        assertEquals(Items.GRASS_BLOCK, test.getItem());
         assertTrue(test.isEnchanted());
     }
 

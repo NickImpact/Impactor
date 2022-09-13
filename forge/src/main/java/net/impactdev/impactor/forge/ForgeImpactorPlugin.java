@@ -25,17 +25,22 @@
 
 package net.impactdev.impactor.forge;
 
+import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import net.impactdev.impactor.forge.platform.ForgePlatformModule;
+import net.impactdev.impactor.forge.scheduler.ForgeSchedulerModule;
+import net.impactdev.impactor.forge.ui.ForgeUIModule;
+import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.Optional;
+import java.util.Set;
 
 public class ForgeImpactorPlugin extends BaseImpactorPlugin implements ImpactorPlugin {
 
@@ -59,6 +64,11 @@ public class ForgeImpactorPlugin extends BaseImpactorPlugin implements ImpactorP
     @Override
     public void shutdown() throws Exception {
 
+    }
+
+    @Override
+    protected Set<ImpactorModule> modules() {
+        return Sets.newHashSet(new ForgeSchedulerModule(), new ForgeUIModule(), new ForgePlatformModule());
     }
 
     public Optional<MinecraftServer> server() {

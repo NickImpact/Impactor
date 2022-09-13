@@ -23,19 +23,16 @@
  *
  */
 
-package net.impactdev.impactor.launcher.loader;
+package net.impactdev.impactor.api.platform.players.transactions;
 
-/**
- * Runtime exception used if there is a problem during loading
- */
-public class LoadingException extends RuntimeException {
+import net.impactdev.impactor.api.items.ImpactorItemStack;
 
-    public LoadingException(String message) {
-        super(message);
-    }
+public interface ItemReceiptTransaction {
 
-    public LoadingException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    ImpactorItemStack source();
+
+    int received();
+
+    boolean successful();
 
 }

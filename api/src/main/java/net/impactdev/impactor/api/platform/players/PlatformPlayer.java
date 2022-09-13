@@ -26,12 +26,14 @@
 package net.impactdev.impactor.api.platform.players;
 
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.items.ImpactorItemStack;
+import net.impactdev.impactor.api.platform.players.transactions.ItemReceiptTransaction;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
 
-public interface PlatformPlayer {
+public interface PlatformPlayer extends Audience {
 
     static PlatformPlayer create(final UUID uuid) {
         return Impactor.instance().factories().provide(Factory.class).create(uuid);
@@ -40,6 +42,8 @@ public interface PlatformPlayer {
     UUID uuid();
 
     Component name();
+
+    ItemReceiptTransaction offer(ImpactorItemStack stack);
 
     interface Factory {
 

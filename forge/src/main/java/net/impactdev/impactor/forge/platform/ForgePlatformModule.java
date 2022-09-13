@@ -23,20 +23,31 @@
  *
  */
 
-package net.impactdev.impactor.launcher.dependencies;
+package net.impactdev.impactor.forge.platform;
 
-public class DependencyDownloadException extends Exception {
+import net.impactdev.impactor.api.platform.Platform;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.providers.BuilderProvider;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.providers.ServiceProvider;
+import net.impactdev.impactor.forge.platform.players.ForgePlatformPlayer;
+import net.impactdev.impactor.modules.ImpactorModule;
+import net.impactdev.impactor.platform.ImpactorPlatform;
 
-    public DependencyDownloadException(String message) {
-        super(message);
+@SuppressWarnings("unused")
+public class ForgePlatformModule implements ImpactorModule {
+
+    @Override
+    public void factories(FactoryProvider provider) {
+        provider.register(PlatformPlayer.Factory.class, new ForgePlatformPlayer.ForgePlayerFactory());
     }
 
-    public DependencyDownloadException(Throwable e) {
-        super(e);
-    }
+    @Override
+    public void builders(BuilderProvider provider) {}
 
-    public DependencyDownloadException(String message, Throwable e) {
-        super(message, e);
+    @Override
+    public void services(ServiceProvider provider) {
+        provider.register(Platform.class, new ImpactorPlatform(new ForgePlatformInfo()));
     }
 
 }

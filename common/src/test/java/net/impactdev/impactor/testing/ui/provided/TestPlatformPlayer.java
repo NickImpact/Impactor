@@ -25,7 +25,9 @@
 
 package net.impactdev.impactor.testing.ui.provided;
 
+import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.transactions.ItemReceiptTransaction;
 import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
@@ -39,5 +41,10 @@ public class TestPlatformPlayer implements PlatformPlayer {
     @Override
     public Component name() {
         return Component.text("Test Environment Player");
+    }
+
+    @Override
+    public ItemReceiptTransaction offer(ImpactorItemStack stack) {
+        return null;
     }
 }
