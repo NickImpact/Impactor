@@ -22,4 +22,10 @@ mandatory = true
 versionRange = "[36,)"
 ordering = "NONE"
 side = "BOTH"
+[[dependencies.impactor]]
+modId = "gooeylibs2"
+mandatory = true
+versionRange = "[2.3.2,)"
+ordering = "NONE"
+side = "BOTH"
 
