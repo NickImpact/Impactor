@@ -18,7 +18,6 @@ dependencies {
 
     implementation(project(":api"))
     implementation(project(":common"))
-    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.18.0")
 
     modImplementation("ca.landonjw:GooeyLibs:1.16.5-2.3.3-SNAPSHOT")
 }
@@ -33,9 +32,12 @@ tasks {
             include(dependency("org.spongepowered:math:.*"))
             include(dependency("com.github.ben-manes.caffeine:caffeine:.*"))
             include(dependency("io.leangen.geantyref:geantyref:.*"))
+            include(dependency("loom_mappings_1_16_5_layered_hash_40359_v2_forge_1_16_5_36_2_34_forge.ca.landonjw:GooeyLibs:1.16.5-2.3.3-SNAPSHOT"))
             exclude("forge-client-extra.jar")
+            exclude("ca/landonjw/gooeylibs2/GooeyLibs.class")
         }
 
+        relocate ("ca.landonjw.gooeylibs2", "net.impactdev.impactor.relocations.gooeylibs")
         relocate ("org.spongepowered", "net.impactdev.impactor.relocations.spongepowered")
         relocate ("io.leangen.geantyref", "net.impactdev.impactor.relocations.geantyref")
         relocate ("net.kyori", "net.impactdev.impactor.relocations.kyori")
