@@ -79,8 +79,8 @@ public class ImpactorSkullStack extends ImpactorAbstractedItemStack implements S
     }
 
     @Override
-    public ItemStack toNative() {
-        ItemStack result = super.toNative();
+    public ItemStack asMinecraftNative() {
+        ItemStack result = super.asMinecraftNative();
         if(this.owner().isPresent()) {
             if(!this.texture().isPresent()) {
                 result.getOrCreateTag().putString("SkullOwner", this.owner().get());

@@ -118,8 +118,8 @@ public class ImpactorBookStack extends ImpactorAbstractedItemStack implements Bo
     }
 
     @Override
-    public ItemStack toNative() {
-        ItemStack stack = super.toNative();
+    public ItemStack asMinecraftNative() {
+        ItemStack stack = super.asMinecraftNative();
         CompoundTag nbt = stack.getOrCreateTag();
         nbt.putString("author", this.author);
         nbt.putInt("generation", this.generation.ordinal());

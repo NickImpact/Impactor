@@ -86,7 +86,7 @@ public class ForgeRegistrationHandler {
                                             .unbreakable()
                                             .build();
 
-                                    ItemStack minecraft = ((ImpactorAbstractedItemStack) stack).toNative();
+                                    ItemStack minecraft = stack.asMinecraftNative();
                                     source.getPlayerOrException().inventory.add(minecraft);
                                     source.getPlayerOrException().inventoryMenu.broadcastChanges();
 
@@ -106,7 +106,7 @@ public class ForgeRegistrationHandler {
                                             .complete()
                                             .build();
 
-                                    ItemStack minecraft = ((ImpactorAbstractedItemStack) skull).toNative();
+                                    ItemStack minecraft = skull.asMinecraftNative();
                                     source.getPlayerOrException().inventory.add(minecraft);
                                     source.getPlayerOrException().inventoryMenu.broadcastChanges();
 
@@ -125,7 +125,7 @@ public class ForgeRegistrationHandler {
                                             .complete()
                                             .build();
 
-                                    ItemStack minecraft = ((ImpactorAbstractedItemStack) skull).toNative();
+                                    ItemStack minecraft = skull.asMinecraftNative();
                                     source.getPlayerOrException().inventory.add(minecraft);
                                     source.getPlayerOrException().inventoryMenu.broadcastChanges();
 
@@ -147,7 +147,7 @@ public class ForgeRegistrationHandler {
                                     .build();
 
                             CommandSourceStack source = context.getSource();
-                            ItemStack minecraft = ((ImpactorAbstractedItemStack) book).toNative();
+                            ItemStack minecraft = book.asMinecraftNative();
                             source.getPlayerOrException().inventory.add(minecraft);
                             source.getPlayerOrException().inventoryMenu.broadcastChanges();
 

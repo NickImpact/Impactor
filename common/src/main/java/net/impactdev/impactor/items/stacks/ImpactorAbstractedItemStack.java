@@ -46,7 +46,8 @@ public abstract class ImpactorAbstractedItemStack extends AbstractedItemStack {
         super(type, builder);
     }
 
-    public ItemStack toNative() {
+    @Override
+    public ItemStack asMinecraftNative() {
         ItemLike like = ((ImpactorItemType) this.type()).minecraft().orElse(null);
         ItemStack result = new ItemStack(like);
         result.setCount(this.quantity());

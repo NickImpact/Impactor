@@ -36,10 +36,24 @@ import net.impactdev.impactor.api.items.types.ItemType;
 import net.impactdev.impactor.api.items.types.ItemTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Set;
 
+/**
+ * <h2>The Basics to an Impactor Item Stack</h2>
+ * Specifies the configuration for an {@link ItemStack} within Minecraft. By default,
+ * this interface supports basic metadata. Through extensions of this interface,
+ * more configurations can be produced that would be capable of supporting additional
+ * details such as NBT tags.
+ * <p>
+ * By default, Impactor provides a simple set of common stacks. These configurations contain
+ * additional properties such as a skull's player skin or type, and a books author and pages.
+ *
+ * @see net.impactdev.impactor.api.items.extensions.BookStack
+ * @see net.impactdev.impactor.api.items.extensions.SkullStack
+ */
 public interface ImpactorItemStack {
 
     static ImpactorItemStack empty() {
@@ -57,6 +71,14 @@ public interface ImpactorItemStack {
     static BookStackBuilder book() {
         return Impactor.instance().builders().provide(BookStackBuilder.class);
     }
+
+    /**
+     * Creates a native minecraft item stack based on this given configuration. The produced ItemStack
+     * will be represented 1:1 from this typing.
+     *
+     * @return A native minecraft ItemStack following this type's configuration
+     */
+    ItemStack asMinecraftNative();
 
     /**
      * Specifies the type of item this viewable item is based on. Effectively, this represents

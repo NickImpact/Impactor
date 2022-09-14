@@ -42,6 +42,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -81,7 +82,7 @@ public class ImpactorItemStackTests {
         assertTrue(basic2.unbreakable());
         assertTrue(basic2.flags().contains(MetaFlag.ENCHANTMENTS));
 
-        ItemStack test = ((ImpactorAbstractedItemStack) basic2).toNative();
+        ItemStack test = basic2.asMinecraftNative();
         assertEquals(Items.GRASS_BLOCK, test.getItem());
         assertTrue(test.isEnchanted());
     }
@@ -98,7 +99,7 @@ public class ImpactorItemStackTests {
         assertEquals(ItemTypes.SKELETON_SKULL, skeleton.type());
         assertEquals(0, skeleton.enchantments().size());
 
-        ItemStack sSkull = ((ImpactorAbstractedItemStack) skeleton).toNative();
+        ItemStack sSkull = skeleton.asMinecraftNative();
         assertEquals(1, sSkull.getCount());
         assertEquals(Items.SKELETON_SKULL, sSkull.getItem());
         assertFalse(sSkull.getOrCreateTag().contains("SkullOwner"));
@@ -120,7 +121,7 @@ public class ImpactorItemStackTests {
         assertTrue(player.owner().filter(username -> username.equals("NickImpact")).isPresent());
         assertTrue(player.unbreakable());
 
-        ItemStack pSkull = ((ImpactorAbstractedItemStack) player).toNative();
+        ItemStack pSkull = player.asMinecraftNative();
         assertTrue(pSkull.getOrCreateTag().contains("SkullOwner"));
         assertNotNull(pSkull.getOrCreateTag().get("SkullOwner"));
         assertEquals("NickImpact", pSkull.getOrCreateTag().getString("SkullOwner"));
@@ -142,7 +143,7 @@ public class ImpactorItemStackTests {
         assertEquals(2, book.pages());
         assertEquals(BookStack.Generation.ORIGINAL, book.generation());
 
-        ItemStack minecraft = ((ImpactorAbstractedItemStack) book).toNative();
+        ItemStack minecraft = book.asMinecraftNative();
         CompoundTag nbt = minecraft.getOrCreateTag();
         assertEquals(Items.WRITTEN_BOOK, minecraft.getItem());
         assertEquals(0, nbt.getInt("generation"));
