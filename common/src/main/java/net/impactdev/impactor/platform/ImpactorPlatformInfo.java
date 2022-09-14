@@ -66,7 +66,6 @@ public abstract class ImpactorPlatformInfo implements PlatformInfo {
     private Set<PlatformComponent> generate() {
         Set<PlatformComponent> result = Sets.newLinkedHashSet();
         result.add(new JDKPlatformComponent());
-        result.add(new MinecraftPlatformComponent());
         this.specifyComponents(result);
 
         return result;

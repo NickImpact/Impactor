@@ -23,28 +23,29 @@
  *
  */
 
-package net.impactdev.impactor.forge.platform;
+package net.impactdev.impactor.fabric.platform;
 
 import com.google.common.collect.Lists;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.impactdev.impactor.api.platform.PlatformComponent;
 import net.impactdev.impactor.api.platform.PlatformType;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
-import net.impactdev.impactor.forge.platform.components.ForgeComponent;
-import net.impactdev.impactor.forge.platform.components.ForgeMinecraftComponent;
+import net.impactdev.impactor.fabric.platform.components.FabricComponent;
+import net.impactdev.impactor.fabric.platform.components.FabricMinecraftComponent;
 import net.impactdev.impactor.platform.ImpactorPlatformInfo;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ForgePlatformInfo extends ImpactorPlatformInfo {
+public class FabricPlatformInfo extends ImpactorPlatformInfo {
 
-    private final List<String> exclusions = Lists.newArrayList("minecraft", "forge");
+    private final List<String> exclusions = Lists.newArrayList("minecraft", "fabricloader", "java");
 
-    protected ForgePlatformInfo() {
-        super(PlatformType.FORGE);
+    protected FabricPlatformInfo() {
+        super(PlatformType.FABRIC);
     }
 
     @Override
@@ -55,18 +56,19 @@ public class ForgePlatformInfo extends ImpactorPlatformInfo {
         }
 
         printer.hr('-').add("Mods: ");
-        List<ModInfo> mods = ModList.get().getMods()
+        List<ModMetadata> mods = FabricLoader.getInstance().getAllMods()
                 .stream()
-                .filter(info -> !this.exclusions.contains(info.getModId()))
+                .map(ModContainer::getMetadata)
+                .filter(metadata -> !this.exclusions.contains(metadata.getId()))
                 .collect(Collectors.toList());
-        for(ModInfo info : mods) {
-            printer.add("%s - %s", info.getDisplayName(), info.getVersion());
+        for(ModMetadata info : mods) {
+            printer.add("%s - %s", info.getName(), info.getVersion());
         }
     }
 
     @Override
     protected void specifyComponents(Set<PlatformComponent> set) {
-        set.add(new ForgeMinecraftComponent());
-        set.add(new ForgeComponent());
+        set.add(new FabricMinecraftComponent());
+        set.add(new FabricComponent());
     }
 }

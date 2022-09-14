@@ -23,22 +23,25 @@
  *
  */
 
-package net.impactdev.impactor.platform.components;
+package net.impactdev.impactor.fabric.platform.components;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.impactdev.impactor.api.platform.PlatformComponent;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
-import net.minecraft.SharedConstants;
 
-public abstract class MinecraftPlatformComponent implements PlatformComponent {
-
+public class FabricComponent implements PlatformComponent {
     @Override
     public String name() {
-        return "Minecraft";
+        return "Fabric";
+    }
+
+    @Override
+    public String version() {
+        return FabricLoader.getInstance().getModContainer("fabricloader").map(mc -> mc.getMetadata().getVersion().getFriendlyString()).orElse("?");
     }
 
     @Override
     public void print(PrettyPrinter printer) {
         printer.add("%s - %s", this.name(), this.version());
     }
-
 }

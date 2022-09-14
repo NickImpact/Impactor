@@ -23,22 +23,27 @@
  *
  */
 
-package net.impactdev.impactor.platform.components;
+package net.impactdev.impactor.fabric;
 
-import net.impactdev.impactor.api.platform.PlatformComponent;
-import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
-import net.minecraft.SharedConstants;
+import net.fabricmc.api.DedicatedServerModInitializer;
+import net.impactdev.impactor.api.logging.Log4jLogger;
+import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import org.apache.logging.log4j.LogManager;
 
-public abstract class MinecraftPlatformComponent implements PlatformComponent {
+public class FabricImpactorBootstrap extends ImpactorBootstrapper implements DedicatedServerModInitializer {
 
-    @Override
-    public String name() {
-        return "Minecraft";
+    public FabricImpactorBootstrap() {
+        super(new Log4jLogger(LogManager.getLogger("Impactor")));
     }
 
     @Override
-    public void print(PrettyPrinter printer) {
-        printer.add("%s - %s", this.name(), this.version());
+    protected ImpactorPlugin createPlugin() {
+        return new FabricImpactorPlugin(this);
     }
 
+    @Override
+    public void onInitializeServer() {
+        this.construct();
+    }
 }

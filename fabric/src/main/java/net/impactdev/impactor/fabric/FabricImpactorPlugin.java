@@ -23,22 +23,36 @@
  *
  */
 
-package net.impactdev.impactor.platform.components;
+package net.impactdev.impactor.fabric;
 
-import net.impactdev.impactor.api.platform.PlatformComponent;
+import com.google.common.collect.Sets;
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
-import net.minecraft.SharedConstants;
+import net.impactdev.impactor.fabric.platform.FabricPlatformModule;
+import net.impactdev.impactor.modules.ImpactorModule;
+import net.impactdev.impactor.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.plugin.ImpactorBootstrapper;
 
-public abstract class MinecraftPlatformComponent implements PlatformComponent {
+import java.util.Set;
 
-    @Override
-    public String name() {
-        return "Minecraft";
+public class FabricImpactorPlugin extends BaseImpactorPlugin {
+
+    public FabricImpactorPlugin(ImpactorBootstrapper bootstrapper) {
+        super(bootstrapper);
     }
 
     @Override
-    public void print(PrettyPrinter printer) {
-        printer.add("%s - %s", this.name(), this.version());
+    public void construct() throws Exception {
+        super.construct();
+
+        PrettyPrinter printer = new PrettyPrinter(80);
+        printer.title("Platform Information");
+        Impactor.instance().platform().info().print(printer);
+        printer.log(this.logger(), PrettyPrinter.Level.INFO);
     }
 
+    @Override
+    protected Set<ImpactorModule> modules() {
+        return Sets.newHashSet(new FabricPlatformModule());
+    }
 }

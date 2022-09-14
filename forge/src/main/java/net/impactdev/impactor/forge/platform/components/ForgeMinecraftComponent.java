@@ -23,22 +23,14 @@
  *
  */
 
-package net.impactdev.impactor.platform.components;
+package net.impactdev.impactor.forge.platform.components;
 
-import net.impactdev.impactor.api.platform.PlatformComponent;
-import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import net.impactdev.impactor.platform.components.MinecraftPlatformComponent;
 import net.minecraft.SharedConstants;
 
-public abstract class MinecraftPlatformComponent implements PlatformComponent {
-
+public final class ForgeMinecraftComponent extends MinecraftPlatformComponent {
     @Override
-    public String name() {
-        return "Minecraft";
+    public String version() {
+        return SharedConstants.getCurrentVersion().getName();
     }
-
-    @Override
-    public void print(PrettyPrinter printer) {
-        printer.add("%s - %s", this.name(), this.version());
-    }
-
 }
