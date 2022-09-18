@@ -19,9 +19,6 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2" apply false
 }
 
-apply(plugin = "maven-publish")
-apply(plugin = "maven-publish-auth")
-
 group = "net.impactdev.impactor"
 version = "5.0.0-SNAPSHOT"
 

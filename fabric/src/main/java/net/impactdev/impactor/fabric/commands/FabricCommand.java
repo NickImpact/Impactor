@@ -23,30 +23,13 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.fabric.commands;
 
-import net.impactdev.impactor.api.platform.Platform;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.fabric.platform.players.FabricPlatformPlayer;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.commands.CommandSourceStack;
 
-public class FabricPlatformModule implements ImpactorModule {
-    @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(PlatformPlayer.Factory.class, new FabricPlatformPlayer.FabricPlayerFactory());
-    }
+public interface FabricCommand {
 
-    @Override
-    public void builders(BuilderProvider provider) {
+    void register(LiteralArgumentBuilder<CommandSourceStack> parent);
 
-    }
-
-    @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
-    }
 }

@@ -23,30 +23,32 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.fabric.ui.gooey;
 
-import net.impactdev.impactor.api.platform.Platform;
+import ca.landonjw.gooeylibs2.api.UIManager;
+import ca.landonjw.gooeylibs2.api.page.GooeyPage;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.fabric.platform.players.FabricPlatformPlayer;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
+import net.impactdev.impactor.fabric.FabricImpactorPlugin;
+import net.minecraft.server.level.ServerPlayer;
 
-public class FabricPlatformModule implements ImpactorModule {
-    @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(PlatformPlayer.Factory.class, new FabricPlatformPlayer.FabricPlayerFactory());
+import java.util.Objects;
+
+public interface GooeyPageOpenCloser {
+
+    default void openPage(GooeyPage page, PlatformPlayer viewer) {
+        ((FabricImpactorPlugin) FabricImpactorPlugin.instance()).server()
+                .ifPresent(server -> {
+                    ServerPlayer forge = server.getPlayerList().getPlayer(viewer.uuid());
+                    UIManager.openUIForcefully(Objects.requireNonNull(forge), page);
+                });
     }
 
-    @Override
-    public void builders(BuilderProvider provider) {
-
+    default void closePage(PlatformPlayer viewer) {
+        ((FabricImpactorPlugin) FabricImpactorPlugin.instance()).server()
+                .ifPresent(server -> {
+                    ServerPlayer forge = server.getPlayerList().getPlayer(viewer.uuid());
+                    UIManager.closeUI(Objects.requireNonNull(forge));
+                });
     }
 
-    @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
-    }
 }

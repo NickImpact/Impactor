@@ -31,7 +31,7 @@ import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.api.ui.containers.views.pagination.builders.PaginationBuilder;
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.builders.SectionedPaginationBuilder;
-import net.impactdev.impactor.forge.ui.containers.ForgeImpactorChestView;
+import net.impactdev.impactor.forge.ui.containers.ForgeChestView;
 import net.impactdev.impactor.forge.ui.containers.ForgePaginationView;
 import net.impactdev.impactor.forge.ui.containers.ForgeSectionedPaginationView;
 import net.impactdev.impactor.modules.ImpactorModule;
@@ -44,7 +44,7 @@ public class ForgeUIModule implements ImpactorModule {
 
     @Override
     public void builders(BuilderProvider provider) {
-        provider.register(ChestView.ChestViewBuilder.class, ForgeImpactorChestView.ForgeImpactorChestViewBuilder::new);
+        provider.register(ChestView.ChestViewBuilder.class, ForgeChestView.ForgeImpactorChestViewBuilder::new);
         provider.register(PaginationBuilder.class, ForgePaginationView.ForgePaginationViewBuilder::new);
         provider.register(SectionedPaginationBuilder.class, ForgeSectionedPaginationView.ForgeSectionedPaginationBuilder::new);
     }

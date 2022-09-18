@@ -26,16 +26,29 @@
 package net.impactdev.impactor.fabric;
 
 import com.google.common.collect.Sets;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import net.impactdev.impactor.fabric.commands.ItemTestCommands;
+import net.impactdev.impactor.fabric.commands.UITestCommands;
 import net.impactdev.impactor.fabric.platform.FabricPlatformModule;
+import net.impactdev.impactor.fabric.ui.FabricUIModule;
 import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.MinecraftServer;
 
+import java.util.Optional;
 import java.util.Set;
 
+import static net.minecraft.commands.Commands.literal;
+
 public class FabricImpactorPlugin extends BaseImpactorPlugin {
+
+    private MinecraftServer server;
 
     public FabricImpactorPlugin(ImpactorBootstrapper bootstrapper) {
         super(bootstrapper);
@@ -45,14 +58,30 @@ public class FabricImpactorPlugin extends BaseImpactorPlugin {
     public void construct() throws Exception {
         super.construct();
 
+        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+            LiteralArgumentBuilder<CommandSourceStack> commands = literal("impactor");
+            new ItemTestCommands().register(commands);
+            new UITestCommands().register(commands);
+            dispatcher.register(commands);
+        });
+
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> this.server = server);
+
         PrettyPrinter printer = new PrettyPrinter(80);
         printer.title("Platform Information");
         Impactor.instance().platform().info().print(printer);
         printer.log(this.logger(), PrettyPrinter.Level.INFO);
     }
 
+    public Optional<MinecraftServer> server() {
+        return Optional.ofNullable(this.server);
+    }
+
     @Override
     protected Set<ImpactorModule> modules() {
-        return Sets.newHashSet(new FabricPlatformModule());
+        return Sets.newHashSet(
+                new FabricPlatformModule(),
+                new FabricUIModule()
+        );
     }
 }

@@ -31,11 +31,11 @@ import org.jetbrains.annotations.Nullable;
 
 public class ExceptionPrinter {
 
-    public static void print(ImpactorPlugin plugin, Exception exception) {
+    public static void print(ImpactorPlugin plugin, Throwable exception) {
         print(plugin, exception, null);
     }
 
-    public static void print(ImpactorPlugin plugin, Exception exception, @Nullable PrettyPrinter.IPrettyPrintable header) {
+    public static void print(ImpactorPlugin plugin, Throwable exception, @Nullable PrettyPrinter.IPrettyPrintable header) {
         PrettyPrinter printer = new PrettyPrinter(80);
         printer.title("Encountered an Exception!");
 

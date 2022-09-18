@@ -23,35 +23,37 @@
  *
  */
 
-package net.impactdev.impactor.forge.ui.containers;
+package net.impactdev.impactor.fabric.ui.containers;
 
-import ca.landonjw.gooeylibs2.api.UIManager;
 import ca.landonjw.gooeylibs2.api.page.GooeyPage;
 import ca.landonjw.gooeylibs2.api.template.types.ChestTemplate;
 import net.impactdev.impactor.adventure.AdventureTranslator;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.Icon;
-import net.impactdev.impactor.api.ui.containers.views.ChestView;
-import net.impactdev.impactor.forge.ui.gooey.GooeyIcon;
-import net.impactdev.impactor.forge.ui.gooey.GooeyPageOpenCloser;
-import net.impactdev.impactor.ui.containers.views.ImpactorChestView;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.SectionedPagination;
+import net.impactdev.impactor.fabric.ui.gooey.GooeyIcon;
+import net.impactdev.impactor.fabric.ui.gooey.GooeyPageOpenCloser;
+import net.impactdev.impactor.ui.containers.views.pagination.views.sectioned.ImpactorSectionedPagination;
+import net.impactdev.impactor.ui.containers.views.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.Optional;
 
-public final class ForgeImpactorChestView extends ImpactorChestView implements GooeyPageOpenCloser {
+public class FabricSectionedPaginationView extends ImpactorSectionedPagination implements GooeyPageOpenCloser {
 
     private final ChestTemplate template;
     private final GooeyPage delegate;
 
-    private ForgeImpactorChestView(ImpactorChestViewBuilder builder) {
+    public FabricSectionedPaginationView(ImpactorSectionedPaginationBuilder builder) {
         super(builder);
+
         ChestTemplate.Builder template = ChestTemplate.builder(this.rows());
         this.layout().elements().forEach((slot, icon) -> {
             template.set(slot, new GooeyIcon(icon));
+        });
+        this.sections().forEach(section -> {
+            section.pages().current().icons().forEach((slot, icon) -> {
+                template.set(slot, new GooeyIcon(icon));
+            });
         });
 
         this.delegate = GooeyPage.builder()
@@ -64,24 +66,24 @@ public final class ForgeImpactorChestView extends ImpactorChestView implements G
     @Override
     public void set(@Nullable Icon icon, int slot) {
         this.template.set(slot, Optional.ofNullable(icon).map(GooeyIcon::new).orElse(null));
-
     }
 
     @Override
-    public void open(PlatformPlayer viewer) {
-        this.openPage(this.delegate, viewer);
+    public void open() {
+        this.openPage(this.delegate, this.viewer);
     }
 
     @Override
-    public void close(PlatformPlayer viewer) {
-        this.closePage(viewer);
+    public void close() {
+        this.closePage(this.viewer);
     }
 
+    public static class FabricSectionedPaginationBuilder extends ImpactorSectionedPaginationBuilder {
 
-    public static final class ForgeImpactorChestViewBuilder extends ImpactorChestViewBuilder {
         @Override
-        public ChestView build() {
-            return new ForgeImpactorChestView(this);
+        public SectionedPagination build() {
+            return new FabricSectionedPaginationView(this);
         }
+
     }
 }
