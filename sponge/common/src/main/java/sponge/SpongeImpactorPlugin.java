@@ -23,21 +23,37 @@
  *
  */
 
-package net.impactdev.impactor.spigot;
+package sponge;
 
-import net.impactdev.impactor.api.logging.PluginLogger;
-import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+import com.google.common.collect.Sets;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import net.impactdev.impactor.modules.ImpactorModule;
+import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import sponge.platform.SpongePlatformModule;
 
-public class SpigotImpactorBootstrap extends ImpactorBootstrapper {
+import java.util.Set;
 
-    public SpigotImpactorBootstrap(PluginLogger logger) {
-        super(logger);
+public class SpongeImpactorPlugin extends BaseImpactorPlugin {
+
+    public SpongeImpactorPlugin(ImpactorBootstrapper bootstrapper) {
+        super(bootstrapper);
     }
 
     @Override
-    protected ImpactorPlugin createPlugin() {
-        return new SpigotImpactorPlugin(this);
+    public void construct() throws Exception {
+        super.construct();
+
+        PrettyPrinter printer = new PrettyPrinter(80);
+        printer.title("Platform Information");
+        Impactor.instance().platform().info().print(printer);
+        printer.log(this.logger(), PrettyPrinter.Level.INFO);
+    }
+
+    @Override
+    protected Set<ImpactorModule> modules() {
+        return Sets.newHashSet(new SpongePlatformModule());
     }
 
 }

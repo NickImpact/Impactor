@@ -5,12 +5,16 @@ pluginManagement {
         maven("https://maven.fabricmc.net/")
         maven("https://maven.architectury.dev/")
         maven("https://maven.minecraftforge.net/")
+        maven("https://repo.papermc.io/repository/maven-public/")
     }
 }
 
 rootProject.name = "Impactor"
 include("api")
 include("common")
+//include("bukkit") // Requires > 1.16.5 (No Mojang Mappings available)
 include("forge")
-//include("bukkit")
 include("fabric")
+include("sponge:common")
+include("sponge:sf")
+include("sponge:sv")

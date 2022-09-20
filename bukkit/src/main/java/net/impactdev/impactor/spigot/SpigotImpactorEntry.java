@@ -25,19 +25,21 @@
 
 package net.impactdev.impactor.spigot;
 
-import net.impactdev.impactor.api.logging.PluginLogger;
-import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import net.impactdev.impactor.api.logging.Log4jLogger;
+import org.apache.logging.log4j.LogManager;
+import org.bukkit.plugin.java.JavaPlugin;
 
-public class SpigotImpactorBootstrap extends ImpactorBootstrapper {
+public final class SpigotImpactorEntry extends JavaPlugin {
 
-    public SpigotImpactorBootstrap(PluginLogger logger) {
-        super(logger);
+    private final SpigotImpactorBootstrap bootstrap = new SpigotImpactorBootstrap(new Log4jLogger(LogManager.getLogger("Impactor")));
+
+    @Override
+    public void onEnable() {
+        this.bootstrap.construct();
     }
 
     @Override
-    protected ImpactorPlugin createPlugin() {
-        return new SpigotImpactorPlugin(this);
+    public void onDisable() {
+        this.bootstrap.shutdown();
     }
-
 }

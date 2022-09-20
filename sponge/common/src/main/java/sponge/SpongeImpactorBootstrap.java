@@ -23,21 +23,33 @@
  *
  */
 
-package net.impactdev.impactor.spigot;
+package sponge;
 
-import net.impactdev.impactor.api.logging.PluginLogger;
+import com.google.inject.Inject;
+import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
+import org.spongepowered.plugin.builtin.jvm.Plugin;
 
-public class SpigotImpactorBootstrap extends ImpactorBootstrapper {
+@Plugin("impactor")
+public class SpongeImpactorBootstrap extends ImpactorBootstrapper {
 
-    public SpigotImpactorBootstrap(PluginLogger logger) {
-        super(logger);
+    @Inject
+    public SpongeImpactorBootstrap(Logger delegate) {
+        super(new Log4jLogger(delegate));
     }
 
     @Override
     protected ImpactorPlugin createPlugin() {
-        return new SpigotImpactorPlugin(this);
+        return new SpongeImpactorPlugin(this);
+    }
+
+    @Listener
+    public void onConstruct(ConstructPluginEvent event) {
+        this.construct();
     }
 
 }

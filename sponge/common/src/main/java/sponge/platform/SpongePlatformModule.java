@@ -23,36 +23,28 @@
  *
  */
 
-package net.impactdev.impactor.fabric.ui;
+package sponge.platform;
 
-import ca.landonjw.gooeylibs2.fabric.FabricBootstrapper;
+import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.api.ui.containers.views.ChestView;
-import net.impactdev.impactor.api.ui.containers.views.pagination.builders.PaginationBuilder;
-import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.builders.SectionedPaginationBuilder;
-import net.impactdev.impactor.fabric.ui.containers.FabricChestView;
-import net.impactdev.impactor.fabric.ui.containers.FabricPaginationView;
-import net.impactdev.impactor.fabric.ui.containers.FabricSectionedPaginationView;
 import net.impactdev.impactor.modules.ImpactorModule;
+import net.impactdev.impactor.platform.ImpactorPlatform;
 
-public class FabricUIModule implements ImpactorModule {
-
-    public FabricUIModule() {
-        new FabricBootstrapper().bootstrap();
-    }
-
+public class SpongePlatformModule implements ImpactorModule {
     @Override
-    public void factories(FactoryProvider provider) {}
+    public void factories(FactoryProvider provider) {
+
+    }
 
     @Override
     public void builders(BuilderProvider provider) {
-        provider.register(ChestView.ChestViewBuilder.class, FabricChestView.FabricImpactorChestViewBuilder::new);
-        provider.register(PaginationBuilder.class, FabricPaginationView.FabricPaginationViewBuilder::new);
-        provider.register(SectionedPaginationBuilder.class, FabricSectionedPaginationView.FabricSectionedPaginationBuilder::new);
+
     }
 
     @Override
-    public void services(ServiceProvider provider) {}
+    public void services(ServiceProvider provider) {
+        provider.register(Platform.class, new ImpactorPlatform(new SpongePlatformInfo()));
+    }
 }

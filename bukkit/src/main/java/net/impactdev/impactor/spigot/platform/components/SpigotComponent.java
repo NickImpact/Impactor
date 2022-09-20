@@ -23,21 +23,26 @@
  *
  */
 
-package net.impactdev.impactor.spigot;
+package net.impactdev.impactor.spigot.platform.components;
 
-import net.impactdev.impactor.api.logging.PluginLogger;
-import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import net.impactdev.impactor.api.platform.PlatformComponent;
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import org.bukkit.Bukkit;
 
-public class SpigotImpactorBootstrap extends ImpactorBootstrapper {
-
-    public SpigotImpactorBootstrap(PluginLogger logger) {
-        super(logger);
+public class SpigotComponent implements PlatformComponent {
+    @Override
+    public String name() {
+        return "Spigot";
     }
 
     @Override
-    protected ImpactorPlugin createPlugin() {
-        return new SpigotImpactorPlugin(this);
+    public String version() {
+        return Bukkit.getBukkitVersion();
+    }
+
+    @Override
+    public void print(PrettyPrinter printer) {
+        printer.add("%s - %s", this.name(), this.version());
     }
 
 }

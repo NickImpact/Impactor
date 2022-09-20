@@ -23,21 +23,14 @@
  *
  */
 
-package net.impactdev.impactor.spigot;
+package sponge.platform.components;
 
-import net.impactdev.impactor.api.logging.PluginLogger;
-import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import net.impactdev.impactor.platform.components.MinecraftPlatformComponent;
+import org.spongepowered.api.Sponge;
 
-public class SpigotImpactorBootstrap extends ImpactorBootstrapper {
-
-    public SpigotImpactorBootstrap(PluginLogger logger) {
-        super(logger);
-    }
-
+public class SpongeMinecraftComponent extends MinecraftPlatformComponent {
     @Override
-    protected ImpactorPlugin createPlugin() {
-        return new SpigotImpactorPlugin(this);
+    public String version() {
+        return Sponge.platform().minecraftVersion().name();
     }
-
 }

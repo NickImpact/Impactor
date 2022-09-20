@@ -23,8 +23,8 @@
 #
 #
 
-name: Impactor Spigot
+name: Impactor
 version: '${version}'
-main: net.impactdev.impactor.spigot.SpigotImpactorBootstrap
-api-version: 1.19
+main: net.impactdev.impactor.spigot.SpigotImpactorEntry
+api-version: 1.16
 authors: [ NickImpact ]

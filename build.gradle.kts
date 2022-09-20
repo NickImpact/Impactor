@@ -6,7 +6,6 @@ buildscript {
     }
     dependencies {
         classpath("com.google.guava:guava:27.1-jre")
-        classpath("org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1")
     }
 }
 
@@ -24,7 +23,14 @@ version = "5.0.0-SNAPSHOT"
 
 tasks {
     val collect by registering(Copy::class) {
-        val tasks = subprojects.filter { it.path != ":api" && it.path != ":common" }.map { it.tasks.named("remapJar") }
+        val filters = mapOf(
+            Pair(":fabric", "remapJar"),
+            Pair(":forge", "remapJar"),
+            Pair(":sponge:sv", "shadowJar"),
+            Pair(":sponge:sf", "remapJar")
+        )
+
+        val tasks = subprojects.filter { filters.containsKey(it.path) }.map { it.tasks.named(filters.getValue(it.path)) }
         dependsOn(tasks)
         from(tasks)
         into(buildDir.resolve("deploy"))
@@ -76,7 +82,8 @@ subprojects {
 }
 
 subprojects {
-    if(path != ":api" && path != ":common" && path != ":launcher") {
+    val filters = listOf(":api", ":common", ":sponge")
+    if(!filters.contains(path)) {
         apply(plugin = "com.github.johnrengelman.shadow")
     }
 }

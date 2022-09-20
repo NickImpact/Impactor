@@ -23,21 +23,29 @@
  *
  */
 
-package net.impactdev.impactor.spigot;
+package sponge.platform.components;
 
-import net.impactdev.impactor.api.logging.PluginLogger;
-import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import net.impactdev.impactor.api.platform.PlatformComponent;
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import org.spongepowered.api.Platform;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.plugin.metadata.PluginMetadata;
 
-public class SpigotImpactorBootstrap extends ImpactorBootstrapper {
-
-    public SpigotImpactorBootstrap(PluginLogger logger) {
-        super(logger);
+public class SpongeImplementationComponent implements PlatformComponent {
+    @Override
+    public String name() {
+        PluginMetadata meta = Sponge.platform().container(Platform.Component.IMPLEMENTATION).metadata();
+        return meta.name().orElse(meta.id());
     }
 
     @Override
-    protected ImpactorPlugin createPlugin() {
-        return new SpigotImpactorPlugin(this);
+    public String version() {
+        return Sponge.platform().container(Platform.Component.IMPLEMENTATION).metadata().version().toString();
+    }
+
+    @Override
+    public void print(PrettyPrinter printer) {
+        printer.add("%s - %s", this.name(), this.version());
     }
 
 }
