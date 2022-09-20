@@ -23,29 +23,37 @@
  *
  */
 
-package sponge.platform.components;
+package net.impactdev.impactor.sponge;
 
-import net.impactdev.impactor.api.platform.PlatformComponent;
+import com.google.common.collect.Sets;
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
-import org.spongepowered.api.Platform;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.plugin.metadata.PluginMetadata;
+import net.impactdev.impactor.modules.ImpactorModule;
+import net.impactdev.impactor.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import net.impactdev.impactor.sponge.platform.SpongePlatformModule;
 
-public class SpongeImplementationComponent implements PlatformComponent {
-    @Override
-    public String name() {
-        PluginMetadata meta = Sponge.platform().container(Platform.Component.IMPLEMENTATION).metadata();
-        return meta.name().orElse(meta.id());
+import java.util.Set;
+
+public class SpongeImpactorPlugin extends BaseImpactorPlugin {
+
+    public SpongeImpactorPlugin(ImpactorBootstrapper bootstrapper) {
+        super(bootstrapper);
     }
 
     @Override
-    public String version() {
-        return Sponge.platform().container(Platform.Component.IMPLEMENTATION).metadata().version().toString();
+    public void construct() throws Exception {
+        super.construct();
+
+        PrettyPrinter printer = new PrettyPrinter(80);
+        printer.title("Platform Information");
+        Impactor.instance().platform().info().print(printer);
+        printer.log(this.logger(), PrettyPrinter.Level.INFO);
     }
 
     @Override
-    public void print(PrettyPrinter printer) {
-        printer.add("%s - %s", this.name(), this.version());
+    protected Set<Class<? extends ImpactorModule>> modules() {
+        return Sets.newHashSet(SpongePlatformModule.class);
     }
 
 }

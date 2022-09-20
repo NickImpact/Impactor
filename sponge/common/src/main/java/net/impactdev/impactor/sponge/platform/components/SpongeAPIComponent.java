@@ -23,14 +23,27 @@
  *
  */
 
-package sponge.platform.components;
+package net.impactdev.impactor.sponge.platform.components;
 
-import net.impactdev.impactor.platform.components.MinecraftPlatformComponent;
+import net.impactdev.impactor.api.platform.PlatformComponent;
+import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 
-public class SpongeMinecraftComponent extends MinecraftPlatformComponent {
+public class SpongeAPIComponent implements PlatformComponent {
+    @Override
+    public String name() {
+        return "Sponge API";
+    }
+
     @Override
     public String version() {
-        return Sponge.platform().minecraftVersion().name();
+        return Sponge.platform().container(Platform.Component.API).metadata().version().toString();
     }
+
+    @Override
+    public void print(PrettyPrinter printer) {
+        printer.add("%s - %s", this.name(), this.version());
+    }
+
 }

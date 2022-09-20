@@ -23,22 +23,24 @@
  *
  */
 
-package sponge.platform.components;
+package net.impactdev.impactor.sponge.platform.components;
 
 import net.impactdev.impactor.api.platform.PlatformComponent;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.plugin.metadata.PluginMetadata;
 
-public class SpongeAPIComponent implements PlatformComponent {
+public class SpongeImplementationComponent implements PlatformComponent {
     @Override
     public String name() {
-        return "Sponge API";
+        PluginMetadata meta = Sponge.platform().container(Platform.Component.IMPLEMENTATION).metadata();
+        return meta.name().orElse(meta.id());
     }
 
     @Override
     public String version() {
-        return Sponge.platform().container(Platform.Component.API).metadata().version().toString();
+        return Sponge.platform().container(Platform.Component.IMPLEMENTATION).metadata().version().toString();
     }
 
     @Override

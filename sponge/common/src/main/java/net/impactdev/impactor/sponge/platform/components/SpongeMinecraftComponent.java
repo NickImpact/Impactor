@@ -23,33 +23,14 @@
  *
  */
 
-package sponge;
+package net.impactdev.impactor.sponge.platform.components;
 
-import com.google.inject.Inject;
-import net.impactdev.impactor.api.logging.Log4jLogger;
-import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.plugin.ImpactorBootstrapper;
-import org.apache.logging.log4j.Logger;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
-import org.spongepowered.plugin.builtin.jvm.Plugin;
+import net.impactdev.impactor.platform.components.MinecraftPlatformComponent;
+import org.spongepowered.api.Sponge;
 
-@Plugin("impactor")
-public class SpongeImpactorBootstrap extends ImpactorBootstrapper {
-
-    @Inject
-    public SpongeImpactorBootstrap(Logger delegate) {
-        super(new Log4jLogger(delegate));
-    }
-
+public class SpongeMinecraftComponent extends MinecraftPlatformComponent {
     @Override
-    protected ImpactorPlugin createPlugin() {
-        return new SpongeImpactorPlugin(this);
+    public String version() {
+        return Sponge.platform().minecraftVersion().name();
     }
-
-    @Listener
-    public void onConstruct(ConstructPluginEvent event) {
-        this.construct();
-    }
-
 }

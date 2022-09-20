@@ -23,16 +23,16 @@
  *
  */
 
-package sponge.platform;
+package net.impactdev.impactor.sponge.platform;
 
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.platform.PlatformComponent;
 import net.impactdev.impactor.api.platform.PlatformType;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.platform.ImpactorPlatformInfo;
-import sponge.platform.components.SpongeAPIComponent;
-import sponge.platform.components.SpongeImplementationComponent;
-import sponge.platform.components.SpongeMinecraftComponent;
+import net.impactdev.impactor.sponge.platform.components.SpongeImplementationComponent;
+import net.impactdev.impactor.sponge.platform.components.SpongeAPIComponent;
+import net.impactdev.impactor.sponge.platform.components.SpongeMinecraftComponent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.plugin.PluginContainer;
 

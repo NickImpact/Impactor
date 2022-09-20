@@ -43,11 +43,14 @@ tasks {
             include(dependency("org.spongepowered:math:.*"))
             include(dependency("com.github.ben-manes.caffeine:caffeine:.*"))
             include(dependency("io.leangen.geantyref:geantyref:.*"))
+            include(dependency("io.github.classgraph:classgraph:.*"))
             include(dependency("loom_mappings_1_16_5_layered_hash_40359_v2.ca.landonjw.gooeylibs:api:3.0.0-SNAPSHOT"))
             include(dependency("loom_mappings_1_16_5_layered_hash_40359_v2.ca.landonjw.gooeylibs:fabric:3.0.0-SNAPSHOT"))
             exclude("ca/landonjw/gooeylibs2/GooeyLibs.class")
         }
 
+        relocate ("io.github.classgraph", "net.impactdev.impactor.relocations.classgraph")
+        relocate ("nonapi.io.github.classgraph", "net.impactdev.impactor.relocations.classgraph.nonapi")
         relocate ("ca.landonjw.gooeylibs2", "net.impactdev.impactor.relocations.gooeylibs")
         relocate ("ca.landonjw.gooeylibs", "net.impactdev.impactor.relocations.gooeylibs")
         relocate ("org.spongepowered", "net.impactdev.impactor.relocations.spongepowered")

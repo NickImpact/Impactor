@@ -31,10 +31,13 @@ tasks {
             include(project(":sponge:common"))
             include(dependency("net.kyori:event-api:.*"))
             include(dependency("net.impactdev:json:.*"))
+            include(dependency("io.github.classgraph:classgraph:.*"))
             include(dependency("com.github.ben-manes.caffeine:caffeine:.*"))
             exclude("forge-client-extra.jar")
         }
 
+        relocate ("io.github.classgraph", "net.impactdev.impactor.relocations.classgraph")
+        relocate ("nonapi.io.github.classgraph", "net.impactdev.impactor.relocations.classgraph.nonapi")
         relocate ("net.kyori.event", "net.impactdev.impactor.relocations.kyori.event")
         relocate ("com.github.benmanes.caffeine", "net.impactdev.impactor.relocations.caffeine")
     }

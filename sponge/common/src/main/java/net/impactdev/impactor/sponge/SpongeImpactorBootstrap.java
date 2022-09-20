@@ -23,28 +23,33 @@
  *
  */
 
-package sponge.platform;
+package net.impactdev.impactor.sponge;
 
-import net.impactdev.impactor.api.platform.Platform;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
+import com.google.inject.Inject;
+import net.impactdev.impactor.api.logging.Log4jLogger;
+import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
+import org.spongepowered.plugin.builtin.jvm.Plugin;
 
-public class SpongePlatformModule implements ImpactorModule {
-    @Override
-    public void factories(FactoryProvider provider) {
+@Plugin("impactor")
+public class SpongeImpactorBootstrap extends ImpactorBootstrapper {
 
+    @Inject
+    public SpongeImpactorBootstrap(Logger delegate) {
+        super(new Log4jLogger(delegate));
     }
 
     @Override
-    public void builders(BuilderProvider provider) {
-
+    protected ImpactorPlugin createPlugin() {
+        return new SpongeImpactorPlugin(this);
     }
 
-    @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new SpongePlatformInfo()));
+    @Listener
+    public void onConstruct(ConstructPluginEvent event) {
+        this.construct();
     }
+
 }

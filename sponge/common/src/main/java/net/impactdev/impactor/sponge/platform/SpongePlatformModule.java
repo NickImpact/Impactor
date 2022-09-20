@@ -23,37 +23,28 @@
  *
  */
 
-package sponge;
+package net.impactdev.impactor.sponge.platform;
 
-import com.google.common.collect.Sets;
-import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import net.impactdev.impactor.api.platform.Platform;
+import net.impactdev.impactor.api.providers.BuilderProvider;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.plugin.BaseImpactorPlugin;
-import net.impactdev.impactor.plugin.ImpactorBootstrapper;
-import sponge.platform.SpongePlatformModule;
+import net.impactdev.impactor.platform.ImpactorPlatform;
 
-import java.util.Set;
+public class SpongePlatformModule implements ImpactorModule {
+    @Override
+    public void factories(FactoryProvider provider) {
 
-public class SpongeImpactorPlugin extends BaseImpactorPlugin {
-
-    public SpongeImpactorPlugin(ImpactorBootstrapper bootstrapper) {
-        super(bootstrapper);
     }
 
     @Override
-    public void construct() throws Exception {
-        super.construct();
+    public void builders(BuilderProvider provider) {
 
-        PrettyPrinter printer = new PrettyPrinter(80);
-        printer.title("Platform Information");
-        Impactor.instance().platform().info().print(printer);
-        printer.log(this.logger(), PrettyPrinter.Level.INFO);
     }
 
     @Override
-    protected Set<ImpactorModule> modules() {
-        return Sets.newHashSet(new SpongePlatformModule());
+    public void services(ServiceProvider provider) {
+        provider.register(Platform.class, new ImpactorPlatform(new SpongePlatformInfo()));
     }
-
 }

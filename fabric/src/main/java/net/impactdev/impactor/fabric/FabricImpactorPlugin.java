@@ -73,15 +73,13 @@ public class FabricImpactorPlugin extends BaseImpactorPlugin {
         printer.log(this.logger(), PrettyPrinter.Level.INFO);
     }
 
+    @Override
+    protected Set<Class<? extends ImpactorModule>> modules() {
+        return Sets.newHashSet(FabricPlatformModule.class, FabricUIModule.class);
+    }
+
     public Optional<MinecraftServer> server() {
         return Optional.ofNullable(this.server);
     }
 
-    @Override
-    protected Set<ImpactorModule> modules() {
-        return Sets.newHashSet(
-                new FabricPlatformModule(),
-                new FabricUIModule()
-        );
-    }
 }

@@ -62,13 +62,13 @@ public class ForgeImpactorPlugin extends BaseImpactorPlugin implements ImpactorP
     }
 
     @Override
-    public void shutdown() throws Exception {
-
+    protected Set<Class<? extends ImpactorModule>> modules() {
+        return Sets.newHashSet(ForgeSchedulerModule.class, ForgeUIModule.class, ForgePlatformModule.class);
     }
 
     @Override
-    protected Set<ImpactorModule> modules() {
-        return Sets.newHashSet(new ForgeSchedulerModule(), new ForgeUIModule(), new ForgePlatformModule());
+    public void shutdown() throws Exception {
+
     }
 
     public Optional<MinecraftServer> server() {

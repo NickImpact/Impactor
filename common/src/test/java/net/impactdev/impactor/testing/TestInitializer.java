@@ -25,19 +25,17 @@
 
 package net.impactdev.impactor.testing;
 
-import com.google.common.collect.Sets;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
 import net.impactdev.impactor.api.APIRegister;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.ImpactorService;
-import net.impactdev.impactor.configuration.ConfigModule;
-import net.impactdev.impactor.items.ItemsModule;
 import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.ui.UIModule;
-import net.impactdev.impactor.util.UtilityModule;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -63,21 +61,26 @@ public class TestInitializer implements BeforeAllCallback, ExtensionContext.Stor
                 // Initialization
                 Impactor impactor = new ImpactorService();
                 APIRegister.register(impactor);
-                Set<ImpactorModule> modules = Sets.newHashSet(
-                        new ConfigModule(),
-                        new ItemsModule(),
-                        new UIModule(),
-                        new UtilityModule()
-                );
-                modules.forEach(module -> {
-                    try {
-                        module.factories(impactor.factories());
-                        module.builders(impactor.builders());
-                        module.services(impactor.services());
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+
+                ClassGraph graph = new ClassGraph().acceptPackages("net.impactdev.impactor").enableClassInfo();
+                try (ScanResult scan = graph.scan()) {
+                    ClassInfoList list = scan.getClassesImplementing(ImpactorModule.class);
+                        list.stream()
+                            .map(info -> info.loadClass(ImpactorModule.class))
+                            .map(type -> {
+                                try {
+                                    return type.newInstance();
+                                }
+                                catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            })
+                            .forEach(module -> {
+                                module.factories(impactor.factories());
+                                module.builders(impactor.builders());
+                                module.services(impactor.services());
+                            });
+                }
             }
         } finally {
             LOCK.unlock();
