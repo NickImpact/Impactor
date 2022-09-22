@@ -23,20 +23,19 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.platform;
 
-import net.impactdev.impactor.api.platform.Platform;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
-import net.impactdev.impactor.platform.players.ServerPlayerProvider;
+import net.impactdev.impactor.platform.players.ImpactorPlatformPlayer;
 
-public class FabricPlatformModule implements ImpactorModule {
+public class PlatformModule implements ImpactorModule {
     @Override
     public void factories(FactoryProvider provider) {
-        provider.register(ServerPlayerProvider.class, new FabricServerPlayerProvider());
+        provider.register(PlatformPlayer.Factory.class, new ImpactorPlatformPlayer.ImpactorPlatformPlayerFactory());
     }
 
     @Override
@@ -46,6 +45,6 @@ public class FabricPlatformModule implements ImpactorModule {
 
     @Override
     public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
+
     }
 }

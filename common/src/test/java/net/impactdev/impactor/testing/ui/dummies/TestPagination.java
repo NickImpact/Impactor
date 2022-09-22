@@ -23,29 +23,43 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.testing.ui.dummies;
 
-import net.impactdev.impactor.api.platform.Platform;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
-import net.impactdev.impactor.platform.players.ServerPlayerProvider;
+import net.impactdev.impactor.api.ui.containers.Icon;
+import net.impactdev.impactor.api.ui.containers.views.pagination.Pagination;
+import net.impactdev.impactor.ui.containers.views.pagination.views.ImpactorPagination;
+import org.jetbrains.annotations.Nullable;
 
-public class FabricPlatformModule implements ImpactorModule {
-    @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(ServerPlayerProvider.class, new FabricServerPlayerProvider());
+public class TestPagination extends ImpactorPagination {
+
+    protected TestPagination(ImpactorPaginationBuilder builder) {
+        super(builder);
     }
 
     @Override
-    public void builders(BuilderProvider provider) {
+    public void set(@Nullable Icon icon, int slot) {
 
     }
 
     @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
+    public void open() {
+
     }
+
+    @Override
+    public void close() {
+
+    }
+
+    public static class TestPaginationBuilder extends ImpactorPagination.ImpactorPaginationBuilder {
+
+        @Override
+        public Pagination build() {
+            return new TestPagination(this);
+        }
+
+    }
+
+
+
 }

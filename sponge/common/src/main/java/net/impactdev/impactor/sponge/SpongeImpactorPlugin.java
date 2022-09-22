@@ -32,6 +32,7 @@ import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
 import net.impactdev.impactor.sponge.platform.SpongePlatformModule;
+import net.impactdev.impactor.sponge.scheduler.SpongeSchedulerModule;
 
 import java.util.Set;
 
@@ -53,7 +54,10 @@ public class SpongeImpactorPlugin extends BaseImpactorPlugin {
 
     @Override
     protected Set<Class<? extends ImpactorModule>> modules() {
-        return Sets.newHashSet(SpongePlatformModule.class);
+        return Sets.newHashSet(
+                SpongePlatformModule.class,
+                SpongeSchedulerModule.class
+        );
     }
 
 }

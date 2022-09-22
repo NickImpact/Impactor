@@ -47,6 +47,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector2i;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -160,7 +161,7 @@ public abstract class ImpactorPagination extends ImpactorView implements Paginat
 
     public static abstract class ImpactorPaginationBuilder extends ImpactorBaseViewBuilder<PaginationBuilder> implements PaginationBuilder {
 
-        protected List<Icon> contents;
+        protected List<Icon> contents = Collections.emptyList();
         protected PlatformPlayer viewer;
         protected ChestLayout layout;
         protected Vector2i zone;

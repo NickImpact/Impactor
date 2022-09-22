@@ -34,6 +34,7 @@ import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.fabric.commands.ItemTestCommands;
 import net.impactdev.impactor.fabric.commands.UITestCommands;
 import net.impactdev.impactor.fabric.platform.FabricPlatformModule;
+import net.impactdev.impactor.fabric.scheduler.FabricSchedulerModule;
 import net.impactdev.impactor.fabric.ui.FabricUIModule;
 import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.plugin.BaseImpactorPlugin;
@@ -75,7 +76,11 @@ public class FabricImpactorPlugin extends BaseImpactorPlugin {
 
     @Override
     protected Set<Class<? extends ImpactorModule>> modules() {
-        return Sets.newHashSet(FabricPlatformModule.class, FabricUIModule.class);
+        return Sets.newHashSet(
+                FabricPlatformModule.class,
+                FabricSchedulerModule.class,
+                FabricUIModule.class
+        );
     }
 
     public Optional<MinecraftServer> server() {

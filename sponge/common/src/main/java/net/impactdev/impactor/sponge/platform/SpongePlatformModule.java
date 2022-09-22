@@ -31,11 +31,12 @@ import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.platform.ImpactorPlatform;
+import net.impactdev.impactor.platform.players.ServerPlayerProvider;
 
 public class SpongePlatformModule implements ImpactorModule {
     @Override
     public void factories(FactoryProvider provider) {
-
+        provider.register(ServerPlayerProvider.class, new SpongeServerPlayerProvider());
     }
 
     @Override

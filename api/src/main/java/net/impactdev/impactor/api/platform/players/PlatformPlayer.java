@@ -27,27 +27,88 @@ package net.impactdev.impactor.api.platform.players;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
-import net.impactdev.impactor.api.platform.players.transactions.ItemReceiptTransaction;
-import net.kyori.adventure.audience.Audience;
+import net.impactdev.impactor.api.platform.players.transactions.ItemTransaction;
 import net.kyori.adventure.text.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.NotNull;
+import org.spongepowered.math.vector.Vector3d;
 
+import java.util.Optional;
 import java.util.UUID;
 
-public interface PlatformPlayer extends Audience {
+/**
+ * A platform player represents a mirror to a player instance registered by the game platform. While
+ * the game object represents an entity that in some implementations can be altered based on respawns,
+ * this instance acts purely as a data accessor to the target player object. As such, this detail
+ * is capable of being stored as it'll not actually hold the player instance behind.
+ * <p>
+ * As a general note, this interface design works primarily for online players only. If the target player
+ * is not online at the time of invoking these accessor calls, these calls are expected to be provided
+ * dummy results, or fail exceptionally.
+ */
+public interface PlatformPlayer extends PlatformSource {
 
-    static PlatformPlayer create(final UUID uuid) {
+    /**
+     * Creates a new platform player instance, if one is not already cached.
+     *
+     * @param uuid The UUID of the target player instance
+     * @return A PlatformPlayer instance mirroring the game player instance
+     */
+    static PlatformPlayer getOrCreate(@NotNull final UUID uuid) {
         return Impactor.instance().factories().provide(Factory.class).create(uuid);
     }
 
-    UUID uuid();
+    /**
+     * Attempts to locate and provide the actual game instance of a player, if available. This will return
+     * empty if and only if the target player represented by this instance is not online.
+     *
+     * @return A game instance of a player if online, {@link Optional#empty() empty} otherwise
+     */
+    Optional<ServerPlayer> asMinecraftPlayer();
 
-    Component name();
+    /**
+     * Specifies the display name of a player, if they have one. Otherwise, this call will
+     * fall back to their actual username, represented via {@link PlatformSource#name()}.
+     *
+     * @return The display name of a user, or their actual username
+     */
+    Component displayName();
 
-    ItemReceiptTransaction offer(ImpactorItemStack stack);
+    /**
+     * Indicates the current world the player exists in.
+     *
+     * @return The world the player is currently in
+     */
+    ServerLevel world();
+
+    /**
+     * Specifies the current block coordinates of a player. This is where the player
+     * would be standing in a particular world.
+     *
+     * @return The position of the player within a world
+     */
+    Vector3d position();
+
+    /**
+     * Attempts to offer the given stack to the target player. In return, a receipt will specify
+     * the result of the transaction, stating its success and, if applicable, the size of the stack
+     * successfully given to the target.
+     *
+     * @param stack The stack being offered to a player
+     * @return A receipt indicating the result of the transaction
+     */
+    ItemTransaction offer(ImpactorItemStack stack);
 
     interface Factory {
 
-        PlatformPlayer create(final UUID uuid);
+        /**
+         * Creates a platform player using the target UUID.
+         *
+         * @param uuid The UUID of the target player
+         * @return A Platform Player representing the player instance
+         */
+        PlatformPlayer create(@NotNull final UUID uuid);
 
     }
 

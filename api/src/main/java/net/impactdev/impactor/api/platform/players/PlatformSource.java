@@ -23,29 +23,41 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.api.platform.players;
 
-import net.impactdev.impactor.api.platform.Platform;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
-import net.impactdev.impactor.platform.players.ServerPlayerProvider;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 
-public class FabricPlatformModule implements ImpactorModule {
-    @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(ServerPlayerProvider.class, new FabricServerPlayerProvider());
+import java.util.UUID;
+
+public interface PlatformSource extends Audience {
+
+    /**
+     * Indicates the UUID of the source this platform instance belongs to. This field will always
+     * be available, despite whether it correctly maps to a player or not.
+     *
+     * @return The UUID of the source
+     */
+    UUID uuid();
+
+    /**
+     * Represents the name of the source. This is meant to target the source's specific name, rather
+     * than their own display name.
+     *
+     * @return A component representing the actual name of a source
+     */
+    Component name();
+
+    interface PlatformSourceFactory {
+
+        /**
+         * Creates a new {@link PlatformSource} that represents the game console. This source can be used
+         * to send messages directly to the console or additionally for other means.
+         *
+         * @return A platform source representing the game console
+         */
+        PlatformSource console();
+
     }
 
-    @Override
-    public void builders(BuilderProvider provider) {
-
-    }
-
-    @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
-    }
 }

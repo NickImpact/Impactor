@@ -1,0 +1,35 @@
+{
+  "loader": {
+    "name": "java_plain",
+    "version": "1.0"
+  },
+  "license": "MIT",
+  "plugins": [
+    {
+      "id": "impactor",
+      "entrypoint": "net.impactdev.impactor.sponge.SpongeImpactorBootstrap",
+      "name": "Impactor",
+      "description": "Multi-platform utility API",
+      "version": "${version}",
+      "branding": {},
+      "links": {
+        "source": "https://github.com/NickImpact/Impactor",
+        "issues": "https://github.com/NickImpact/Impactor/issues"
+      },
+      "contributors": [
+        {
+          "name": "NickImpact",
+          "description": "Lead Developer"
+        }
+      ],
+      "dependencies": [
+        {
+          "id": "spongeapi",
+          "version": "8.0.0",
+          "load-order": "after",
+          "optional": false
+        }
+      ]
+    }
+  ]
+}

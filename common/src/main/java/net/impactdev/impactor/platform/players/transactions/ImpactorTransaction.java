@@ -23,29 +23,30 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.platform.players.transactions;
 
-import net.impactdev.impactor.api.platform.Platform;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
-import net.impactdev.impactor.platform.players.ServerPlayerProvider;
+import net.impactdev.impactor.api.platform.players.transactions.Transaction;
+import org.jetbrains.annotations.Nullable;
 
-public class FabricPlatformModule implements ImpactorModule {
-    @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(ServerPlayerProvider.class, new FabricServerPlayerProvider());
+import java.util.Optional;
+
+public class ImpactorTransaction implements Transaction {
+
+    private final boolean successful;
+    private final Throwable trace;
+
+    public ImpactorTransaction(boolean successful, @Nullable Throwable trace) {
+        this.successful = successful;
+        this.trace = trace;
     }
 
     @Override
-    public void builders(BuilderProvider provider) {
-
+    public boolean successful() {
+        return this.successful;
     }
 
     @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
+    public Optional<Throwable> failureTrace() {
+        return Optional.ofNullable(this.trace);
     }
 }

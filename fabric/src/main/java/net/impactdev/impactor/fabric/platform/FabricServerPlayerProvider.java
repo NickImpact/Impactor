@@ -25,27 +25,16 @@
 
 package net.impactdev.impactor.fabric.platform;
 
-import net.impactdev.impactor.api.platform.Platform;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
+import net.impactdev.impactor.fabric.FabricImpactorPlugin;
 import net.impactdev.impactor.platform.players.ServerPlayerProvider;
+import net.minecraft.server.level.ServerPlayer;
 
-public class FabricPlatformModule implements ImpactorModule {
+import java.util.Optional;
+import java.util.UUID;
+
+public class FabricServerPlayerProvider implements ServerPlayerProvider {
     @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(ServerPlayerProvider.class, new FabricServerPlayerProvider());
-    }
-
-    @Override
-    public void builders(BuilderProvider provider) {
-
-    }
-
-    @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
+    public Optional<ServerPlayer> locate(UUID target) {
+        return ((FabricImpactorPlugin) FabricImpactorPlugin.instance()).server().map(server -> server.getPlayerList().getPlayer(target));
     }
 }

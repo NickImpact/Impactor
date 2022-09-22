@@ -88,7 +88,7 @@ public class UITestCommands implements FabricCommand {
                                         )
                                         .build();
 
-                                PlatformPlayer viewer = PlatformPlayer.create(context.getSource().getPlayerOrException()
+                                PlatformPlayer viewer = PlatformPlayer.getOrCreate(context.getSource().getPlayerOrException()
                                         .getUUID());
                                 view.open(viewer);
 
@@ -117,7 +117,7 @@ public class UITestCommands implements FabricCommand {
                             .build()
                     ).build();
 
-                    PlatformPlayer viewer = PlatformPlayer.create(context.getSource().getPlayerOrException().getUUID());
+                    PlatformPlayer viewer = PlatformPlayer.getOrCreate(context.getSource().getPlayerOrException().getUUID());
                     Pagination pagination = Pagination.builder()
                             .provider(Key.key("impactor", "pagination"))
                             .viewer(viewer)
@@ -189,7 +189,7 @@ public class UITestCommands implements FabricCommand {
                                 .build()
                         ).build();
 
-                        PlatformPlayer viewer = PlatformPlayer.create(context.getSource().getPlayerOrException()
+                        PlatformPlayer viewer = PlatformPlayer.getOrCreate(context.getSource().getPlayerOrException()
                                 .getUUID());
                         SectionedPagination pagination = SectionedPagination.builder()
                                 .provider(Key.key("impactor", "test"))

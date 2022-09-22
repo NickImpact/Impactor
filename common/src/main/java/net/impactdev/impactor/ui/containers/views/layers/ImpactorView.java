@@ -31,6 +31,8 @@ import net.impactdev.impactor.api.ui.containers.processors.CloseProcessor;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 
+import java.util.Optional;
+
 public abstract class ImpactorView implements View {
 
     protected final Key namespace;
@@ -41,7 +43,7 @@ public abstract class ImpactorView implements View {
     protected final CloseProcessor close;
 
     protected ImpactorView(Key namespace, Component title, boolean readonly, ClickProcessor click, CloseProcessor close) {
-        this.namespace = namespace;
+        this.namespace = Optional.ofNullable(namespace).orElseThrow(() -> new IllegalStateException("Provider was not specified"));
         this.title = title;
         this.readonly = readonly;
         this.click = click;

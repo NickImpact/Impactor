@@ -33,7 +33,6 @@ import net.impactdev.impactor.api.items.types.ItemType;
 import net.impactdev.impactor.api.items.types.ItemTypes;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.Icon;
-import net.impactdev.impactor.api.ui.containers.Layout;
 import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.api.ui.containers.views.pagination.Pagination;
@@ -41,7 +40,6 @@ import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.Secti
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdaterType;
 import net.impactdev.impactor.forge.ForgeImpactorPlugin;
-import net.impactdev.impactor.items.stacks.ImpactorAbstractedItemStack;
 import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.util.ExceptionPrinter;
 import net.kyori.adventure.key.Key;
@@ -184,7 +182,7 @@ public class ForgeRegistrationHandler {
                                             )
                                             .build();
 
-                                    PlatformPlayer viewer = PlatformPlayer.create(context.getSource().getPlayerOrException().getUUID());
+                                    PlatformPlayer viewer = PlatformPlayer.getOrCreate(context.getSource().getPlayerOrException().getUUID());
                                     view.open(viewer);
 
                                     return 1;
@@ -209,7 +207,7 @@ public class ForgeRegistrationHandler {
                                     .build()
                             ).build();
 
-                            PlatformPlayer viewer = PlatformPlayer.create(context.getSource().getPlayerOrException().getUUID());
+                            PlatformPlayer viewer = PlatformPlayer.getOrCreate(context.getSource().getPlayerOrException().getUUID());
                             Pagination pagination = Pagination.builder()
                                     .provider(Key.key("impactor", "pagination"))
                                     .viewer(viewer)
@@ -281,7 +279,7 @@ public class ForgeRegistrationHandler {
                                         .build()
                                 ).build();
 
-                                PlatformPlayer viewer = PlatformPlayer.create(context.getSource().getPlayerOrException()
+                                PlatformPlayer viewer = PlatformPlayer.getOrCreate(context.getSource().getPlayerOrException()
                                         .getUUID());
                                 SectionedPagination pagination = SectionedPagination.builder()
                                         .provider(Key.key("impactor", "test"))

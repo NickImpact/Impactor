@@ -38,6 +38,7 @@ import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.configuration.ConfigModule;
 import net.impactdev.impactor.items.ItemsModule;
 import net.impactdev.impactor.modules.ImpactorModule;
+import net.impactdev.impactor.platform.PlatformModule;
 import net.impactdev.impactor.ui.UIModule;
 import net.impactdev.impactor.util.ExceptionPrinter;
 import net.impactdev.impactor.util.UtilityModule;
@@ -86,6 +87,7 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin {
         Set<Class<? extends ImpactorModule>> modules = Sets.newHashSet(
                 ConfigModule.class,
                 ItemsModule.class,
+                PlatformModule.class,
                 UIModule.class,
                 UtilityModule.class
         );

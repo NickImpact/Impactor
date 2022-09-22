@@ -3,6 +3,7 @@ import java.nio.charset.StandardCharsets
 repositories {
     mavenCentral()
     mavenLocal()
+    maven("https://jitpack.io")
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") {
         name = "Spigot MC Snapshots"
     }
@@ -13,7 +14,8 @@ repositories {
 
 dependencies {
     // Spigot API
-    implementation("org.spigotmc:spigot:1.19.2:remapped-mojang")
+    implementation("org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT")
+//    implementation("org.spigotmc:spigot:1.19.2:remapped-mojang")
 
     // Impactor Modules
     implementation(project(":api"))

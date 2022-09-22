@@ -26,7 +26,6 @@
 package net.impactdev.impactor.testing.ui;
 
 import com.google.common.collect.Lists;
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.types.ItemTypes;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
@@ -38,17 +37,16 @@ import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.Secti
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.sections.Section;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdaterType;
-import net.impactdev.impactor.testing.ui.provided.TestPlatformPlayer;
-import net.impactdev.impactor.ui.containers.views.service.ViewingService;
+import net.impactdev.impactor.platform.players.ImpactorPlatformPlayer;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.util.TriState;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.spongepowered.math.vector.Vector2i;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static net.kyori.adventure.text.Component.text;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,93 +58,93 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PaginationTests {
 
     private static final Key TEST_KEY = Key.key("impactor", "test");
-    private static final PlatformPlayer VIEWER = new TestPlatformPlayer();
+    private static final PlatformPlayer VIEWER = new ImpactorPlatformPlayer(UUID.randomUUID());
 
-//    @Test
-//    public void build() {
-//        Pagination test = Pagination.builder()
-//                .provider(TEST_KEY)
-//                .viewer(VIEWER)
-//                .layout(this.basicLayout())
-//                .zone(Vector2i.from(7, 4), Vector2i.ONE)
-//                .build();
-//
-//        assertEquals(Key.key("impactor", "test"), test.namespace());
-//        assertEquals(Vector2i.from(7, 4), test.zone());
-//        assertNotNull(test.updaters());
-//        assertEquals(TriState.NOT_SET, test.style());
-//        assertEquals(1, test.page());
-//        assertNotNull(test.pages());
-//    }
-//
-//    @Test
-//    public void buildWithContext() {
-//        ImpactorItemStack dummy = ImpactorItemStack.empty();
-//        ContextRuleset rules = ContextRuleset.create();
-//        rules.filter(icon -> icon.context().has(int.class) && icon.context().require(int.class) < 6);
-//        List<Icon> icons = Lists.newArrayList();
-//        for(int i = 0; i < 10; i++) {
-//            icons.add(Icon.builder()
-//                    .display(() -> dummy)
-//                    .append(int.class, i + 1)
-//                    .constant()
-//                    .build()
-//            );
-//        }
-//
-//        Pagination test = Pagination.builder()
-//                .provider(TEST_KEY)
-//                .viewer(VIEWER)
-//                .contents(icons)
-//                .layout(this.basicLayout())
-//                .zone(Vector2i.from(7, 4), Vector2i.ONE)
-//                .ruleset(rules)
-//                .build();
-//
-//        Map<Integer, Icon> results = test.pages().current().icons();
+    @Test
+    public void build() {
+        Pagination test = Pagination.builder()
+                .provider(TEST_KEY)
+                .viewer(VIEWER)
+                .layout(this.basicLayout())
+                .zone(Vector2i.from(7, 4), Vector2i.ONE)
+                .build();
+
+        assertEquals(Key.key("impactor", "test"), test.namespace());
+        assertEquals(Vector2i.from(7, 4), test.zone());
+        assertNotNull(test.updaters());
+        assertEquals(TriState.NOT_SET, test.style());
+        assertEquals(1, test.page());
+        assertNotNull(test.pages());
+    }
+
+    @Test
+    public void buildWithContext() {
+        ImpactorItemStack dummy = ImpactorItemStack.empty();
+        ContextRuleset rules = ContextRuleset.create();
+        rules.filter(icon -> icon.context().has(int.class) && icon.context().require(int.class) < 6);
+        List<Icon> icons = Lists.newArrayList();
+        for(int i = 0; i < 10; i++) {
+            icons.add(Icon.builder()
+                    .display(() -> dummy)
+                    .append(int.class, i + 1)
+                    .constant()
+                    .build()
+            );
+        }
+
+        Pagination test = Pagination.builder()
+                .provider(TEST_KEY)
+                .viewer(VIEWER)
+                .contents(icons)
+                .layout(this.basicLayout())
+                .zone(Vector2i.from(7, 4), Vector2i.ONE)
+                .ruleset(rules)
+                .build();
+
+        Map<Integer, Icon> results = test.pages().current().icons();
 //        assertEquals(5, results.size());
-//        for(int i = 0; i < 5; i++) {
-//            assertEquals(i + 1, results.get(i + 10).context().require(int.class));
-//        }
-//    }
-//
-//    @Test
-//    public void withUpdates() {
-//        ImpactorItemStack dummy = ImpactorItemStack.empty();
-//        ContextRuleset rules = ContextRuleset.create();
-//        rules.filter(icon -> icon.context().has(int.class) && icon.context().require(int.class) < 6);
-//        List<Icon> icons = Lists.newArrayList();
-//        for(int i = 0; i < 10; i++) {
-//            icons.add(Icon.builder()
-//                    .display(() -> dummy)
-//                    .append(int.class, i + 1)
-//                    .constant()
-//                    .build()
-//            );
-//        }
-//
-//        Pagination test = Pagination.builder()
-//                .provider(TEST_KEY)
-//                .viewer(VIEWER)
-//                .contents(icons)
-//                .layout(this.basicLayout())
-//                .zone(Vector2i.from(7, 4), Vector2i.ONE)
-//                .ruleset(rules)
-//                .build();
-//
-//        Map<Integer, Icon> results = test.pages().current().icons();
+        for(int i = 0; i < 5; i++) {
+            assertEquals(i + 1, results.get(i + 10).context().require(int.class));
+        }
+    }
+
+    @Test
+    public void withUpdates() {
+        ImpactorItemStack dummy = ImpactorItemStack.empty();
+        ContextRuleset rules = ContextRuleset.create();
+        rules.filter(icon -> icon.context().has(int.class) && icon.context().require(int.class) < 6);
+        List<Icon> icons = Lists.newArrayList();
+        for(int i = 0; i < 10; i++) {
+            icons.add(Icon.builder()
+                    .display(() -> dummy)
+                    .append(int.class, i + 1)
+                    .constant()
+                    .build()
+            );
+        }
+
+        Pagination test = Pagination.builder()
+                .provider(TEST_KEY)
+                .viewer(VIEWER)
+                .contents(icons)
+                .layout(this.basicLayout())
+                .zone(Vector2i.from(7, 4), Vector2i.ONE)
+                .ruleset(rules)
+                .build();
+
+        Map<Integer, Icon> results = test.pages().current().icons();
 //        assertEquals(5, results.size());
-//        for(int i = 0; i < 5; i++) {
-//            assertEquals(i + 1, results.get(i + 10).context().require(int.class));
-//        }
-//        rules.filter(icon -> icon.context().require(int.class) > 5);
-//        results = test.pages().current().icons();
+        for(int i = 0; i < 5; i++) {
+            assertEquals(i + 1, results.get(i + 10).context().require(int.class));
+        }
+        rules.filter(icon -> icon.context().require(int.class) > 5);
+        results = test.pages().current().icons();
 //        assertEquals(5, results.size());
-//        for(int i = 0; i < 5; i++) {
-//            assertEquals(i + 6, results.get(i + 10).context().require(int.class));
-//        }
-//    }
-//
+        for(int i = 0; i < 5; i++) {
+            assertEquals(i + 6, results.get(i + 10).context().require(int.class));
+        }
+    }
+
 //    @Test
 //    public void sectioned() {
 //        ImpactorItemStack dummy = ImpactorItemStack.empty();
@@ -204,28 +202,28 @@ public class PaginationTests {
 //        assertFalse(section.within(0));
 //        assertFalse(section.within(Vector2i.from(5, 0)));
 //    }
-//
-//    @Test
-//    public void withoutProvider() {
-//        Exception ex = assertThrows(NullPointerException.class, () -> Pagination.builder()
-//                .title(text("Exceptional"))
-//                .viewer(VIEWER)
-//                .build());
-//        assertEquals("Provider was not specified", ex.getMessage());
-//    }
-//
-//    private ChestLayout basicLayout() {
-//        return ChestLayout.builder()
-//                .size(6)
-//                .border(Icon.builder()
-//                        .display(() -> ImpactorItemStack.basic()
-//                                .type(ItemTypes.BLACK_STAINED_GLASS_PANE)
-//                                .title(Component.empty())
-//                                .build()
-//                        )
-//                        .build()
-//                )
-//                .build();
-//    }
+
+    @Test
+    public void withoutProvider() {
+        Exception ex = assertThrows(IllegalStateException.class, () -> Pagination.builder()
+                .title(text("Exceptional"))
+                .viewer(VIEWER)
+                .build());
+        assertEquals("Provider was not specified", ex.getMessage());
+    }
+
+    private ChestLayout basicLayout() {
+        return ChestLayout.builder()
+                .size(6)
+                .border(Icon.builder()
+                        .display(() -> ImpactorItemStack.basic()
+                                .type(ItemTypes.BLACK_STAINED_GLASS_PANE)
+                                .title(Component.empty())
+                                .build()
+                        )
+                        .build()
+                )
+                .build();
+    }
 
 }

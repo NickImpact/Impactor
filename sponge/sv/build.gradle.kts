@@ -1,3 +1,11 @@
+plugins {
+    id("org.spongepowered.gradle.vanilla") version "0.2.1-SNAPSHOT"
+}
+
+minecraft {
+    version("1.16.5")
+}
+
 dependencies {
     implementation(project(":sponge:common"))
 }

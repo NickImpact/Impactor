@@ -23,16 +23,26 @@
  *
  */
 
-package net.impactdev.impactor.api.platform.players.transactions;
+package net.impactdev.impactor.sponge.ui;
 
-import net.impactdev.impactor.api.items.ImpactorItemStack;
+import net.impactdev.impactor.api.providers.BuilderProvider;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.providers.ServiceProvider;
+import net.impactdev.impactor.modules.ImpactorModule;
 
-public interface ItemReceiptTransaction {
+public final class SpongeUIModule implements ImpactorModule {
+    @Override
+    public void factories(FactoryProvider provider) {
 
-    ImpactorItemStack source();
+    }
 
-    int received();
+    @Override
+    public void builders(BuilderProvider provider) {
 
-    boolean successful();
+    }
 
+    @Override
+    public void services(ServiceProvider provider) {
+
+    }
 }

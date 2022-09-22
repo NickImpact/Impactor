@@ -24,10 +24,10 @@ version = "5.0.0-SNAPSHOT"
 tasks {
     val collect by registering(Copy::class) {
         val filters = mapOf(
-            Pair(":fabric", "remapJar"),
-            Pair(":forge", "remapJar"),
-            Pair(":sponge:sv", "shadowJar"),
-            Pair(":sponge:sf", "remapJar")
+            ":fabric" to "remapJar",
+            ":forge" to "remapJar",
+            ":sponge:sv" to "shadowJar",
+            ":sponge:sf" to "remapJar"
         )
 
         val tasks = subprojects.filter { filters.containsKey(it.path) }.map { it.tasks.named(filters.getValue(it.path)) }

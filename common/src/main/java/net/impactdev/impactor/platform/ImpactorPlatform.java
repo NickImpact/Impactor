@@ -46,7 +46,7 @@ public class ImpactorPlatform implements Platform {
 
     @Override
     public PlatformPlayer player(UUID target) {
-        return PlatformPlayer.create(target);
+        return PlatformPlayer.getOrCreate(target);
     }
 
 }

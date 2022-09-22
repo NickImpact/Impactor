@@ -23,28 +23,30 @@
  *
  */
 
-package net.impactdev.impactor.testing.ui.provided;
+package net.impactdev.impactor.platform.players.transactions;
 
 import net.impactdev.impactor.api.items.ImpactorItemStack;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.platform.players.transactions.ItemReceiptTransaction;
-import net.kyori.adventure.text.Component;
+import net.impactdev.impactor.api.platform.players.transactions.ItemTransaction;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.UUID;
+public class ImpactorItemTransaction extends ImpactorTransaction implements ItemTransaction {
 
-public class TestPlatformPlayer implements PlatformPlayer {
-    @Override
-    public UUID uuid() {
-        return UUID.randomUUID();
+    private final ImpactorItemStack source;
+    private final int received;
+
+    public ImpactorItemTransaction(ImpactorItemStack source, int received, boolean successful, @Nullable Throwable trace) {
+        super(successful, trace);
+        this.source = source;
+        this.received = received;
     }
 
     @Override
-    public Component name() {
-        return Component.text("Test Environment Player");
+    public ImpactorItemStack source() {
+        return this.source;
     }
 
     @Override
-    public ItemReceiptTransaction offer(ImpactorItemStack stack) {
-        return null;
+    public int received() {
+        return this.received;
     }
 }

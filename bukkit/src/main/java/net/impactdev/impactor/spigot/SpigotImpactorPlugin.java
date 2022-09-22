@@ -52,7 +52,7 @@ public class SpigotImpactorPlugin extends BaseImpactorPlugin {
     }
 
     @Override
-    protected Set<ImpactorModule> modules() {
-        return Sets.newHashSet(new SpigotPlatformModule());
+    protected Set<Class<? extends ImpactorModule>> modules() {
+        return Sets.newHashSet(SpigotPlatformModule.class);
     }
 }

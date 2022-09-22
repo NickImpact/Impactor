@@ -23,29 +23,27 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.testing.ui.dummies;
 
-import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
+import net.impactdev.impactor.api.ui.containers.views.pagination.builders.PaginationBuilder;
 import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
-import net.impactdev.impactor.platform.players.ServerPlayerProvider;
 
-public class FabricPlatformModule implements ImpactorModule {
+public class TestUIModule implements ImpactorModule {
     @Override
     public void factories(FactoryProvider provider) {
-        provider.register(ServerPlayerProvider.class, new FabricServerPlayerProvider());
+
     }
 
     @Override
     public void builders(BuilderProvider provider) {
-
+        provider.register(PaginationBuilder.class, TestPagination.TestPaginationBuilder::new);
     }
 
     @Override
     public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
+
     }
 }
