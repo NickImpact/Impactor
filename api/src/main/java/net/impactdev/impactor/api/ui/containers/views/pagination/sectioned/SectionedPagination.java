@@ -26,21 +26,14 @@
 package net.impactdev.impactor.api.ui.containers.views.pagination.sectioned;
 
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.ui.containers.Icon;
-import net.impactdev.impactor.api.ui.containers.Layout;
 import net.impactdev.impactor.api.ui.containers.View;
 import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
-import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.api.ui.containers.views.pagination.Pagination;
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.builders.SectionedPaginationBuilder;
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.sections.Section;
-import net.kyori.adventure.key.Key;
 import org.checkerframework.common.value.qual.IntRange;
-import org.jetbrains.annotations.Nullable;
-import org.spongepowered.math.vector.Vector2i;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * A sectioned pagination is a pagination which features more than one pagination. Unlike a base

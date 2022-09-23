@@ -27,8 +27,8 @@ package net.impactdev.impactor.api.items.builders;
 
 import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
-import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.impactdev.impactor.api.items.properties.MetaFlag;
+import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.impactdev.impactor.api.services.text.CustomComponents;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Contract;

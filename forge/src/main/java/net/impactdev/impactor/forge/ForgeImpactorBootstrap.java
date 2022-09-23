@@ -25,8 +25,10 @@
 
 package net.impactdev.impactor.forge;
 
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+import net.impactdev.impactor.game.commands.ImpactorCommandRegistrationEvent;
 import net.impactdev.impactor.forge.bootstrap.ForgeRegistrationHandler;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
 import net.minecraftforge.common.MinecraftForge;
@@ -73,7 +75,7 @@ public class ForgeImpactorBootstrap extends ImpactorBootstrapper {
 
         @SubscribeEvent
         public void onCommandRegistration(final RegisterCommandsEvent event) {
-            ForgeRegistrationHandler.onCommandRegistration(event);
+            Impactor.instance().events().post(new ImpactorCommandRegistrationEvent(event.getDispatcher()));
         }
 
     }

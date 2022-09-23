@@ -25,7 +25,6 @@
 
 package net.impactdev.impactor.fabric;
 
-import com.google.common.collect.Sets;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -36,8 +35,9 @@ import net.impactdev.impactor.fabric.commands.UITestCommands;
 import net.impactdev.impactor.fabric.platform.FabricPlatformModule;
 import net.impactdev.impactor.fabric.scheduler.FabricSchedulerModule;
 import net.impactdev.impactor.fabric.ui.FabricUIModule;
+import net.impactdev.impactor.game.commands.ImpactorCommandRegistrationEvent;
+import net.impactdev.impactor.game.plugin.GameImpactorPlugin;
 import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
@@ -47,7 +47,7 @@ import java.util.Set;
 
 import static net.minecraft.commands.Commands.literal;
 
-public class FabricImpactorPlugin extends BaseImpactorPlugin {
+public class FabricImpactorPlugin extends GameImpactorPlugin {
 
     private MinecraftServer server;
 
@@ -64,6 +64,8 @@ public class FabricImpactorPlugin extends BaseImpactorPlugin {
             new ItemTestCommands().register(commands);
             new UITestCommands().register(commands);
             dispatcher.register(commands);
+
+            Impactor.instance().events().post(new ImpactorCommandRegistrationEvent(dispatcher));
         });
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> this.server = server);
@@ -76,11 +78,12 @@ public class FabricImpactorPlugin extends BaseImpactorPlugin {
 
     @Override
     protected Set<Class<? extends ImpactorModule>> modules() {
-        return Sets.newHashSet(
-                FabricPlatformModule.class,
-                FabricSchedulerModule.class,
-                FabricUIModule.class
-        );
+        Set<Class<? extends ImpactorModule>> parent = super.modules();
+        parent.add(FabricPlatformModule.class);
+        parent.add(FabricSchedulerModule.class);
+        parent.add(FabricUIModule.class);
+
+        return parent;
     }
 
     public Optional<MinecraftServer> server() {

@@ -18,6 +18,7 @@ dependencies {
 
     implementation(project(":api"))
     implementation(project(":common"))
+    implementation(project(":game"))
 
     modImplementation("ca.landonjw:GooeyLibs:1.16.5-2.3.3-SNAPSHOT")
 }
@@ -27,6 +28,7 @@ tasks {
         dependencies {
             include(project(":api"))
             include(project(":common"))
+            include(project(":game"))
             include(dependency("net.impactdev:json:.*"))
             include(dependency("net.kyori:.*:.*"))
             include(dependency("org.spongepowered:math:.*"))

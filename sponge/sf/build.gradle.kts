@@ -28,6 +28,7 @@ tasks {
         dependencies {
             include(project(":api"))
             include(project(":common"))
+            include(project(":game"))
             include(project(":sponge:common"))
             include(dependency("net.kyori:event-api:.*"))
             include(dependency("net.impactdev:json:.*"))

@@ -25,18 +25,17 @@
 
 package net.impactdev.impactor.sponge;
 
-import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import net.impactdev.impactor.game.plugin.GameImpactorPlugin;
 import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
 import net.impactdev.impactor.sponge.platform.SpongePlatformModule;
 import net.impactdev.impactor.sponge.scheduler.SpongeSchedulerModule;
 
 import java.util.Set;
 
-public class SpongeImpactorPlugin extends BaseImpactorPlugin {
+public class SpongeImpactorPlugin extends GameImpactorPlugin {
 
     public SpongeImpactorPlugin(ImpactorBootstrapper bootstrapper) {
         super(bootstrapper);
@@ -54,10 +53,11 @@ public class SpongeImpactorPlugin extends BaseImpactorPlugin {
 
     @Override
     protected Set<Class<? extends ImpactorModule>> modules() {
-        return Sets.newHashSet(
-                SpongePlatformModule.class,
-                SpongeSchedulerModule.class
-        );
+        Set<Class<? extends ImpactorModule>> parent = super.modules();
+        parent.add(SpongePlatformModule.class);
+        parent.add(SpongeSchedulerModule.class);
+
+        return parent;
     }
 
 }

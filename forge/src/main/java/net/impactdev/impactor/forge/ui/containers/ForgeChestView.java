@@ -33,7 +33,7 @@ import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.forge.ui.gooey.GooeyIcon;
 import net.impactdev.impactor.forge.ui.gooey.GooeyPageOpenCloser;
-import net.impactdev.impactor.ui.containers.views.ImpactorChestView;
+import net.impactdev.impactor.game.ui.containers.views.ImpactorChestView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;

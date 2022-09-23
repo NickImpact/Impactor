@@ -32,8 +32,8 @@ import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.forge.platform.ForgePlatformModule;
 import net.impactdev.impactor.forge.scheduler.ForgeSchedulerModule;
 import net.impactdev.impactor.forge.ui.ForgeUIModule;
+import net.impactdev.impactor.game.plugin.GameImpactorPlugin;
 import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
@@ -42,7 +42,7 @@ import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import java.util.Optional;
 import java.util.Set;
 
-public class ForgeImpactorPlugin extends BaseImpactorPlugin implements ImpactorPlugin {
+public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorPlugin {
 
     private MinecraftServer server;
 
@@ -63,7 +63,12 @@ public class ForgeImpactorPlugin extends BaseImpactorPlugin implements ImpactorP
 
     @Override
     protected Set<Class<? extends ImpactorModule>> modules() {
-        return Sets.newHashSet(ForgeSchedulerModule.class, ForgeUIModule.class, ForgePlatformModule.class);
+        Set<Class<? extends ImpactorModule>> parent = super.modules();
+        parent.add(ForgeSchedulerModule.class);
+        parent.add(ForgeUIModule.class);
+        parent.add(ForgePlatformModule.class);
+
+        return parent;
     }
 
     @Override

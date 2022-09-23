@@ -31,7 +31,6 @@ import net.impactdev.impactor.api.items.types.ItemTypes;
 import net.kyori.adventure.text.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface BookStack extends ImpactorItemStack {
 

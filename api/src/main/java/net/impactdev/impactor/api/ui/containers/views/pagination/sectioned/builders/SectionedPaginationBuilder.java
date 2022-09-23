@@ -27,9 +27,9 @@ package net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.buil
 
 import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.builders.Required;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.BaseViewBuilder;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.SectionedPagination;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.Contract;

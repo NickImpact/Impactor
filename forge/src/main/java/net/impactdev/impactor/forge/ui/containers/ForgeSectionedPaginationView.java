@@ -32,8 +32,8 @@ import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.forge.ui.gooey.GooeyIcon;
 import net.impactdev.impactor.forge.ui.gooey.GooeyPageOpenCloser;
-import net.impactdev.impactor.ui.containers.views.pagination.views.sectioned.ImpactorSectionedPagination;
-import net.impactdev.impactor.ui.containers.views.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
+import net.impactdev.impactor.game.ui.containers.views.pagination.views.sectioned.ImpactorSectionedPagination;
+import net.impactdev.impactor.game.ui.containers.views.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;

@@ -26,14 +26,16 @@
 package net.impactdev.impactor.api.items;
 
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
 import net.impactdev.impactor.api.items.builders.provided.BasicItemStackBuilder;
 import net.impactdev.impactor.api.items.builders.provided.BookStackBuilder;
-import net.impactdev.impactor.api.items.builders.provided.SkullStackBuilder;
-import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
+import net.impactdev.impactor.api.items.extensions.BookStack;
+import net.impactdev.impactor.api.items.extensions.SkullStack;
 import net.impactdev.impactor.api.items.properties.MetaFlag;
 import net.impactdev.impactor.api.items.types.ItemType;
 import net.impactdev.impactor.api.items.types.ItemTypes;
+import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
+import net.impactdev.impactor.api.items.builders.provided.SkullStackBuilder;
+import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minecraft.world.item.ItemStack;
@@ -51,8 +53,8 @@ import java.util.Set;
  * By default, Impactor provides a simple set of common stacks. These configurations contain
  * additional properties such as a skull's player skin or type, and a books author and pages.
  *
- * @see net.impactdev.impactor.api.items.extensions.BookStack
- * @see net.impactdev.impactor.api.items.extensions.SkullStack
+ * @see BookStack
+ * @see SkullStack
  */
 public interface ImpactorItemStack {
 
