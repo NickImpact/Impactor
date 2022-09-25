@@ -8,6 +8,12 @@ architectury {
     forge()
 }
 
+loom {
+    forge {
+        mixinConfig("mixins.impactor.sponge.json")
+    }
+}
+
 repositories {
     mavenCentral()
 }

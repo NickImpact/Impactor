@@ -30,8 +30,8 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableSet;
 import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
-import net.impactdev.impactor.api.ui.containers.processors.ClickProcessor;
 import net.impactdev.impactor.api.ui.containers.Icon;
+import net.impactdev.impactor.api.ui.containers.processors.ClickProcessor;
 import net.impactdev.impactor.api.utilities.context.Context;
 import org.jetbrains.annotations.NotNull;
 

@@ -27,7 +27,6 @@ package net.impactdev.impactor.platform.components;
 
 import net.impactdev.impactor.api.platform.PlatformComponent;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
-import net.minecraft.SharedConstants;
 
 public abstract class MinecraftPlatformComponent implements PlatformComponent {
 

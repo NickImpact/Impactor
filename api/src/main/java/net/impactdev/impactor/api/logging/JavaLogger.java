@@ -27,10 +27,8 @@ package net.impactdev.impactor.api.logging;
 
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 
-import java.util.Collection;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

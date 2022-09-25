@@ -25,10 +25,10 @@
 
 package net.impactdev.impactor.api.storage.sql.hikari;
 
-import net.impactdev.impactor.api.storage.StorageCredentials;
-import net.impactdev.impactor.api.storage.sql.ConnectionFactory;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import net.impactdev.impactor.api.storage.StorageCredentials;
+import net.impactdev.impactor.api.storage.sql.ConnectionFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;

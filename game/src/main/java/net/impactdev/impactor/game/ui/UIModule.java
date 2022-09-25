@@ -31,11 +31,11 @@ import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRuleset;
-import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.game.ui.containers.ImpactorIcon;
 import net.impactdev.impactor.game.ui.containers.layouts.ImpactorChestLayout;
 import net.impactdev.impactor.game.ui.containers.views.pagination.ImpactorContextRuleset;
 import net.impactdev.impactor.game.ui.containers.views.pagination.layers.ImpactorPage;
+import net.impactdev.impactor.modules.ImpactorModule;
 
 @SuppressWarnings("unused")
 public class UIModule implements ImpactorModule {

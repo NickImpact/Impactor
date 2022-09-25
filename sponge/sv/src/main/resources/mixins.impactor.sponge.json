@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "net.impactdev.impactor.sponge.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.8",
+  "mixins": [
+    "CommandRegistrationMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

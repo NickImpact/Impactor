@@ -32,7 +32,6 @@ import net.impactdev.impactor.api.platform.PlatformInfo;
 import net.impactdev.impactor.api.platform.PlatformType;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.platform.components.JDKPlatformComponent;
-import net.impactdev.impactor.platform.components.MinecraftPlatformComponent;
 
 import java.util.Set;
 

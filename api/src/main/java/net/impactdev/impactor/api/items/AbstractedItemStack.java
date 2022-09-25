@@ -28,8 +28,8 @@ package net.impactdev.impactor.api.items;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import net.impactdev.impactor.api.items.builders.AbstractStackBuilder;
-import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.impactdev.impactor.api.items.properties.MetaFlag;
+import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.impactdev.impactor.api.items.types.ItemType;
 import net.kyori.adventure.text.Component;
 

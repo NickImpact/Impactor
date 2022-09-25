@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.game.commands;
+package net.impactdev.impactor.game.commands.executors;
 
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import org.jetbrains.annotations.Nullable;

@@ -30,8 +30,12 @@ import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.commands.CommandRegistrationEvent;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
+import net.impactdev.impactor.api.event.ImpactorEvent;
+import net.impactdev.impactor.game.commands.event.ImpactorCommandRegistrationEvent;
 import net.impactdev.impactor.game.commands.registration.CommandManager;
+import net.kyori.event.EventBus;
 import net.minecraft.commands.CommandSourceStack;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -46,26 +50,29 @@ public class CommandTest {
 
     @BeforeAll
     public static void initialize() {
-        CommandManager registrar = Impactor.instance().factories().provide(CommandManager.class);
+        CommandManager registrar = new CommandManager();
+        EventBus<ImpactorEvent> events = Impactor.instance().events();
 
-        ClassGraph graph = new ClassGraph().acceptPackages("net.impactdev.impactor.game").enableClassInfo();
-        try (ScanResult scan = graph.scan()) {
-            ClassInfoList list = scan.getClassesImplementing(ImpactorCommand.class);
-            list.stream()
-                    .map(info -> info.loadClass(ImpactorCommand.class))
-                    .filter(type -> !type.isInterface())
-                    .map(type -> {
-                        try {
-                            return type.newInstance();
-                        }
-                        catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .forEach(registrar::register);
-        }
-
-        ((CommandManager) registrar).registerWithBrigadier(dispatcher);
+        events.subscribe(CommandRegistrationEvent.class, event -> {
+            ClassGraph graph = new ClassGraph().acceptPackages("net.impactdev.impactor.game.test").enableClassInfo();
+            try (ScanResult scan = graph.scan()) {
+                ClassInfoList list = scan.getClassesImplementing(ImpactorCommand.class);
+                list.stream()
+                        .map(info -> info.loadClass(ImpactorCommand.class))
+                        .filter(type -> !type.isInterface())
+                        .map(type -> {
+                            try {
+                                return type.newInstance();
+                            }
+                            catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .forEach(registrar::register);
+            }
+        });
+        events.post(new ImpactorCommandRegistrationEvent(registrar));
+        registrar.registerWithBrigadier(dispatcher);
     }
 
     @Test

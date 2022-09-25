@@ -26,10 +26,10 @@
 package net.impactdev.impactor.api.scoreboard;
 
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
-import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.utilities.context.Context;
 
 import java.util.List;

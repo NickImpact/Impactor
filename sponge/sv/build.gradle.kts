@@ -1,18 +1,32 @@
 plugins {
-    id("org.spongepowered.gradle.vanilla") version "0.2.1-SNAPSHOT"
+    id("architectury-plugin") version "3.4-SNAPSHOT"
+    id("dev.architectury.loom") version "0.12.0-SNAPSHOT"
 }
 
-minecraft {
-    version("1.16.5")
+architectury {
+    platformSetupLoomIde()
 }
 
 dependencies {
+    val loom = project.extensions.getByName<net.fabricmc.loom.api.LoomGradleExtensionAPI>("loom")
+    loom.silentMojangMappingsLicense()
+
+    minecraft("com.mojang:minecraft:${rootProject.property("minecraft")}")
+    mappings(loom.officialMojangMappings())
+    modImplementation("net.fabricmc:fabric-loader:${rootProject.property("fabric")}")
+
     implementation(project(":sponge:common"))
 }
 
 tasks {
     assemble {
         dependsOn(shadowJar)
+    }
+
+    jar {
+        manifest {
+            attributes["MixinConfigs"] = "mixins.impactor.sponge.json"
+        }
     }
 
     shadowJar {

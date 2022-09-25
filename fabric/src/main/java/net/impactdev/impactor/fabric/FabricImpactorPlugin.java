@@ -43,8 +43,6 @@ import net.minecraft.server.MinecraftServer;
 import java.util.Optional;
 import java.util.Set;
 
-import static net.minecraft.commands.Commands.literal;
-
 public class FabricImpactorPlugin extends GameImpactorPlugin {
 
     private MinecraftServer server;
@@ -58,7 +56,7 @@ public class FabricImpactorPlugin extends GameImpactorPlugin {
         super.construct();
 
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
-            CommandManager manager = Impactor.instance().factories().provide(CommandManager.class);
+            CommandManager manager = new CommandManager();
             PostResult result = Impactor.instance().events().post(new ImpactorCommandRegistrationEvent(manager));
             if(result.wasSuccessful()) {
                 manager.registerWithBrigadier(dispatcher);

@@ -25,20 +25,10 @@
 
 package net.impactdev.impactor.api.storage.sql.file;
 
-import com.google.common.collect.Lists;
-import net.impactdev.impactor.api.Impactor;
-//import net.impactdev.impactor.api.dependencies.Dependency;
-//import net.impactdev.impactor.api.dependencies.DependencyManager;
-//import net.impactdev.impactor.api.dependencies.ProvidedDependencies;
-//import net.impactdev.impactor.api.dependencies.classloader.IsolatedClassLoader;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
-import java.util.EnumSet;
 import java.util.Properties;
 import java.util.function.Function;
 

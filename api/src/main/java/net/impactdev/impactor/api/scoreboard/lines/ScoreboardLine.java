@@ -30,9 +30,9 @@ import net.impactdev.impactor.api.scoreboard.components.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.scoreboard.lines.types.AnimatedLine;
+import net.impactdev.impactor.api.scoreboard.lines.types.ConstantLine;
 import net.impactdev.impactor.api.scoreboard.lines.types.ListeningLine;
 import net.impactdev.impactor.api.scoreboard.lines.types.RefreshingLine;
-import net.impactdev.impactor.api.scoreboard.lines.types.ConstantLine;
 import net.kyori.adventure.text.Component;
 
 /**

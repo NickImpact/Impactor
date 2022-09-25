@@ -25,8 +25,8 @@
 
 package net.impactdev.impactor.api.scoreboard.objective.types;
 
-import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.components.ScoreboardAnimation;
+import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
 
 public interface AnimatedObjective extends ScoreboardObjective, Updatable, ScoreboardAnimation {

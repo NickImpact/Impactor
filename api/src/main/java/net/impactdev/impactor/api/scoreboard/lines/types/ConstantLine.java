@@ -25,8 +25,8 @@
 
 package net.impactdev.impactor.api.scoreboard.lines.types;
 
-import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.scoreboard.lines.ScoreboardLine;
 import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.text.Component;
 

@@ -26,8 +26,8 @@
 package net.impactdev.impactor.api.scoreboard.effects;
 
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.services.text.MessageService;
 import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;

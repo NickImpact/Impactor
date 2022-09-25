@@ -25,10 +25,10 @@
 
 package net.impactdev.impactor.api.scoreboard.components;
 
-import net.impactdev.impactor.api.scoreboard.objective.types.AnimatedObjective;
+import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.scoreboard.frames.ScoreboardFrame;
 import net.impactdev.impactor.api.scoreboard.lines.types.AnimatedLine;
-import net.impactdev.impactor.api.builders.Builder;
+import net.impactdev.impactor.api.scoreboard.objective.types.AnimatedObjective;
 import net.impactdev.impactor.api.utilities.lists.CircularLinkedList;
 
 import java.util.Collection;

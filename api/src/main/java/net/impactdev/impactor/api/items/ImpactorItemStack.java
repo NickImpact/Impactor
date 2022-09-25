@@ -26,16 +26,16 @@
 package net.impactdev.impactor.api.items;
 
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
 import net.impactdev.impactor.api.items.builders.provided.BasicItemStackBuilder;
 import net.impactdev.impactor.api.items.builders.provided.BookStackBuilder;
+import net.impactdev.impactor.api.items.builders.provided.SkullStackBuilder;
 import net.impactdev.impactor.api.items.extensions.BookStack;
 import net.impactdev.impactor.api.items.extensions.SkullStack;
 import net.impactdev.impactor.api.items.properties.MetaFlag;
+import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.impactdev.impactor.api.items.types.ItemType;
 import net.impactdev.impactor.api.items.types.ItemTypes;
-import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
-import net.impactdev.impactor.api.items.builders.provided.SkullStackBuilder;
-import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minecraft.world.item.ItemStack;

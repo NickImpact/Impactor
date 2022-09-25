@@ -25,10 +25,10 @@
 
 package net.impactdev.impactor.api.scoreboard.objective.types;
 
+import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.scoreboard.components.Updatable;
 import net.impactdev.impactor.api.scoreboard.frames.types.ListeningFrame;
 import net.impactdev.impactor.api.scoreboard.objective.ScoreboardObjective;
-import net.impactdev.impactor.api.builders.Builder;
 
 public interface ListeningObjective extends ScoreboardObjective, Updatable {
 

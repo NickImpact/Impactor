@@ -27,8 +27,8 @@ package net.impactdev.impactor.api.items.builders;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import net.impactdev.impactor.api.items.properties.MetaFlag;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
+import net.impactdev.impactor.api.items.properties.MetaFlag;
 import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.impactdev.impactor.api.items.properties.enchantments.Enchantments;
 import net.kyori.adventure.text.Component;

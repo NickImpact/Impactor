@@ -26,9 +26,9 @@
 package net.impactdev.impactor.api.configuration;
 
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.configuration.keys.EnduringKey;
 import net.impactdev.impactor.api.configuration.loader.KeyProvider;
-import net.impactdev.impactor.api.builders.Builder;
 
 import java.nio.file.Path;
 

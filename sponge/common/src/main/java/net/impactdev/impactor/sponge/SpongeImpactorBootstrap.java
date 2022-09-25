@@ -30,8 +30,10 @@ import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
 import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.command.Command;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 @Plugin("impactor")
@@ -50,6 +52,11 @@ public class SpongeImpactorBootstrap extends ImpactorBootstrapper {
     @Listener
     public void onConstruct(ConstructPluginEvent event) {
         this.construct();
+    }
+
+    @Listener
+    public void onCommandRegistration(RegisterCommandEvent<Command.Raw> event) {
+
     }
 
 }

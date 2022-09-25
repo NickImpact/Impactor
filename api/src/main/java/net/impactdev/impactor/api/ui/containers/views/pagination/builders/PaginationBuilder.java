@@ -27,8 +27,8 @@ package net.impactdev.impactor.api.ui.containers.views.pagination.builders;
 
 import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.builders.Required;
-import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.BaseViewBuilder;
 import net.impactdev.impactor.api.ui.containers.views.pagination.Pagination;
