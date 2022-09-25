@@ -25,20 +25,27 @@
 
 package net.impactdev.impactor.game.commands;
 
-import com.mojang.brigadier.CommandDispatcher;
-import net.impactdev.impactor.api.commands.CommandRegistrationEvent;
-import net.minecraft.commands.CommandSourceStack;
+import net.impactdev.impactor.api.commands.executors.CommandResult;
+import net.impactdev.impactor.api.commands.executors.CommandExecutors;
+import net.impactdev.impactor.api.providers.BuilderProvider;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.providers.ServiceProvider;
+import net.impactdev.impactor.modules.ImpactorModule;
 
-public class ImpactorCommandRegistrationEvent implements CommandRegistrationEvent {
-
-    private final CommandDispatcher<CommandSourceStack> dispatcher;
-
-    public ImpactorCommandRegistrationEvent(CommandDispatcher<CommandSourceStack> dispatcher) {
-        this.dispatcher = dispatcher;
+public class CommandsModule implements ImpactorModule {
+    @Override
+    public void factories(FactoryProvider provider) {
+        provider.register(CommandExecutors.Factory.class, new ImpactorCommandFactory());
+        provider.register(CommandResult.Factory.class, new ImpactorCommandResult.ImpactorCommandResultFactory());
     }
 
     @Override
-    public CommandDispatcher<CommandSourceStack> dispatcher() {
-        return this.dispatcher;
+    public void builders(BuilderProvider provider) {
+        provider.register(CommandResult.CommandResultBuilder.class, ImpactorCommandResult.ImpactorCommandResultBuilder::new);
+    }
+
+    @Override
+    public void services(ServiceProvider provider) {
+
     }
 }

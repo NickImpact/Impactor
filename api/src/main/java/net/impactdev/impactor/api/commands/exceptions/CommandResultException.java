@@ -23,17 +23,21 @@
  *
  */
 
-package net.impactdev.impactor.api.commands;
+package net.impactdev.impactor.api.commands.exceptions;
 
-import com.mojang.brigadier.CommandDispatcher;
-import net.impactdev.impactor.api.event.ImpactorEvent;
-import net.minecraft.commands.CommandSourceStack;
+import net.impactdev.impactor.api.commands.executors.CommandResult;
 
-/**
- * Fired once the game platform indicates commands are being registered.
- */
-public interface CommandRegistrationEvent extends ImpactorEvent {
+public class CommandResultException extends Exception {
 
-    CommandDispatcher<CommandSourceStack> constructor();
+    private final CommandResult result;
+
+    public CommandResultException(CommandResult result, Throwable cause) {
+        super(cause);
+        this.result = result;
+    }
+
+    public CommandResult result() {
+        return this.result;
+    }
 
 }

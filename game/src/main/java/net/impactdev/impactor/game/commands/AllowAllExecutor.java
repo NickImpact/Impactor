@@ -23,17 +23,22 @@
  *
  */
 
-package net.impactdev.impactor.api.commands.executors;
+package net.impactdev.impactor.game.commands;
 
-import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.commands.CommandSourceStack;
+import net.impactdev.impactor.api.commands.executors.CommandExecutor;
+import net.impactdev.impactor.api.commands.executors.CommandExecutors;
 
-import java.util.function.Predicate;
+public class AllowAllExecutor implements CommandExecutors {
 
-public interface ImpactorCommand {
+    private final CommandExecutor delegate;
 
-    Predicate<CommandSourceStack> requirement();
+    public AllowAllExecutor(CommandExecutor delegate) {
+        this.delegate = delegate;
+    }
 
-    CommandResult execute(CommandContext<CommandSourceStack> context);
+    @Override
+    public CommandExecutor executor() {
+        return this.delegate;
+    }
 
 }

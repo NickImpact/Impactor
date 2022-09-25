@@ -23,17 +23,21 @@
  *
  */
 
-package net.impactdev.impactor.api.commands;
+package net.impactdev.impactor.game.commands;
 
-import com.mojang.brigadier.CommandDispatcher;
-import net.impactdev.impactor.api.event.ImpactorEvent;
-import net.minecraft.commands.CommandSourceStack;
+import net.impactdev.impactor.api.commands.executors.CommandExecutor;
+import net.impactdev.impactor.api.commands.executors.CommandExecutors;
 
-/**
- * Fired once the game platform indicates commands are being registered.
- */
-public interface CommandRegistrationEvent extends ImpactorEvent {
+public class ImpactorCommandFactory implements CommandExecutors.Factory {
 
-    CommandDispatcher<CommandSourceStack> constructor();
+    @Override
+    public CommandExecutors allowAll(CommandExecutor executor) {
+        return new AllowAllExecutor(executor);
+    }
+
+    @Override
+    public CommandExecutors playersOnly(CommandExecutor executor) {
+        return new PlayersOnlyExecutor(executor);
+    }
 
 }

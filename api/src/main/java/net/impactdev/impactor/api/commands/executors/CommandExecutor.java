@@ -23,17 +23,13 @@
  *
  */
 
-package net.impactdev.impactor.api.commands;
+package net.impactdev.impactor.api.commands.executors;
 
-import com.mojang.brigadier.CommandDispatcher;
-import net.impactdev.impactor.api.event.ImpactorEvent;
-import net.minecraft.commands.CommandSourceStack;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.impactdev.impactor.api.utilities.context.Context;
 
-/**
- * Fired once the game platform indicates commands are being registered.
- */
-public interface CommandRegistrationEvent extends ImpactorEvent {
+public interface CommandExecutor {
 
-    CommandDispatcher<CommandSourceStack> constructor();
+    CommandResult execute(Context context) throws CommandSyntaxException;
 
 }

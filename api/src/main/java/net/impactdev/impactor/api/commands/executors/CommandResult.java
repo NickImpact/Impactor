@@ -25,10 +25,50 @@
 
 package net.impactdev.impactor.api.commands.executors;
 
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.builders.Builder;
+
+import java.util.Optional;
+
 public interface CommandResult {
 
-    boolean successful();
+    static CommandResult successful() {
+        return Impactor.instance().factories().provide(Factory.class).successful();
+    }
+
+    static CommandResult exceptional(Throwable reason) {
+        return Impactor.instance().factories().provide(Factory.class).exceptional(reason);
+    }
+
+    static CommandResultBuilder builder() {
+        return Impactor.instance().builders().provide(CommandResultBuilder.class);
+    }
+
+    boolean isSuccessful();
 
     int result();
+
+    Optional<Throwable> reason();
+
+    interface Factory {
+
+        CommandResult successful();
+
+        CommandResult exceptional(Throwable cause);
+
+    }
+
+    /**
+     * Represents a builder for a command result that is assumed successful. A command result is only
+     * ever considered a failure if and only if {@link #exceptional(Throwable)} has been invoked, to
+     * which the result will forcibly set its state to that of a failed execution.
+     */
+    interface CommandResultBuilder extends Builder<CommandResult> {
+
+        CommandResultBuilder result(int result);
+
+        CommandResultBuilder exceptional(Throwable cause);
+
+    }
 
 }
