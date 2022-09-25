@@ -23,14 +23,13 @@
  *
  */
 
-package net.impactdev.impactor.game.commands;
+package net.impactdev.impactor.game.commands.registration;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
-import net.impactdev.impactor.api.commands.registration.CommandRegistrar;
 import net.impactdev.impactor.game.commands.specs.CommandRoot;
 import net.minecraft.commands.CommandSourceStack;
 
@@ -39,11 +38,10 @@ import java.util.Optional;
 
 import static net.impactdev.impactor.game.commands.AnnotationReader.optional;
 
-public class ImpactorCommandRegistrar implements CommandRegistrar {
+public class CommandManager {
 
     private final CommandGenerator generator = new CommandGenerator();
 
-    @Override
     public void register(ImpactorCommand command) {
         Optional<CommandPath> path = optional(command, CommandPath.class);
 
@@ -79,6 +77,9 @@ public class ImpactorCommandRegistrar implements CommandRegistrar {
 
             parent.addChild(redirect.build());
         }
+
+        this.generator.roots.clear();
+        this.generator.redirects.clear();
     }
 
 }

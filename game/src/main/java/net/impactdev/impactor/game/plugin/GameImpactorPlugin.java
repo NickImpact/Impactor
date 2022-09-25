@@ -26,6 +26,13 @@
 package net.impactdev.impactor.game.plugin;
 
 import com.google.common.collect.Sets;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.commands.CommandRegistrationEvent;
+import net.impactdev.impactor.game.commands.CommandsModule;
+import net.impactdev.impactor.game.commands.dev.items.BookCommand;
+import net.impactdev.impactor.game.commands.dev.items.ItemKeyArgument;
+import net.impactdev.impactor.game.commands.dev.items.skulls.SkullSkinArgument;
+import net.impactdev.impactor.game.commands.dev.items.skulls.SkullTextureArgument;
 import net.impactdev.impactor.game.items.ItemsModule;
 import net.impactdev.impactor.game.ui.UIModule;
 import net.impactdev.impactor.modules.ImpactorModule;
@@ -44,8 +51,17 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
     protected Set<Class<? extends ImpactorModule>> modules() {
         return Sets.newHashSet(
                 ItemsModule.class,
-                UIModule.class
+                UIModule.class,
+                CommandsModule.class
         );
     }
 
+    @Override
+    public void construct() throws Exception {
+        super.construct();
+
+        Impactor.instance().events().subscribe(CommandRegistrationEvent.class, event -> {
+            event.register(new ItemKeyArgument(), new BookCommand(), new SkullSkinArgument(), new SkullTextureArgument());
+        });
+    }
 }

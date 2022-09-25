@@ -25,7 +25,6 @@
 
 package net.impactdev.impactor.forge;
 
-import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;

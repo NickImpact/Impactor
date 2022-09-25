@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.game.commands;
+package net.impactdev.impactor.game.commands.registration;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;

@@ -25,7 +25,6 @@
 
 package net.impactdev.impactor.api.commands;
 
-import net.impactdev.impactor.api.commands.registration.CommandRegistrar;
 import net.impactdev.impactor.api.event.ImpactorEvent;
 
 /**
@@ -33,6 +32,6 @@ import net.impactdev.impactor.api.event.ImpactorEvent;
  */
 public interface CommandRegistrationEvent extends ImpactorEvent {
 
-    CommandRegistrar registrar();
+    void register(ImpactorCommand... commands);
 
 }

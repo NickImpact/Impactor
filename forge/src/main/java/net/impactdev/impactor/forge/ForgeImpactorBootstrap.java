@@ -26,11 +26,12 @@
 package net.impactdev.impactor.forge;
 
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.game.commands.registration.CommandManager;
 import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.game.commands.ImpactorCommandRegistrationEvent;
-import net.impactdev.impactor.forge.bootstrap.ForgeRegistrationHandler;
+import net.impactdev.impactor.game.commands.event.ImpactorCommandRegistrationEvent;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import net.kyori.event.PostResult;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -54,7 +55,6 @@ public class ForgeImpactorBootstrap extends ImpactorBootstrapper {
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onSetup);
         MinecraftForge.EVENT_BUS.addListener(this::onServerShutdown);
-        MinecraftForge.EVENT_BUS.addListener(ForgeRegistrationHandler::onCommandRegistration);
     }
 
     @Override
@@ -75,7 +75,11 @@ public class ForgeImpactorBootstrap extends ImpactorBootstrapper {
 
         @SubscribeEvent
         public void onCommandRegistration(final RegisterCommandsEvent event) {
-            Impactor.instance().events().post(new ImpactorCommandRegistrationEvent(event.getDispatcher()));
+            CommandManager manager = Impactor.instance().factories().provide(CommandManager.class);
+            PostResult result = Impactor.instance().events().post(new ImpactorCommandRegistrationEvent(manager));
+            if(result.wasSuccessful()) {
+                manager.registerWithBrigadier(event.getDispatcher());
+            }
         }
 
     }

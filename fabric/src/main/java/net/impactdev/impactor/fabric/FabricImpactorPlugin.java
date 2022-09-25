@@ -25,21 +25,19 @@
 
 package net.impactdev.impactor.fabric;
 
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
-import net.impactdev.impactor.fabric.commands.ItemTestCommands;
-import net.impactdev.impactor.fabric.commands.UITestCommands;
 import net.impactdev.impactor.fabric.platform.FabricPlatformModule;
 import net.impactdev.impactor.fabric.scheduler.FabricSchedulerModule;
 import net.impactdev.impactor.fabric.ui.FabricUIModule;
-import net.impactdev.impactor.game.commands.ImpactorCommandRegistrationEvent;
+import net.impactdev.impactor.game.commands.event.ImpactorCommandRegistrationEvent;
+import net.impactdev.impactor.game.commands.registration.CommandManager;
 import net.impactdev.impactor.game.plugin.GameImpactorPlugin;
 import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
-import net.minecraft.commands.CommandSourceStack;
+import net.kyori.event.PostResult;
 import net.minecraft.server.MinecraftServer;
 
 import java.util.Optional;
@@ -60,12 +58,11 @@ public class FabricImpactorPlugin extends GameImpactorPlugin {
         super.construct();
 
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
-            LiteralArgumentBuilder<CommandSourceStack> commands = literal("impactor");
-            new ItemTestCommands().register(commands);
-            new UITestCommands().register(commands);
-            dispatcher.register(commands);
-
-            Impactor.instance().events().post(new ImpactorCommandRegistrationEvent(dispatcher));
+            CommandManager manager = Impactor.instance().factories().provide(CommandManager.class);
+            PostResult result = Impactor.instance().events().post(new ImpactorCommandRegistrationEvent(manager));
+            if(result.wasSuccessful()) {
+                manager.registerWithBrigadier(dispatcher);
+            }
         });
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> this.server = server);

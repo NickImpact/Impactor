@@ -23,7 +23,24 @@
  *
  */
 
-package net.impactdev.impactor.fabric.commands;
+package net.impactdev.impactor.game.commands.event;
 
-public class FabricCommandFactory {
+import net.impactdev.impactor.api.commands.CommandRegistrationEvent;
+import net.impactdev.impactor.api.commands.ImpactorCommand;
+import net.impactdev.impactor.game.commands.registration.CommandManager;
+
+public class ImpactorCommandRegistrationEvent implements CommandRegistrationEvent {
+
+    private final CommandManager manager;
+
+    public ImpactorCommandRegistrationEvent(CommandManager registrar) {
+        this.manager = registrar;
+    }
+
+    @Override
+    public void register(ImpactorCommand... commands) {
+        for(ImpactorCommand command : commands) {
+            this.manager.register(command);
+        }
+    }
 }

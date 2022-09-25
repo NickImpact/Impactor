@@ -31,8 +31,7 @@ import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
-import net.impactdev.impactor.api.commands.registration.CommandRegistrar;
-import net.impactdev.impactor.game.commands.ImpactorCommandRegistrar;
+import net.impactdev.impactor.game.commands.registration.CommandManager;
 import net.minecraft.commands.CommandSourceStack;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -43,11 +42,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CommandTest {
 
-    private static CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>();
+    private static final CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>();
 
     @BeforeAll
     public static void initialize() {
-        CommandRegistrar registrar = Impactor.instance().factories().provide(CommandRegistrar.class);
+        CommandManager registrar = Impactor.instance().factories().provide(CommandManager.class);
 
         ClassGraph graph = new ClassGraph().acceptPackages("net.impactdev.impactor.game").enableClassInfo();
         try (ScanResult scan = graph.scan()) {
@@ -66,7 +65,7 @@ public class CommandTest {
                     .forEach(registrar::register);
         }
 
-        ((ImpactorCommandRegistrar) registrar).registerWithBrigadier(dispatcher);
+        ((CommandManager) registrar).registerWithBrigadier(dispatcher);
     }
 
     @Test
