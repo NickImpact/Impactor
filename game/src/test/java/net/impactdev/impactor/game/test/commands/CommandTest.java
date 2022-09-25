@@ -26,56 +26,66 @@
 package net.impactdev.impactor.game.test.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.impactdev.impactor.api.commands.executors.CommandResult;
-import net.impactdev.impactor.api.commands.executors.CommandExecutors;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.commands.ImpactorCommand;
+import net.impactdev.impactor.api.commands.registration.CommandRegistrar;
+import net.impactdev.impactor.game.commands.ImpactorCommandRegistrar;
 import net.minecraft.commands.CommandSourceStack;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static net.minecraft.commands.Commands.literal;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CommandTest {
 
-    private static CommandDispatcher<CommandSourceStack> dispatcher;
+    private static CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>();
 
     @BeforeAll
     public static void initialize() {
-        dispatcher = new CommandDispatcher<>();
+        CommandRegistrar registrar = Impactor.instance().factories().provide(CommandRegistrar.class);
+
+        ClassGraph graph = new ClassGraph().acceptPackages("net.impactdev.impactor.game").enableClassInfo();
+        try (ScanResult scan = graph.scan()) {
+            ClassInfoList list = scan.getClassesImplementing(ImpactorCommand.class);
+            list.stream()
+                    .map(info -> info.loadClass(ImpactorCommand.class))
+                    .filter(type -> !type.isInterface())
+                    .map(type -> {
+                        try {
+                            return type.newInstance();
+                        }
+                        catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .forEach(registrar::register);
+        }
+
+        ((ImpactorCommandRegistrar) registrar).registerWithBrigadier(dispatcher);
     }
 
     @Test
     public void exceptionTest() {
-        dispatcher.register(this.failing());
-        assertThrows(RuntimeException.class, () -> {
-            dispatcher.execute("failing", null);
-        });
-
-        assertEquals(1, assertDoesNotThrow(() -> dispatcher.execute("failing working", null)));
-        assertThrows(RuntimeException.class, () -> dispatcher.execute("failing working failAgain", null));
+        assertThrows(RuntimeException.class, () -> dispatcher.execute("exceptional failing", null));
+        assertEquals(1, assertDoesNotThrow(() -> dispatcher.execute("exceptional passing", null)));
+        assertThrows(RuntimeException.class, () -> dispatcher.execute("exceptional passing failing", null));
     }
 
     @Test
-    public void statusCodes() {
-        dispatcher.register(this.statuses());
-        assertEquals('a', assertDoesNotThrow(() -> dispatcher.execute("statuses A", null)));
-        assertEquals('b', assertDoesNotThrow(() -> dispatcher.execute("statuses B", null)));
-    }
+    public void redirection() {
+        String[] usages = dispatcher.getAllUsage(dispatcher.getRoot(), null, false);
+        for(String usage : usages) {
+            System.out.println(usage);
+        }
 
-    private LiteralArgumentBuilder<CommandSourceStack> failing() {
-        return literal("failing")
-                .executes(CommandExecutors.allowAll(context -> CommandResult.exceptional(new RuntimeException("I fail purposefully"))))
-                .then(literal("working").executes(CommandExecutors.allowAll(context -> CommandResult.successful()))
-                        .then(literal("failAgain").executes(CommandExecutors.allowAll(context -> CommandResult.exceptional(new RuntimeException("I also fail purposefully!")))))
-                );
-    }
-
-    private LiteralArgumentBuilder<CommandSourceStack> statuses() {
-        return literal("statuses")
-                .then(literal("A").executes(CommandExecutors.allowAll(context -> CommandResult.builder().result('a').build())))
-                .then(literal("B").executes(context -> 'b'));
+        assertEquals(1, assertDoesNotThrow(() -> dispatcher.execute("redirecting normal", null)));
+        assertEquals(1, assertDoesNotThrow(() -> dispatcher.execute("redirecting n", null)));
+        assertEquals(2, assertDoesNotThrow(() -> dispatcher.execute("redirecting normal child", null)));
+        assertEquals(2, assertDoesNotThrow(() -> dispatcher.execute("redirecting n child", null)));
     }
 }

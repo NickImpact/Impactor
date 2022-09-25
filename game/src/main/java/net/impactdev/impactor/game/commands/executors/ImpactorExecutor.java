@@ -23,38 +23,32 @@
  *
  */
 
-package net.impactdev.impactor.api.commands.executors;
+package net.impactdev.impactor.game.commands.executors;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.leangen.geantyref.TypeToken;
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.exceptions.CommandResultException;
+import net.impactdev.impactor.api.commands.executors.CommandExecutor;
+import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.utilities.context.Context;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.minecraft.commands.CommandSourceStack;
 import org.apache.commons.lang3.StringUtils;
 
-public interface CommandExecutors extends Command<CommandSourceStack> {
+public final class ImpactorExecutor implements Command<CommandSourceStack> {
 
-    TypeToken<CommandContext<CommandSourceStack>> COMMAND_CONTEXT = new TypeToken<CommandContext<CommandSourceStack>>() {};
+    private final CommandExecutor delegate;
 
-    static CommandExecutors allowAll(CommandExecutor executor) {
-        return Impactor.instance().factories().provide(Factory.class).allowAll(executor);
+    public ImpactorExecutor(CommandExecutor executor) {
+        this.delegate = executor;
     }
-
-    static CommandExecutors playersOnly(CommandExecutor executor) {
-        return Impactor.instance().factories().provide(Factory.class).playersOnly(executor);
-    }
-
-    CommandExecutor executor();
 
     @Override
-    default int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         try {
-            Context ctx = Context.empty().append(COMMAND_CONTEXT, context);
-            CommandResult result = this.executor().execute(ctx);
+            Context ctx = Context.empty().append(CommandExecutor.COMMAND_CONTEXT, context);
+            CommandResult result = this.delegate.execute(ctx);
             if(result.reason().isPresent()) {
                 throw new CommandResultException(result, result.reason().get());
             }
@@ -77,7 +71,7 @@ public interface CommandExecutors extends Command<CommandSourceStack> {
             printer.add("Parse Results:");
             printer.add(context.getInput()).add(StringUtils.leftPad("^", context.getRange().getEnd()));
 
-            printer.newline().add("Tracked Exception Stacktrace:");
+            printer.hr('-').add("Tracked Exception Stacktrace:");
             printer.add(tracked.getCause());
 
             printer.print(System.err);
@@ -87,20 +81,17 @@ public interface CommandExecutors extends Command<CommandSourceStack> {
             printer.title("Command Parsing Exception");
             printer.add("An unexpected exception occurred while attempting to process");
             printer.add("a command!");
-            printer.newline().add("Tracked Exception Stacktrace:");
+            printer.hr('-');
+            printer.add("Raw Input: " + context.getInput());
+            printer.newline();
+            printer.add("Parse Results:");
+            printer.add(context.getInput()).add(StringUtils.leftPad("^", context.getRange().getEnd()));
+            printer.hr('-').add("Exception Stacktrace:");
             printer.add(unexpected);
 
             printer.print(System.err);
             throw unexpected;
         }
-    }
-
-    interface Factory {
-
-        CommandExecutors allowAll(CommandExecutor executor);
-
-        CommandExecutors playersOnly(CommandExecutor executor);
-
     }
 
 }

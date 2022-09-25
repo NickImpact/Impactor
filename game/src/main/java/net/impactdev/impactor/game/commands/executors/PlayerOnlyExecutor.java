@@ -23,18 +23,27 @@
  *
  */
 
-package net.impactdev.impactor.api.commands.executors;
+package net.impactdev.impactor.game.commands.executors;
 
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.leangen.geantyref.TypeToken;
+import net.impactdev.impactor.api.commands.executors.CommandExecutor;
+import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.utilities.context.Context;
-import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
 
-public interface CommandExecutor {
+public final class PlayerOnlyExecutor implements CommandExecutor {
 
-    TypeToken<CommandContext<CommandSourceStack>> COMMAND_CONTEXT = new TypeToken<CommandContext<CommandSourceStack>>() {};
+    private final CommandExecutor delegate;
 
-    CommandResult execute(Context context) throws CommandSyntaxException;
+    public PlayerOnlyExecutor(CommandExecutor delegate) {
+        this.delegate = delegate;
+    }
 
+    @Override
+    public CommandResult execute(Context context) throws CommandSyntaxException {
+        ServerPlayer player = context.require(CommandExecutor.COMMAND_CONTEXT).getSource().getPlayerOrException();
+        context.append(ServerPlayer.class, player);
+
+        return this.delegate.execute(context);
+    }
 }

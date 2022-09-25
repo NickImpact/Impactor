@@ -23,18 +23,47 @@
  *
  */
 
-package net.impactdev.impactor.api.commands.executors;
+package net.impactdev.impactor.game.commands.specs;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.leangen.geantyref.TypeToken;
-import net.impactdev.impactor.api.utilities.context.Context;
+import com.google.common.base.Preconditions;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
+import org.jetbrains.annotations.Nullable;
 
-public interface CommandExecutor {
+import java.util.Optional;
 
-    TypeToken<CommandContext<CommandSourceStack>> COMMAND_CONTEXT = new TypeToken<CommandContext<CommandSourceStack>>() {};
+public class CommandRoot extends CommandSpec.LiteralCommandSpec {
 
-    CommandResult execute(Context context) throws CommandSyntaxException;
+    public CommandRoot(LiteralArgumentBuilder<CommandSourceStack> root) {
+        super(root);
+    }
+
+    public Optional<CommandSpec<?>> findNode(final String[] keys) {
+        Preconditions.checkArgument(keys.length > 0);
+
+        return Optional.ofNullable(this.findNodeRecursively(keys, 0, this));
+    }
+
+    @Nullable
+    private CommandSpec<?> findNodeRecursively(final String[] path, final int index, final CommandSpec<?> current) {
+        if(!path[index].equals(current.key())) {
+            return null;
+        }
+
+        if(path.length - 1 == index) {
+            return current;
+        }
+
+        if(!current.children().isEmpty()) {
+            for(CommandSpec<?> child : current.children()) {
+                CommandSpec<?> spec = this.findNodeRecursively(path, index + 1, child);
+                if(spec != null) {
+                    return spec;
+                }
+            }
+        }
+
+        return null;
+    }
 
 }

@@ -25,14 +25,30 @@
 
 package net.impactdev.impactor.api.commands;
 
-import net.impactdev.impactor.api.commands.registration.CommandRegistrar;
-import net.impactdev.impactor.api.event.ImpactorEvent;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.services.Service;
+import net.minecraft.commands.CommandSourceStack;
 
-/**
- * Fired once the game platform indicates commands are being registered.
- */
-public interface CommandRegistrationEvent extends ImpactorEvent {
+import java.util.function.Predicate;
 
-    CommandRegistrar registrar();
+public interface PermissionsService extends Service {
+
+    boolean hasPermission(CommandSourceStack stack, String permission);
+
+    /**
+     * Creates a {@link Predicate} responsible for verifying whether the source of an executed command
+     * has a particular permission.
+     * <p>
+     * This type of predicate is meant to be chained in a manner such that further requirements for any particular
+     * command can simply be appended to it via {@link Predicate#and(Predicate)}. As such, expected usage for
+     * this predicate usage would be something along the lines of:
+     * <ul><li>PermissionsService.validate(x).and(some other predicate)</li></ul>
+     *
+     * @param permission The permission to validate against the command source
+     * @return A predicate which is responsible for the permissions validation
+     */
+    static Predicate<CommandSourceStack> validate(String permission) {
+        return stack -> Impactor.instance().services().provide(PermissionsService.class).hasPermission(stack, permission);
+    }
 
 }

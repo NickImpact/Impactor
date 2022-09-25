@@ -23,18 +23,19 @@
  *
  */
 
-package net.impactdev.impactor.api.commands.executors;
+package net.impactdev.impactor.game.test.commands.exceptional;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.leangen.geantyref.TypeToken;
-import net.impactdev.impactor.api.utilities.context.Context;
-import net.minecraft.commands.CommandSourceStack;
+import net.impactdev.impactor.api.commands.ImpactorCommand;
+import net.impactdev.impactor.api.commands.annotations.Alias;
+import net.impactdev.impactor.api.commands.annotations.CommandPath;
+import net.impactdev.impactor.api.commands.executors.CommandExecutor;
+import net.impactdev.impactor.api.commands.executors.CommandResult;
 
-public interface CommandExecutor {
-
-    TypeToken<CommandContext<CommandSourceStack>> COMMAND_CONTEXT = new TypeToken<CommandContext<CommandSourceStack>>() {};
-
-    CommandResult execute(Context context) throws CommandSyntaxException;
-
+@CommandPath("exceptional")
+@Alias("passing")
+public class Passing implements ImpactorCommand {
+    @Override
+    public CommandExecutor executor() {
+        return context -> CommandResult.successful();
+    }
 }

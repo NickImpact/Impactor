@@ -23,24 +23,32 @@
  *
  */
 
-package net.impactdev.impactor.game.commands.dev;
+package net.impactdev.impactor.game.commands.executors;
 
-import com.mojang.brigadier.context.CommandContext;
-import net.impactdev.impactor.api.commands.executors.CommandResult;
-import net.impactdev.impactor.api.commands.executors.ImpactorCommand;
-import net.minecraft.commands.CommandSourceStack;
+import net.impactdev.impactor.api.commands.ImpactorCommand;
+import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
+import net.impactdev.impactor.api.commands.executors.CommandExecutor;
 
-import java.util.function.Predicate;
+import java.util.Optional;
 
-public class ItemTestCommands implements ImpactorCommand {
+import static net.impactdev.impactor.game.commands.AnnotationReader.optional;
 
-    @Override
-    public Predicate<CommandSourceStack> requirement() {
-        return null;
+public class ExecutorFactory {
+
+    public static CommandExecutor create(ImpactorCommand command) {
+        Optional<RestrictedExecutor> restrictions = optional(command, RestrictedExecutor.class);
+        if(restrictions.isPresent()) {
+            RestrictedExecutor settings = restrictions.get();
+            if(settings.players() && settings.system()) {
+                return command.executor();
+            } else if(settings.players()) {
+                return new PlayerOnlyExecutor(command.executor());
+            } else {
+                return new NonPlayerExecutor(command.executor());
+            }
+        } else {
+            return command.executor();
+        }
     }
 
-    @Override
-    public CommandResult execute(CommandContext<CommandSourceStack> context) {
-        return null;
-    }
 }

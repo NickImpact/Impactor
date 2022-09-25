@@ -23,27 +23,45 @@
  *
  */
 
-package net.impactdev.impactor.game.commands;
+package net.impactdev.impactor.game.commands.executors;
 
+import com.mojang.brigadier.Message;
+import com.mojang.brigadier.exceptions.CommandExceptionType;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.impactdev.impactor.api.commands.executors.CommandExecutor;
-import net.impactdev.impactor.api.commands.executors.CommandExecutors;
+import net.impactdev.impactor.api.commands.executors.CommandResult;
+import net.impactdev.impactor.api.utilities.context.Context;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import org.jetbrains.annotations.Nullable;
 
-public class PlayersOnlyExecutor implements CommandExecutors {
+public class NonPlayerExecutor implements CommandExecutor {
 
+    private static final RequireNonPlayerSourceSyntaxExceptionType EXCEPTION = new RequireNonPlayerSourceSyntaxExceptionType();
     private final CommandExecutor delegate;
 
-    public PlayersOnlyExecutor(CommandExecutor delegate) {
+    public NonPlayerExecutor(CommandExecutor delegate) {
         this.delegate = delegate;
     }
 
     @Override
-    public CommandExecutor executor() {
-        return context -> {
-            ServerPlayer source = context.require(CommandExecutors.COMMAND_CONTEXT).getSource().getPlayerOrException();
-            context.append(ServerPlayer.class, source);
+    public CommandResult execute(Context context) throws CommandSyntaxException {
+        @Nullable Entity entity = context.require(CommandExecutor.COMMAND_CONTEXT).getSource().getEntity();
+        if(entity != null) {
+            if(entity instanceof ServerPlayer) {
+                throw EXCEPTION.create();
+            }
+        }
 
-            return this.delegate.execute(context);
-        };
+        return this.delegate.execute(context);
+    }
+
+    private static class RequireNonPlayerSourceSyntaxExceptionType extends SimpleCommandExceptionType {
+
+        public RequireNonPlayerSourceSyntaxExceptionType() {
+            super(() -> "Players are not permitted to run this command!");
+        }
+
     }
 }

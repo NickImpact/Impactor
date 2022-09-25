@@ -26,7 +26,7 @@
 package net.impactdev.impactor.game.commands;
 
 import net.impactdev.impactor.api.commands.executors.CommandResult;
-import net.impactdev.impactor.api.commands.executors.CommandExecutors;
+import net.impactdev.impactor.api.commands.registration.CommandRegistrar;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
@@ -35,7 +35,7 @@ import net.impactdev.impactor.modules.ImpactorModule;
 public class CommandsModule implements ImpactorModule {
     @Override
     public void factories(FactoryProvider provider) {
-        provider.register(CommandExecutors.Factory.class, new ImpactorCommandFactory());
+        provider.register(CommandRegistrar.class, new ImpactorCommandRegistrar());
         provider.register(CommandResult.Factory.class, new ImpactorCommandResult.ImpactorCommandResultFactory());
     }
 

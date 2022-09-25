@@ -23,18 +23,22 @@
  *
  */
 
-package net.impactdev.impactor.api.commands.executors;
+package net.impactdev.impactor.game.test.commands.source;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.leangen.geantyref.TypeToken;
-import net.impactdev.impactor.api.utilities.context.Context;
+import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
-public interface CommandExecutor {
+public class TestCommandSourceStack extends CommandSourceStack {
 
-    TypeToken<CommandContext<CommandSourceStack>> COMMAND_CONTEXT = new TypeToken<CommandContext<CommandSourceStack>>() {};
-
-    CommandResult execute(Context context) throws CommandSyntaxException;
+    public TestCommandSourceStack(CommandSource param0, Vec3 param1, Vec2 param2, ServerLevel param3, int param4, String param5, Component param6, MinecraftServer param7, @Nullable Entity param8) {
+        super(param0, param1, param2, param3, param4, param5, param6, param7, param8);
+    }
 
 }

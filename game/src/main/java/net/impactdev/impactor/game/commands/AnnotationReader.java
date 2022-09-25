@@ -25,19 +25,20 @@
 
 package net.impactdev.impactor.game.commands;
 
-import net.impactdev.impactor.api.commands.executors.CommandExecutor;
-import net.impactdev.impactor.api.commands.executors.CommandExecutors;
+import net.impactdev.impactor.api.commands.ImpactorCommand;
 
-public class ImpactorCommandFactory implements CommandExecutors.Factory {
+import java.lang.annotation.Annotation;
+import java.util.Optional;
 
-    @Override
-    public CommandExecutors allowAll(CommandExecutor executor) {
-        return new AllowAllExecutor(executor);
+public class AnnotationReader {
+
+    public static <T extends Annotation> T require(ImpactorCommand target, Class<T> type) {
+        return optional(target, type)
+                .orElseThrow(() -> new IllegalArgumentException("Required annotation not found: " + type.getSimpleName()));
     }
 
-    @Override
-    public CommandExecutors playersOnly(CommandExecutor executor) {
-        return new PlayersOnlyExecutor(executor);
+    public static <T extends Annotation> Optional<T> optional(ImpactorCommand target, Class<T> type) {
+        return Optional.ofNullable(target.getClass().getAnnotation(type));
     }
 
 }

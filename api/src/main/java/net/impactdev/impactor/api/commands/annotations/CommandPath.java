@@ -23,18 +23,25 @@
  *
  */
 
-package net.impactdev.impactor.api.commands.executors;
+package net.impactdev.impactor.api.commands.annotations;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.leangen.geantyref.TypeToken;
-import net.impactdev.impactor.api.utilities.context.Context;
-import net.minecraft.commands.CommandSourceStack;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface CommandExecutor {
+/**
+ * Specifies the root of a particular command. For instance, in this particular path, "impactor testing abc",
+ * if our target {@link Alias} is "abc", we can specify "impactor testing" via {@link #value()} to scan
+ * the command tree for that particular path. Should that path not yet exist, this path will be generated as
+ * literal nodes down to the target alias.
+ *
+ * <p>This particular element need only be applied to a
+ */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface CommandPath {
 
-    TypeToken<CommandContext<CommandSourceStack>> COMMAND_CONTEXT = new TypeToken<CommandContext<CommandSourceStack>>() {};
-
-    CommandResult execute(Context context) throws CommandSyntaxException;
+    String value();
 
 }

@@ -23,22 +23,17 @@
  *
  */
 
-package net.impactdev.impactor.game.commands;
+package net.impactdev.impactor.api.commands.annotations;
 
-import net.impactdev.impactor.api.commands.executors.CommandExecutor;
-import net.impactdev.impactor.api.commands.executors.CommandExecutors;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class AllowAllExecutor implements CommandExecutors {
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Permission {
 
-    private final CommandExecutor delegate;
-
-    public AllowAllExecutor(CommandExecutor delegate) {
-        this.delegate = delegate;
-    }
-
-    @Override
-    public CommandExecutor executor() {
-        return this.delegate;
-    }
+    String value();
 
 }
