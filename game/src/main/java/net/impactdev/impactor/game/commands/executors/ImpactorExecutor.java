@@ -28,8 +28,8 @@ package net.impactdev.impactor.game.commands.executors;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.exceptions.CommandResultException;
-import net.impactdev.impactor.api.commands.executors.CommandExecutor;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.utilities.context.Context;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
@@ -47,7 +47,7 @@ public final class ImpactorExecutor implements Command<CommandSourceStack> {
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         try {
-            Context ctx = Context.empty().append(CommandExecutor.COMMAND_CONTEXT, context);
+            Context ctx = Context.empty().append(ImpactorCommand.COMMAND_CONTEXT, context);
             CommandResult result = this.delegate.execute(ctx);
             if(result.reason().isPresent()) {
                 throw new CommandResultException(result, result.reason().get());

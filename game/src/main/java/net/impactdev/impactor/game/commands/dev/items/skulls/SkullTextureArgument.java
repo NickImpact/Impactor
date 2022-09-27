@@ -33,9 +33,9 @@ import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
 import net.impactdev.impactor.api.commands.annotations.Permission;
 import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
-import net.impactdev.impactor.api.commands.executors.CommandExecutor;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
+import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.text.format.TextColor;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
@@ -55,23 +55,21 @@ public class SkullTextureArgument implements ImpactorCommand.Argument<String> {
     }
 
     @Override
-    public CommandExecutor executor() {
-        return ctx -> {
-            CommandContext<CommandSourceStack> context = ctx.require(CommandExecutor.COMMAND_CONTEXT);
-            ServerPlayer source = ctx.require(ServerPlayer.class);
+    public CommandResult execute(Context context) {
+        CommandContext<CommandSourceStack> ctx = context.require(COMMAND_CONTEXT);
+        ServerPlayer source = context.require(ServerPlayer.class);
 
-            ImpactorItemStack skull = ImpactorItemStack.skull()
-                    .title(text("Impactor Skull Test").color(TextColor.color(0x42, 0x87, 0xf5)))
-                    .glow()
-                    .unbreakable()
-                    .player(context.getArgument("base64", String.class), true)
-                    .build();
+        ImpactorItemStack skull = ImpactorItemStack.skull()
+                .title(text("Impactor Skull Test").color(TextColor.color(0x42, 0x87, 0xf5)))
+                .glow()
+                .unbreakable()
+                .player(ctx.getArgument("base64", String.class), true)
+                .build();
 
-            ItemStack minecraft = skull.asMinecraftNative();
-            source.inventory.add(minecraft);
-            source.inventoryMenu.broadcastChanges();
+        ItemStack minecraft = skull.asMinecraftNative();
+        source.inventory.add(minecraft);
+        source.inventoryMenu.broadcastChanges();
 
-            return CommandResult.successful();
-        };
+        return CommandResult.successful();
     }
 }

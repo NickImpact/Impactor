@@ -23,18 +23,14 @@
  *
  */
 
-package net.impactdev.impactor.api.commands.executors;
+package net.impactdev.impactor.game.commands.executors;
 
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.leangen.geantyref.TypeToken;
+import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.utilities.context.Context;
-import net.minecraft.commands.CommandSourceStack;
 
 public interface CommandExecutor {
 
-    TypeToken<CommandContext<CommandSourceStack>> COMMAND_CONTEXT = new TypeToken<CommandContext<CommandSourceStack>>() {};
-
-    CommandResult execute(Context context) throws CommandSyntaxException;
+    CommandResult execute(Context var1) throws CommandSyntaxException;
 
 }

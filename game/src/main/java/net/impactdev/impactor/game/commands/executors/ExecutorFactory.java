@@ -27,7 +27,6 @@ package net.impactdev.impactor.game.commands.executors;
 
 import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
-import net.impactdev.impactor.api.commands.executors.CommandExecutor;
 
 import java.util.Optional;
 
@@ -40,14 +39,14 @@ public class ExecutorFactory {
         if(restrictions.isPresent()) {
             RestrictedExecutor settings = restrictions.get();
             if(settings.players() && settings.system()) {
-                return command.executor();
+                return command::execute;
             } else if(settings.players()) {
-                return new PlayerOnlyExecutor(command.executor());
+                return new PlayerOnlyExecutor(command::execute);
             } else {
-                return new NonPlayerExecutor(command.executor());
+                return new NonPlayerExecutor(command::execute);
             }
         } else {
-            return command.executor();
+            return command::execute;
         }
     }
 

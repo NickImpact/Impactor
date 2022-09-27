@@ -26,14 +26,19 @@
 package net.impactdev.impactor.api.commands;
 
 import com.mojang.brigadier.arguments.ArgumentType;
-import net.impactdev.impactor.api.commands.executors.CommandExecutor;
+import com.mojang.brigadier.context.CommandContext;
+import io.leangen.geantyref.TypeToken;
+import net.impactdev.impactor.api.commands.executors.CommandResult;
+import net.impactdev.impactor.api.utilities.context.Context;
 import net.minecraft.commands.CommandSourceStack;
 
 import java.util.function.Predicate;
 
 public interface ImpactorCommand {
 
-    CommandExecutor executor();
+    TypeToken<CommandContext<CommandSourceStack>> COMMAND_CONTEXT = new TypeToken<CommandContext<CommandSourceStack>>() {};
+
+    CommandResult execute(Context context);
 
     interface Argument<T> extends ImpactorCommand {
 

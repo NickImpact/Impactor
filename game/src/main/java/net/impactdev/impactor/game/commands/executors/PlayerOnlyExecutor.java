@@ -26,7 +26,7 @@
 package net.impactdev.impactor.game.commands.executors;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.impactdev.impactor.api.commands.executors.CommandExecutor;
+import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.utilities.context.Context;
 import net.minecraft.server.level.ServerPlayer;
@@ -41,7 +41,7 @@ public final class PlayerOnlyExecutor implements CommandExecutor {
 
     @Override
     public CommandResult execute(Context context) throws CommandSyntaxException {
-        ServerPlayer player = context.require(CommandExecutor.COMMAND_CONTEXT).getSource().getPlayerOrException();
+        ServerPlayer player = context.require(ImpactorCommand.COMMAND_CONTEXT).getSource().getPlayerOrException();
         context.append(ServerPlayer.class, player);
 
         return this.delegate.execute(context);

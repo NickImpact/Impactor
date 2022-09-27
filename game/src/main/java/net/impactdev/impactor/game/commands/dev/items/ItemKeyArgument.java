@@ -32,10 +32,10 @@ import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
 import net.impactdev.impactor.api.commands.annotations.Permission;
 import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
-import net.impactdev.impactor.api.commands.executors.CommandExecutor;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.types.ItemType;
+import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.commands.CommandSourceStack;
@@ -59,27 +59,25 @@ public class ItemKeyArgument implements ImpactorCommand.Argument<ResourceLocatio
     }
 
     @Override
-    public CommandExecutor executor() {
-        return ctx -> {
-            CommandContext<CommandSourceStack> context = ctx.require(CommandExecutor.COMMAND_CONTEXT);
-            ServerPlayer source = ctx.require(ServerPlayer.class);
-            ResourceLocation location = context.getArgument("key", ResourceLocation.class);
+    public CommandResult execute(Context context) {
+        CommandContext<CommandSourceStack> ctx = context.require(COMMAND_CONTEXT);
+        ServerPlayer source = context.require(ServerPlayer.class);
+        ResourceLocation location = ctx.getArgument("key", ResourceLocation.class);
 
-            @Subst("minecraft") String namespace = location.getNamespace();
-            @Subst("air") String path = location.getPath();
-            Key key = Key.key(namespace, path);
-            ItemType type = ItemType.from(key);
-            ImpactorItemStack stack = ImpactorItemStack.basic()
-                    .type(type)
-                    .title(text("Impactor Item Test").color(NamedTextColor.GOLD))
-                    .unbreakable()
-                    .build();
+        @Subst("minecraft") String namespace = location.getNamespace();
+        @Subst("air") String path = location.getPath();
+        Key key = Key.key(namespace, path);
+        ItemType type = ItemType.from(key);
+        ImpactorItemStack stack = ImpactorItemStack.basic()
+                .type(type)
+                .title(text("Impactor Item Test").color(NamedTextColor.GOLD))
+                .unbreakable()
+                .build();
 
-            ItemStack minecraft = stack.asMinecraftNative();
-            source.inventory.add(minecraft);
-            source.inventoryMenu.broadcastChanges();
+        ItemStack minecraft = stack.asMinecraftNative();
+        source.inventory.add(minecraft);
+        source.inventoryMenu.broadcastChanges();
 
-            return CommandResult.successful();
-        };
+        return CommandResult.successful();
     }
 }

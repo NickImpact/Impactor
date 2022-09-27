@@ -68,6 +68,7 @@ public class ImpactorCommandResult implements CommandResult {
         public CommandResult exceptional(Throwable throwable) {
             return new ImpactorCommandResult(false, 0, throwable);
         }
+
     }
 
     public static class ImpactorCommandResultBuilder implements CommandResultBuilder {

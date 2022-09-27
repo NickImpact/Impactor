@@ -27,15 +27,15 @@ package net.impactdev.impactor.game.test.commands.exceptional;
 
 import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
-import net.impactdev.impactor.api.commands.executors.CommandExecutor;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
+import net.impactdev.impactor.api.utilities.context.Context;
 
 @CommandPath("exceptional passing")
 @Alias("failing")
 public class FailingChild extends Failing {
 
     @Override
-    public CommandExecutor executor() {
-        return ctx -> CommandResult.exceptional(new RuntimeException("I also fail purposefully!"));
+    public CommandResult execute(Context context) {
+        throw new RuntimeException("I also fail purposefully!");
     }
 }

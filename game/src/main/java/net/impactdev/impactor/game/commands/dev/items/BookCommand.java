@@ -25,20 +25,18 @@
 
 package net.impactdev.impactor.game.commands.dev.items;
 
-import com.mojang.brigadier.context.CommandContext;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
 import net.impactdev.impactor.api.commands.annotations.Permission;
 import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
-import net.impactdev.impactor.api.commands.executors.CommandExecutor;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.extensions.BookStack;
+import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
@@ -51,28 +49,25 @@ import static net.kyori.adventure.text.Component.text;
 public class BookCommand implements ImpactorCommand {
 
     @Override
-    public CommandExecutor executor() {
-        return ctx -> {
-            CommandContext<CommandSourceStack> context = ctx.require(CommandExecutor.COMMAND_CONTEXT);
-            ServerPlayer source = ctx.require(ServerPlayer.class);
+    public CommandResult execute(Context context) {
+        ServerPlayer source = context.require(ServerPlayer.class);
 
-            ImpactorItemStack book = ImpactorItemStack.book()
-                    .type(BookStack.BookType.WRITTEN)
-                    .title(text("Impactor Book Test")
-                            .style(Style.style().decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE))
-                            .color(TextColor.color(0x42, 0x87, 0xf5))
-                    )
-                    .author("NickImpact")
-                    .unbreakable()
-                    .generation(BookStack.Generation.ORIGINAL)
-                    .pages(text("Hello World!"))
-                    .build();
+        ImpactorItemStack book = ImpactorItemStack.book()
+                .type(BookStack.BookType.WRITTEN)
+                .title(text("Impactor Book Test")
+                        .style(Style.style().decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE))
+                        .color(TextColor.color(0x42, 0x87, 0xf5))
+                )
+                .author("NickImpact")
+                .unbreakable()
+                .generation(BookStack.Generation.ORIGINAL)
+                .pages(text("Hello World!"))
+                .build();
 
-            ItemStack minecraft = book.asMinecraftNative();
-            source.inventory.add(minecraft);
-            source.inventoryMenu.broadcastChanges();
+        ItemStack minecraft = book.asMinecraftNative();
+        source.inventory.add(minecraft);
+        source.inventoryMenu.broadcastChanges();
 
-            return CommandResult.successful();
-        };
+        return CommandResult.successful();
     }
 }
