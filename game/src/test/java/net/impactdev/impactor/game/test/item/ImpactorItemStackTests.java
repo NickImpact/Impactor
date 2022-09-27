@@ -64,12 +64,6 @@ public class ImpactorItemStackTests {
                 .unbreakable()
                 .build();
 
-        ImpactorItemStack diamond = ImpactorItemStack.basic()
-                .type(ItemTypes.DIAMOND)
-                .title(Component.text("A colorful diamond!").color(TextColor.color(0x42, 0x87, 0xf5)))
-                .glow()
-                .build();
-
         assertEquals(ItemTypes.DIRT, basic.type());
         assertNotNull(basic.title());
         assertTrue(basic.unbreakable());

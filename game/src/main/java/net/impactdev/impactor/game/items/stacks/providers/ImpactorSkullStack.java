@@ -26,8 +26,7 @@
 package net.impactdev.impactor.game.items.stacks.providers;
 
 import net.impactdev.impactor.api.items.AbstractedItemStack;
-import net.impactdev.impactor.api.items.ImpactorItemStack;
-import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
+import net.impactdev.impactor.api.items.builders.provided.SkullStackBuilder;
 import net.impactdev.impactor.api.items.extensions.SkullStack;
 import net.impactdev.impactor.api.items.types.ItemTypes;
 import net.impactdev.impactor.game.items.stacks.builders.ImpactorSkullStackBuilder;
@@ -69,11 +68,6 @@ public final class ImpactorSkullStack extends AbstractedItemStack implements Sku
     @Override
     public Optional<PlayerHeadMetadata> playerMetadata() {
         return Optional.ofNullable(this.metadata);
-    }
-
-    @Override
-    public <I extends ImpactorItemStack, B extends ImpactorItemStackBuilder<I, B>> B asBuilder() {
-        return null;
     }
 
     @Override
@@ -132,6 +126,14 @@ public final class ImpactorSkullStack extends AbstractedItemStack implements Sku
         @Override
         public Optional<String> texture() {
             return Optional.ofNullable(this.texture);
+        }
+
+        private void apply(SkullStackBuilder root) {
+            if(this.username != null) {
+                root.player(this.username, false);
+            } else {
+                root.player(this.texture, true);
+            }
         }
     }
 }

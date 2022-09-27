@@ -153,14 +153,4 @@ public interface ImpactorItemStack {
      */
     boolean unbreakable();
 
-    /**
-     * Returns a new builder satisfied with the set values of this component. This is to allow
-     * for mutability on an item stack without actually altering this particular stack, thereby
-     * maintaining thread safety and immutability.
-     *
-     * @return A builder composed of the values making up this particular item stack
-     * @param <B> The type of builder responsible for manipulating the item stack
-     */
-    <I extends ImpactorItemStack, B extends ImpactorItemStackBuilder<I, B>> B asBuilder();
-
 }

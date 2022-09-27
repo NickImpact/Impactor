@@ -23,15 +23,10 @@
  *
  */
 
-package net.impactdev.impactor.game.items.stacks.providers;
+package net.impactdev.impactor.api.builders;
 
-import net.impactdev.impactor.api.items.AbstractedItemStack;
-import net.impactdev.impactor.game.items.stacks.builders.ImpactorBasicStackBuilder;
+public interface Buildable<T, B extends Builder<T>> {
 
-public class ImpactorBasicStack extends AbstractedItemStack {
-
-    public ImpactorBasicStack(ImpactorBasicStackBuilder builder) {
-        super(builder.type, builder);
-    }
+    B toBuilder();
 
 }

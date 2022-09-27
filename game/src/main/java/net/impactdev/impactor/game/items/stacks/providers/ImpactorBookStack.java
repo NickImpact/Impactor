@@ -26,12 +26,7 @@
 package net.impactdev.impactor.game.items.stacks.providers;
 
 import net.impactdev.impactor.api.items.AbstractedItemStack;
-import net.impactdev.impactor.api.items.ImpactorItemStack;
-import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
-import net.impactdev.impactor.api.items.builders.provided.BookStackBuilder;
 import net.impactdev.impactor.api.items.extensions.BookStack;
-import net.impactdev.impactor.api.items.properties.MetaFlag;
-import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.impactdev.impactor.game.items.stacks.builders.ImpactorBookStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -89,32 +84,6 @@ public class ImpactorBookStack extends AbstractedItemStack implements BookStack 
     @Override
     public List<Component> contents() {
         return new ArrayList<>(this.pages.values());
-    }
-
-    @Override
-    public <I extends ImpactorItemStack, B extends ImpactorItemStackBuilder<I, B>> B asBuilder() {
-        BookStackBuilder builder = ImpactorItemStack.book()
-                .type(this.bookType)
-                .title(this.title)
-                .author(this.author)
-                .generation(this.generation)
-                .pages(this.pages.values())
-                .lore(this.lore)
-                .quantity(this.quantity);
-
-        for(Enchantment enchantment : this.enchantments) {
-            builder.enchantment(enchantment);
-        }
-
-        for(MetaFlag flag : this.flags) {
-            builder.hide(flag);
-        }
-
-        if(this.unbreakable) {
-            builder.unbreakable();
-        }
-
-        return (B) builder.build();
     }
 
     @Override
