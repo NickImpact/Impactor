@@ -29,15 +29,10 @@ import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
 import net.impactdev.impactor.api.items.extensions.SkullStack;
 import org.jetbrains.annotations.Contract;
 
-import java.util.UUID;
-
 public interface SkullStackBuilder extends ImpactorItemStackBuilder<SkullStack, SkullStackBuilder> {
 
     @Contract("_ -> this")
     SkullStackBuilder mob(final SkullStack.SkullType type);
-
-    @Contract("_ -> this")
-    SkullStackBuilder player(final UUID uuid);
 
     @Contract("_,_ -> this")
     SkullStackBuilder player(final String spec, final boolean texture);

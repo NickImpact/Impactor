@@ -30,51 +30,14 @@ import net.impactdev.impactor.api.items.builders.AbstractStackBuilder;
 import net.impactdev.impactor.api.items.builders.provided.SkullStackBuilder;
 import net.impactdev.impactor.api.items.extensions.SkullStack;
 import net.impactdev.impactor.game.items.stacks.providers.ImpactorSkullStack;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ImpactorSkullStackBuilder extends AbstractStackBuilder<SkullStack, SkullStackBuilder>
-        implements SkullStackBuilder, SkullStackBuilder.Mob, SkullStackBuilder.Player {
+public class ImpactorSkullStackBuilder extends AbstractStackBuilder<SkullStack, SkullStackBuilder> implements SkullStackBuilder {
 
     public boolean isPlayer;
     public @Nullable SkullStack.SkullType type;
     public @Nullable String texture;
     public @Nullable String target;
-
-    @Override
-    public Mob mob() {
-        this.isPlayer = false;
-        return this;
-    }
-
-    @Override
-    public SkullStackBuilder type(SkullStack.SkullType type) {
-        this.type = type;
-        return this;
-    }
-
-    @Override
-    public Player player() {
-        this.isPlayer = true;
-        return this;
-    }
-
-    @Override
-    public Player of(String target) {
-        this.target = target;
-        return this;
-    }
-
-    @Override
-    public Player texture(@NotNull String texture) {
-        this.texture = texture;
-        return this;
-    }
-
-    @Override
-    public SkullStackBuilder complete() {
-        return this;
-    }
 
     @Override
     public SkullStack build() {
@@ -87,4 +50,22 @@ public class ImpactorSkullStackBuilder extends AbstractStackBuilder<SkullStack, 
         return new ImpactorSkullStack(this);
     }
 
+    @Override
+    public SkullStackBuilder mob(SkullStack.SkullType type) {
+        this.isPlayer = false;
+        this.type = type;
+        return this;
+    }
+
+    @Override
+    public SkullStackBuilder player(String spec, boolean texture) {
+        if(texture) {
+            this.texture = spec;
+        } else {
+            this.target = spec;
+        }
+
+        this.isPlayer = true;
+        return this;
+    }
 }

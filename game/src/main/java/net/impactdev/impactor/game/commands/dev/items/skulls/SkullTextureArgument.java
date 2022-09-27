@@ -64,9 +64,7 @@ public class SkullTextureArgument implements ImpactorCommand.Argument<String> {
                     .title(text("Impactor Skull Test").color(TextColor.color(0x42, 0x87, 0xf5)))
                     .glow()
                     .unbreakable()
-                    .player()
-                    .texture("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmY1OGZiN2NiZjlmOGRjZmMzYmM5ZDYxYzdjYjViMjI5YmY0OWRiMTEwMTMzNmZmZGMyZDA4N2MwYjk0MTYyIn19fQ==")
-                    .complete()
+                    .player(context.getArgument("base64", String.class), true)
                     .build();
 
             ItemStack minecraft = skull.asMinecraftNative();

@@ -118,7 +118,11 @@ public class ImpactorItemStackTests {
         assertTrue(player.supportsTextures());
         assertFalse(player.skullType().isPresent());
         assertEquals(1, player.quantity());
-        assertTrue(player.owner().filter(username -> username.equals("NickImpact")).isPresent());
+        assertTrue(player.playerMetadata()
+                .flatMap(SkullStack.PlayerHeadMetadata::username)
+                .filter(username -> username.equals("NickImpact"))
+                .isPresent()
+        );
         assertTrue(player.unbreakable());
 
         ItemStack pSkull = player.asMinecraftNative();

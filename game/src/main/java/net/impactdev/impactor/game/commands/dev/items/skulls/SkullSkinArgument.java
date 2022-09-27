@@ -64,9 +64,7 @@ public class SkullSkinArgument implements ImpactorCommand.Argument<String> {
                     .title(text("Impactor Skull Test").color(TextColor.color(0x42, 0x87, 0xf5)))
                     .glow()
                     .unbreakable()
-                    .player()
-                    .of(context.getArgument("value", String.class))
-                    .complete()
+                    .player(context.getArgument("value", String.class), false)
                     .build();
 
             ItemStack minecraft = skull.asMinecraftNative();

@@ -37,9 +37,7 @@ public interface SkullStack extends ImpactorItemStack {
 
     Optional<SkullType> skullType();
 
-    Optional<String> texture();
-
-    Optional<String> owner();
+    Optional<PlayerHeadMetadata> playerMetadata();
 
     enum SkullType {
         SKELETON(ItemTypes.SKELETON_SKULL),
@@ -56,6 +54,14 @@ public interface SkullStack extends ImpactorItemStack {
         public ItemType delegate() {
             return this.type;
         }
+
+    }
+
+    interface PlayerHeadMetadata {
+
+        Optional<String> username();
+
+        Optional<String> texture();
 
     }
 

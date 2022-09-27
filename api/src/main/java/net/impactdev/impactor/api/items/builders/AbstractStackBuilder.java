@@ -45,6 +45,7 @@ public abstract class AbstractStackBuilder<I extends ImpactorItemStack, B extend
     public int quantity = 1;
     public Set<Enchantment> enchantments = Sets.newLinkedHashSet();
     public Set<MetaFlag> flags = Sets.newHashSet();
+    public int damage;
     public boolean unbreakable;
 
     @Override
@@ -74,6 +75,12 @@ public abstract class AbstractStackBuilder<I extends ImpactorItemStack, B extend
     @Override
     public B enchantment(Enchantment enchantment) {
         this.enchantments.add(enchantment);
+        return (B) this;
+    }
+
+    @Override
+    public B damage(int damage) {
+        this.damage = damage;
         return (B) this;
     }
 

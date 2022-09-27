@@ -39,18 +39,21 @@ import net.minecraft.world.item.ItemStack;
 import java.util.Optional;
 import java.util.UUID;
 
-public class ImpactorSkullStack extends AbstractedItemStack implements SkullStack {
+public final class ImpactorSkullStack extends AbstractedItemStack implements SkullStack {
 
     private final SkullType type;
-    private final String target;
-    private final String texture;
+    private final PlayerHeadMetadata metadata;
 
     @SuppressWarnings("ConstantConditions")
     public ImpactorSkullStack(ImpactorSkullStackBuilder builder) {
         super(builder.isPlayer ? ItemTypes.PLAYER_HEAD : builder.type.delegate(), builder);
         this.type = builder.type;
-        this.target = builder.target;
-        this.texture = builder.texture;
+
+        if(builder.isPlayer) {
+            this.metadata = new ImpactorPlayerHeadMetadata(builder.target, builder.texture);
+        } else {
+            this.metadata = null;
+        }
     }
 
     @Override
@@ -64,13 +67,8 @@ public class ImpactorSkullStack extends AbstractedItemStack implements SkullStac
     }
 
     @Override
-    public Optional<String> texture() {
-        return Optional.ofNullable(this.texture);
-    }
-
-    @Override
-    public Optional<String> owner() {
-        return Optional.ofNullable(this.target);
+    public Optional<PlayerHeadMetadata> playerMetadata() {
+        return Optional.ofNullable(this.metadata);
     }
 
     @Override
@@ -81,19 +79,23 @@ public class ImpactorSkullStack extends AbstractedItemStack implements SkullStac
     @Override
     public ItemStack asMinecraftNative() {
         ItemStack result = super.asMinecraftNative();
-        if(this.owner().isPresent()) {
-            if(!this.texture().isPresent()) {
-                result.getOrCreateTag().putString("SkullOwner", this.owner().get());
-            } else {
-                CompoundTag nbt = result.getOrCreateTagElement("SkullOwner");
-                nbt.putString("Name", this.owner().orElse("Impactor"));
-                this.properties(nbt);
+        if(this.playerMetadata().isPresent()) {
+            if (this.metadata.username().isPresent()) {
+                if (!this.metadata.texture().isPresent()) {
+                    result.getOrCreateTag().putString("SkullOwner", this.metadata.username().get());
+                }
+                else {
+                    CompoundTag nbt = result.getOrCreateTagElement("SkullOwner");
+                    nbt.putString("Name", this.metadata.username().orElse("Impactor"));
+                    this.properties(nbt);
+                }
             }
-        } else {
-            if(this.texture().isPresent()) {
-                CompoundTag nbt = result.getOrCreateTagElement("SkullOwner");
-                nbt.putUUID("Id", UUID.randomUUID());
-                this.properties(nbt);
+            else {
+                if (this.metadata.texture().isPresent()) {
+                    CompoundTag nbt = result.getOrCreateTagElement("SkullOwner");
+                    nbt.putUUID("Id", UUID.randomUUID());
+                    this.properties(nbt);
+                }
             }
         }
 
@@ -105,10 +107,31 @@ public class ImpactorSkullStack extends AbstractedItemStack implements SkullStac
         ListTag textures = new ListTag();
 
         CompoundTag value = new CompoundTag();
-        value.put("Value", StringTag.valueOf(this.texture().get()));
+        value.put("Value", StringTag.valueOf(this.metadata.texture().orElseThrow(() -> new IllegalStateException("No available texture"))));
         textures.add(value);
         properties.put("textures", textures);
 
         nbt.put("Properties", properties);
+    }
+
+    public static class ImpactorPlayerHeadMetadata implements PlayerHeadMetadata {
+
+        private final String username;
+        private final String texture;
+
+        public ImpactorPlayerHeadMetadata(final String username, final String texture) {
+            this.username = username;
+            this.texture = texture;
+        }
+
+        @Override
+        public Optional<String> username() {
+            return Optional.ofNullable(this.username);
+        }
+
+        @Override
+        public Optional<String> texture() {
+            return Optional.ofNullable(this.texture);
+        }
     }
 }
