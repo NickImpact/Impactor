@@ -34,6 +34,7 @@ import net.impactdev.impactor.api.items.types.ItemType;
 import net.impactdev.impactor.api.items.types.ItemTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.nbt.CompoundTag;
@@ -63,6 +64,12 @@ public class ImpactorItemStackTests {
                 .unbreakable()
                 .build();
 
+        ImpactorItemStack diamond = ImpactorItemStack.basic()
+                .type(ItemTypes.DIAMOND)
+                .title(Component.text("A colorful diamond!").color(TextColor.color(0x42, 0x87, 0xf5)))
+                .glow()
+                .build();
+
         assertEquals(ItemTypes.DIRT, basic.type());
         assertNotNull(basic.title());
         assertTrue(basic.unbreakable());
@@ -88,8 +95,7 @@ public class ImpactorItemStackTests {
     @Test
     public void skullItemStack() {
         SkullStack skeleton = ImpactorItemStack.skull()
-                .mob()
-                .type(SkullStack.SkullType.SKELETON)
+                .mob(SkullStack.SkullType.SKELETON)
                 .title(Component.text("A skeleton skull").color(NamedTextColor.YELLOW))
                 .quantity(1)
                 .build();
@@ -103,13 +109,9 @@ public class ImpactorItemStackTests {
         assertFalse(sSkull.getOrCreateTag().contains("SkullOwner"));
 
         SkullStack player = ImpactorItemStack.skull()
-                .player()
-                .of("NickImpact")
-                .complete()
+                .player("NickImpact", false)
                 .title(mini("<gradient:green:blue>NickImpact's Skull"))
-                .lore(Lists.newArrayList(
-                        mini("<gray>A skull of a really cool guy")
-                ))
+                .lore(Lists.newArrayList(mini("<gray>A skull of a really cool guy")))
                 .unbreakable()
                 .quantity(1)
                 .build();

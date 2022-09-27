@@ -25,13 +25,13 @@
 
 package net.impactdev.impactor.game.items.stacks.providers;
 
+import net.impactdev.impactor.api.items.AbstractedItemStack;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
 import net.impactdev.impactor.api.items.builders.provided.BookStackBuilder;
 import net.impactdev.impactor.api.items.extensions.BookStack;
 import net.impactdev.impactor.api.items.properties.MetaFlag;
 import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
-import net.impactdev.impactor.game.items.stacks.ImpactorAbstractedItemStack;
 import net.impactdev.impactor.game.items.stacks.builders.ImpactorBookStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
 
-public class ImpactorBookStack extends ImpactorAbstractedItemStack implements BookStack {
+public class ImpactorBookStack extends AbstractedItemStack implements BookStack {
 
     private final BookType bookType;
     private final String author;

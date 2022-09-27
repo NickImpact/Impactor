@@ -106,6 +106,14 @@ public interface ImpactorItemStackBuilder<I extends ImpactorItemStack, B extends
     B enchantment(final Enchantment enchantment);
 
     /**
+     * Specifies
+     *
+     * @param damage
+     * @return
+     */
+    B damage(final int damage);
+
+    /**
      * Marks the resulting item stack as unbreakable. This simply means that any tool that is
      * expected to take damage and eventually break over time from usage should not receive
      * any actual damage, and simply have infinite durability.

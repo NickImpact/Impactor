@@ -25,35 +25,21 @@
 
 package net.impactdev.impactor.api.items.builders.provided;
 
-import net.impactdev.impactor.api.builders.Builder;
 import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
 import net.impactdev.impactor.api.items.extensions.SkullStack;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 public interface SkullStackBuilder extends ImpactorItemStackBuilder<SkullStack, SkullStackBuilder> {
 
-    @Contract("-> !null")
-    Mob mob();
+    @Contract("_ -> this")
+    SkullStackBuilder mob(final SkullStack.SkullType type);
 
-    @Contract("-> !null")
-    Player player();
+    @Contract("_ -> this")
+    SkullStackBuilder player(final UUID uuid);
 
-    interface Mob {
-
-        @Contract("_ -> !null")
-        SkullStackBuilder type(final SkullStack.SkullType type);
-
-    }
-
-    interface Player extends Builder.Child<SkullStackBuilder> {
-
-        @Contract("_ -> this")
-        Player of(final String target);
-
-        @Contract("_ -> this")
-        Player texture(@NotNull final String texture);
-
-    }
+    @Contract("_,_ -> this")
+    SkullStackBuilder player(final String spec, final boolean texture);
 
 }

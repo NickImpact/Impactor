@@ -25,14 +25,14 @@
 
 package net.impactdev.impactor.game.items.stacks.providers;
 
+import net.impactdev.impactor.api.items.AbstractedItemStack;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
 import net.impactdev.impactor.api.items.properties.MetaFlag;
 import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
-import net.impactdev.impactor.game.items.stacks.ImpactorAbstractedItemStack;
 import net.impactdev.impactor.game.items.stacks.builders.ImpactorBasicStackBuilder;
 
-public class ImpactorBasicStack extends ImpactorAbstractedItemStack {
+public class ImpactorBasicStack extends AbstractedItemStack {
 
     public ImpactorBasicStack(ImpactorBasicStackBuilder builder) {
         super(builder.type, builder);

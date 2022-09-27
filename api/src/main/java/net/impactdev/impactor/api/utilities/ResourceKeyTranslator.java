@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.util;
+package net.impactdev.impactor.api.utilities;
 
 import net.kyori.adventure.key.Key;
 import net.minecraft.resources.ResourceLocation;
