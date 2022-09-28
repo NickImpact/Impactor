@@ -23,17 +23,33 @@
  *
  */
 
-package net.impactdev.impactor.api.commands.annotations;
+package net.impactdev.impactor.game.test.commands.permissions;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import net.impactdev.impactor.api.commands.ImpactorCommand;
+import net.impactdev.impactor.api.commands.annotations.Alias;
+import net.impactdev.impactor.api.commands.annotations.CommandPath;
+import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
+import net.impactdev.impactor.api.commands.executors.CommandResult;
+import net.impactdev.impactor.api.utilities.context.Context;
+import net.minecraft.commands.CommandSourceStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Permission {
+import java.util.function.Predicate;
 
-    String value();
+@CommandPath("requirements")
+@Alias("permissions")
+@Permission("impactor.commands.tests.permissions")
+public class PermissionSetCommand implements ImpactorCommand {
+
+    @Override
+    public @Nullable Predicate<CommandSourceStack> requirement() {
+        return null;
+    }
+
+    @Override
+    public @NotNull CommandResult execute(Context context) {
+        return CommandResult.successful();
+    }
 
 }

@@ -31,7 +31,7 @@ import com.mojang.brigadier.context.CommandContext;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
-import net.impactdev.impactor.api.commands.annotations.Permission;
+import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
 import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
@@ -40,6 +40,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import static net.kyori.adventure.text.Component.text;
 
@@ -55,7 +56,7 @@ public class SkullSkinArgument implements ImpactorCommand.Argument<String> {
     }
 
     @Override
-    public CommandResult execute(Context context) {
+    public @NotNull CommandResult execute(Context context) {
         CommandContext<CommandSourceStack> ctx = context.require(COMMAND_CONTEXT);
         ServerPlayer source = context.require(ServerPlayer.class);
 

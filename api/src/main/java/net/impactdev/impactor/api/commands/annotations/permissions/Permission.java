@@ -23,22 +23,19 @@
  *
  */
 
-package net.impactdev.impactor.game.test.commands.exceptional;
+package net.impactdev.impactor.api.commands.annotations.permissions;
 
-import net.impactdev.impactor.api.commands.ImpactorCommand;
-import net.impactdev.impactor.api.commands.annotations.Alias;
-import net.impactdev.impactor.api.commands.annotations.CommandPath;
-import net.impactdev.impactor.api.commands.executors.CommandResult;
-import net.impactdev.impactor.api.utilities.context.Context;
-import org.jetbrains.annotations.NotNull;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@CommandPath("exceptional")
-@Alias("failing")
-public class Failing implements ImpactorCommand {
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Permission {
 
-    @Override
-    public @NotNull CommandResult execute(Context context) {
-        throw new RuntimeException("I fail purposefully!");
-    }
+    String value();
+
+    Phase phase() default Phase.LOOKUP;
 
 }

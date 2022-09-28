@@ -31,6 +31,8 @@ import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.utilities.context.Context;
 import net.minecraft.commands.CommandSourceStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
@@ -38,17 +40,17 @@ public interface ImpactorCommand {
 
     TypeToken<CommandContext<CommandSourceStack>> COMMAND_CONTEXT = new TypeToken<CommandContext<CommandSourceStack>>() {};
 
+    @Nullable
+    default Predicate<CommandSourceStack> requirement() {
+        return null;
+    }
+
+    @NotNull
     CommandResult execute(Context context);
 
     interface Argument<T> extends ImpactorCommand {
 
         ArgumentType<T> type();
-
-    }
-
-    interface Requiring {
-
-        Predicate<CommandSourceStack> requirement();
 
     }
 

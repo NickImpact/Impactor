@@ -31,9 +31,13 @@ import com.google.common.collect.Multimap;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
+import net.impactdev.impactor.api.commands.PermissionsService;
 import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
+import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
+import net.impactdev.impactor.api.commands.annotations.permissions.Phase;
 import net.impactdev.impactor.game.commands.executors.ExecutorFactory;
 import net.impactdev.impactor.game.commands.executors.ImpactorExecutor;
 import net.impactdev.impactor.game.commands.specs.CommandRoot;
@@ -44,7 +48,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.function.Predicate;
 
+import static net.impactdev.impactor.game.commands.AnnotationReader.optional;
 import static net.impactdev.impactor.game.commands.AnnotationReader.require;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
@@ -60,11 +66,18 @@ public class CommandGenerator {
                 this.createArgument((ImpactorCommand.Argument<?>) command, alias.value()) :
                 this.createLiteral(alias.value());
 
-        if(command instanceof ImpactorCommand.Requiring) {
-            builder.requires(((ImpactorCommand.Requiring) command).requirement());
+        Predicate<CommandSourceStack> requirement = null;
+        Optional<Permission> permission = optional(command, Permission.class);
+        if(permission.isPresent() && permission.get().phase().equals(Phase.LOOKUP)) {
+            requirement = source -> Impactor.instance().services().provide(PermissionsService.class).hasPermission(source, permission.get().value());
         }
 
-        builder.executes(new ImpactorExecutor(ExecutorFactory.create(command)));
+        Optional.ofNullable(Optional.ofNullable(requirement)
+                    .map(r -> Optional.ofNullable(command.requirement()).map(r::and).orElse(r))
+                    .orElse(command.requirement()))
+                .ifPresent(builder::requires);
+
+        builder.executes(new ImpactorExecutor(ExecutorFactory.create(command), permission.orElse(null)));
         this.register(path, builder);
 
         if(!(command instanceof ImpactorCommand.Argument)) {

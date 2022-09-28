@@ -26,15 +26,18 @@
 package net.impactdev.impactor.game.test.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandRegistrationEvent;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
+import net.impactdev.impactor.api.commands.PermissionsService;
 import net.impactdev.impactor.api.event.ImpactorEvent;
 import net.impactdev.impactor.game.commands.event.ImpactorCommandRegistrationEvent;
 import net.impactdev.impactor.game.commands.registration.CommandManager;
+import net.impactdev.impactor.game.test.commands.permissions.AlwaysTrueOrFalsePermissionService;
 import net.kyori.event.EventBus;
 import net.minecraft.commands.CommandSourceStack;
 import org.junit.jupiter.api.BeforeAll;
@@ -93,5 +96,20 @@ public class CommandTest {
         assertEquals(1, assertDoesNotThrow(() -> dispatcher.execute("redirecting n", null)));
         assertEquals(2, assertDoesNotThrow(() -> dispatcher.execute("redirecting normal child", null)));
         assertEquals(2, assertDoesNotThrow(() -> dispatcher.execute("redirecting n child", null)));
+    }
+
+    @Test
+    public void requirements() {
+        AlwaysTrueOrFalsePermissionService service = new AlwaysTrueOrFalsePermissionService(true);
+        Impactor.instance().services().register(PermissionsService.class, service);
+
+        assertEquals(1, assertDoesNotThrow(() -> dispatcher.execute("requirements permissions", null)));
+
+        service = new AlwaysTrueOrFalsePermissionService(false);
+        Impactor.instance().services().register(PermissionsService.class, service);
+
+        assertThrows(CommandSyntaxException.class, () -> dispatcher.execute("requirements permissions", null));
+        CommandSyntaxException exception = assertThrows(CommandSyntaxException.class, () -> dispatcher.execute("requirements permissions-execution-check", null));
+        assertEquals("You don't have permission to execute this command!", exception.getMessage());
     }
 }

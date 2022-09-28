@@ -29,13 +29,14 @@ import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.utilities.context.Context;
+import org.jetbrains.annotations.NotNull;
 
 @CommandPath("exceptional passing")
 @Alias("failing")
 public class FailingChild extends Failing {
 
     @Override
-    public CommandResult execute(Context context) {
+    public @NotNull CommandResult execute(Context context) {
         throw new RuntimeException("I also fail purposefully!");
     }
 }

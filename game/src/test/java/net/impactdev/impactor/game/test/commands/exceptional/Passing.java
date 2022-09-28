@@ -30,13 +30,14 @@ import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.utilities.context.Context;
+import org.jetbrains.annotations.NotNull;
 
 @CommandPath("exceptional")
 @Alias("passing")
 public class Passing implements ImpactorCommand {
 
     @Override
-    public CommandResult execute(Context context) {
+    public @NotNull CommandResult execute(Context context) {
         return CommandResult.successful();
     }
 

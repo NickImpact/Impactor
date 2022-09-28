@@ -23,22 +23,27 @@
  *
  */
 
-package net.impactdev.impactor.game.test.commands.exceptional;
+package net.impactdev.impactor.game.test.commands.permissions;
 
-import net.impactdev.impactor.api.commands.ImpactorCommand;
-import net.impactdev.impactor.api.commands.annotations.Alias;
-import net.impactdev.impactor.api.commands.annotations.CommandPath;
-import net.impactdev.impactor.api.commands.executors.CommandResult;
-import net.impactdev.impactor.api.utilities.context.Context;
-import org.jetbrains.annotations.NotNull;
+import net.impactdev.impactor.api.commands.PermissionsService;
+import net.minecraft.commands.CommandSourceStack;
 
-@CommandPath("exceptional")
-@Alias("failing")
-public class Failing implements ImpactorCommand {
+public class AlwaysTrueOrFalsePermissionService implements PermissionsService {
+
+    private final boolean value;
+
+    public AlwaysTrueOrFalsePermissionService(boolean value) {
+        this.value = value;
+    }
 
     @Override
-    public @NotNull CommandResult execute(Context context) {
-        throw new RuntimeException("I fail purposefully!");
+    public boolean hasPermission(CommandSourceStack stack, String permission) {
+        return this.value;
+    }
+
+    @Override
+    public String getServiceName() {
+        return "Impactor Test Service";
     }
 
 }

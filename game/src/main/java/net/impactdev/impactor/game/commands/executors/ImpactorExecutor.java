@@ -28,32 +28,46 @@ package net.impactdev.impactor.game.commands.executors;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
+import net.impactdev.impactor.api.commands.PermissionsService;
+import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
+import net.impactdev.impactor.api.commands.annotations.permissions.Phase;
 import net.impactdev.impactor.api.commands.exceptions.CommandResultException;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.utilities.context.Context;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.minecraft.commands.CommandSourceStack;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public final class ImpactorExecutor implements Command<CommandSourceStack> {
 
     private final CommandExecutor delegate;
+    private final @Nullable Permission permission;
 
-    public ImpactorExecutor(CommandExecutor executor) {
+    public ImpactorExecutor(CommandExecutor executor, @Nullable Permission permission) {
         this.delegate = executor;
+        this.permission = permission;
     }
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         try {
-            Context ctx = Context.empty().append(ImpactorCommand.COMMAND_CONTEXT, context);
-            CommandResult result = this.delegate.execute(ctx);
-            if(result.reason().isPresent()) {
-                throw new CommandResultException(result, result.reason().get());
-            }
+            if(this.verify(context.getSource())) {
+                Context ctx = Context.empty().append(ImpactorCommand.COMMAND_CONTEXT, context);
+                CommandResult result = this.delegate.execute(ctx);
+                if (result.reason().isPresent()) {
+                    throw new CommandResultException(result, result.reason().get());
+                }
 
-            return result.result();
+                return result.result();
+            } else {
+                throw new NoPermissionExceptionType().create();
+            }
         } catch (CommandResultException tracked) {
             PrettyPrinter printer = new PrettyPrinter(80);
             printer.title("Command Parsing Exception");
@@ -92,6 +106,21 @@ public final class ImpactorExecutor implements Command<CommandSourceStack> {
             printer.print(System.err);
             throw unexpected;
         }
+    }
+
+    private boolean verify(CommandSourceStack source) {
+        return Optional.ofNullable(this.permission)
+                .filter(p -> p.phase().equals(Phase.EXECUTION))
+                .map(p -> Impactor.instance().services().provide(PermissionsService.class).hasPermission(source, p.value()))
+                .orElse(true);
+    }
+
+    private static class NoPermissionExceptionType extends SimpleCommandExceptionType {
+
+        public NoPermissionExceptionType() {
+            super(() -> "You don't have permission to execute this command!");
+        }
+
     }
 
 }
