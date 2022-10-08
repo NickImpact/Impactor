@@ -26,7 +26,6 @@
 package net.impactdev.impactor.api.items;
 
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.items.builders.ImpactorItemStackBuilder;
 import net.impactdev.impactor.api.items.builders.provided.BasicItemStackBuilder;
 import net.impactdev.impactor.api.items.builders.provided.BookStackBuilder;
 import net.impactdev.impactor.api.items.builders.provided.SkullStackBuilder;

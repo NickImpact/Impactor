@@ -26,15 +26,25 @@
 package net.impactdev.impactor.sponge;
 
 import com.google.inject.Inject;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.commands.PermissionsService;
 import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+import net.impactdev.impactor.game.commands.permissions.LuckPermsPermissionsService;
+import net.impactdev.impactor.game.commands.permissions.NoOpPermissionsService;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
 import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.Server;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
+import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
+
+import java.util.Optional;
 
 @Plugin("impactor")
 public class SpongeImpactorBootstrap extends ImpactorBootstrapper {
@@ -57,6 +67,16 @@ public class SpongeImpactorBootstrap extends ImpactorBootstrapper {
     @Listener
     public void onCommandRegistration(RegisterCommandEvent<Command.Raw> event) {
 
+    }
+
+    @Listener
+    public void initializePermissionsService(StartingEngineEvent<Server> event) {
+        boolean luckperms = Sponge.pluginManager().plugin("luckperms").isPresent();
+        if(luckperms) {
+            Impactor.instance().services().register(PermissionsService.class, new LuckPermsPermissionsService());
+        } else {
+            Impactor.instance().services().register(PermissionsService.class, new NoOpPermissionsService());
+        }
     }
 
 }

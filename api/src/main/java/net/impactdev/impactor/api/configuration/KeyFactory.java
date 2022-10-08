@@ -56,9 +56,9 @@ import net.impactdev.impactor.api.configuration.keys.FunctionalKey;
 @FunctionalInterface
 public interface KeyFactory<T> {
 
-	T getValue(ConfigurationAdapter adapter, String path, T def);
+	T getValue(ConfigurationAdapter adapter, ConfigPath path, T def);
 
-	default BaseConfigKey<T> createKey(String path, T def) {
+	default BaseConfigKey<T> createKey(ConfigPath path, T def) {
 		return new FunctionalKey<>(this, path, def);
 	}
 }

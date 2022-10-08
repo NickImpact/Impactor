@@ -100,7 +100,7 @@ public interface Config {
 		 * @throws IllegalArgumentException If the class provided is not annotated with
 		 * {@link KeyProvider}
 		 */
-		ConfigBuilder provider(@KeyProvider Class<?> provider);
+		ConfigBuilder providers(Class<?> provider, Class<?>... children);
 
 		/**
 		 * Indicates the path that the config lives at.

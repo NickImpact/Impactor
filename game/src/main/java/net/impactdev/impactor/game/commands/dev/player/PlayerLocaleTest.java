@@ -23,30 +23,33 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.game.commands.dev.player;
 
-import net.impactdev.impactor.api.platform.Platform;
+import net.impactdev.impactor.api.commands.ImpactorCommand;
+import net.impactdev.impactor.api.commands.annotations.Alias;
+import net.impactdev.impactor.api.commands.annotations.CommandPath;
+import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
+import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.fabric.platform.players.FabricPlatformPlayer;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
+import net.impactdev.impactor.api.utilities.context.Context;
+import net.impactdev.impactor.plugin.BaseImpactorPlugin;
+import net.kyori.adventure.text.Component;
+import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.NotNull;
 
-public class FabricPlatformModule implements ImpactorModule {
-    @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(PlatformPlayer.Factory.class, new FabricPlatformPlayer.FabricPlatformPlayerFactory());
-    }
+@CommandPath("impactor players")
+@Alias("locale")
+@RestrictedExecutor(system = false)
+public final class PlayerLocaleTest implements ImpactorCommand {
 
     @Override
-    public void builders(BuilderProvider provider) {
+    public @NotNull CommandResult execute(Context context) {
+        ServerPlayer source = context.require(ServerPlayer.class);
+        PlatformPlayer player = PlatformPlayer.getOrCreate(source.getUUID());
+        player.sendMessage(Component.text("Using locale: " + player.locale().getDisplayName()));
+        BaseImpactorPlugin.instance().logger().info("Using locale: " + player.locale().toLanguageTag());
 
+        return CommandResult.successful();
     }
 
-    @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
-    }
 }

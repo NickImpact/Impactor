@@ -25,15 +25,15 @@
 
 package net.impactdev.impactor.platform.players;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.impactdev.impactor.adventure.AdventureTranslator;
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.transactions.ItemTransaction;
 import net.impactdev.impactor.platform.players.transactions.ImpactorItemTransaction;
+import net.kyori.adventure.audience.MessageType;
+import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.translation.GlobalTranslator;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -42,20 +42,14 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
 
-import java.util.Optional;
 import java.util.UUID;
 
-public class ImpactorPlatformPlayer implements PlatformPlayer {
+public abstract class ImpactorPlatformPlayer implements PlatformPlayer {
 
     private final UUID uuid;
 
     public ImpactorPlatformPlayer(UUID uuid) {
         this.uuid = uuid;
-    }
-
-    @Override
-    public Optional<ServerPlayer> asMinecraftPlayer() {
-        return Impactor.instance().factories().provide(ServerPlayerProvider.class).locate(this.uuid);
     }
 
     @Override
@@ -112,15 +106,12 @@ public class ImpactorPlatformPlayer implements PlatformPlayer {
                 .orElse(null);
     }
 
-    public static class ImpactorPlatformPlayerFactory implements Factory {
+    @Override
+    public void sendMessage(@NotNull Identity source, @NotNull Component message, @NotNull MessageType type) {
+        Component translated = GlobalTranslator.render(message, this.locale());
+        net.minecraft.network.chat.Component vanilla = AdventureTranslator.toNative(translated);
 
-        private final LoadingCache<UUID, PlatformPlayer> cache = Caffeine.newBuilder().build(ImpactorPlatformPlayer::new);
-
-        @Override
-        public PlatformPlayer create(@NotNull UUID uuid) {
-            return this.cache.get(uuid);
-        }
-
+        // TODO - Add ChatType <-> MessageType mapping
+        this.asMinecraftPlayer().ifPresent(target -> target.sendMessage(vanilla, source.uuid()));
     }
-
 }

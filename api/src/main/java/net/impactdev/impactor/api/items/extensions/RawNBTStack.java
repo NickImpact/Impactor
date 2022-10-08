@@ -23,30 +23,34 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.api.items.extensions;
 
-import net.impactdev.impactor.api.platform.Platform;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.fabric.platform.players.FabricPlatformPlayer;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.items.ImpactorItemStack;
+import net.minecraft.nbt.CompoundTag;
 
-public class FabricPlatformModule implements ImpactorModule {
-    @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(PlatformPlayer.Factory.class, new FabricPlatformPlayer.FabricPlatformPlayerFactory());
+/**
+ * This type of ItemStack is designed to be created using purely raw NBT, and has no conception
+ * of identity in terms of other extensions like {@link BookStack} and {@link SkullStack}. Realistically,
+ * this type of stack is created and used for configurable items specified through configurations.
+ */
+public interface RawNBTStack extends ImpactorItemStack {
+
+    static RawNBTStack from(CompoundTag nbt) {
+        return Impactor.instance().factories().provide(Factory.class).from(nbt);
     }
 
-    @Override
-    public void builders(BuilderProvider provider) {
+    /**
+     * Specifies the NBT that created this particular stack.
+     *
+     * @return The NBT which created this stack
+     */
+    CompoundTag nbt();
+
+    interface Factory {
+
+        RawNBTStack from(CompoundTag nbt);
 
     }
 
-    @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
-    }
 }

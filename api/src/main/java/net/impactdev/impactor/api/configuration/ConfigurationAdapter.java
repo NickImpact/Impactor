@@ -57,19 +57,19 @@ public interface ConfigurationAdapter {
 
 	void reload();
 
-	String getString(String path, String def);
+	String getString(ConfigPath path, String def);
 
-	int getInteger(String path, int def);
+	int getInteger(ConfigPath path, int def);
 
-	long getLong(String path, long def);
+	long getLong(ConfigPath path, long def);
 
-	double getDouble(String path, double def);
+	double getDouble(ConfigPath path, double def);
 
-	boolean getBoolean(String path, boolean def);
+	boolean getBoolean(ConfigPath path, boolean def);
 
-	List<String> getStringList(String path, List<String> def);
+	List<String> getStringList(ConfigPath path, List<String> def);
 
-	List<String> getKeys(String path, List<String> def);
+	List<String> getKeys(ConfigPath path, List<String> def);
 
-	Map<String, String> getStringMap(String path, Map<String, String> def);
+	Map<String, String> getStringMap(ConfigPath path, Map<String, String> def);
 }

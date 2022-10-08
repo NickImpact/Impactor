@@ -23,18 +23,31 @@
  *
  */
 
-package net.impactdev.impactor.sponge.platform;
+package net.impactdev.impactor.game.commands.permissions;
 
-import net.impactdev.impactor.platform.players.ServerPlayerProvider;
+import net.impactdev.impactor.api.commands.PermissionsService;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
-import org.spongepowered.api.Sponge;
 
 import java.util.Optional;
-import java.util.UUID;
 
-public class SpongeServerPlayerProvider implements ServerPlayerProvider {
+public final class LuckPermsPermissionsService implements PermissionsService {
+
+    private static final LuckPerms API = LuckPermsProvider.get();
+
     @Override
-    public Optional<ServerPlayer> locate(UUID target) {
-        return Sponge.server().player(target).map(sponge -> (ServerPlayer) sponge);
+    public boolean hasPermission(CommandSourceStack stack, String permission) {
+        return Optional.ofNullable(stack.getEntity()).filter(entity -> entity instanceof ServerPlayer)
+                .map(entity -> (ServerPlayer) entity)
+                .map(player -> API.getUserManager().getUser(player.getUUID()))
+                .map(user -> user.getCachedData().getPermissionData().checkPermission(permission).asBoolean())
+                .orElse(true);
+    }
+
+    @Override
+    public String getServiceName() {
+        return "LuckPerms Permissions Service";
     }
 }

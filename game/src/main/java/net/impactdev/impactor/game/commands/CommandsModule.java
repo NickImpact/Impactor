@@ -25,11 +25,13 @@
 
 package net.impactdev.impactor.game.commands;
 
+import net.impactdev.impactor.api.commands.PermissionsService;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.game.commands.executors.ImpactorCommandResult;
+import net.impactdev.impactor.game.commands.permissions.NoOpPermissionsService;
 import net.impactdev.impactor.modules.ImpactorModule;
 
 public class CommandsModule implements ImpactorModule {
@@ -45,6 +47,6 @@ public class CommandsModule implements ImpactorModule {
 
     @Override
     public void services(ServiceProvider provider) {
-
+        provider.register(PermissionsService.class, new NoOpPermissionsService());
     }
 }

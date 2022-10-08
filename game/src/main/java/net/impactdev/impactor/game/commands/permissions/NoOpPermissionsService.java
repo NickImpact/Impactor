@@ -23,20 +23,19 @@
  *
  */
 
-package net.impactdev.impactor.forge.platform;
+package net.impactdev.impactor.game.commands.permissions;
 
-import net.impactdev.impactor.platform.players.ServerPlayerProvider;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.impactdev.impactor.api.commands.PermissionsService;
+import net.minecraft.commands.CommandSourceStack;
 
-import java.util.Optional;
-import java.util.UUID;
-
-public class ForgeServerPlayerProvider implements ServerPlayerProvider {
-
+public final class NoOpPermissionsService implements PermissionsService {
     @Override
-    public Optional<ServerPlayer> locate(UUID target) {
-        return Optional.ofNullable(ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(target));
+    public boolean hasPermission(CommandSourceStack stack, String permission) {
+        return true;
     }
 
+    @Override
+    public String getServiceName() {
+        return "NO-OP Permissions Service";
+    }
 }

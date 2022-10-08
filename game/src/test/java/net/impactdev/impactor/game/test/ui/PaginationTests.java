@@ -33,6 +33,7 @@ import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.pagination.Pagination;
 import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRuleset;
+import net.impactdev.impactor.game.test.ui.dummies.TestPlatformPlayer;
 import net.impactdev.impactor.platform.players.ImpactorPlatformPlayer;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -52,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class PaginationTests {
 
     private static final Key TEST_KEY = Key.key("impactor", "test");
-    private static final PlatformPlayer VIEWER = new ImpactorPlatformPlayer(UUID.randomUUID());
+    private static final PlatformPlayer VIEWER = new TestPlatformPlayer(UUID.randomUUID());
 
     @Test
     public void build() {

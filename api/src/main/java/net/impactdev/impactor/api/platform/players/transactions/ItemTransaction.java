@@ -27,7 +27,7 @@ package net.impactdev.impactor.api.platform.players.transactions;
 
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 
-public interface ItemTransaction {
+public interface ItemTransaction extends Transaction {
 
     ImpactorItemStack source();
 

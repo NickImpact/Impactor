@@ -23,18 +23,27 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.game.test.ui.dummies;
 
-import net.impactdev.impactor.fabric.FabricImpactorPlugin;
-import net.impactdev.impactor.platform.players.ServerPlayerProvider;
+import net.impactdev.impactor.platform.players.ImpactorPlatformPlayer;
 import net.minecraft.server.level.ServerPlayer;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FabricServerPlayerProvider implements ServerPlayerProvider {
+public final class TestPlatformPlayer extends ImpactorPlatformPlayer {
+    public TestPlatformPlayer(UUID uuid) {
+        super(uuid);
+    }
+
     @Override
-    public Optional<ServerPlayer> locate(UUID target) {
-        return ((FabricImpactorPlugin) FabricImpactorPlugin.instance()).server().map(server -> server.getPlayerList().getPlayer(target));
+    public Locale locale() {
+        return null;
+    }
+
+    @Override
+    public Optional<ServerPlayer> asMinecraftPlayer() {
+        return Optional.empty();
     }
 }

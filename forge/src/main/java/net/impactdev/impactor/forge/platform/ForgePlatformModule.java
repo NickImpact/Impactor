@@ -26,19 +26,20 @@
 package net.impactdev.impactor.forge.platform;
 
 import net.impactdev.impactor.api.platform.Platform;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
+import net.impactdev.impactor.forge.platform.players.ForgePlatformPlayer;
 import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.platform.ImpactorPlatform;
-import net.impactdev.impactor.platform.players.ServerPlayerProvider;
 
 @SuppressWarnings("unused")
 public class ForgePlatformModule implements ImpactorModule {
 
     @Override
     public void factories(FactoryProvider provider) {
-        provider.register(ServerPlayerProvider.class, new ForgeServerPlayerProvider());
+        provider.register(PlatformPlayer.Factory.class, new ForgePlatformPlayer.ForgePlatformPlayerFactory());
     }
 
     @Override

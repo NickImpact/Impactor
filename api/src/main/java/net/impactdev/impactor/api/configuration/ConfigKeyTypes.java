@@ -70,35 +70,35 @@ public class ConfigKeyTypes {
 	private static final KeyFactory<String> LOWERCASE_STRING = (adapter, path, def) -> adapter.getString(path, def).toLowerCase();
 	private static final KeyFactory<Map<String, String>> STRING_MAP = ConfigurationAdapter::getStringMap;
 
-	public static BaseConfigKey<Boolean> booleanKey(String path, boolean def) {
+	public static BaseConfigKey<Boolean> booleanKey(ConfigPath path, boolean def) {
 		return BOOLEAN.createKey(path, def);
 	}
 
-	public static BaseConfigKey<String> stringKey(String path, String def) {
+	public static BaseConfigKey<String> stringKey(ConfigPath path, String def) {
 		return STRING.createKey(path, def);
 	}
 
-	public static BaseConfigKey<String> lowercaseStringKey(String path, String def) {
+	public static BaseConfigKey<String> lowercaseStringKey(ConfigPath path, String def) {
 		return LOWERCASE_STRING.createKey(path, def);
 	}
 
-	public static BaseConfigKey<Integer> intKey(String path, int def) {
+	public static BaseConfigKey<Integer> intKey(ConfigPath path, int def) {
 		return INTEGER.createKey(path, def);
 	}
 
-	public static BaseConfigKey<Long> longKey(String path, long def) {
+	public static BaseConfigKey<Long> longKey(ConfigPath path, long def) {
 		return LONG.createKey(path, def);
 	}
 
-	public static BaseConfigKey<Double> doubleKey(String path, double def) {
+	public static BaseConfigKey<Double> doubleKey(ConfigPath path, double def) {
 		return DOUBLE.createKey(path, def);
 	}
 
-	public static BaseConfigKey<List<String>> listKey(String path, List<String> def) {
+	public static BaseConfigKey<List<String>> listKey(ConfigPath path, List<String> def) {
 		return LIST.createKey(path, def);
 	}
 
-	public static BaseConfigKey<Map<String, String>> mapKey(String path, ImmutableMap<String, String> def) {
+	public static BaseConfigKey<Map<String, String>> mapKey(ConfigPath path, ImmutableMap<String, String> def) {
 		return STRING_MAP.createKey(path, def);
 	}
 

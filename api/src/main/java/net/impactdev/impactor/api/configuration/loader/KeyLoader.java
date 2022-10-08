@@ -39,8 +39,8 @@ public class KeyLoader {
 
     private final List<ConfigKey<?>> keys = Lists.newArrayList();
 
-    public KeyLoader(Class<?> provider) {
-        this.init(provider);
+    public KeyLoader(List<Class<?>> providers) {
+        this.init(providers);
     }
 
     public int size() {
@@ -51,9 +51,9 @@ public class KeyLoader {
         return ImmutableList.copyOf(this.keys);
     }
 
-    private void init(Class<?> provider) {
+    private void init(List<Class<?>> providers) {
         AtomicInteger index = new AtomicInteger();
-        Arrays.stream(provider.getDeclaredFields())
+        providers.forEach(provider -> Arrays.stream(provider.getDeclaredFields())
                 .filter(field -> Modifier.isStatic(field.getModifiers()))
                 .filter(field -> ConfigKey.class.isAssignableFrom(field.getType()))
                 .forEach(field -> {
@@ -67,7 +67,7 @@ public class KeyLoader {
                     } catch (Exception e) {
                         throw new RuntimeException("Exception processing field: " + field.getName(), e);
                     }
-                });
+                }));
     }
 
 }

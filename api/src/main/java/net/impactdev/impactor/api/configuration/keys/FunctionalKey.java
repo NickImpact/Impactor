@@ -26,6 +26,7 @@
 package net.impactdev.impactor.api.configuration.keys;
 
 import net.impactdev.impactor.api.configuration.ConfigKey;
+import net.impactdev.impactor.api.configuration.ConfigPath;
 import net.impactdev.impactor.api.configuration.ConfigurationAdapter;
 import net.impactdev.impactor.api.configuration.KeyFactory;
 
@@ -57,10 +58,10 @@ import net.impactdev.impactor.api.configuration.KeyFactory;
 public class FunctionalKey<T> extends BaseConfigKey<T> implements ConfigKey<T> {
 
 	private final KeyFactory<T> factory;
-	private final String path;
+	private final ConfigPath path;
 	private final T def;
 
-	public FunctionalKey(KeyFactory<T> factory, String path, T def) {
+	public FunctionalKey(KeyFactory<T> factory, ConfigPath path, T def) {
 		this.factory = factory;
 		this.path = path;
 		this.def = def;

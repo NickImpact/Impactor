@@ -23,30 +23,30 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.api.events.provided;
 
-import net.impactdev.impactor.api.platform.Platform;
+import com.mojang.authlib.GameProfile;
+import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.fabric.platform.players.FabricPlatformPlayer;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
 
-public class FabricPlatformModule implements ImpactorModule {
-    @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(PlatformPlayer.Factory.class, new FabricPlatformPlayer.FabricPlatformPlayerFactory());
-    }
+public interface ClientConnectionEvent extends ImpactorEvent {
 
-    @Override
-    public void builders(BuilderProvider provider) {
+    interface Login extends ClientConnectionEvent {
+
+        GameProfile profile();
 
     }
 
-    @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
+    interface Join extends ClientConnectionEvent {
+
+        PlatformPlayer player();
+
     }
+
+    interface Disconnect extends ClientConnectionEvent {
+
+        PlatformPlayer player();
+
+    }
+
 }

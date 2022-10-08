@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "net.impactdev.impactor.forge.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.8",
+  "mixins": [
+    "ServerboundClientInformationPacketAccessor",
+    "ServerPlayerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "mixins.impactor.forge.refmap.json"
+}

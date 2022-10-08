@@ -18,5 +18,8 @@
     "minecraft": ">=1.16.5",
     "java": ">=8"
   },
-  "accessWidener": "gooeylibs.accesswidener"
+  "accessWidener": "gooeylibs.accesswidener",
+  "mixins": [
+    "mixins.impactor.fabric.json"
+  ]
 }

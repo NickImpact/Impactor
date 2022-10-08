@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.api.commands;
 
-import net.impactdev.impactor.api.event.ImpactorEvent;
+import net.impactdev.impactor.api.events.ImpactorEvent;
 
 /**
  * Fired once the game platform indicates commands are being registered.

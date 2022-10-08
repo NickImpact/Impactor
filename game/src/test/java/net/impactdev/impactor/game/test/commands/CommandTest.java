@@ -34,7 +34,7 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandRegistrationEvent;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.PermissionsService;
-import net.impactdev.impactor.api.event.ImpactorEvent;
+import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.game.commands.event.ImpactorCommandRegistrationEvent;
 import net.impactdev.impactor.game.commands.registration.CommandManager;
 import net.impactdev.impactor.game.test.commands.permissions.AlwaysTrueOrFalsePermissionService;

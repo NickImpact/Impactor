@@ -76,6 +76,10 @@ public interface ConfigKey<T> {
 	 */
 	T get(ConfigurationAdapter adapter);
 
+	default T parse() {
+		return this.context().parent().get(this);
+	}
+
 	interface ParentContext {
 
 		/**

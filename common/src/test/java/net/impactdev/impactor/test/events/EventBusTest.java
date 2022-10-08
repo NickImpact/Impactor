@@ -26,7 +26,7 @@
 package net.impactdev.impactor.test.events;
 
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.event.ImpactorEvent;
+import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.kyori.event.AbstractCancellable;
 import net.kyori.event.EventBus;
 import net.kyori.event.EventSubscription;

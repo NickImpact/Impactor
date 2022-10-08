@@ -25,12 +25,12 @@
 
 package net.impactdev.impactor.api.platform.players;
 
-import net.kyori.adventure.audience.Audience;
+import net.impactdev.impactor.api.adventure.LocalizedAudience;
 import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
 
-public interface PlatformSource extends Audience {
+public interface PlatformSource extends LocalizedAudience {
 
     /**
      * Indicates the UUID of the source this platform instance belongs to. This field will always

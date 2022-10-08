@@ -23,15 +23,12 @@
  *
  */
 
-package net.impactdev.impactor.platform.players;
+package net.impactdev.impactor.api.events;
 
-import net.minecraft.server.level.ServerPlayer;
-
-import java.util.Optional;
-import java.util.UUID;
-
-public interface ServerPlayerProvider {
-
-    Optional<ServerPlayer> locate(UUID target);
-
-}
+/**
+ * Represents an event applicable to being pushed onto the Impactor
+ * {@link net.kyori.event.EventBus event bus}. Events of this nature are not cancellable
+ * by default, and are intended to inherit in some form from {@link net.kyori.event.Cancellable}
+ * in order to achieve this status.
+ */
+public interface ImpactorEvent {}

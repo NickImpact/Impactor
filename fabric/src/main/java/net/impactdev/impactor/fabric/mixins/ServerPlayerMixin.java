@@ -23,30 +23,33 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.fabric.mixins;
 
-import net.impactdev.impactor.api.platform.Platform;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.fabric.platform.players.FabricPlatformPlayer;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
+import net.impactdev.impactor.locale.LocaleCache;
+import net.impactdev.impactor.locale.LocaleProvider;
+import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
+import net.minecraft.server.level.ServerPlayer;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public class FabricPlatformModule implements ImpactorModule {
-    @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(PlatformPlayer.Factory.class, new FabricPlatformPlayer.FabricPlatformPlayerFactory());
+import java.util.Locale;
+
+@SuppressWarnings("FieldCanBeLocal")
+@Mixin(ServerPlayer.class)
+public abstract class ServerPlayerMixin implements LocaleProvider {
+
+    private Locale impactor$language = Locale.US;
+
+    @Inject(method = "updateOptions", at = @At("TAIL"))
+    public void impactor$updateClientLanguage(ServerboundClientInformationPacket packet, CallbackInfo ci) {
+        ServerboundClientInformationPacketAccessor accessor = (ServerboundClientInformationPacketAccessor) packet;
+        this.impactor$language = LocaleCache.getLocale(accessor.impactor$accessor$language());
     }
 
     @Override
-    public void builders(BuilderProvider provider) {
-
-    }
-
-    @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
+    public Locale locale() {
+        return this.impactor$language;
     }
 }

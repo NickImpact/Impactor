@@ -65,6 +65,7 @@ public class FabricImpactorPlugin extends GameImpactorPlugin {
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> this.server = server);
 
+
         PrettyPrinter printer = new PrettyPrinter(80);
         printer.title("Platform Information");
         Impactor.instance().platform().info().print(printer);

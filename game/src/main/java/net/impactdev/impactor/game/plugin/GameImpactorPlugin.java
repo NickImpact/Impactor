@@ -33,6 +33,7 @@ import net.impactdev.impactor.game.commands.dev.items.BookCommand;
 import net.impactdev.impactor.game.commands.dev.items.ItemKeyArgument;
 import net.impactdev.impactor.game.commands.dev.items.skulls.SkullSkinArgument;
 import net.impactdev.impactor.game.commands.dev.items.skulls.SkullTextureArgument;
+import net.impactdev.impactor.game.commands.dev.player.PlayerLocaleTest;
 import net.impactdev.impactor.game.items.ItemsModule;
 import net.impactdev.impactor.game.ui.UIModule;
 import net.impactdev.impactor.modules.ImpactorModule;
@@ -61,7 +62,14 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
         super.construct();
 
         Impactor.instance().events().subscribe(CommandRegistrationEvent.class, event -> {
-            event.register(new ItemKeyArgument(), new BookCommand(), new SkullSkinArgument(), new SkullTextureArgument());
+            this.logger().info("Received registration event, generating...");
+            event.register(
+                    new ItemKeyArgument(),
+                    new BookCommand(),
+                    new SkullSkinArgument(),
+                    new SkullTextureArgument(),
+                    new PlayerLocaleTest()
+            );
         });
     }
 }

@@ -28,6 +28,7 @@ package net.impactdev.impactor.configuration;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import io.leangen.geantyref.TypeToken;
+import net.impactdev.impactor.api.configuration.ConfigPath;
 import net.impactdev.impactor.api.configuration.ConfigurationAdapter;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -93,7 +94,7 @@ public class ImpactorConfigurationAdapter implements ConfigurationAdapter {
         }
     }
 
-    private <T> void checkMissing(String path, T def) {
+    private <T> void checkMissing(ConfigPath path, T def) {
         if (update && !this.contains(path)) {
             try {
                 resolvePath(path).set(def);
@@ -104,7 +105,7 @@ public class ImpactorConfigurationAdapter implements ConfigurationAdapter {
         }
     }
 
-    private <T> void checkMissing(String path, T def, TypeToken<T> type) {
+    private <T> void checkMissing(ConfigPath path, T def, TypeToken<T> type) {
         if (update && !this.contains(path)) {
             try {
                 resolvePath(path).set(type.getType(), def);
@@ -115,50 +116,55 @@ public class ImpactorConfigurationAdapter implements ConfigurationAdapter {
         }
     }
 
-    public boolean contains(String path) {
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean contains(ConfigPath path) {
         return !resolvePath(path).virtual();
     }
 
-    private ConfigurationNode resolvePath(String path) {
+    private ConfigurationNode resolvePath(ConfigPath path) {
         if (this.root == null) {
             throw new RuntimeException("Config is not loaded.");
         }
 
-        return this.root.node(Splitter.on('.').splitToList(path).toArray());
+        if(path.split()) {
+            return this.root.node(Splitter.on('.').splitToList(path.target()).toArray());
+        } else {
+            return this.root.node(path.target());
+        }
     }
 
     @Override
-    public String getString(String path, String def) {
+    public String getString(ConfigPath path, String def) {
         this.checkMissing(path, def);
         return resolvePath(path).getString(def);
     }
 
     @Override
-    public int getInteger(String path, int def) {
+    public int getInteger(ConfigPath path, int def) {
         this.checkMissing(path, def);
         return resolvePath(path).getInt(def);
     }
 
     @Override
-    public long getLong(String path, long def) {
+    public long getLong(ConfigPath path, long def) {
         this.checkMissing(path, def);
         return resolvePath(path).getLong(def);
     }
 
     @Override
-    public double getDouble(String path, double def) {
+    public double getDouble(ConfigPath path, double def) {
         this.checkMissing(path, def);
         return resolvePath(path).getDouble(def);
     }
 
     @Override
-    public boolean getBoolean(String path, boolean def) {
+    public boolean getBoolean(ConfigPath path, boolean def) {
         this.checkMissing(path, def);
         return resolvePath(path).getBoolean(def);
     }
 
     @Override
-    public List<String> getStringList(String path, List<String> def) {
+    public List<String> getStringList(ConfigPath path, List<String> def) {
         this.checkMissing(path, def, new TypeToken<List<String>>() {});
         ConfigurationNode node = resolvePath(path);
         if (node.virtual()) {
@@ -174,7 +180,7 @@ public class ImpactorConfigurationAdapter implements ConfigurationAdapter {
     }
 
     @Override
-    public List<String> getKeys(String path, List<String> def) {
+    public List<String> getKeys(ConfigPath path, List<String> def) {
         this.checkMissing(path, def, new TypeToken<List<String>>() {});
         ConfigurationNode node = resolvePath(path);
         if (node.virtual()) {
@@ -185,7 +191,7 @@ public class ImpactorConfigurationAdapter implements ConfigurationAdapter {
     }
 
     @Override
-    public Map<String, String> getStringMap(String path, Map<String, String> def) {
+    public Map<String, String> getStringMap(ConfigPath path, Map<String, String> def) {
         this.checkMissing(path, def, new TypeToken<Map<String, String>>() {});
         ConfigurationNode node = resolvePath(path);
         if (node.virtual()) {

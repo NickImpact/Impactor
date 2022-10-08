@@ -23,28 +23,32 @@
  *
  */
 
-package net.impactdev.impactor.platform;
+package net.impactdev.impactor.api.configuration;
 
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.players.ImpactorPlatformPlayer;
+public final class ConfigPath {
 
-public class PlatformModule implements ImpactorModule {
-    @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(PlatformPlayer.Factory.class, new ImpactorPlatformPlayer.ImpactorPlatformPlayerFactory());
+    private final String path;
+    private final boolean split;
+
+    private ConfigPath(String path, boolean split) {
+        this.path = path;
+        this.split = split;
     }
 
-    @Override
-    public void builders(BuilderProvider provider) {
-
+    public static ConfigPath path(String path) {
+        return path(path, true);
     }
 
-    @Override
-    public void services(ServiceProvider provider) {
-
+    public static ConfigPath path(String path, boolean split) {
+        return new ConfigPath(path, split);
     }
+
+    public String target() {
+        return this.path;
+    }
+
+    public boolean split() {
+        return this.split;
+    }
+
 }

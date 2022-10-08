@@ -23,12 +23,27 @@
  *
  */
 
-package net.impactdev.impactor.api.event;
+package net.impactdev.impactor.fabric.mixins;
 
-/**
- * Represents an event applicable to being pushed onto the Impactor
- * {@link net.kyori.event.EventBus event bus}. Events of this nature are not cancellable
- * by default, and are intended to inherit in some form from {@link net.kyori.event.Cancellable}
- * in order to achieve this status.
- */
-public interface ImpactorEvent {}
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.events.provided.ClientConnectionEvent;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.minecraft.network.Connection;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(PlayerList.class)
+public class PlayerJoinTrackerMixin {
+
+    @Inject(method = "placeNewPlayer", at = @At(value = "RETURN"))
+    private void impactor$postPlayerJoin(Connection connection, ServerPlayer player, CallbackInfo ci) {
+        Impactor.instance().events().post(
+                (ClientConnectionEvent.Join) () -> PlatformPlayer.getOrCreate(player.getUUID())
+        );
+    }
+
+}

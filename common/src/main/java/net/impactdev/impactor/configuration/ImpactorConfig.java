@@ -25,6 +25,7 @@
 
 package net.impactdev.impactor.configuration;
 
+import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.configuration.Config;
 import net.impactdev.impactor.api.configuration.ConfigKey;
 import net.impactdev.impactor.api.configuration.ConfigurationAdapter;
@@ -34,6 +35,8 @@ import net.impactdev.impactor.api.configuration.loader.KeyLoader;
 import net.impactdev.impactor.api.configuration.loader.KeyProvider;
 
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 public class ImpactorConfig implements Config {
@@ -49,9 +52,9 @@ public class ImpactorConfig implements Config {
     private final ConfigurationAdapter adapter;
     private final KeyLoader loader;
 
-    public ImpactorConfig(Path path, boolean supply, @KeyProvider Class<?> provider) {
+    public ImpactorConfig(Path path, boolean supply, List<Class<?>> providers) {
         this.adapter = new ImpactorConfigurationAdapter(path, supply);
-        this.loader = new KeyLoader(provider);
+        this.loader = new KeyLoader(providers);
         this.load();
     }
 
@@ -99,13 +102,14 @@ public class ImpactorConfig implements Config {
 
     public static class ImpactorConfigBuilder implements ConfigBuilder {
 
-        private Class<?> provider;
+        private final List<Class<?>> providers = Lists.newArrayList();
         private Path path;
         private boolean supply;
 
         @Override
-        public ConfigBuilder provider(Class<?> provider) {
-            this.provider = provider;
+        public ConfigBuilder providers(Class<?> provider, Class<?>... children) {
+            this.providers.add(provider);
+            this.providers.addAll(Arrays.asList(children));
             return this;
         }
 
@@ -123,7 +127,7 @@ public class ImpactorConfig implements Config {
 
         @Override
         public Config build() {
-            return new ImpactorConfig(this.path, this.supply, this.provider);
+            return new ImpactorConfig(this.path, this.supply, this.providers);
         }
     }
 

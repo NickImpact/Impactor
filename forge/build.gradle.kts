@@ -8,6 +8,12 @@ architectury {
     forge()
 }
 
+loom {
+    mixin {
+        defaultRefmapName.set("mixins.impactor.forge.refmap.json")
+    }
+}
+
 dependencies {
     val loom = project.extensions.getByName<net.fabricmc.loom.api.LoomGradleExtensionAPI>("loom")
     loom.silentMojangMappingsLicense()
@@ -24,6 +30,16 @@ dependencies {
 }
 
 tasks {
+    jar {
+        manifest {
+            attributes(
+                "MixinConfigs" to "mixins.impactor.forge.json",
+                "TweakOrder" to 0,
+                "TweakClass" to "org.spongepowered.asm.launch.MixinTweaker"
+            )
+        }
+    }
+
     shadowJar {
         dependencies {
             include(project(":api"))
@@ -40,7 +56,7 @@ tasks {
         }
 
         relocate ("ca.landonjw.gooeylibs2", "net.impactdev.impactor.relocations.gooeylibs")
-        relocate ("org.spongepowered", "net.impactdev.impactor.relocations.spongepowered")
+        relocate ("org.spongepowered.math", "net.impactdev.impactor.relocations.spongepowered.math")
         relocate ("io.leangen.geantyref", "net.impactdev.impactor.relocations.geantyref")
         relocate ("net.kyori", "net.impactdev.impactor.relocations.kyori")
         relocate ("com.github.benmanes.caffeine", "net.impactdev.impactor.relocations.caffeine")

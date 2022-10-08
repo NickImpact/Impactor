@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.api;
 
-import net.impactdev.impactor.api.event.ImpactorEvent;
+import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;

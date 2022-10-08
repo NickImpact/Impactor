@@ -8,6 +8,12 @@ architectury {
     fabric()
 }
 
+loom {
+    mixin {
+        defaultRefmapName.set("mixins.impactor.fabric.refmap.json")
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -55,7 +61,7 @@ tasks {
 //        relocate ("nonapi.io.github.classgraph", "net.impactdev.impactor.relocations.classgraph.nonapi")
         relocate ("ca.landonjw.gooeylibs2", "net.impactdev.impactor.relocations.gooeylibs")
         relocate ("ca.landonjw.gooeylibs", "net.impactdev.impactor.relocations.gooeylibs")
-        relocate ("org.spongepowered", "net.impactdev.impactor.relocations.spongepowered")
+        relocate ("org.spongepowered.math", "net.impactdev.impactor.relocations.spongepowered.math")
         relocate ("io.leangen.geantyref", "net.impactdev.impactor.relocations.geantyref")
         relocate ("net.kyori", "net.impactdev.impactor.relocations.kyori")
         relocate ("com.github.benmanes.caffeine", "net.impactdev.impactor.relocations.caffeine")
