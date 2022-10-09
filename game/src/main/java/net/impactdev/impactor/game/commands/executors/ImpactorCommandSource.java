@@ -29,8 +29,15 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.impactdev.impactor.api.commands.executors.CommandSource;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformSource;
+import net.kyori.adventure.audience.MessageType;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.inventory.Book;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.TitlePart;
 import net.minecraft.commands.CommandSourceStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -68,5 +75,65 @@ public final class ImpactorCommandSource implements CommandSource {
     @Override
     public PlatformPlayer requirePlayer() throws CommandSyntaxException {
         return this.asPlayer().orElseThrow(CommandSourceStack.ERROR_NOT_PLAYER::create);
+    }
+
+    @Override
+    public void sendMessage(@NotNull Identity source, @NotNull Component message, @NotNull MessageType type) {
+        this.source.sendMessage(source, message, type);
+    }
+
+    @Override
+    public void sendActionBar(@NotNull Component message) {
+        this.source.sendActionBar(message);
+    }
+
+    @Override
+    public void sendPlayerListHeaderAndFooter(@NotNull Component header, @NotNull Component footer) {
+        this.source.sendPlayerListHeaderAndFooter(header, footer);
+    }
+
+    @Override
+    public <T> void sendTitlePart(@NotNull TitlePart<T> part, @NotNull T value) {
+        this.source.sendTitlePart(part, value);
+    }
+
+    @Override
+    public void showBossBar(@NotNull BossBar bar) {
+        this.source.showBossBar(bar);
+    }
+
+    @Override
+    public void hideBossBar(@NotNull BossBar bar) {
+        this.source.hideBossBar(bar);
+    }
+
+    @Override
+    public void clearTitle() {
+        this.source.clearTitle();
+    }
+
+    @Override
+    public void resetTitle() {
+        this.source.resetTitle();
+    }
+
+    @Override
+    public void playSound(@NotNull Sound sound) {
+        this.source.playSound(sound);
+    }
+
+    @Override
+    public void playSound(@NotNull Sound sound, double x, double y, double z) {
+        this.source.playSound(sound, x, y, z);
+    }
+
+    @Override
+    public void playSound(@NotNull Sound sound, Sound.@NotNull Emitter emitter) {
+        this.source.playSound(sound, emitter);
+    }
+
+    @Override
+    public void openBook(@NotNull Book book) {
+        this.source.openBook(book);
     }
 }
