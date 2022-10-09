@@ -20,6 +20,7 @@ dependencies {
 
     // Adventure
     api("net.kyori:adventure-api:4.11.0")
+    api("net.kyori:adventure-nbt:4.11.0")
     api("net.kyori:adventure-text-serializer-legacy:4.11.0")
     api("net.kyori:adventure-text-serializer-gson:4.11.0")
     api("net.kyori:adventure-text-minimessage:4.11.0")

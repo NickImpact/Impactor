@@ -28,12 +28,11 @@ package net.impactdev.impactor.game.items.stacks.providers;
 import net.impactdev.impactor.api.items.AbstractedItemStack;
 import net.impactdev.impactor.api.items.extensions.BookStack;
 import net.impactdev.impactor.game.items.stacks.builders.ImpactorBookStackBuilder;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.ListBinaryTag;
+import net.kyori.adventure.nbt.StringBinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -87,23 +86,21 @@ public class ImpactorBookStack extends AbstractedItemStack implements BookStack 
     }
 
     @Override
-    public ItemStack asMinecraftNative() {
-        ItemStack stack = super.asMinecraftNative();
-        CompoundTag nbt = stack.getOrCreateTag();
-        nbt.putString("author", this.author);
-        nbt.putInt("generation", this.generation.ordinal());
+    public CompoundBinaryTag nbt() {
+        CompoundBinaryTag nbt = super.nbt();
+        nbt = nbt.putString("author", this.author);
+        nbt = nbt.putInt("generation", this.generation.ordinal());
+        nbt = nbt.putString("title", "Impactor Generated Book");
 
         int max = this.pages.lastKey();
-        ListTag pages = new ListTag();
+        ListBinaryTag pages = ListBinaryTag.empty();
         for(int i = 1; i <= max; i++) {
             @Nullable Component result = this.pages.get(i);
-            pages.add(StringTag.valueOf(GsonComponentSerializer.gson().serialize(
+            pages = pages.add(StringBinaryTag.of(GsonComponentSerializer.gson().serialize(
                     Optional.ofNullable(result).orElse(Component.empty())
             )));
         }
 
-        nbt.putString("title", "Impactor Generated Book");
-        nbt.put("pages", pages);
-        return stack;
+        return nbt.put("pages", pages);
     }
 }

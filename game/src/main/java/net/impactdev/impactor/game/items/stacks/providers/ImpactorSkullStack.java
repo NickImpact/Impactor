@@ -30,8 +30,11 @@ import net.impactdev.impactor.api.items.builders.provided.SkullStackBuilder;
 import net.impactdev.impactor.api.items.extensions.SkullStack;
 import net.impactdev.impactor.api.items.types.ItemTypes;
 import net.impactdev.impactor.game.items.stacks.builders.ImpactorSkullStackBuilder;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.ListBinaryTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.world.item.ItemStack;
 
@@ -71,37 +74,40 @@ public final class ImpactorSkullStack extends AbstractedItemStack implements Sku
     }
 
     @Override
-    public ItemStack asMinecraftNative() {
-        ItemStack result = super.asMinecraftNative();
+    public CompoundBinaryTag nbt() {
+        CompoundBinaryTag nbt =  super.nbt();
         if(this.playerMetadata().isPresent()) {
             if (this.metadata.username().isPresent()) {
                 if (!this.metadata.texture().isPresent()) {
-                    result.getOrCreateTag().putString("SkullOwner", this.metadata.username().get());
+                    nbt = nbt.putString("SkullOwner", this.metadata.username().get());
                 }
                 else {
-                    CompoundTag nbt = result.getOrCreateTagElement("SkullOwner");
-                    nbt.putString("Name", this.metadata.username().orElse("Impactor"));
-                    this.properties(nbt);
+                    CompoundBinaryTag owner = CompoundBinaryTag.empty();
+                    owner.putString("Name", this.metadata.username().orElse("Impactor"));
+                    this.properties(owner);
+
+                    nbt = nbt.put("SkullOwner", owner);
                 }
-            }
-            else {
+            } else {
                 if (this.metadata.texture().isPresent()) {
-                    CompoundTag nbt = result.getOrCreateTagElement("SkullOwner");
-                    nbt.putUUID("Id", UUID.randomUUID());
-                    this.properties(nbt);
+                    CompoundBinaryTag owner = CompoundBinaryTag.empty();
+                    owner.putIntArray("Id", NbtUtils.createUUID(UUID.randomUUID()).getAsIntArray());
+                    this.properties(owner);
+
+                    nbt = nbt.put("SkullOwner", owner);
                 }
             }
         }
 
-        return result;
+        return nbt;
     }
 
-    private void properties(CompoundTag nbt) {
-        CompoundTag properties = new CompoundTag();
-        ListTag textures = new ListTag();
+    private void properties(CompoundBinaryTag nbt) {
+        CompoundBinaryTag properties = CompoundBinaryTag.empty();
+        ListBinaryTag textures = ListBinaryTag.empty();
 
-        CompoundTag value = new CompoundTag();
-        value.put("Value", StringTag.valueOf(this.metadata.texture().orElseThrow(() -> new IllegalStateException("No available texture"))));
+        CompoundBinaryTag value = CompoundBinaryTag.empty();
+        value.putString("Value", this.metadata.texture().orElseThrow(() -> new IllegalStateException("No available texture")));
         textures.add(value);
         properties.put("textures", textures);
 

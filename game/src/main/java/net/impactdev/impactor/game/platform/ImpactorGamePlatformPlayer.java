@@ -23,34 +23,38 @@
  *
  */
 
-package net.impactdev.impactor.api.items.extensions;
+package net.impactdev.impactor.game.platform;
 
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.impactdev.impactor.api.platform.players.transactions.ItemTransaction;
+import net.impactdev.impactor.game.items.stacks.ItemStackTranslator;
+import net.impactdev.impactor.platform.players.ImpactorPlatformPlayer;
+import net.impactdev.impactor.platform.players.transactions.ImpactorItemTransaction;
+import net.minecraft.world.item.ItemStack;
 
-/**
- * This type of ItemStack is designed to be created using purely raw NBT, and has no conception
- * of identity in terms of other extensions like {@link BookStack} and {@link SkullStack}. Realistically,
- * this type of stack is created and used for configurable items specified through configurations.
- */
-public interface RawNBTStack extends ImpactorItemStack {
+import java.util.UUID;
 
-    static RawNBTStack from(CompoundTag nbt) {
-        return Impactor.instance().factories().provide(Factory.class).from(nbt);
+public abstract class ImpactorGamePlatformPlayer extends ImpactorPlatformPlayer {
+
+    public ImpactorGamePlatformPlayer(UUID uuid) {
+        super(uuid);
     }
 
-    /**
-     * Specifies the NBT that created this particular stack.
-     *
-     * @return The NBT which created this stack
-     */
-    CompoundTag nbt();
+    @Override
+    public ItemTransaction offer(ImpactorItemStack stack) {
+        return this.asMinecraftPlayer()
+                .map(player -> {
+                    ItemStack minecraft = ItemStackTranslator.translate(stack);
 
-    interface Factory {
-
-        RawNBTStack from(CompoundTag nbt);
-
+                    boolean result = player.inventory.add(minecraft);
+                    player.inventoryMenu.broadcastChanges();
+                    return new ImpactorItemTransaction(
+                            stack,
+                            minecraft.getCount(),
+                            result,
+                            null
+                    );
+                })
+                .orElse(null);
     }
-
 }

@@ -25,11 +25,10 @@
 
 package net.impactdev.impactor.sponge.platform.players;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.platform.players.ImpactorPlatformPlayer;
+import net.impactdev.impactor.game.platform.ImpactorGamePlatformPlayer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Sponge;
@@ -39,7 +38,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
-public final class SpongePlatformPlayer extends ImpactorPlatformPlayer {
+public final class SpongePlatformPlayer extends ImpactorGamePlatformPlayer {
 
     public SpongePlatformPlayer(UUID uuid) {
         super(uuid);

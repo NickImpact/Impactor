@@ -32,9 +32,9 @@ import net.impactdev.impactor.api.items.extensions.SkullStack;
 import net.impactdev.impactor.api.items.properties.MetaFlag;
 import net.impactdev.impactor.api.items.types.ItemType;
 import net.impactdev.impactor.api.items.types.ItemTypes;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.nbt.CompoundTag;
@@ -42,6 +42,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.junit.jupiter.api.Test;
 
+import static net.impactdev.impactor.game.items.stacks.ItemStackTranslator.translate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -81,7 +82,7 @@ public class ImpactorItemStackTests {
         assertTrue(basic2.unbreakable());
         assertTrue(basic2.flags().contains(MetaFlag.ENCHANTMENTS));
 
-        ItemStack test = basic2.asMinecraftNative();
+        ItemStack test = translate(basic2);
         assertEquals(Items.GRASS_BLOCK, test.getItem());
         assertTrue(test.isEnchanted());
     }
@@ -97,7 +98,7 @@ public class ImpactorItemStackTests {
         assertEquals(ItemTypes.SKELETON_SKULL, skeleton.type());
         assertEquals(0, skeleton.enchantments().size());
 
-        ItemStack sSkull = skeleton.asMinecraftNative();
+        ItemStack sSkull = translate(skeleton);
         assertEquals(1, sSkull.getCount());
         assertEquals(Items.SKELETON_SKULL, sSkull.getItem());
         assertFalse(sSkull.getOrCreateTag().contains("SkullOwner"));
@@ -119,7 +120,7 @@ public class ImpactorItemStackTests {
         );
         assertTrue(player.unbreakable());
 
-        ItemStack pSkull = player.asMinecraftNative();
+        ItemStack pSkull = translate(player);
         assertTrue(pSkull.getOrCreateTag().contains("SkullOwner"));
         assertNotNull(pSkull.getOrCreateTag().get("SkullOwner"));
         assertEquals("NickImpact", pSkull.getOrCreateTag().getString("SkullOwner"));
@@ -141,12 +142,40 @@ public class ImpactorItemStackTests {
         assertEquals(2, book.pages());
         assertEquals(BookStack.Generation.ORIGINAL, book.generation());
 
-        ItemStack minecraft = book.asMinecraftNative();
+        ItemStack minecraft = translate(book);
         CompoundTag nbt = minecraft.getOrCreateTag();
         assertEquals(Items.WRITTEN_BOOK, minecraft.getItem());
         assertEquals(0, nbt.getInt("generation"));
         assertEquals(3, nbt.getList("pages", 8).size());
         assertEquals(Component.text("NickImpact"), GsonComponentSerializer.gson().deserialize(nbt.getString("author")));
+    }
+
+    @Test
+    public void testNBTTranslation() {
+        ImpactorItemStack basic = ImpactorItemStack.basic()
+                .type(ItemTypes.DIRT)
+                .title(Component.text("Test Item"))
+                .unbreakable()
+                .build();
+
+        CompoundTag minecraft = translate(basic).getOrCreateTag();
+        assertEquals(basic.unbreakable(), minecraft.getBoolean("Unbreakable"));
+        assertEquals(basic.title(), GsonComponentSerializer.gson().deserialize(minecraft.getCompound("display").getString("Name")));
+
+        BookStack book = ImpactorItemStack.book()
+                .type(BookStack.BookType.WRITTEN)
+                .title(Component.text("A Very Neat Book").color(NamedTextColor.GOLD))
+                .author("NickImpact")
+                .generation(BookStack.Generation.ORIGINAL)
+                .page(1, Component.text("A set of text that makes up").append(Component.text(" page 1")))
+                .page(3, Component.text("Hello World!").color(NamedTextColor.RED))
+                .build();
+
+        CompoundBinaryTag impactor = book.nbt();
+        minecraft = translate(book).getOrCreateTag();
+        assertEquals(impactor.getString("title"), minecraft.getString("title"));
+        assertEquals(impactor.getInt("generation"), minecraft.getInt("generation"));
+        assertEquals(3, minecraft.getList("pages", 8).size());
     }
 
     private static Component mini(String input) {

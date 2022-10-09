@@ -60,7 +60,6 @@ public final class ForgeChestView extends ImpactorChestView implements GooeyPage
     @Override
     public void set(@Nullable Icon icon, int slot) {
         this.template.set(slot, Optional.ofNullable(icon).map(GooeyIcon::new).orElse(null));
-
     }
 
     @Override

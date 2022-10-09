@@ -33,6 +33,8 @@ import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.extensions.BookStack;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.transactions.ItemTransaction;
 import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
@@ -52,6 +54,7 @@ public class BookCommand implements ImpactorCommand {
     @Override
     public @NotNull CommandResult execute(Context context) {
         ServerPlayer source = context.require(ServerPlayer.class);
+        PlatformPlayer platform = PlatformPlayer.getOrCreate(source.getUUID());
 
         ImpactorItemStack book = ImpactorItemStack.book()
                 .type(BookStack.BookType.WRITTEN)
@@ -65,10 +68,7 @@ public class BookCommand implements ImpactorCommand {
                 .pages(text("Hello World!"))
                 .build();
 
-        ItemStack minecraft = book.asMinecraftNative();
-        source.inventory.add(minecraft);
-        source.inventoryMenu.broadcastChanges();
-
-        return CommandResult.successful();
+        ItemTransaction transaction = platform.offer(book);
+        return transaction.successful() ? CommandResult.successful() : CommandResult.builder().result(0).build();
     }
 }

@@ -33,6 +33,10 @@ import net.impactdev.impactor.api.items.properties.MetaFlag;
 import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.impactdev.impactor.api.items.types.ItemType;
 import net.impactdev.impactor.api.utilities.ResourceKeyTranslator;
+import net.kyori.adventure.nbt.BinaryTagTypes;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.ListBinaryTag;
+import net.kyori.adventure.nbt.StringBinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.core.Registry;
@@ -100,38 +104,8 @@ public abstract class AbstractedItemStack implements ImpactorItemStack {
     }
 
     @Override
-    public ItemStack asMinecraftNative() {
-        ItemLike like = this.type().minecraft().orElse(null);
-        ItemStack result = new ItemStack(like);
-        result.setCount(this.quantity());
-        if(this.title != null) {
-            result.getOrCreateTagElement("display").putString("Name", GsonComponentSerializer.gson().serialize(this.title));
-        }
-
-        if(!this.lore.isEmpty()) {
-            ListTag lore = new ListTag();
-            for (Component line : this.lore()) {
-                lore.add(StringTag.valueOf(GsonComponentSerializer.gson().serialize(line)));
-            }
-            result.getOrCreateTagElement("display").put("Lore", lore);
-        }
-
-        for(Enchantment enchantment : this.enchantments()) {
-            net.minecraft.world.item.enchantment.Enchantment target = Registry.ENCHANTMENT.get(ResourceKeyTranslator.asResourceLocation(enchantment.type()));
-            result.enchant(target, enchantment.level());
-        }
-
-        if(this.unbreakable) {
-            result.getOrCreateTag().putBoolean("Unbreakable", true);
-        }
-
-        int flags = 0;
-        for(MetaFlag flag : this.flags) {
-            flags |= (1 << flag.ordinal());
-        }
-        result.getOrCreateTag().putInt("HideFlags", flags);
-
-        return result;
+    public CompoundBinaryTag nbt() {
+        return CompoundBinaryTag.empty();
     }
 
 }

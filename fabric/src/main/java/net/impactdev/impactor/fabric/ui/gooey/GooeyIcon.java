@@ -29,12 +29,13 @@ import ca.landonjw.gooeylibs2.api.button.ButtonClick;
 import ca.landonjw.gooeylibs2.api.button.GooeyButton;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.utilities.context.Context;
+import net.impactdev.impactor.game.items.stacks.ItemStackTranslator;
 import org.jetbrains.annotations.NotNull;
 
 public class GooeyIcon extends GooeyButton {
 
     public GooeyIcon(@NotNull Icon icon) {
-        super(icon.display().get().asMinecraftNative(), action -> {
+        super(ItemStackTranslator.translate(icon.display().get()), action -> {
             Context context = Context.empty();
             context.with(icon.context())
 //                    .append(PlatformPlayer.class, action.getPlayer()) // TODO - Forge platform player translator

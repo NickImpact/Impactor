@@ -35,6 +35,7 @@ import net.impactdev.impactor.api.items.properties.MetaFlag;
 import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.impactdev.impactor.api.items.types.ItemType;
 import net.impactdev.impactor.api.items.types.ItemTypes;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minecraft.world.item.ItemStack;
@@ -72,14 +73,6 @@ public interface ImpactorItemStack {
     static BookStackBuilder book() {
         return Impactor.instance().builders().provide(BookStackBuilder.class);
     }
-
-    /**
-     * Creates a native minecraft item stack based on this given configuration. The produced ItemStack
-     * will be represented 1:1 from this typing.
-     *
-     * @return A native minecraft ItemStack following this type's configuration
-     */
-    ItemStack asMinecraftNative();
 
     /**
      * Specifies the type of item this viewable item is based on. Effectively, this represents
@@ -152,4 +145,13 @@ public interface ImpactorItemStack {
      */
     boolean unbreakable();
 
+    /**
+     * Represents additional nbt data specific to the item stack. This data would be mirrored onto
+     * the proper structure within the native stack itself, once the item is created. By default,
+     * this simply returns {@link CompoundBinaryTag#empty()}, but can be overridden to supply further
+     * values at time of translation.
+     *
+     * @return Additional NBT data respective to the item in question
+     */
+    CompoundBinaryTag nbt();
 }

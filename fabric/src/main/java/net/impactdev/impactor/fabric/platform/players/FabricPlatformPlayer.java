@@ -29,8 +29,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.fabric.FabricImpactorPlugin;
+import net.impactdev.impactor.game.platform.ImpactorGamePlatformPlayer;
 import net.impactdev.impactor.locale.LocaleProvider;
-import net.impactdev.impactor.platform.players.ImpactorPlatformPlayer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +38,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
-public final class FabricPlatformPlayer extends ImpactorPlatformPlayer {
+public final class FabricPlatformPlayer extends ImpactorGamePlatformPlayer {
 
     public FabricPlatformPlayer(UUID uuid) {
         super(uuid);

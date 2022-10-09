@@ -35,6 +35,8 @@ import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
 import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.transactions.ItemTransaction;
 import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.text.format.TextColor;
 import net.minecraft.commands.CommandSourceStack;
@@ -59,6 +61,7 @@ public class SkullSkinArgument implements ImpactorCommand.Argument<String> {
     public @NotNull CommandResult execute(Context context) {
         CommandContext<CommandSourceStack> ctx = context.require(COMMAND_CONTEXT);
         ServerPlayer source = context.require(ServerPlayer.class);
+        PlatformPlayer platform = PlatformPlayer.getOrCreate(source.getUUID());
 
         ImpactorItemStack skull = ImpactorItemStack.skull()
                 .title(text("Impactor Skull Test").color(TextColor.color(0x42, 0x87, 0xf5)))
@@ -67,10 +70,7 @@ public class SkullSkinArgument implements ImpactorCommand.Argument<String> {
                 .player(ctx.getArgument("value", String.class), false)
                 .build();
 
-        ItemStack minecraft = skull.asMinecraftNative();
-        source.inventory.add(minecraft);
-        source.inventoryMenu.broadcastChanges();
-
-        return CommandResult.successful();
+        ItemTransaction transaction = platform.offer(skull);
+        return transaction.successful() ? CommandResult.successful() : CommandResult.builder().result(0).build();
     }
 }

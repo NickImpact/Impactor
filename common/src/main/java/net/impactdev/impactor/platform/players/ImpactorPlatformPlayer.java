@@ -25,12 +25,8 @@
 
 package net.impactdev.impactor.platform.players;
 
-import com.mojang.authlib.GameProfile;
 import net.impactdev.impactor.adventure.AdventureTranslator;
-import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.platform.players.transactions.ItemTransaction;
-import net.impactdev.impactor.platform.players.transactions.ImpactorItemTransaction;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
@@ -40,7 +36,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -89,24 +84,6 @@ public abstract class ImpactorPlatformPlayer implements PlatformPlayer {
                 .map(Entity::position)
                 .map(vector -> new Vector3d(vector.x, vector.y, vector.z))
                 .orElseThrow(() -> new IllegalStateException("Target player not found"));
-    }
-
-    @Override
-    public ItemTransaction offer(ImpactorItemStack stack) {
-        return this.asMinecraftPlayer()
-                .map(player -> player.inventory)
-                .map(inventory -> {
-                    ItemStack minecraft = stack.asMinecraftNative();
-
-                    boolean result = inventory.add(minecraft);
-                    return new ImpactorItemTransaction(
-                            stack,
-                            minecraft.getCount(),
-                            result,
-                            null
-                    );
-                })
-                .orElse(null);
     }
 
     @Override

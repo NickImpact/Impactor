@@ -25,6 +25,8 @@
 
 package net.impactdev.impactor.game.test.ui.dummies;
 
+import net.impactdev.impactor.api.items.ImpactorItemStack;
+import net.impactdev.impactor.api.platform.players.transactions.ItemTransaction;
 import net.impactdev.impactor.platform.players.ImpactorPlatformPlayer;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -45,5 +47,10 @@ public final class TestPlatformPlayer extends ImpactorPlatformPlayer {
     @Override
     public Optional<ServerPlayer> asMinecraftPlayer() {
         return Optional.empty();
+    }
+
+    @Override
+    public ItemTransaction offer(ImpactorItemStack stack) {
+        return null;
     }
 }

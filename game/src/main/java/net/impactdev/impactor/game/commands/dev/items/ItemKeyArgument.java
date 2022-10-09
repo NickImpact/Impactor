@@ -35,6 +35,8 @@ import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.types.ItemType;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.transactions.ItemTransaction;
 import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -63,6 +65,7 @@ public class ItemKeyArgument implements ImpactorCommand.Argument<ResourceLocatio
     public @NotNull CommandResult execute(Context context) {
         CommandContext<CommandSourceStack> ctx = context.require(COMMAND_CONTEXT);
         ServerPlayer source = context.require(ServerPlayer.class);
+        PlatformPlayer platform = PlatformPlayer.getOrCreate(source.getUUID());
         ResourceLocation location = ctx.getArgument("key", ResourceLocation.class);
 
         @Subst("minecraft") String namespace = location.getNamespace();
@@ -75,10 +78,7 @@ public class ItemKeyArgument implements ImpactorCommand.Argument<ResourceLocatio
                 .unbreakable()
                 .build();
 
-        ItemStack minecraft = stack.asMinecraftNative();
-        source.inventory.add(minecraft);
-        source.inventoryMenu.broadcastChanges();
-
-        return CommandResult.successful();
+        ItemTransaction transaction = platform.offer(stack);
+        return transaction.successful() ? CommandResult.successful() : CommandResult.builder().result(0).build();
     }
 }
