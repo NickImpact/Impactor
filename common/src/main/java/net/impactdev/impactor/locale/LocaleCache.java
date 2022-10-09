@@ -25,11 +25,10 @@
 
 package net.impactdev.impactor.locale;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.impactdev.impactor.plugin.BaseImpactorPlugin;
-import net.impactdev.impactor.util.ExceptionPrinter;
+import net.impactdev.impactor.api.utilities.ExceptionPrinter;
 import org.apache.commons.lang3.LocaleUtils;
 
 import java.util.Locale;

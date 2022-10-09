@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.util;
+package net.impactdev.impactor.api.utilities;
 
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;

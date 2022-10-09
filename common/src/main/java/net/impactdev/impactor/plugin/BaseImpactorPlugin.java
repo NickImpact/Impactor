@@ -37,7 +37,7 @@ import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.configuration.ConfigModule;
 import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.util.ExceptionPrinter;
+import net.impactdev.impactor.api.utilities.ExceptionPrinter;
 import net.impactdev.impactor.util.UtilityModule;
 
 import java.util.Collections;

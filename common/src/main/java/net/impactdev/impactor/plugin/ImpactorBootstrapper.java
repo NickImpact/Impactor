@@ -27,7 +27,7 @@ package net.impactdev.impactor.plugin;
 
 import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.util.ExceptionPrinter;
+import net.impactdev.impactor.api.utilities.ExceptionPrinter;
 
 public abstract class ImpactorBootstrapper {
 

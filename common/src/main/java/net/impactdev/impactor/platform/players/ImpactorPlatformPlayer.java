@@ -25,6 +25,7 @@
 
 package net.impactdev.impactor.platform.players;
 
+import com.mojang.authlib.GameProfile;
 import net.impactdev.impactor.adventure.AdventureTranslator;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
@@ -34,6 +35,7 @@ import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
+import net.minecraft.network.chat.ChatType;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -42,6 +44,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 public abstract class ImpactorPlatformPlayer implements PlatformPlayer {
@@ -111,7 +114,35 @@ public abstract class ImpactorPlatformPlayer implements PlatformPlayer {
         Component translated = GlobalTranslator.render(message, this.locale());
         net.minecraft.network.chat.Component vanilla = AdventureTranslator.toNative(translated);
 
-        // TODO - Add ChatType <-> MessageType mapping
-        this.asMinecraftPlayer().ifPresent(target -> target.sendMessage(vanilla, source.uuid()));
+        this.asMinecraftPlayer().ifPresent(target -> target.sendMessage(vanilla, ChatTypeMapping.mapping(type), source.uuid()));
+    }
+
+    private enum ChatTypeMapping {
+        CHAT(ChatType.CHAT, MessageType.CHAT),
+        SYSTEM(ChatType.SYSTEM, MessageType.SYSTEM);
+
+        private final ChatType minecraft;
+        private final MessageType adventure;
+
+        ChatTypeMapping(final ChatType minecraft, final MessageType adventure) {
+            this.minecraft = minecraft;
+            this.adventure = adventure;
+        }
+
+        public static ChatType mapping(MessageType type) {
+            return Arrays.stream(values())
+                    .filter(m -> m.adventure.equals(type))
+                    .map(m -> m.minecraft)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid message type"));
+        }
+
+        public ChatType minecraft() {
+            return this.minecraft;
+        }
+
+        public MessageType adventure() {
+            return this.adventure;
+        }
     }
 }
