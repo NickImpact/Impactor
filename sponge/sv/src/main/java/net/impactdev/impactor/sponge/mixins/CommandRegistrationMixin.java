@@ -27,8 +27,10 @@ package net.impactdev.impactor.sponge.mixins;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.game.commands.event.ImpactorCommandRegistrationEvent;
-import net.impactdev.impactor.game.commands.registration.CommandManager;
+import net.impactdev.impactor.commands.event.ImpactorCommandRegistrationEvent;
+import net.impactdev.impactor.commands.registration.CommandManager;
+import net.impactdev.impactor.commands.sources.SourceTranslator;
+import net.impactdev.impactor.game.commands.CommandSourceStackTranslator;
 import net.kyori.event.PostResult;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -46,7 +48,11 @@ public class CommandRegistrationMixin {
 
     @Inject(method = "<init>", at = @At(value = "TAIL"))
     public void impactor$fireImpactorCommandRegistrationEvent(Commands.CommandSelection commandSelection, CallbackInfo ci) {
-        CommandManager manager = new CommandManager();
+        Impactor.instance().services()
+                .provide(SourceTranslator.class)
+                .register(CommandSourceStack.class, new CommandSourceStackTranslator());
+
+        CommandManager<CommandSourceStack> manager = new CommandManager<>();
         PostResult result = Impactor.instance().events().post(new ImpactorCommandRegistrationEvent(manager));
         if(result.wasSuccessful()) {
             manager.registerWithBrigadier(this.dispatcher);

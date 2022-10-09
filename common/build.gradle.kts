@@ -15,6 +15,7 @@ dependencies {
 
     api("com.github.ben-manes.caffeine:caffeine:2.9.3")
     implementation("io.github.classgraph:classgraph:4.8.149")
+    implementation("net.luckperms:api:5.4")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")

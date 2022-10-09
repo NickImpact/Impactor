@@ -29,15 +29,18 @@ import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import net.impactdev.impactor.commands.sources.SourceTranslator;
 import net.impactdev.impactor.fabric.platform.FabricPlatformModule;
 import net.impactdev.impactor.fabric.scheduler.FabricSchedulerModule;
 import net.impactdev.impactor.fabric.ui.FabricUIModule;
-import net.impactdev.impactor.game.commands.event.ImpactorCommandRegistrationEvent;
-import net.impactdev.impactor.game.commands.registration.CommandManager;
+import net.impactdev.impactor.commands.event.ImpactorCommandRegistrationEvent;
+import net.impactdev.impactor.commands.registration.CommandManager;
+import net.impactdev.impactor.game.commands.CommandSourceStackTranslator;
 import net.impactdev.impactor.game.plugin.GameImpactorPlugin;
 import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
 import net.kyori.event.PostResult;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 
 import java.util.Optional;
@@ -56,7 +59,11 @@ public class FabricImpactorPlugin extends GameImpactorPlugin {
         super.construct();
 
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
-            CommandManager manager = new CommandManager();
+            Impactor.instance().services()
+                    .provide(SourceTranslator.class)
+                    .register(CommandSourceStack.class, new CommandSourceStackTranslator());
+
+            CommandManager<CommandSourceStack> manager = new CommandManager<>();
             PostResult result = Impactor.instance().events().post(new ImpactorCommandRegistrationEvent(manager));
             if(result.wasSuccessful()) {
                 manager.registerWithBrigadier(dispatcher);
