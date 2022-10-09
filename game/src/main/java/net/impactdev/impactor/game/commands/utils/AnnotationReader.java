@@ -23,36 +23,22 @@
  *
  */
 
-package net.impactdev.impactor.game.test.commands.permissions;
+package net.impactdev.impactor.game.commands.utils;
 
 import net.impactdev.impactor.api.commands.ImpactorCommand;
-import net.impactdev.impactor.api.commands.annotations.Alias;
-import net.impactdev.impactor.api.commands.annotations.CommandPath;
-import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
-import net.impactdev.impactor.api.commands.executors.CommandContext;
-import net.impactdev.impactor.api.commands.executors.CommandResult;
-import net.impactdev.impactor.api.commands.executors.CommandSource;
-import net.impactdev.impactor.api.platform.players.PlatformSource;
-import net.impactdev.impactor.api.utilities.context.Context;
-import net.minecraft.commands.CommandSourceStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Predicate;
+import java.lang.annotation.Annotation;
+import java.util.Optional;
 
-@CommandPath("requirements")
-@Alias("permissions")
-@Permission("impactor.commands.tests.permissions")
-public class PermissionSetCommand implements ImpactorCommand {
+public class AnnotationReader {
 
-    @Override
-    public @Nullable Predicate<CommandSource> requirement() {
-        return null;
+    public static <T extends Annotation> T require(ImpactorCommand target, Class<T> type) {
+        return optional(target, type)
+                .orElseThrow(() -> new IllegalArgumentException("Required annotation not found: " + type.getSimpleName()));
     }
 
-    @Override
-    public @NotNull CommandResult execute(CommandContext context) {
-        return CommandResult.successful();
+    public static <T extends Annotation> Optional<T> optional(ImpactorCommand target, Class<T> type) {
+        return Optional.ofNullable(target.getClass().getAnnotation(type));
     }
 
 }

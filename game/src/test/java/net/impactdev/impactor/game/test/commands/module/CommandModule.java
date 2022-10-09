@@ -23,15 +23,27 @@
  *
  */
 
-package net.impactdev.impactor.api.utilities;
+package net.impactdev.impactor.game.test.commands.module;
 
-import net.kyori.adventure.key.Key;
-import net.minecraft.resources.ResourceLocation;
+import net.impactdev.impactor.api.platform.players.PlatformSource;
+import net.impactdev.impactor.api.providers.BuilderProvider;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.providers.ServiceProvider;
+import net.impactdev.impactor.modules.ImpactorModule;
 
-public class ResourceKeyTranslator {
-
-    public static ResourceLocation asResourceLocation(Key key) {
-        return new ResourceLocation(key.namespace(), key.value());
+public final class CommandModule implements ImpactorModule {
+    @Override
+    public void factories(FactoryProvider provider) {
+        provider.register(PlatformSource.Factory.class, new TestSource.TestFactory());
     }
 
+    @Override
+    public void builders(BuilderProvider provider) {
+
+    }
+
+    @Override
+    public void services(ServiceProvider provider) {
+
+    }
 }

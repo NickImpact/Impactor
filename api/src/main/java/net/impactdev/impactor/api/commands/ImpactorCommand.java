@@ -26,11 +26,10 @@
 package net.impactdev.impactor.api.commands;
 
 import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import io.leangen.geantyref.TypeToken;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.impactdev.impactor.api.commands.executors.CommandContext;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
-import net.impactdev.impactor.api.utilities.context.Context;
-import net.minecraft.commands.CommandSourceStack;
+import net.impactdev.impactor.api.commands.executors.CommandSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,15 +37,13 @@ import java.util.function.Predicate;
 
 public interface ImpactorCommand {
 
-    TypeToken<CommandContext<CommandSourceStack>> COMMAND_CONTEXT = new TypeToken<CommandContext<CommandSourceStack>>() {};
-
     @Nullable
-    default Predicate<CommandSourceStack> requirement() {
+    default Predicate<CommandSource> requirement() {
         return null;
     }
 
     @NotNull
-    CommandResult execute(Context context);
+    CommandResult execute(CommandContext context) throws CommandSyntaxException;
 
     interface Argument<T> extends ImpactorCommand {
 

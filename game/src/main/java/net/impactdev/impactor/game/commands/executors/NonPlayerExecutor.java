@@ -27,12 +27,8 @@ package net.impactdev.impactor.game.commands.executors;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import net.impactdev.impactor.api.commands.ImpactorCommand;
+import net.impactdev.impactor.api.commands.executors.CommandContext;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
-import net.impactdev.impactor.api.utilities.context.Context;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
-import org.jetbrains.annotations.Nullable;
 
 public class NonPlayerExecutor implements CommandExecutor {
 
@@ -44,12 +40,9 @@ public class NonPlayerExecutor implements CommandExecutor {
     }
 
     @Override
-    public CommandResult execute(Context context) throws CommandSyntaxException {
-        @Nullable Entity entity = context.require(ImpactorCommand.COMMAND_CONTEXT).getSource().getEntity();
-        if(entity != null) {
-            if(entity instanceof ServerPlayer) {
-                throw EXCEPTION.create();
-            }
+    public CommandResult execute(CommandContext context) throws CommandSyntaxException {
+        if(context.source().asPlayer().isPresent()) {
+            throw EXCEPTION.create();
         }
 
         return this.delegate.execute(context);

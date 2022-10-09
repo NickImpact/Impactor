@@ -26,11 +26,11 @@
 package net.impactdev.impactor.game.commands.permissions;
 
 import net.impactdev.impactor.api.commands.PermissionsService;
-import net.minecraft.commands.CommandSourceStack;
+import net.impactdev.impactor.api.platform.players.PlatformSource;
 
 public final class NoOpPermissionsService implements PermissionsService {
     @Override
-    public boolean hasPermission(CommandSourceStack stack, String permission) {
+    public boolean hasPermission(PlatformSource source, String permission) {
         return true;
     }
 

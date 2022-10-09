@@ -25,15 +25,15 @@
 
 package net.impactdev.impactor.api.events.provided;
 
-import com.mojang.authlib.GameProfile;
 import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.PlatformSource;
 
 public interface ClientConnectionEvent extends ImpactorEvent {
 
     interface Login extends ClientConnectionEvent {
 
-        GameProfile profile();
+        PlatformSource profile();
 
     }
 

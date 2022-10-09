@@ -23,22 +23,34 @@
  *
  */
 
-package net.impactdev.impactor.game.commands;
+package net.impactdev.impactor.game.commands.utils;
 
-import net.impactdev.impactor.api.commands.ImpactorCommand;
+import net.impactdev.impactor.api.commands.executors.CommandSource;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.PlatformSource;
+import net.impactdev.impactor.game.commands.executors.ImpactorCommandSource;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import org.jetbrains.annotations.Nullable;
 
-import java.lang.annotation.Annotation;
-import java.util.Optional;
+public final class SourceTranslator {
 
-public class AnnotationReader {
+    public static CommandSource translate(CommandSourceStack mojang) {
+        if(mojang == null) {
+            return null;
+        }
 
-    public static <T extends Annotation> T require(ImpactorCommand target, Class<T> type) {
-        return optional(target, type)
-                .orElseThrow(() -> new IllegalArgumentException("Required annotation not found: " + type.getSimpleName()));
-    }
+        @Nullable Entity entity = mojang.getEntity();
+        if(entity == null) {
+            return new ImpactorCommandSource(PlatformSource.console());
+        }
 
-    public static <T extends Annotation> Optional<T> optional(ImpactorCommand target, Class<T> type) {
-        return Optional.ofNullable(target.getClass().getAnnotation(type));
+        if(entity instanceof ServerPlayer) {
+            return new ImpactorCommandSource(PlatformPlayer.getOrCreate(entity.getUUID()));
+        } else {
+            throw new UnsupportedOperationException("Pending source translation");
+        }
     }
 
 }

@@ -29,12 +29,9 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.platform.players.transactions.ItemTransaction;
 import net.kyori.adventure.text.Component;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
 
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -60,14 +57,6 @@ public interface PlatformPlayer extends PlatformSource {
     }
 
     /**
-     * Attempts to locate and provide the actual game instance of a player, if available. This will return
-     * empty if and only if the target player represented by this instance is not online.
-     *
-     * @return A game instance of a player if online, {@link Optional#empty() empty} otherwise
-     */
-    Optional<ServerPlayer> asMinecraftPlayer();
-
-    /**
      * Specifies the display name of a player, if they have one. Otherwise, this call will
      * fall back to their actual username, represented via {@link PlatformSource#name()}.
      *
@@ -75,12 +64,12 @@ public interface PlatformPlayer extends PlatformSource {
      */
     Component displayName();
 
-    /**
-     * Indicates the current world the player exists in.
-     *
-     * @return The world the player is currently in
-     */
-    ServerLevel world();
+//    /**
+//     * Indicates the current world the player exists in.
+//     *
+//     * @return The world the player is currently in
+//     */
+//    ServerLevel world();
 
     /**
      * Specifies the current block coordinates of a player. This is where the player

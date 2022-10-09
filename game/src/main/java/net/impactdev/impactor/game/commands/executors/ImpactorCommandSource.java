@@ -23,36 +23,50 @@
  *
  */
 
-package net.impactdev.impactor.game.test.commands.permissions;
+package net.impactdev.impactor.game.commands.executors;
 
-import net.impactdev.impactor.api.commands.ImpactorCommand;
-import net.impactdev.impactor.api.commands.annotations.Alias;
-import net.impactdev.impactor.api.commands.annotations.CommandPath;
-import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
-import net.impactdev.impactor.api.commands.executors.CommandContext;
-import net.impactdev.impactor.api.commands.executors.CommandResult;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.impactdev.impactor.api.commands.executors.CommandSource;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformSource;
-import net.impactdev.impactor.api.utilities.context.Context;
+import net.kyori.adventure.text.Component;
 import net.minecraft.commands.CommandSourceStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Predicate;
+import java.util.Optional;
+import java.util.UUID;
 
-@CommandPath("requirements")
-@Alias("permissions")
-@Permission("impactor.commands.tests.permissions")
-public class PermissionSetCommand implements ImpactorCommand {
+public final class ImpactorCommandSource implements CommandSource {
 
-    @Override
-    public @Nullable Predicate<CommandSource> requirement() {
-        return null;
+    private final PlatformSource source;
+
+    public ImpactorCommandSource(PlatformSource source) {
+        this.source = source;
     }
 
     @Override
-    public @NotNull CommandResult execute(CommandContext context) {
-        return CommandResult.successful();
+    public UUID uuid() {
+        return this.source.uuid();
     }
 
+    @Override
+    public Component name() {
+        return this.source.name();
+    }
+
+    @Override
+    public PlatformSource asPlatform() {
+        return this.source;
+    }
+
+    @Override
+    public Optional<PlatformPlayer> asPlayer() {
+        return Optional.of(this.source)
+                .filter(s -> s instanceof PlatformPlayer)
+                .map(s -> (PlatformPlayer) s);
+    }
+
+    @Override
+    public PlatformPlayer requirePlayer() throws CommandSyntaxException {
+        return this.asPlayer().orElseThrow(CommandSourceStack.ERROR_NOT_PLAYER::create);
+    }
 }

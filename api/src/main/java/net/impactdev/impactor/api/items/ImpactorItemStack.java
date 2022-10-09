@@ -38,14 +38,13 @@ import net.impactdev.impactor.api.items.types.ItemTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Set;
 
 /**
  * <h2>The Basics to an Impactor Item Stack</h2>
- * Specifies the configuration for an {@link ItemStack} within Minecraft. By default,
+ * Specifies the configuration for an ItemStack within Minecraft. By default,
  * this interface supports basic metadata. Through extensions of this interface,
  * more configurations can be produced that would be capable of supporting additional
  * details such as NBT tags.

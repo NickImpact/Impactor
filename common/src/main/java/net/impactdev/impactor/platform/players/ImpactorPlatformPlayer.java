@@ -40,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 
 public abstract class ImpactorPlatformPlayer implements PlatformPlayer {
@@ -54,6 +55,8 @@ public abstract class ImpactorPlatformPlayer implements PlatformPlayer {
     public UUID uuid() {
         return this.uuid;
     }
+
+    protected abstract Optional<ServerPlayer> asMinecraftPlayer();
 
     @Override
     public Component name() {
@@ -71,12 +74,12 @@ public abstract class ImpactorPlatformPlayer implements PlatformPlayer {
                 .orElse(Component.text("Unknown"));
     }
 
-    @Override
-    public ServerLevel world() {
-        return this.asMinecraftPlayer()
-                .map(ServerPlayer::getLevel)
-                .orElseThrow(() -> new IllegalStateException("Target player not found"));
-    }
+//    @Override
+//    public ServerLevel world() {
+//        return this.asMinecraftPlayer()
+//                .map(ServerPlayer::getLevel)
+//                .orElseThrow(() -> new IllegalStateException("Target player not found"));
+//    }
 
     @Override
     public Vector3d position() {

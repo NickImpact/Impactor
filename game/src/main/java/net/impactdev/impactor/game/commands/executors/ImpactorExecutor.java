@@ -26,17 +26,16 @@
 package net.impactdev.impactor.game.commands.executors;
 
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.PermissionsService;
 import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
 import net.impactdev.impactor.api.commands.annotations.permissions.Phase;
 import net.impactdev.impactor.api.commands.exceptions.CommandResultException;
+import net.impactdev.impactor.api.commands.executors.CommandContext;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
-import net.impactdev.impactor.api.utilities.context.Context;
+import net.impactdev.impactor.api.commands.executors.CommandSource;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.minecraft.commands.CommandSourceStack;
 import org.apache.commons.lang3.StringUtils;
@@ -55,11 +54,11 @@ public final class ImpactorExecutor implements Command<CommandSourceStack> {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    public int run(com.mojang.brigadier.context.CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         try {
-            if(this.verify(context.getSource())) {
-                Context ctx = Context.empty().append(ImpactorCommand.COMMAND_CONTEXT, context);
-                CommandResult result = this.delegate.execute(ctx);
+            CommandContext impactor = new ImpactorCommandContext(context);
+            if(this.verify(impactor.source())) {
+                CommandResult result = this.delegate.execute(impactor);
                 if (result.reason().isPresent()) {
                     throw new CommandResultException(result, result.reason().get());
                 }
@@ -108,10 +107,16 @@ public final class ImpactorExecutor implements Command<CommandSourceStack> {
         }
     }
 
-    private boolean verify(CommandSourceStack source) {
+    private boolean verify(CommandSource source) {
         return Optional.ofNullable(this.permission)
                 .filter(p -> p.phase().equals(Phase.EXECUTION))
-                .map(p -> Impactor.instance().services().provide(PermissionsService.class).hasPermission(source, p.value()))
+                .map(p -> Impactor.instance().services()
+                        .provide(PermissionsService.class)
+                        .hasPermission(
+                                Optional.ofNullable(source).map(CommandSource::asPlatform).orElse(null),
+                                p.value()
+                        )
+                )
                 .orElse(true);
     }
 

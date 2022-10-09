@@ -30,7 +30,7 @@ import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
 
 import java.util.Optional;
 
-import static net.impactdev.impactor.game.commands.AnnotationReader.optional;
+import static net.impactdev.impactor.game.commands.utils.AnnotationReader.optional;
 
 public class ExecutorFactory {
 

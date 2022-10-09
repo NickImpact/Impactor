@@ -26,13 +26,13 @@
 package net.impactdev.impactor.game.commands.executors;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.impactdev.impactor.api.commands.ImpactorCommand;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import net.impactdev.impactor.api.commands.executors.CommandContext;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
-import net.impactdev.impactor.api.utilities.context.Context;
-import net.minecraft.server.level.ServerPlayer;
 
 public final class PlayerOnlyExecutor implements CommandExecutor {
 
+    private static final RequirePlayerSourceSyntaxExceptionType EXCEPTION = new RequirePlayerSourceSyntaxExceptionType();
     private final CommandExecutor delegate;
 
     public PlayerOnlyExecutor(CommandExecutor delegate) {
@@ -40,10 +40,19 @@ public final class PlayerOnlyExecutor implements CommandExecutor {
     }
 
     @Override
-    public CommandResult execute(Context context) throws CommandSyntaxException {
-        ServerPlayer player = context.require(ImpactorCommand.COMMAND_CONTEXT).getSource().getPlayerOrException();
-        context.append(ServerPlayer.class, player);
+    public CommandResult execute(CommandContext context) throws CommandSyntaxException {
+        if(!context.source().asPlayer().isPresent()) {
+            throw EXCEPTION.create();
+        }
 
         return this.delegate.execute(context);
+    }
+
+    private static class RequirePlayerSourceSyntaxExceptionType extends SimpleCommandExceptionType {
+
+        public RequirePlayerSourceSyntaxExceptionType() {
+            super(() -> "You must be a player to run this command!");
+        }
+
     }
 }

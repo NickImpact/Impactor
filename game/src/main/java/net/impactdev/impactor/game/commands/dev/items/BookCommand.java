@@ -25,22 +25,21 @@
 
 package net.impactdev.impactor.game.commands.dev.items;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
 import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
 import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
+import net.impactdev.impactor.api.commands.executors.CommandContext;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.extensions.BookStack;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.transactions.ItemTransaction;
-import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import static net.kyori.adventure.text.Component.text;
@@ -52,9 +51,8 @@ import static net.kyori.adventure.text.Component.text;
 public class BookCommand implements ImpactorCommand {
 
     @Override
-    public @NotNull CommandResult execute(Context context) {
-        ServerPlayer source = context.require(ServerPlayer.class);
-        PlatformPlayer platform = PlatformPlayer.getOrCreate(source.getUUID());
+    public @NotNull CommandResult execute(CommandContext context) throws CommandSyntaxException {
+        PlatformPlayer platform = context.source().requirePlayer();
 
         ImpactorItemStack book = ImpactorItemStack.book()
                 .type(BookStack.BookType.WRITTEN)

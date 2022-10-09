@@ -38,20 +38,25 @@ import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
 import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
 import net.impactdev.impactor.api.commands.annotations.permissions.Phase;
+import net.impactdev.impactor.api.commands.executors.CommandContext;
+import net.impactdev.impactor.api.commands.executors.CommandSource;
 import net.impactdev.impactor.game.commands.executors.ExecutorFactory;
+import net.impactdev.impactor.game.commands.executors.ImpactorCommandContext;
 import net.impactdev.impactor.game.commands.executors.ImpactorExecutor;
 import net.impactdev.impactor.game.commands.specs.CommandRoot;
 import net.impactdev.impactor.game.commands.specs.CommandSpec;
+import net.impactdev.impactor.game.commands.utils.SourceTranslator;
 import net.minecraft.commands.CommandSourceStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Predicate;
 
-import static net.impactdev.impactor.game.commands.AnnotationReader.optional;
-import static net.impactdev.impactor.game.commands.AnnotationReader.require;
+import static net.impactdev.impactor.game.commands.utils.AnnotationReader.optional;
+import static net.impactdev.impactor.game.commands.utils.AnnotationReader.require;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
@@ -69,12 +74,21 @@ public class CommandGenerator {
         Predicate<CommandSourceStack> requirement = null;
         Optional<Permission> permission = optional(command, Permission.class);
         if(permission.isPresent() && permission.get().phase().equals(Phase.LOOKUP)) {
-            requirement = source -> Impactor.instance().services().provide(PermissionsService.class).hasPermission(source, permission.get().value());
+            requirement = translated(source -> Impactor.instance().services()
+                    .provide(PermissionsService.class)
+                    .hasPermission(
+                            Optional.ofNullable(source).map(CommandSource::asPlatform).orElse(null),
+                            permission.get().value()
+                    )
+            );
         }
 
         Optional.ofNullable(Optional.ofNullable(requirement)
-                    .map(r -> Optional.ofNullable(command.requirement()).map(r::and).orElse(r))
-                    .orElse(command.requirement()))
+                    .map(r -> Optional.ofNullable(command.requirement())
+                            .map(req -> r.and(Objects.requireNonNull(translated(req))))
+                            .orElse(r)
+                    )
+                    .orElse(translated(command.requirement())))
                 .ifPresent(builder::requires);
 
         builder.executes(new ImpactorExecutor(ExecutorFactory.create(command), permission.orElse(null)));
@@ -132,6 +146,18 @@ public class CommandGenerator {
                 parent.append(builder);
             }
         }
+    }
+
+    @Nullable
+    private Predicate<CommandSourceStack> translated(Predicate<CommandSource> context) {
+        if(context == null) {
+            return null;
+        }
+
+        return stack -> {
+            CommandSource ctx = SourceTranslator.translate(stack);
+            return context.test(ctx);
+        };
     }
 
 }

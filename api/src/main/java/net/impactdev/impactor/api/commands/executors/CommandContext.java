@@ -23,22 +23,18 @@
  *
  */
 
-package net.impactdev.impactor.game.test.commands.exceptional;
+package net.impactdev.impactor.api.commands.executors;
 
-import net.impactdev.impactor.api.commands.ImpactorCommand;
-import net.impactdev.impactor.api.commands.annotations.Alias;
-import net.impactdev.impactor.api.commands.annotations.CommandPath;
-import net.impactdev.impactor.api.commands.executors.CommandContext;
-import net.impactdev.impactor.api.commands.executors.CommandResult;
-import org.jetbrains.annotations.NotNull;
+import com.mojang.brigadier.context.StringRange;
 
-@CommandPath("exceptional")
-@Alias("passing")
-public class Passing implements ImpactorCommand {
+public interface CommandContext {
 
-    @Override
-    public @NotNull CommandResult execute(CommandContext context) {
-        return CommandResult.successful();
-    }
+    CommandSource source();
+
+    <V> V argument(final String name, final Class<V> type);
+
+    StringRange range();
+
+    String input();
 
 }

@@ -23,36 +23,42 @@
  *
  */
 
-package net.impactdev.impactor.game.test.commands.permissions;
+package net.impactdev.impactor.game.commands.executors;
 
-import net.impactdev.impactor.api.commands.ImpactorCommand;
-import net.impactdev.impactor.api.commands.annotations.Alias;
-import net.impactdev.impactor.api.commands.annotations.CommandPath;
-import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
+import com.mojang.brigadier.context.StringRange;
 import net.impactdev.impactor.api.commands.executors.CommandContext;
-import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.commands.executors.CommandSource;
-import net.impactdev.impactor.api.platform.players.PlatformSource;
-import net.impactdev.impactor.api.utilities.context.Context;
+import net.impactdev.impactor.game.commands.utils.SourceTranslator;
 import net.minecraft.commands.CommandSourceStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Predicate;
+public final class ImpactorCommandContext implements CommandContext {
 
-@CommandPath("requirements")
-@Alias("permissions")
-@Permission("impactor.commands.tests.permissions")
-public class PermissionSetCommand implements ImpactorCommand {
+    private final com.mojang.brigadier.context.CommandContext<CommandSourceStack> delegate;
+    private final CommandSource source;
 
-    @Override
-    public @Nullable Predicate<CommandSource> requirement() {
-        return null;
+    public ImpactorCommandContext(com.mojang.brigadier.context.CommandContext<CommandSourceStack> delegate) {
+        this.delegate = delegate;
+        this.source = SourceTranslator.translate(delegate.getSource());
     }
 
     @Override
-    public @NotNull CommandResult execute(CommandContext context) {
-        return CommandResult.successful();
+    public CommandSource source() {
+        return this.source;
+    }
+
+    @Override
+    public <V> V argument(String name, Class<V> type) {
+        return this.delegate.getArgument(name, type);
+    }
+
+    @Override
+    public StringRange range() {
+        return this.delegate.getRange();
+    }
+
+    @Override
+    public String input() {
+        return this.delegate.getInput();
     }
 
 }

@@ -25,10 +25,12 @@
 
 package net.impactdev.impactor.game.commands.dev.player;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
 import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
+import net.impactdev.impactor.api.commands.executors.CommandContext;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.utilities.context.Context;
@@ -43,9 +45,8 @@ import org.jetbrains.annotations.NotNull;
 public final class PlayerLocaleTest implements ImpactorCommand {
 
     @Override
-    public @NotNull CommandResult execute(Context context) {
-        ServerPlayer source = context.require(ServerPlayer.class);
-        PlatformPlayer player = PlatformPlayer.getOrCreate(source.getUUID());
+    public @NotNull CommandResult execute(CommandContext context) throws CommandSyntaxException {
+        PlatformPlayer player = context.source().requirePlayer();
         player.sendMessage(Component.text("Using locale: " + player.locale().getDisplayName()));
         BaseImpactorPlugin.instance().logger().info("Using locale: " + player.locale().toLanguageTag());
 

@@ -27,12 +27,10 @@ package net.impactdev.impactor.api.items.types;
 
 import net.impactdev.impactor.api.Impactor;
 import net.kyori.adventure.key.Key;
-import net.minecraft.world.item.Item;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
 
 public interface ItemType {
 
@@ -45,8 +43,6 @@ public interface ItemType {
     }
 
     Key key();
-
-    Optional<Item> minecraft();
 
     interface Factory {
 

@@ -25,12 +25,17 @@
 
 package net.impactdev.impactor.api.platform.players;
 
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.adventure.LocalizedAudience;
 import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
 
 public interface PlatformSource extends LocalizedAudience {
+
+    static PlatformSource console() {
+        return Impactor.instance().factories().provide(Factory.class).console();
+    }
 
     /**
      * Indicates the UUID of the source this platform instance belongs to. This field will always
@@ -48,7 +53,7 @@ public interface PlatformSource extends LocalizedAudience {
      */
     Component name();
 
-    interface PlatformSourceFactory {
+    interface Factory {
 
         /**
          * Creates a new {@link PlatformSource} that represents the game console. This source can be used

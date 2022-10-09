@@ -26,6 +26,7 @@
 package net.impactdev.impactor.game.test.commands.permissions;
 
 import net.impactdev.impactor.api.commands.PermissionsService;
+import net.impactdev.impactor.api.platform.players.PlatformSource;
 import net.minecraft.commands.CommandSourceStack;
 
 public class AlwaysTrueOrFalsePermissionService implements PermissionsService {
@@ -37,7 +38,7 @@ public class AlwaysTrueOrFalsePermissionService implements PermissionsService {
     }
 
     @Override
-    public boolean hasPermission(CommandSourceStack stack, String permission) {
+    public boolean hasPermission(PlatformSource stack, String permission) {
         return this.value;
     }
 

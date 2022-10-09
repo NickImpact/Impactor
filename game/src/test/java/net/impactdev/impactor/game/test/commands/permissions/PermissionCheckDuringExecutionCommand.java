@@ -30,6 +30,7 @@ import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
 import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
 import net.impactdev.impactor.api.commands.annotations.permissions.Phase;
+import net.impactdev.impactor.api.commands.executors.CommandContext;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.utilities.context.Context;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +40,7 @@ import org.jetbrains.annotations.NotNull;
 @Permission(value = "impactor.commands.tests.permissions", phase = Phase.EXECUTION)
 public class PermissionCheckDuringExecutionCommand implements ImpactorCommand {
     @Override
-    public @NotNull CommandResult execute(Context context) {
+    public @NotNull CommandResult execute(CommandContext context) {
         return CommandResult.successful();
     }
 }

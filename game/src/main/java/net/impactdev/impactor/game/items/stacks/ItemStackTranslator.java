@@ -28,13 +28,13 @@ package net.impactdev.impactor.game.items.stacks;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.properties.MetaFlag;
 import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
-import net.impactdev.impactor.api.utilities.ResourceKeyTranslator;
+import net.impactdev.impactor.game.items.ImpactorItemType;
+import net.impactdev.impactor.game.utilities.ResourceKeyTranslator;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagType;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
-import net.kyori.adventure.nbt.StringBinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.core.Registry;
@@ -59,7 +59,7 @@ import java.util.function.Function;
 public final class ItemStackTranslator {
 
     public static ItemStack translate(ImpactorItemStack stack) {
-        ItemLike like = stack.type().minecraft().orElse(null);
+        ItemLike like = ((ImpactorItemType)stack.type()).minecraft().orElse(null);
         ItemStack result = new ItemStack(like);
         result.setCount(stack.quantity());
         if(stack.title() != null) {

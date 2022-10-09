@@ -26,11 +26,11 @@
 package net.impactdev.impactor.game.commands.executors;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.impactdev.impactor.api.commands.executors.CommandContext;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
-import net.impactdev.impactor.api.utilities.context.Context;
 
 public interface CommandExecutor {
 
-    CommandResult execute(Context var1) throws CommandSyntaxException;
+    CommandResult execute(CommandContext context) throws CommandSyntaxException;
 
 }

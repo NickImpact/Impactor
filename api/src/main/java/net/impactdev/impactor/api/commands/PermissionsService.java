@@ -26,14 +26,14 @@
 package net.impactdev.impactor.api.commands;
 
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.platform.players.PlatformSource;
 import net.impactdev.impactor.api.services.Service;
-import net.minecraft.commands.CommandSourceStack;
 
 import java.util.function.Predicate;
 
 public interface PermissionsService extends Service {
 
-    boolean hasPermission(CommandSourceStack stack, String permission);
+    boolean hasPermission(PlatformSource stack, String permission);
 
     /**
      * Creates a {@link Predicate} responsible for verifying whether the source of an executed command
@@ -47,7 +47,7 @@ public interface PermissionsService extends Service {
      * @param permission The permission to validate against the command source
      * @return A predicate which is responsible for the permissions validation
      */
-    static Predicate<CommandSourceStack> validate(String permission) {
+    static Predicate<PlatformSource> validate(String permission) {
         return stack -> Impactor.instance().services().provide(PermissionsService.class).hasPermission(stack, permission);
     }
 

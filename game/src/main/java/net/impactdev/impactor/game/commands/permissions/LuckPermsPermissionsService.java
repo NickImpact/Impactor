@@ -26,10 +26,9 @@
 package net.impactdev.impactor.game.commands.permissions;
 
 import net.impactdev.impactor.api.commands.PermissionsService;
+import net.impactdev.impactor.api.platform.players.PlatformSource;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Optional;
 
@@ -38,10 +37,8 @@ public final class LuckPermsPermissionsService implements PermissionsService {
     private static final LuckPerms API = LuckPermsProvider.get();
 
     @Override
-    public boolean hasPermission(CommandSourceStack stack, String permission) {
-        return Optional.ofNullable(stack.getEntity()).filter(entity -> entity instanceof ServerPlayer)
-                .map(entity -> (ServerPlayer) entity)
-                .map(player -> API.getUserManager().getUser(player.getUUID()))
+    public boolean hasPermission(PlatformSource source, String permission) {
+        return Optional.ofNullable(API.getUserManager().getUser(source.uuid()))
                 .map(user -> user.getCachedData().getPermissionData().checkPermission(permission).asBoolean())
                 .orElse(true);
     }

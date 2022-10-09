@@ -27,21 +27,18 @@ package net.impactdev.impactor.game.commands.dev.items.skulls;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
 import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
 import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
+import net.impactdev.impactor.api.commands.executors.CommandContext;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.transactions.ItemTransaction;
-import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.text.format.TextColor;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import static net.kyori.adventure.text.Component.text;
@@ -58,16 +55,14 @@ public class SkullSkinArgument implements ImpactorCommand.Argument<String> {
     }
 
     @Override
-    public @NotNull CommandResult execute(Context context) {
-        CommandContext<CommandSourceStack> ctx = context.require(COMMAND_CONTEXT);
-        ServerPlayer source = context.require(ServerPlayer.class);
-        PlatformPlayer platform = PlatformPlayer.getOrCreate(source.getUUID());
+    public @NotNull CommandResult execute(CommandContext context) throws CommandSyntaxException {
+        PlatformPlayer platform = context.source().requirePlayer();
 
         ImpactorItemStack skull = ImpactorItemStack.skull()
                 .title(text("Impactor Skull Test").color(TextColor.color(0x42, 0x87, 0xf5)))
                 .glow()
                 .unbreakable()
-                .player(ctx.getArgument("value", String.class), false)
+                .player(context.argument("value", String.class), false)
                 .build();
 
         ItemTransaction transaction = platform.offer(skull);

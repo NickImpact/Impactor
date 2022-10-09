@@ -28,7 +28,6 @@ package net.impactdev.impactor.game.commands.registration;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
-import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
 import net.impactdev.impactor.game.commands.specs.CommandRoot;
@@ -37,7 +36,7 @@ import net.minecraft.commands.CommandSourceStack;
 import java.util.Map;
 import java.util.Optional;
 
-import static net.impactdev.impactor.game.commands.AnnotationReader.optional;
+import static net.impactdev.impactor.game.commands.utils.AnnotationReader.optional;
 
 public class CommandManager {
 

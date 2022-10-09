@@ -23,36 +23,40 @@
  *
  */
 
-package net.impactdev.impactor.game.test.commands.permissions;
+package net.impactdev.impactor.game.test.commands.module;
 
-import net.impactdev.impactor.api.commands.ImpactorCommand;
-import net.impactdev.impactor.api.commands.annotations.Alias;
-import net.impactdev.impactor.api.commands.annotations.CommandPath;
-import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
-import net.impactdev.impactor.api.commands.executors.CommandContext;
-import net.impactdev.impactor.api.commands.executors.CommandResult;
-import net.impactdev.impactor.api.commands.executors.CommandSource;
 import net.impactdev.impactor.api.platform.players.PlatformSource;
-import net.impactdev.impactor.api.utilities.context.Context;
-import net.minecraft.commands.CommandSourceStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.kyori.adventure.text.Component;
 
-import java.util.function.Predicate;
+import java.util.Locale;
+import java.util.UUID;
 
-@CommandPath("requirements")
-@Alias("permissions")
-@Permission("impactor.commands.tests.permissions")
-public class PermissionSetCommand implements ImpactorCommand {
+public final class TestSource implements PlatformSource {
+
+    private final UUID uuid = new UUID(0, 0);
 
     @Override
-    public @Nullable Predicate<CommandSource> requirement() {
-        return null;
+    public Locale locale() {
+        return Locale.US;
     }
 
     @Override
-    public @NotNull CommandResult execute(CommandContext context) {
-        return CommandResult.successful();
+    public UUID uuid() {
+        return this.uuid;
+    }
+
+    @Override
+    public Component name() {
+        return Component.text("Console");
+    }
+
+    public static class TestFactory implements Factory {
+
+        @Override
+        public PlatformSource console() {
+            return new TestSource();
+        }
+
     }
 
 }

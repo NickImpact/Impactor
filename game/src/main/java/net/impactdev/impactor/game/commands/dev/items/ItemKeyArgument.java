@@ -26,25 +26,22 @@
 package net.impactdev.impactor.game.commands.dev.items;
 
 import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
 import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
 import net.impactdev.impactor.api.commands.annotations.RestrictedExecutor;
+import net.impactdev.impactor.api.commands.executors.CommandContext;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.types.ItemType;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.transactions.ItemTransaction;
-import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
@@ -62,11 +59,9 @@ public class ItemKeyArgument implements ImpactorCommand.Argument<ResourceLocatio
     }
 
     @Override
-    public @NotNull CommandResult execute(Context context) {
-        CommandContext<CommandSourceStack> ctx = context.require(COMMAND_CONTEXT);
-        ServerPlayer source = context.require(ServerPlayer.class);
-        PlatformPlayer platform = PlatformPlayer.getOrCreate(source.getUUID());
-        ResourceLocation location = ctx.getArgument("key", ResourceLocation.class);
+    public @NotNull CommandResult execute(CommandContext context) throws CommandSyntaxException {
+        PlatformPlayer platform = context.source().requirePlayer();
+        ResourceLocation location = context.argument("key", ResourceLocation.class);
 
         @Subst("minecraft") String namespace = location.getNamespace();
         @Subst("air") String path = location.getPath();

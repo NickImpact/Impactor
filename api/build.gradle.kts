@@ -1,10 +1,5 @@
 plugins {
     id("maven-publish")
-    id("org.spongepowered.gradle.vanilla") version "0.2.1-SNAPSHOT"
-}
-
-minecraft {
-    version("1.16.5")
 }
 
 repositories {
@@ -12,6 +7,7 @@ repositories {
     maven("https://repo.spongepowered.org/repository/maven-releases") {
         name = "Sponge Releases"
     }
+    maven("https://libraries.minecraft.net")
 }
 
 dependencies {
@@ -46,6 +42,7 @@ dependencies {
     api(group = "org.spongepowered", name = "math", version = "2.0.1")
     implementation("org.apache.logging.log4j:log4j-api:2.18.0")
     implementation(group = "com.zaxxer", name = "HikariCP", version = "4.0.3")
+    compileOnly("com.mojang:brigadier:1.0.18")
 }
 
 publishing {

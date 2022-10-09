@@ -23,22 +23,15 @@
  *
  */
 
-package net.impactdev.impactor.game.test.commands.exceptional;
+package net.impactdev.impactor.game.utilities;
 
-import net.impactdev.impactor.api.commands.ImpactorCommand;
-import net.impactdev.impactor.api.commands.annotations.Alias;
-import net.impactdev.impactor.api.commands.annotations.CommandPath;
-import net.impactdev.impactor.api.commands.executors.CommandContext;
-import net.impactdev.impactor.api.commands.executors.CommandResult;
-import org.jetbrains.annotations.NotNull;
+import net.kyori.adventure.key.Key;
+import net.minecraft.resources.ResourceLocation;
 
-@CommandPath("exceptional")
-@Alias("passing")
-public class Passing implements ImpactorCommand {
+public class ResourceKeyTranslator {
 
-    @Override
-    public @NotNull CommandResult execute(CommandContext context) {
-        return CommandResult.successful();
+    public static ResourceLocation asResourceLocation(Key key) {
+        return new ResourceLocation(key.namespace(), key.value());
     }
 
 }
