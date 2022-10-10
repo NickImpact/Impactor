@@ -25,12 +25,41 @@
 
 package net.impactdev.impactor.api.placeholders;
 
-import java.util.List;
+import net.kyori.adventure.text.Component;
 
-public interface PlaceholderManager {
+import java.util.Arrays;
+import java.util.function.Function;
 
-    void register(PlaceholderParser parser);
+public enum ComponentModifiers implements Function<Component, Component> {
+    SPACE_BEFORE("p") {
+        @Override
+        public Component apply(Component text) {
+            return Component.space().append(text);
+        }
+    },
+    SPACE_AFTER("s") {
+        @Override
+        public Component apply(Component text) {
+            return text.append(Component.space());
+        }
+    };
 
-    List<PlaceholderParser> parsers();
+    private final String key;
+
+    ComponentModifiers(String key) {
+        this.key = key;
+    }
+
+    public static Component transform(String key, Component component) {
+        return Arrays.stream(values())
+                .filter(modifier -> modifier.key.equals(key))
+                .map(modifier -> modifier.apply(component))
+                .findFirst()
+                .orElse(component);
+    }
+
+    public String key() {
+        return this.key;
+    }
 
 }
