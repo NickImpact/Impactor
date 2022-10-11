@@ -25,7 +25,9 @@
 
 package net.impactdev.impactor.test.text;
 
+import net.impactdev.impactor.adventure.LegacyProcessor;
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.adventure.TextProcessor;
 import net.impactdev.impactor.api.utilities.context.Context;
 import net.impactdev.impactor.adventure.MiniMessageProcessor;
 import net.impactdev.impactor.api.placeholders.PlaceholderService;
@@ -35,17 +37,40 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.junit.jupiter.api.Test;
 
 import static net.kyori.adventure.text.Component.text;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public final class PlaceholderParsingTest {
 
     @Test
     public void mini() {
-        MiniMessageProcessor service = new MiniMessageProcessor();
+        TextProcessor service = new MiniMessageProcessor();
         PlaceholderService placeholders = Impactor.instance().services().provide(PlaceholderService.class);
+        LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
 
         placeholders.register(Key.key("impactor", "test"), ctx -> text("Hello World!"));
         Component result = service.parse("Testing: <impactor-test>", Context.empty());
-        System.out.println(LegacyComponentSerializer.legacyAmpersand().serialize(result));
+        assertEquals("Testing: Hello World!", serializer.serialize(result));
+    }
+
+    @Test
+    public void ampersand() {
+        TextProcessor service = new LegacyProcessor('&');
+        PlaceholderService placeholders = Impactor.instance().services().provide(PlaceholderService.class);
+        placeholders.register(Key.key("impactor", "test"), ctx -> text("Hello World!"));
+        LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
+
+        Component result = service.parse("Ampersand: {{impactor:test}}");
+        assertEquals("Ampersand: Hello World!", serializer.serialize(result));
+
+        Component only = service.parse("{{impactor:test}}");
+        assertEquals("Hello World!", serializer.serialize(only));
+
+        Component styled = service.parse("&7Testing a gray string with a placeholder of {{impactor:test}}");
+        assertEquals("&7Testing a gray string with a placeholder of Hello World!", serializer.serialize(styled));
+
+        // TODO - Fix when styles are last characters
+//        Component prependedStyle = service.parse("&7Testing &a{{impactor:test}}");
+//        assertEquals("&7Testing &aHello World!", serializer.serialize(prependedStyle));
     }
 
 }

@@ -31,6 +31,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public interface TextProcessor {
 
@@ -107,7 +108,9 @@ public interface TextProcessor {
      * @param context A set of context relative to placeholder parsing
      * @return A transformed list of parsed and renderable {@link Component Components}
      */
-    List<@NotNull Component> parse(List<String> raw, Context context);
+    default List<@NotNull Component> parse(List<String> raw, Context context) {
+        return raw.stream().map(input -> this.parse(input, context)).collect(Collectors.toList());
+    }
 
     /**
      * Represents a utility factory capable of providing registered instances of different

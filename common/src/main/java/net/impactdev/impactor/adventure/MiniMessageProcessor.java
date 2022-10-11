@@ -49,13 +49,13 @@ import java.util.stream.Collectors;
 
 public final class MiniMessageProcessor implements TextProcessor {
 
+    private final PlaceholderService service = Impactor.instance().services().provide(PlaceholderService.class);
     private final MiniMessage mini = MiniMessage.miniMessage();
     private final Pattern pattern = Pattern.compile("<(?<tag>\\w+(-[-_\\w]+)?)>");
 
     @Override
     public @NotNull Component parse(String raw, Context context) {
-        PlaceholderService service = Impactor.instance().services().provide(PlaceholderService.class);
-        Map<String, PlaceholderParser> parsers = service.parsers().entrySet().stream()
+        Map<String, PlaceholderParser> parsers = this.service.parsers().entrySet().stream()
                 .map(entry -> Maps.immutableEntry(entry.getKey().asString().replace(":", "-"), entry.getValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
@@ -63,15 +63,10 @@ public final class MiniMessageProcessor implements TextProcessor {
         return mini.deserialize(raw, placeholders.toArray(new TagResolver[0]));
     }
 
-    @Override
-    public List<@NotNull Component> parse(List<String> raw, Context context) {
-        return null;
-    }
-
     private List<TagResolver> locate(String raw, Context context, Map<String, PlaceholderParser> parsers) {
         // TODO - With Java 9+ implementation, switch to Matcher#results()
         List<MatchResult> matches = Lists.newArrayList();
-        Matcher matcher = pattern.matcher(raw);
+        Matcher matcher = this.pattern.matcher(raw);
         while(matcher.find()) {
             matches.add(matcher.toMatchResult());
         }
