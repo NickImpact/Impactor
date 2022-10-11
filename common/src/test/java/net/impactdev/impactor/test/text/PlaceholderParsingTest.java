@@ -27,7 +27,7 @@ package net.impactdev.impactor.test.text;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.utilities.context.Context;
-import net.impactdev.impactor.placeholders.MiniMessageParsingService;
+import net.impactdev.impactor.adventure.MiniMessageProcessor;
 import net.impactdev.impactor.api.placeholders.PlaceholderService;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -40,7 +40,7 @@ public final class PlaceholderParsingTest {
 
     @Test
     public void mini() {
-        MiniMessageParsingService service = new MiniMessageParsingService();
+        MiniMessageProcessor service = new MiniMessageProcessor();
         PlaceholderService placeholders = Impactor.instance().services().provide(PlaceholderService.class);
 
         placeholders.register(Key.key("impactor", "test"), ctx -> text("Hello World!"));

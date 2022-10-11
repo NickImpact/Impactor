@@ -23,15 +23,28 @@
  *
  */
 
-package net.impactdev.impactor.api.adventure;
+package net.impactdev.impactor.adventure;
 
-import net.impactdev.impactor.api.services.Service;
-import net.impactdev.impactor.api.utilities.context.Context;
-import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.NotNull;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import net.impactdev.impactor.api.adventure.TextProcessor;
 
-public interface TextParsingService extends Service {
+import java.util.concurrent.TimeUnit;
 
-    @NotNull Component parse(String raw, Context context);
+public class TextProcessorFactory implements TextProcessor.Factory {
 
+    private final MiniMessageProcessor mini = new MiniMessageProcessor();
+    private final LoadingCache<Character, LegacyProcessor> legacy = Caffeine.newBuilder()
+            .expireAfterAccess(15, TimeUnit.MINUTES)
+            .build(LegacyProcessor::new);
+
+    @Override
+    public TextProcessor mini() {
+        return this.mini;
+    }
+
+    @Override
+    public TextProcessor legacy(char character) {
+        return this.legacy.get(character);
+    }
 }

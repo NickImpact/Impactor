@@ -25,11 +25,26 @@
 
 package net.impactdev.impactor.api.placeholders;
 
+import net.impactdev.impactor.api.adventure.TextProcessor;
 import net.impactdev.impactor.api.services.Service;
 import net.kyori.adventure.key.Key;
 
 import java.util.Map;
 
+/**
+ * Represents a service responsible for managing placeholders registered by different plugins. These placeholders
+ * are represented by a parser which accepts a {@link net.impactdev.impactor.api.utilities.context.Context} for
+ * additional information regarding placeholders.
+ *
+ * <p>The placeholder service goes hand in hand with a {@link TextProcessor}
+ * which parses a raw string into a valid Adventure {@link net.kyori.adventure.text.Component}, complete
+ * with styling and filled in placeholders.
+ *
+ * <h2>Platform Placeholder Services</h2>
+ * With some platforms, such as Sponge, placeholders exist with their own service. Impactor will do its best
+ * to translate these placeholders, but if the source for a target placeholder does not support the provided
+ * context resolution, these could display unexpectedly.
+ */
 public interface PlaceholderService extends Service {
 
     void register(Key key, PlaceholderParser parser);

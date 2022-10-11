@@ -23,12 +23,12 @@
  *
  */
 
-package net.impactdev.impactor.placeholders;
+package net.impactdev.impactor.adventure;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.adventure.TextParsingService;
+import net.impactdev.impactor.api.adventure.TextProcessor;
 import net.impactdev.impactor.api.placeholders.ComponentModifiers;
 import net.impactdev.impactor.api.placeholders.PlaceholderParser;
 import net.impactdev.impactor.api.placeholders.PlaceholderService;
@@ -47,15 +47,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public final class MiniMessageParsingService implements TextParsingService {
+public final class MiniMessageProcessor implements TextProcessor {
 
     private final MiniMessage mini = MiniMessage.miniMessage();
     private final Pattern pattern = Pattern.compile("<(?<tag>\\w+(-[-_\\w]+)?)>");
-
-    @Override
-    public String getServiceName() {
-        return "MiniMessage Text Parsing Service";
-    }
 
     @Override
     public @NotNull Component parse(String raw, Context context) {
@@ -66,6 +61,11 @@ public final class MiniMessageParsingService implements TextParsingService {
 
         List<TagResolver> placeholders = this.locate(raw, context, parsers);
         return mini.deserialize(raw, placeholders.toArray(new TagResolver[0]));
+    }
+
+    @Override
+    public List<@NotNull Component> parse(List<String> raw, Context context) {
+        return null;
     }
 
     private List<TagResolver> locate(String raw, Context context, Map<String, PlaceholderParser> parsers) {

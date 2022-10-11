@@ -28,11 +28,17 @@ package net.impactdev.impactor.sponge;
 import com.google.inject.Inject;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.PermissionsService;
+import net.impactdev.impactor.api.events.provided.RegisterPlaceholdersEvent;
 import net.impactdev.impactor.api.logging.Log4jLogger;
+import net.impactdev.impactor.api.placeholders.PlaceholderParser;
+import net.impactdev.impactor.api.placeholders.PlaceholderService;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.commands.permissions.LuckPermsPermissionsService;
 import net.impactdev.impactor.commands.permissions.NoOpPermissionsService;
+import net.impactdev.impactor.placeholders.ImpactorPlaceholderService;
+import net.impactdev.impactor.placeholders.ImpactorRegisterPlaceholdersEvent;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import net.kyori.adventure.key.Key;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
@@ -41,6 +47,9 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
+import org.spongepowered.api.placeholder.PlaceholderContext;
+import org.spongepowered.api.registry.RegistryEntry;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 @Plugin("impactor")
@@ -68,12 +77,29 @@ public class SpongeImpactorBootstrap extends ImpactorBootstrapper {
 
     @Listener
     public void initializePermissionsService(StartingEngineEvent<Server> event) {
+        // Permissions Service
         boolean luckperms = Sponge.pluginManager().plugin("luckperms").isPresent();
         if(luckperms) {
             Impactor.instance().services().register(PermissionsService.class, new LuckPermsPermissionsService());
         } else {
             Impactor.instance().services().register(PermissionsService.class, new NoOpPermissionsService());
         }
+
+        // Placeholder Service
+        PlaceholderService service = new ImpactorPlaceholderService();
+        Sponge.game().registry(RegistryTypes.PLACEHOLDER_PARSER)
+                .streamEntries()
+                .forEach(entry -> {
+                    Key key = entry.key();
+                    PlaceholderParser parser = context -> entry.value().parse(
+                            PlaceholderContext.builder().associatedObject(context).build()
+                    );
+
+                    service.register(key, parser);
+                });
+
+        Impactor.instance().services().register(PlaceholderService.class, service);
+        Impactor.instance().events().post(new ImpactorRegisterPlaceholdersEvent(service));
     }
 
 }

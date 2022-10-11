@@ -23,25 +23,31 @@
  *
  */
 
-package net.impactdev.impactor.api.events.provided;
+package net.impactdev.impactor.adventure;
 
-import net.impactdev.impactor.api.events.ImpactorEvent;
-import net.impactdev.impactor.api.placeholders.PlaceholderParser;
-import net.kyori.adventure.key.Key;
+import net.impactdev.impactor.api.adventure.TextProcessor;
+import net.impactdev.impactor.api.utilities.context.Context;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
+import java.util.List;
 
-/**
- * Fired when Impactor is setting up the placeholder service. This permits a plugin to register
- * their own placeholders such that they'd then be capable of being parsed through the
- * service. A placeholder is registered using a key, to help indicate the source of the placeholder
- * while also allowing for multiple placeholders with the same name to exist, such that they don't
- * fit the same key.
- */
-public interface RegisterPlaceholdersEvent extends ImpactorEvent {
+public final class LegacyProcessor implements TextProcessor {
 
-    RegisterPlaceholdersEvent register(Key key, PlaceholderParser parser);
+    private final LegacyComponentSerializer serializer;
 
-    RegisterPlaceholdersEvent registerAll(Map<Key, PlaceholderParser> parsers);
+    public LegacyProcessor(char character) {
+        this.serializer = LegacyComponentSerializer.legacy(character);
+    }
 
+    @Override
+    public @NotNull Component parse(String raw, Context context) {
+        return null;
+    }
+
+    @Override
+    public List<@NotNull Component> parse(List<String> raw, Context context) {
+        return null;
+    }
 }

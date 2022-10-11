@@ -27,10 +27,21 @@ package net.impactdev.impactor.api.placeholders;
 
 import net.impactdev.impactor.api.utilities.context.Context;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 
 @FunctionalInterface
 public interface PlaceholderParser {
 
-    Component parse(Context context);
+    /**
+     * Attempts to create a component given a set of context. If the placeholder is unable
+     * to be resolved due to whatever reason, this should strictly return {@link Component#empty()}.
+     * Returning null here will invoke a runtime exception warning the server of the invalid
+     * parsing result.
+     *
+     * @param context A set of context to aid in placeholder resolution
+     * @return A non-null component, where {@link Component#empty()} would represent the null case
+     * for an invalid parse result.
+     */
+    @NotNull Component parse(Context context);
 
 }

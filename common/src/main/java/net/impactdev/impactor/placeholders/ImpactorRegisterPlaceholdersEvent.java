@@ -23,25 +23,33 @@
  *
  */
 
-package net.impactdev.impactor.api.events.provided;
+package net.impactdev.impactor.placeholders;
 
-import net.impactdev.impactor.api.events.ImpactorEvent;
+import net.impactdev.impactor.api.events.provided.RegisterPlaceholdersEvent;
 import net.impactdev.impactor.api.placeholders.PlaceholderParser;
+import net.impactdev.impactor.api.placeholders.PlaceholderService;
 import net.kyori.adventure.key.Key;
 
 import java.util.Map;
 
-/**
- * Fired when Impactor is setting up the placeholder service. This permits a plugin to register
- * their own placeholders such that they'd then be capable of being parsed through the
- * service. A placeholder is registered using a key, to help indicate the source of the placeholder
- * while also allowing for multiple placeholders with the same name to exist, such that they don't
- * fit the same key.
- */
-public interface RegisterPlaceholdersEvent extends ImpactorEvent {
+public class ImpactorRegisterPlaceholdersEvent implements RegisterPlaceholdersEvent {
 
-    RegisterPlaceholdersEvent register(Key key, PlaceholderParser parser);
+    private final PlaceholderService service;
 
-    RegisterPlaceholdersEvent registerAll(Map<Key, PlaceholderParser> parsers);
+    public ImpactorRegisterPlaceholdersEvent(PlaceholderService service) {
+        this.service = service;
+    }
+
+    @Override
+    public RegisterPlaceholdersEvent register(Key key, PlaceholderParser parser) {
+        this.service.register(key, parser);
+        return this;
+    }
+
+    @Override
+    public RegisterPlaceholdersEvent registerAll(Map<Key, PlaceholderParser> parsers) {
+        parsers.forEach(this::register);
+        return this;
+    }
 
 }
