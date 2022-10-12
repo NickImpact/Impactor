@@ -28,6 +28,7 @@ package net.impactdev.impactor.sponge.platform;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.platform.PlatformComponent;
 import net.impactdev.impactor.api.platform.PlatformType;
+import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.platform.ImpactorPlatformInfo;
 import net.impactdev.impactor.sponge.platform.components.SpongeAPIComponent;
@@ -37,7 +38,9 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SpongePlatformInfo extends ImpactorPlatformInfo {
 
@@ -73,4 +76,25 @@ public class SpongePlatformInfo extends ImpactorPlatformInfo {
         set.add(new SpongeImplementationComponent());
     }
 
+    @Override
+    public List<PluginMetadata> plugins() {
+        return Sponge.pluginManager().plugins()
+                .stream()
+                .map(this::translate)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<PluginMetadata> plugin(String id) {
+        return Optional.empty();
+    }
+
+    private PluginMetadata translate(PluginContainer container) {
+        return PluginMetadata.builder()
+                .id(container.metadata().id())
+                .name(container.metadata().name().orElse(container.metadata().id()))
+                .version(container.metadata().version().toString())
+                .description(container.metadata().description().orElse(null))
+                .build();
+    }
 }

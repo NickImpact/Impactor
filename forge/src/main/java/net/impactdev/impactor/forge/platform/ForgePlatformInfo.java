@@ -28,14 +28,18 @@ package net.impactdev.impactor.forge.platform;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.platform.PlatformComponent;
 import net.impactdev.impactor.api.platform.PlatformType;
+import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.forge.platform.components.ForgeComponent;
 import net.impactdev.impactor.forge.platform.components.ForgeMinecraftComponent;
 import net.impactdev.impactor.platform.ImpactorPlatformInfo;
+import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
+import net.minecraftforge.forgespi.language.IModInfo;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -68,5 +72,29 @@ public class ForgePlatformInfo extends ImpactorPlatformInfo {
     protected void specifyComponents(Set<PlatformComponent> set) {
         set.add(new ForgeMinecraftComponent());
         set.add(new ForgeComponent());
+    }
+
+    @Override
+    public List<PluginMetadata> plugins() {
+        return ModList.get().getMods()
+                .stream()
+                .map(this::translate)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<PluginMetadata> plugin(String id) {
+        return ModList.get().getModContainerById(id)
+                .map(ModContainer::getModInfo)
+                .map(this::translate);
+    }
+
+    private PluginMetadata translate(IModInfo info) {
+        return PluginMetadata.builder()
+                .id(info.getModId())
+                .name(info.getDisplayName())
+                .version(info.getVersion().toString())
+                .description(info.getDescription())
+                .build();
     }
 }

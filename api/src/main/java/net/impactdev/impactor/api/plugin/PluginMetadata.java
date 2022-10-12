@@ -27,6 +27,8 @@ package net.impactdev.impactor.api.plugin;
 
 import net.impactdev.impactor.api.builders.Builder;
 
+import java.util.Optional;
+
 public final class PluginMetadata {
 
 	private final String id;
@@ -42,19 +44,19 @@ public final class PluginMetadata {
 	}
 
 	public String id() {
-		return id;
-	}
-
-	public String name() {
-		return name;
+		return this.id;
 	}
 
 	public String version() {
-		return version;
+		return this.version;
 	}
 
-	public String description() {
-		return description;
+	public Optional<String> name() {
+		return Optional.ofNullable(this.name);
+	}
+
+	public Optional<String> description() {
+		return Optional.ofNullable(this.description);
 	}
 
 	public static PluginMetadataBuilder builder() {

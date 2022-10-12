@@ -31,12 +31,14 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.impactdev.impactor.api.platform.PlatformComponent;
 import net.impactdev.impactor.api.platform.PlatformType;
+import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.fabric.platform.components.FabricComponent;
 import net.impactdev.impactor.fabric.platform.components.FabricMinecraftComponent;
 import net.impactdev.impactor.platform.ImpactorPlatformInfo;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -70,5 +72,30 @@ public class FabricPlatformInfo extends ImpactorPlatformInfo {
     protected void specifyComponents(Set<PlatformComponent> set) {
         set.add(new FabricMinecraftComponent());
         set.add(new FabricComponent());
+    }
+
+    @Override
+    public List<PluginMetadata> plugins() {
+        return FabricLoader.getInstance().getAllMods()
+                .stream()
+                .map(ModContainer::getMetadata)
+                .map(this::translate)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<PluginMetadata> plugin(String id) {
+        return FabricLoader.getInstance().getModContainer(id)
+                .map(ModContainer::getMetadata)
+                .map(this::translate);
+    }
+
+    private PluginMetadata translate(ModMetadata metadata) {
+        return PluginMetadata.builder()
+                .id(metadata.getId())
+                .name(metadata.getName())
+                .version(metadata.getVersion().getFriendlyString())
+                .description(metadata.getDescription())
+                .build();
     }
 }

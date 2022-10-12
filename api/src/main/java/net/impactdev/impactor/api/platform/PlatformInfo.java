@@ -25,14 +25,51 @@
 
 package net.impactdev.impactor.api.platform;
 
+import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import org.intellij.lang.annotations.Pattern;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface PlatformInfo extends PrettyPrinter.IPrettyPrintable {
 
+    /**
+     * Specifies the type of platform we are working against. This is based on the priority
+     * server software in play. For instance, even if you are using the forge implementation
+     * of Impactor, Impactor will specify Sponge if SpongeForge is found within the environment.
+     *
+     * @return The implementation defined platform type
+     */
     PlatformType type();
 
+    /**
+     * Specifies components regarding the environment. Typically, this contains data like
+     * the minecraft version, as well as the server software versions.
+     *
+     * @return A set of components useful for detailing the environment the plugin is active in
+     */
     Set<PlatformComponent> components();
+
+    /**
+     * Fetches a list of mods/plugins in active use on the platform. This returns a mod's metadata,
+     * such as the plugin name, version, license, and more.
+     *
+     * @return A list of metadata detailing all active mods/plugins
+     */
+    List<PluginMetadata> plugins();
+
+    /**
+     * Attempts to locate a mod/plugin with the given ID from the platform environment. If
+     * the target is present, a valid metadata will be returned for the mod/plugin. Note
+     * that per specification, mod/plugin IDs are meant to be all lowercase, using only
+     * alphanumeric characters, with additional support for dashes and underscores. Additionally,
+     * the ID must start with an alphanumeric character.
+     *
+     * @param id The ID of the mod/plugin
+     * @return Metadata representing the target, or empty if not found.
+     */
+    Optional<PluginMetadata> plugin(@Pattern("[a-z][a-z0-9_-]{0,63}") String id);
 
 }
