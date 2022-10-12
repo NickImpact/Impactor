@@ -29,6 +29,8 @@ import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.ui.containers.views.pagination.builders.PaginationBuilder;
+import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.SectionedPagination;
+import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.builders.SectionedPaginationBuilder;
 import net.impactdev.impactor.modules.ImpactorModule;
 
 public class TestUIModule implements ImpactorModule {
@@ -39,7 +41,8 @@ public class TestUIModule implements ImpactorModule {
 
     @Override
     public void builders(BuilderProvider provider) {
-        provider.register(PaginationBuilder.class, TestPagination.TestPaginationBuilder::new);
+        provider.register(PaginationBuilder.class, TestPaginationBuilder::new);
+        provider.register(SectionedPaginationBuilder.class, TestSectionedPaginationBuilder::new);
     }
 
     @Override

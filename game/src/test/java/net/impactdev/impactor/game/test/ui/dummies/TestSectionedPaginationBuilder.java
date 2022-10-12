@@ -25,27 +25,15 @@
 
 package net.impactdev.impactor.game.test.ui.dummies;
 
-import net.impactdev.impactor.api.ui.containers.Icon;
-import net.impactdev.impactor.game.ui.containers.views.pagination.views.ImpactorPagination;
-import org.jetbrains.annotations.Nullable;
+import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.SectionedPagination;
+import net.impactdev.impactor.game.ui.containers.views.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
 
-public class TestPagination extends ImpactorPagination {
-    protected TestPagination(ImpactorPaginationBuilder builder) {
-        super(builder);
-    }
+
+public class TestSectionedPaginationBuilder extends ImpactorSectionedPaginationBuilder {
 
     @Override
-    public void set(@Nullable Icon icon, int slot) {
-
+    public SectionedPagination build() {
+        return new TestSectionedPagination(this);
     }
 
-    @Override
-    public void open() {
-
-    }
-
-    @Override
-    public void close() {
-
-    }
 }

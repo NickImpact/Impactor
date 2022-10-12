@@ -51,7 +51,8 @@ public final class MiniMessageProcessor implements TextProcessor {
 
     private final PlaceholderService service = Impactor.instance().services().provide(PlaceholderService.class);
     private final MiniMessage mini = MiniMessage.miniMessage();
-    private final Pattern pattern = Pattern.compile("<(?<tag>\\w+(-[-_\\w]+)?)>");
+    private final Pattern TAG = Pattern.compile("<(?<tag>\\w+(-[-_\\w:]+)?)>");
+    private final Pattern ARGUMENTS = Pattern.compile("(?<args>:\\w+)+");
 
     @Override
     public @NotNull Component parse(String raw, Context context) {
@@ -66,20 +67,26 @@ public final class MiniMessageProcessor implements TextProcessor {
     private List<TagResolver> locate(String raw, Context context, Map<String, PlaceholderParser> parsers) {
         // TODO - With Java 9+ implementation, switch to Matcher#results()
         List<MatchResult> matches = Lists.newArrayList();
-        Matcher matcher = this.pattern.matcher(raw);
+        Matcher matcher = this.TAG.matcher(raw);
         while(matcher.find()) {
             matches.add(matcher.toMatchResult());
         }
 
         return PairStream.from(parsers)
-                .filter((key, parser) -> matches.stream().map(mr -> mr.group(1)).anyMatch(s -> s.equals(key)))
+                .filter((key, parser) -> matches.stream()
+                        .map(mr -> {
+                            String match = mr.group(1);
+                            return match.substring(0, match.contains(":") ? match.indexOf(":") : match.length());
+                        })
+                        .anyMatch(s -> s.equals(key))
+                )
                 .map((key, parser) -> TagResolver.resolver(key, (args, ctx) -> {
                     Component result = parser.parse(context);
                     while(args.hasNext()) {
-                        result = ComponentModifiers.transform(args.pop().value(), result);
+                        result = ComponentModifiers.transform(args.pop().value().charAt(0), result);
                     }
 
-                    return Tag.selfClosingInserting(parser.parse(context));
+                    return Tag.selfClosingInserting(result);
                 }))
                 .collect(Collectors.toList());
     }

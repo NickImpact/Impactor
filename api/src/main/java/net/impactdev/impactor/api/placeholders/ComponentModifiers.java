@@ -31,34 +31,34 @@ import java.util.Arrays;
 import java.util.function.Function;
 
 public enum ComponentModifiers implements Function<Component, Component> {
-    SPACE_BEFORE("p") {
+    SPACE_BEFORE('p') {
         @Override
         public Component apply(Component text) {
             return Component.space().append(text);
         }
     },
-    SPACE_AFTER("s") {
+    SPACE_AFTER('s') {
         @Override
         public Component apply(Component text) {
             return text.append(Component.space());
         }
     };
 
-    private final String key;
+    private final char key;
 
-    ComponentModifiers(String key) {
+    ComponentModifiers(char key) {
         this.key = key;
     }
 
-    public static Component transform(String key, Component component) {
+    public static Component transform(char key, Component component) {
         return Arrays.stream(values())
-                .filter(modifier -> modifier.key.equals(key))
+                .filter(modifier -> modifier.key == key)
                 .map(modifier -> modifier.apply(component))
                 .findFirst()
                 .orElse(component);
     }
 
-    public String key() {
+    public char key() {
         return this.key;
     }
 

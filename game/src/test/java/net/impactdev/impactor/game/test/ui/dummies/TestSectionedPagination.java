@@ -26,11 +26,12 @@
 package net.impactdev.impactor.game.test.ui.dummies;
 
 import net.impactdev.impactor.api.ui.containers.Icon;
-import net.impactdev.impactor.game.ui.containers.views.pagination.views.ImpactorPagination;
+import net.impactdev.impactor.game.ui.containers.views.pagination.views.sectioned.ImpactorSectionedPagination;
+import net.impactdev.impactor.game.ui.containers.views.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
 import org.jetbrains.annotations.Nullable;
 
-public class TestPagination extends ImpactorPagination {
-    protected TestPagination(ImpactorPaginationBuilder builder) {
+public class TestSectionedPagination extends ImpactorSectionedPagination {
+    protected TestSectionedPagination(ImpactorSectionedPaginationBuilder builder) {
         super(builder);
     }
 

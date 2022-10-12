@@ -30,7 +30,6 @@ import ca.landonjw.gooeylibs2.api.button.GooeyButton;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.utilities.context.Context;
-import net.impactdev.impactor.forge.platform.players.ForgePlatformPlayer;
 import net.impactdev.impactor.game.items.stacks.ItemStackTranslator;
 import org.jetbrains.annotations.NotNull;
 

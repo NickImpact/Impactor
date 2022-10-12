@@ -32,11 +32,7 @@ import net.impactdev.impactor.api.items.types.ItemTypes;
 import net.impactdev.impactor.game.items.stacks.builders.ImpactorSkullStackBuilder;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.Optional;
 import java.util.UUID;

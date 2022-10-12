@@ -26,15 +26,35 @@
 package net.impactdev.impactor.placeholders;
 
 import com.google.common.collect.Maps;
+import net.impactdev.impactor.api.configuration.ConfigKey;
+import net.impactdev.impactor.api.configuration.keys.BaseConfigKey;
 import net.impactdev.impactor.api.placeholders.PlaceholderParser;
 import net.impactdev.impactor.api.placeholders.PlaceholderService;
+import net.impactdev.impactor.placeholders.provided.ImpactorPlaceholder;
+import net.impactdev.impactor.placeholders.provided.ImpactorPlaceholders;
 import net.kyori.adventure.key.Key;
 
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Map;
 
 public final class ImpactorPlaceholderService implements PlaceholderService {
 
     private final Map<Key, PlaceholderParser> placeholders = Maps.newHashMap();
+
+    public ImpactorPlaceholderService() {
+        Arrays.stream(ImpactorPlaceholders.class.getDeclaredFields())
+                .filter(field -> Modifier.isStatic(field.getModifiers()))
+                .filter(field -> ImpactorPlaceholder.class.isAssignableFrom(field.getType()))
+                .forEach(field -> {
+                    try {
+                        ImpactorPlaceholder placeholder = (ImpactorPlaceholder) field.get(null);
+                        this.register(placeholder.key(), placeholder.parser());
+                    } catch (Exception e) {
+                        throw new RuntimeException("Exception processing field: " + field.getName(), e);
+                    }
+                });
+    }
 
     @Override
     public void register(Key key, PlaceholderParser parser) {

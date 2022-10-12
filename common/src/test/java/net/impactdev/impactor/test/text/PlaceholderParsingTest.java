@@ -46,10 +46,13 @@ public final class PlaceholderParsingTest {
         TextProcessor service = new MiniMessageProcessor();
         PlaceholderService placeholders = Impactor.instance().services().provide(PlaceholderService.class);
         LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
-
         placeholders.register(Key.key("impactor", "test"), ctx -> text("Hello World!"));
+
         Component result = service.parse("Testing: <impactor-test>", Context.empty());
         assertEquals("Testing: Hello World!", serializer.serialize(result));
+
+        Component argument = service.parse("Testing:<impactor-test:s:p>!");
+        assertEquals("Testing: Hello World! !", serializer.serialize(argument));
     }
 
     @Test
@@ -57,7 +60,7 @@ public final class PlaceholderParsingTest {
         TextProcessor service = new LegacyProcessor('&');
         PlaceholderService placeholders = Impactor.instance().services().provide(PlaceholderService.class);
         placeholders.register(Key.key("impactor", "test"), ctx -> text("Hello World!"));
-        LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
+        LegacyComponentSerializer serializer = LegacyComponentSerializer.builder().hexColors().character('&').build();
 
         Component result = service.parse("Ampersand: {{impactor:test}}");
         assertEquals("Ampersand: Hello World!", serializer.serialize(result));
@@ -68,9 +71,26 @@ public final class PlaceholderParsingTest {
         Component styled = service.parse("&7Testing a gray string with a placeholder of {{impactor:test}}");
         assertEquals("&7Testing a gray string with a placeholder of Hello World!", serializer.serialize(styled));
 
-        // TODO - Fix when styles are last characters
-//        Component prependedStyle = service.parse("&7Testing &a{{impactor:test}}");
-//        assertEquals("&7Testing &aHello World!", serializer.serialize(prependedStyle));
+        Component prependedStyle = service.parse("&7Testing &a{{impactor:test}}");
+        assertEquals("&7Testing &aHello World!", serializer.serialize(prependedStyle));
+
+        Component decorated = service.parse("&7Testing &a&l{{impactor:test}}");
+        assertEquals("&7Testing &a&lHello World!", serializer.serialize(decorated));
+
+        Component hex = service.parse("&#00FF00Testing {{impactor:test}}");
+        assertEquals("&#00ff00Testing Hello World!", serializer.serialize(hex));
+
+        Component prependedHex = service.parse("Testing &#00FF00{{impactor:test}}");
+        assertEquals("Testing &#00ff00Hello World!", serializer.serialize(prependedHex));
+
+        Component invalidPlaceholder = service.parse("Testing {{impactor:i-dont-exist}}");
+        assertEquals("Testing {{impactor:i-dont-exist}}", serializer.serialize(invalidPlaceholder));
+
+        Component styledInvalidPlaceholder = service.parse("&#AABBCC{{impactor:i-dont-exist}}");
+        assertEquals("&#aabbcc{{impactor:i-dont-exist}}", serializer.serialize(styledInvalidPlaceholder));
+
+        Component argumentedSpace = service.parse("{{impactor:test|s}}{{impactor:test}}");
+        assertEquals("Hello World! Hello World!", serializer.serialize(argumentedSpace));
     }
 
 }

@@ -25,6 +25,7 @@
 
 package net.impactdev.impactor.api.platform;
 
+import net.impactdev.impactor.api.platform.performance.Performance;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.services.Service;
 
@@ -38,6 +39,8 @@ public interface Platform extends Service {
     }
 
     PlatformInfo info();
+
+    Performance performance();
 
     PlatformPlayer player(final UUID target);
 

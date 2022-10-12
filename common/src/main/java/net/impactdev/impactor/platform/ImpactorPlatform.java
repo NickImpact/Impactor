@@ -27,6 +27,7 @@ package net.impactdev.impactor.platform;
 
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.platform.PlatformInfo;
+import net.impactdev.impactor.api.platform.performance.Performance;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 
 import java.util.UUID;
@@ -42,6 +43,11 @@ public class ImpactorPlatform implements Platform {
     @Override
     public PlatformInfo info() {
         return this.info;
+    }
+
+    @Override
+    public Performance performance() {
+        return null;
     }
 
     @Override
