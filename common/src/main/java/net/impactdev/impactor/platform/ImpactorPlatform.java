@@ -25,21 +25,23 @@
 
 package net.impactdev.impactor.platform;
 
+import com.google.common.base.Suppliers;
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.platform.PlatformInfo;
 import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public class ImpactorPlatform implements Platform {
 
     private final PlatformInfo info;
-    private final PerformanceMonitor performance;
+    private final Supplier<PerformanceMonitor> performance;
 
     public ImpactorPlatform(PlatformInfo info) {
         this.info = info;
-        this.performance = PerformanceMonitor.create();
+        this.performance = Suppliers.memoize(PerformanceMonitor::create);
     }
 
     @Override
@@ -49,7 +51,7 @@ public class ImpactorPlatform implements Platform {
 
     @Override
     public PerformanceMonitor performance() {
-        return this.performance;
+        return this.performance.get();
     }
 
     @Override
