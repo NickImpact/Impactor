@@ -52,7 +52,6 @@ public final class MiniMessageProcessor implements TextProcessor {
     private final PlaceholderService service = Impactor.instance().services().provide(PlaceholderService.class);
     private final MiniMessage mini = MiniMessage.miniMessage();
     private final Pattern TAG = Pattern.compile("<(?<tag>\\w+(-[-_\\w:]+)?)>");
-    private final Pattern ARGUMENTS = Pattern.compile("(?<args>:\\w+)+");
 
     @Override
     public @NotNull Component parse(String raw, Context context) {

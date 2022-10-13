@@ -23,33 +23,39 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.platform.performance;
 
-import net.impactdev.impactor.api.platform.Platform;
+import me.lucko.spark.api.Spark;
+import me.lucko.spark.api.SparkProvider;
+import me.lucko.spark.api.statistic.StatisticWindow;
+import me.lucko.spark.api.statistic.misc.DoubleAverageInfo;
+import net.impactdev.impactor.api.platform.performance.MemoryWatcher;
 import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.fabric.platform.performance.FabricPerformanceFactory;
-import net.impactdev.impactor.fabric.platform.players.FabricPlatformPlayer;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
 
-public class FabricPlatformModule implements ImpactorModule {
+import java.util.Optional;
+
+public class SparkPerformanceMonitor implements PerformanceMonitor {
+
+    private final Spark api = SparkProvider.get();
+
     @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(PlatformPlayer.Factory.class, new FabricPlatformPlayer.FabricPlatformPlayerFactory());
-        provider.register(PerformanceMonitor.Factory.class, new FabricPerformanceFactory());
+    public double ticksPerSecond() {
+        return Optional.ofNullable(this.api.tps())
+                .map(stat -> stat.poll(StatisticWindow.TicksPerSecond.MINUTES_1))
+                .orElse(PerformanceMonitor.INCOMPATIBLE_VALUE);
     }
 
     @Override
-    public void builders(BuilderProvider provider) {
-
+    public double averageTickDuration() {
+        return Optional.ofNullable(this.api.mspt())
+                .map(stat -> stat.poll(StatisticWindow.MillisPerTick.MINUTES_1))
+                .map(DoubleAverageInfo::mean)
+                .orElse(PerformanceMonitor.INCOMPATIBLE_VALUE);
     }
 
     @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
+    public MemoryWatcher memory() {
+        return new MemoryWatcher();
     }
+
 }

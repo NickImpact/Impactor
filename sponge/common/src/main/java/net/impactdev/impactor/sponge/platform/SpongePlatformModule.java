@@ -26,6 +26,7 @@
 package net.impactdev.impactor.sponge.platform;
 
 import net.impactdev.impactor.api.platform.Platform;
+import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
@@ -38,6 +39,7 @@ public class SpongePlatformModule implements ImpactorModule {
     @Override
     public void factories(FactoryProvider provider) {
         provider.register(PlatformPlayer.Factory.class, new SpongePlatformPlayer.SpongePlatformPlayerFactory());
+        provider.register(PerformanceMonitor.Factory.class, new SpongePerformanceMonitorFactory());
     }
 
     @Override

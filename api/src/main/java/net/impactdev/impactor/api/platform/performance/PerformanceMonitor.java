@@ -25,6 +25,8 @@
 
 package net.impactdev.impactor.api.platform.performance;
 
+import net.impactdev.impactor.api.Impactor;
+
 /**
  * Provides performance statistics involving the server. This includes things such as ticks
  * per second, memory usage, and more.
@@ -34,9 +36,13 @@ package net.impactdev.impactor.api.platform.performance;
  * replace Spark, but rather simply work alongside it. If you need further performance details regarding
  * the platform, consider hooking into Spark and accessing its API directly.
  */
-public interface Performance {
+public interface PerformanceMonitor {
 
     double INCOMPATIBLE_VALUE = 0.0;
+
+    static PerformanceMonitor create() {
+        return Impactor.instance().factories().provide(Factory.class).create();
+    }
 
     /**
      * Gets the current TPS statistic from the platform. If the platform does not support ticks
@@ -60,6 +66,12 @@ public interface Performance {
      *
      * @return Memory statistics regarding the platform runtime environment
      */
-    Memory memory();
+    MemoryWatcher memory();
+
+    interface Factory {
+
+        PerformanceMonitor create();
+
+    }
 
 }

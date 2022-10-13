@@ -5,7 +5,8 @@
   "minVersion": "0.8",
   "mixins": [
     "ServerboundClientInformationPacketAccessor",
-    "ServerPlayerMixin"
+    "ServerPlayerMixin",
+    "MinecraftServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

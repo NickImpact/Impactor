@@ -23,33 +23,24 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.forge.platform.performance;
 
-import net.impactdev.impactor.api.platform.Platform;
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.fabric.platform.performance.FabricPerformanceFactory;
-import net.impactdev.impactor.fabric.platform.players.FabricPlatformPlayer;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
+import net.impactdev.impactor.forge.ForgeImpactorPlugin;
+import net.impactdev.impactor.platform.performance.SparkPerformanceMonitor;
+import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 
-public class FabricPlatformModule implements ImpactorModule {
+public class ForgePerformanceMonitorFactory implements PerformanceMonitor.Factory {
     @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(PlatformPlayer.Factory.class, new FabricPlatformPlayer.FabricPlatformPlayerFactory());
-        provider.register(PerformanceMonitor.Factory.class, new FabricPerformanceFactory());
-    }
+    public PerformanceMonitor create() {
+        if(Impactor.instance().platform().info().plugin("spark").isPresent()) {
+            return new SparkPerformanceMonitor();
+        }
 
-    @Override
-    public void builders(BuilderProvider provider) {
-
-    }
-
-    @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
+        return ((ForgeImpactorPlugin) BaseImpactorPlugin.instance())
+                .server()
+                .map(server -> (PerformanceMonitor) server)
+                .orElseThrow(() -> new IllegalStateException("Server is not yet available..."));
     }
 }

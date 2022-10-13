@@ -23,33 +23,38 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.sponge.platform;
 
-import net.impactdev.impactor.api.platform.Platform;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.platform.performance.MemoryWatcher;
 import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.fabric.platform.performance.FabricPerformanceFactory;
-import net.impactdev.impactor.fabric.platform.players.FabricPlatformPlayer;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
+import net.impactdev.impactor.platform.performance.SparkPerformanceMonitor;
+import org.spongepowered.api.Sponge;
 
-public class FabricPlatformModule implements ImpactorModule {
+public class SpongePerformanceMonitorFactory implements PerformanceMonitor.Factory {
     @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(PlatformPlayer.Factory.class, new FabricPlatformPlayer.FabricPlatformPlayerFactory());
-        provider.register(PerformanceMonitor.Factory.class, new FabricPerformanceFactory());
-    }
+    public PerformanceMonitor create() {
+        if(Impactor.instance().platform().info().plugin("spark").isPresent()) {
+            return new SparkPerformanceMonitor();
+        }
 
-    @Override
-    public void builders(BuilderProvider provider) {
+        return new PerformanceMonitor() {
+            private final MemoryWatcher memory = new MemoryWatcher();
 
-    }
+            @Override
+            public double ticksPerSecond() {
+                return Sponge.server().ticksPerSecond();
+            }
 
-    @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
+            @Override
+            public double averageTickDuration() {
+                return Sponge.server().averageTickTime();
+            }
+
+            @Override
+            public MemoryWatcher memory() {
+                return this.memory;
+            }
+        };
     }
 }

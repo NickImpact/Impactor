@@ -23,33 +23,35 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform;
+package net.impactdev.impactor.fabric.mixins;
 
-import net.impactdev.impactor.api.platform.Platform;
+import net.impactdev.impactor.api.platform.performance.MemoryWatcher;
 import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.fabric.platform.performance.FabricPerformanceFactory;
-import net.impactdev.impactor.fabric.platform.players.FabricPlatformPlayer;
-import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Mth;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 
-public class FabricPlatformModule implements ImpactorModule {
+@Mixin(MinecraftServer.class)
+public class MinecraftServerMixin implements PerformanceMonitor {
+
+    @Shadow private float averageTickTime;
+    @Shadow @Final public long[] tickTimes;
+
     @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(PlatformPlayer.Factory.class, new FabricPlatformPlayer.FabricPlatformPlayerFactory());
-        provider.register(PerformanceMonitor.Factory.class, new FabricPerformanceFactory());
+    public double ticksPerSecond() {
+        return 1000 / Math.max(50, this.averageTickTime);
     }
 
     @Override
-    public void builders(BuilderProvider provider) {
-
+    public double averageTickDuration() {
+        return Mth.average(this.tickTimes) / 1000000;
     }
 
     @Override
-    public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
+    public MemoryWatcher memory() {
+        return new MemoryWatcher();
     }
+
 }

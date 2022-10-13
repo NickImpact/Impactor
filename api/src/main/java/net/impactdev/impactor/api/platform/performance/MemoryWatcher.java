@@ -23,25 +23,30 @@
  *
  */
 
-package net.impactdev.impactor.api.platform;
+package net.impactdev.impactor.api.platform.performance;
 
-import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.services.Service;
+public class MemoryWatcher {
 
-import java.util.UUID;
+    private final long MAX = this.runtime().maxMemory() / 1024 / 1024;
 
-public interface Platform extends Service {
-
-    @Override
-    default String getServiceName() {
-        return "Platform";
+    public long current() {
+        return this.runtime().totalMemory() / 1024 / 1024 - runtime().freeMemory() / 1024 / 1024;
     }
 
-    PlatformInfo info();
+    public long allocated() {
+        return this.runtime().totalMemory() / 1024 / 1024;
+    }
 
-    PerformanceMonitor performance();
+    public long max() {
+        return MAX;
+    }
 
-    PlatformPlayer player(final UUID target);
+    public double convertMbToGb(long value) {
+        return value / 1024.0;
+    }
+
+    private Runtime runtime() {
+        return Runtime.getRuntime();
+    }
 
 }

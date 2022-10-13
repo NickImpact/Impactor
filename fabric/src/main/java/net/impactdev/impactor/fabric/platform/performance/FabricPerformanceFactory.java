@@ -23,30 +23,25 @@
  *
  */
 
-package net.impactdev.impactor.api.platform.performance;
+package net.impactdev.impactor.fabric.platform.performance;
 
-public class Memory {
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
+import net.impactdev.impactor.fabric.FabricImpactorPlugin;
+import net.impactdev.impactor.platform.performance.SparkPerformanceMonitor;
+import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 
-    private final long MAX = this.runtime().maxMemory() / 1024 / 1024;
+public class FabricPerformanceFactory implements PerformanceMonitor.Factory {
 
-    public long current() {
-        return this.runtime().totalMemory() / 1024 / 1024 - runtime().freeMemory() / 1024 / 1024;
+    @Override
+    public PerformanceMonitor create() {
+        if(Impactor.instance().platform().info().plugin("spark").isPresent()) {
+            return new SparkPerformanceMonitor();
+        }
+
+        return ((FabricImpactorPlugin) BaseImpactorPlugin.instance())
+                .server()
+                .map(server -> (PerformanceMonitor) server)
+                .orElseThrow(() -> new IllegalStateException("Server is not yet available..."));
     }
-
-    public long allocated() {
-        return this.runtime().totalMemory() / 1024 / 1024;
-    }
-
-    public long max() {
-        return MAX;
-    }
-
-    public double convertMbToGb(long value) {
-        return value / 1024.0;
-    }
-
-    private Runtime runtime() {
-        return Runtime.getRuntime();
-    }
-
 }

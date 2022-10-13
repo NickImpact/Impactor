@@ -27,16 +27,14 @@ package net.impactdev.impactor.placeholders.provided;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformSource;
-import net.impactdev.impactor.api.platform.performance.Memory;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
-import net.minecraft.server.dedicated.DedicatedServer;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
 
+@SuppressWarnings("unused")
 public final class ImpactorPlaceholders {
 
     public static final ImpactorPlaceholder NAME = new ImpactorPlaceholder(

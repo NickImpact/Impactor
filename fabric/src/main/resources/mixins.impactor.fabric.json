@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "minVersion": "0.8",
   "mixins": [
+    "MinecraftServerMixin",
     "PlayerJoinTrackerMixin",
     "ServerboundClientInformationPacketAccessor",
     "ServerPlayerMixin"
