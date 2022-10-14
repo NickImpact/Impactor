@@ -23,36 +23,27 @@
  *
  */
 
-package net.impactdev.impactor.forge.platform;
+package net.impactdev.impactor.adventure;
 
-import net.impactdev.impactor.api.platform.Platform;
-import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.platform.players.PlatformSource;
+import net.impactdev.impactor.api.adventure.TextProcessor;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.forge.platform.performance.ForgePerformanceMonitorFactory;
-import net.impactdev.impactor.forge.platform.players.ForgePlatformPlayer;
 import net.impactdev.impactor.modules.ImpactorModule;
-import net.impactdev.impactor.platform.ImpactorPlatform;
 
-@SuppressWarnings("unused")
-public class ForgePlatformModule implements ImpactorModule {
-
+public class AdventureModule implements ImpactorModule {
     @Override
     public void factories(FactoryProvider provider) {
-        provider.register(PlatformPlayer.Factory.class, new ForgePlatformPlayer.ForgePlatformPlayerFactory());
-        provider.register(PerformanceMonitor.Factory.class, new ForgePerformanceMonitorFactory());
-        provider.register(PlatformSource.Factory.class, ForgePlatformSource::new);
+        provider.register(TextProcessor.Factory.class, new TextProcessorFactory());
     }
 
     @Override
-    public void builders(BuilderProvider provider) {}
+    public void builders(BuilderProvider provider) {
+
+    }
 
     @Override
     public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new ForgePlatformInfo()));
-    }
 
+    }
 }

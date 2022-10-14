@@ -91,6 +91,10 @@ public final class PlaceholderParsingTest {
 
         Component argumentedSpace = service.parse("{{impactor:test|s}}{{impactor:test}}");
         assertEquals("Hello World! Hello World!", serializer.serialize(argumentedSpace));
+
+        Component after = service.parse("&aTPS: {{impactor:test}} (MSPT: {{impactor:test}} ms)");
+        assertEquals("&aTPS: Hello World! (MSPT: Hello World! ms)", serializer.serialize(after));
+
     }
 
 }

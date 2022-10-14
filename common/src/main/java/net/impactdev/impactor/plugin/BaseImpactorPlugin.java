@@ -29,6 +29,7 @@ import com.google.common.collect.Sets;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
+import net.impactdev.impactor.adventure.AdventureModule;
 import net.impactdev.impactor.api.APIRegister;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.ImpactorService;
@@ -38,6 +39,7 @@ import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.configuration.ConfigModule;
 import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.api.utilities.ExceptionPrinter;
+import net.impactdev.impactor.placeholders.PlaceholderModule;
 import net.impactdev.impactor.util.UtilityModule;
 
 import java.util.Collections;
@@ -83,7 +85,9 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin {
         this.bootstrapper.logger().info("Initializing plugin modules...");
         Set<Class<? extends ImpactorModule>> modules = Sets.newHashSet(
                 ConfigModule.class,
-                UtilityModule.class
+                UtilityModule.class,
+                AdventureModule.class,
+                PlaceholderModule.class
         );
         modules.addAll(Optional.ofNullable(this.modules()).orElse(Collections.emptySet()));
         modules.forEach(type -> {

@@ -25,6 +25,7 @@
 
 package net.impactdev.impactor.adventure;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.Impactor;
@@ -42,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,13 +51,13 @@ import java.util.stream.Collectors;
 
 public final class MiniMessageProcessor implements TextProcessor {
 
-    private final PlaceholderService service = Impactor.instance().services().provide(PlaceholderService.class);
+    private final Supplier<PlaceholderService> service = Suppliers.memoize(() -> Impactor.instance().services().provide(PlaceholderService.class));
     private final MiniMessage mini = MiniMessage.miniMessage();
     private final Pattern TAG = Pattern.compile("<(?<tag>\\w+(-[-_\\w:]+)?)>");
 
     @Override
     public @NotNull Component parse(String raw, Context context) {
-        Map<String, PlaceholderParser> parsers = this.service.parsers().entrySet().stream()
+        Map<String, PlaceholderParser> parsers = this.service.get().parsers().entrySet().stream()
                 .map(entry -> Maps.immutableEntry(entry.getKey().asString().replace(":", "-"), entry.getValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 

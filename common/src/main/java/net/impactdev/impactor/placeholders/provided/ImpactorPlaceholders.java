@@ -31,11 +31,15 @@ import net.kyori.adventure.key.Key;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 
+import java.text.DecimalFormat;
+
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
 
 @SuppressWarnings("unused")
 public final class ImpactorPlaceholders {
+
+    private static final DecimalFormat FORMATTER = new DecimalFormat("0.###");
 
     public static final ImpactorPlaceholder NAME = new ImpactorPlaceholder(
             impactor("name"),
@@ -58,7 +62,7 @@ public final class ImpactorPlaceholders {
     );
     public static final ImpactorPlaceholder MSPT = new ImpactorPlaceholder(
             impactor("mspt"),
-            ctx -> text(Impactor.instance().platform().performance().averageTickDuration())
+            ctx -> text(FORMATTER.format(Impactor.instance().platform().performance().averageTickDuration()))
     );
 
     public static final ImpactorPlaceholder MEMORY_USAGE = new ImpactorPlaceholder(

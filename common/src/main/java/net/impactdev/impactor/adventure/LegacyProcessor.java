@@ -26,6 +26,7 @@
 package net.impactdev.impactor.adventure;
 
 import com.google.common.base.Splitter;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.Impactor;
@@ -48,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,7 +63,7 @@ public final class LegacyProcessor implements TextProcessor {
     private static final Pattern LAST_FORMATS = Pattern.compile("(&([a-fk-or0-9]|#[a-f0-9]{6})){1,2}$", Pattern.CASE_INSENSITIVE);
     private static final Map<Character, TextFormat> FORMATTERS = Maps.newHashMap();
 
-    private final PlaceholderService service = Impactor.instance().services().provide(PlaceholderService.class);
+    private final Supplier<PlaceholderService> service = Suppliers.memoize(() -> Impactor.instance().services().provide(PlaceholderService.class));
     private final LegacyComponentSerializer serializer;
 
     public LegacyProcessor(char character) {
@@ -85,14 +87,14 @@ public final class LegacyProcessor implements TextProcessor {
     }
 
     private List<Component> tokenize(String input, Context context) {
-        Map<Key, PlaceholderParser> parsers = this.service.parsers();
+        Map<Key, PlaceholderParser> parsers = this.service.get().parsers();
 
         List<String> split = Splitter.on(TOKENIZER).splitToList(input);
         List<Component> result = Lists.newArrayList();
 
         List<TextFormat> decorations = Lists.newArrayList();
         StringBuilder cache = new StringBuilder();
-        for(int i = 0; i < split.size() - 2; i++) {
+        for(int i = 0; i < split.size(); i++) {
             if(split.get(i).equals("{{") && split.get(i + 2).equals("}}")) {
                 if(cache.length() > 0) {
                     String built = cache.toString();
@@ -157,6 +159,10 @@ public final class LegacyProcessor implements TextProcessor {
             } else {
                 cache.append(split.get(i));
             }
+        }
+
+        if(cache.length() > 0) {
+            result.add(this.serializer.deserialize(cache.toString()));
         }
 
         return result;
