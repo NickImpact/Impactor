@@ -33,6 +33,9 @@ import net.impactdev.impactor.commands.dev.items.BookCommand;
 import net.impactdev.impactor.commands.dev.items.ItemKeyArgument;
 import net.impactdev.impactor.commands.dev.items.skulls.SkullSkinArgument;
 import net.impactdev.impactor.commands.dev.items.skulls.SkullTextureArgument;
+import net.impactdev.impactor.commands.dev.messages.ActionBar;
+import net.impactdev.impactor.commands.dev.messages.Chat;
+import net.impactdev.impactor.commands.dev.messages.Title;
 import net.impactdev.impactor.commands.dev.performance.PerformanceCheck;
 import net.impactdev.impactor.commands.dev.player.PlayerLocaleTest;
 import net.impactdev.impactor.game.items.ItemsModule;
@@ -70,7 +73,10 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
                     new SkullSkinArgument(),
                     new SkullTextureArgument(),
                     new PlayerLocaleTest(),
-                    new PerformanceCheck()
+                    new PerformanceCheck(),
+                    new Chat(),
+                    new ActionBar(),
+                    new Title()
             );
         });
     }

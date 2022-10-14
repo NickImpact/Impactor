@@ -23,15 +23,25 @@
  *
  */
 
-package net.impactdev.impactor.game.utilities;
+package net.impactdev.impactor.util;
 
 import net.kyori.adventure.key.Key;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ResourceKeyTranslator {
 
-    public static ResourceLocation asResourceLocation(Key key) {
+    public static @NotNull ResourceLocation asResourceLocation(@NotNull Key key) {
         return new ResourceLocation(key.namespace(), key.value());
+    }
+
+    public static @Nullable ResourceLocation asResourceLocationNullable(@Nullable Key key) {
+        if(key == null) {
+            return null;
+        }
+
+        return asResourceLocation(key);
     }
 
 }

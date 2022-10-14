@@ -29,7 +29,7 @@ import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.properties.MetaFlag;
 import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.impactdev.impactor.game.items.ImpactorItemType;
-import net.impactdev.impactor.game.utilities.ResourceKeyTranslator;
+import net.impactdev.impactor.util.ResourceKeyTranslator;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagType;
 import net.kyori.adventure.nbt.BinaryTagTypes;

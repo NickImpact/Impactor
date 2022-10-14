@@ -25,8 +25,11 @@
 
 package net.impactdev.impactor.adventure;
 
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
+import org.jetbrains.annotations.Nullable;
 
 public class AdventureTranslator {
 
@@ -36,5 +39,30 @@ public class AdventureTranslator {
 
     public static net.kyori.adventure.text.Component fromNative(Component component) {
         return GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(component));
+    }
+
+    public static SoundSource asVanilla(final Sound.Source source) {
+        switch(source) {
+            case MASTER: return SoundSource.MASTER;
+            case MUSIC: return SoundSource.MUSIC;
+            case RECORD: return SoundSource.RECORDS;
+            case WEATHER: return SoundSource.WEATHER;
+            case BLOCK: return SoundSource.BLOCKS;
+            case HOSTILE: return SoundSource.HOSTILE;
+            case NEUTRAL: return SoundSource.NEUTRAL;
+            case PLAYER: return SoundSource.PLAYERS;
+            case AMBIENT: return SoundSource.AMBIENT;
+            case VOICE: return SoundSource.VOICE;
+        }
+
+        throw new IllegalArgumentException(source.name());
+    }
+
+    public static @Nullable SoundSource asVanillaNullable(final Sound.Source source) {
+        if(source == null) {
+            return null;
+        }
+
+        return asVanilla(source);
     }
 }
