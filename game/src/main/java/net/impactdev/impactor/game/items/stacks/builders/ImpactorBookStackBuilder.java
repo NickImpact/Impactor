@@ -41,9 +41,9 @@ public class ImpactorBookStackBuilder
         implements BookStackBuilder
 {
 
-    public BookStack.BookType type;
+    public BookStack.BookType type = BookStack.BookType.WRITTEN;
     public String author;
-    public BookStack.Generation generation;
+    public BookStack.Generation generation = BookStack.Generation.ORIGINAL;
     public TreeMap<Integer, Component> pages = Maps.newTreeMap();
 
     @Override

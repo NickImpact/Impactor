@@ -23,12 +23,11 @@
  *
  */
 
-package net.impactdev.impactor.commands.dev.messages;
+package net.impactdev.impactor.commands.dev.adventure;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.impactdev.impactor.adventure.AdventureTranslator;
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
@@ -39,16 +38,13 @@ import net.minecraft.commands.arguments.ComponentArgument;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
-@CommandPath("impactor messaging title")
+@CommandPath("impactor adventure action-bar")
 @Alias("message")
-public class Title implements ImpactorCommand.Argument<Component> {
+public class ActionBar implements ImpactorCommand.Argument<Component> {
     @Override
     public @NotNull CommandResult execute(CommandContext context) throws CommandSyntaxException {
         PlatformSource source = context.source().asPlatform();
-        source.showTitle(net.kyori.adventure.title.Title.title(
-                AdventureTranslator.fromNative(context.argument("message", Component.class)),
-                net.kyori.adventure.text.Component.text("Platform: " + Impactor.instance().platform().info().type().name())
-        ));
+        source.sendActionBar(AdventureTranslator.fromNative(context.argument("message", Component.class)));
         return CommandResult.successful();
     }
 

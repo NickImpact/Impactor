@@ -29,13 +29,14 @@ import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandRegistrationEvent;
 import net.impactdev.impactor.commands.CommandsModule;
+import net.impactdev.impactor.commands.dev.adventure.Book;
 import net.impactdev.impactor.commands.dev.items.BookCommand;
 import net.impactdev.impactor.commands.dev.items.ItemKeyArgument;
 import net.impactdev.impactor.commands.dev.items.skulls.SkullSkinArgument;
 import net.impactdev.impactor.commands.dev.items.skulls.SkullTextureArgument;
-import net.impactdev.impactor.commands.dev.messages.ActionBar;
-import net.impactdev.impactor.commands.dev.messages.Chat;
-import net.impactdev.impactor.commands.dev.messages.Title;
+import net.impactdev.impactor.commands.dev.adventure.ActionBar;
+import net.impactdev.impactor.commands.dev.adventure.Chat;
+import net.impactdev.impactor.commands.dev.adventure.Title;
 import net.impactdev.impactor.commands.dev.performance.PerformanceCheck;
 import net.impactdev.impactor.commands.dev.player.PlayerLocaleTest;
 import net.impactdev.impactor.game.items.ItemsModule;
@@ -76,7 +77,8 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
                     new PerformanceCheck(),
                     new Chat(),
                     new ActionBar(),
-                    new Title()
+                    new Title(),
+                    new Book()
             );
         });
     }

@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.commands.dev.messages;
+package net.impactdev.impactor.commands.dev.adventure;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -38,7 +38,7 @@ import net.minecraft.commands.arguments.ComponentArgument;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
-@CommandPath("impactor messaging chat")
+@CommandPath("impactor adventure chat")
 @Alias("message")
 public class Chat implements ImpactorCommand.Argument<Component> {
     @Override

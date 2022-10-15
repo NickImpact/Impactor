@@ -23,33 +23,33 @@
  *
  */
 
-package net.impactdev.impactor.commands.dev.messages;
+package net.impactdev.impactor.commands.dev.adventure;
 
-import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.impactdev.impactor.adventure.AdventureTranslator;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
 import net.impactdev.impactor.api.commands.annotations.Alias;
 import net.impactdev.impactor.api.commands.annotations.CommandPath;
 import net.impactdev.impactor.api.commands.executors.CommandContext;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
-import net.impactdev.impactor.api.platform.players.PlatformSource;
-import net.minecraft.commands.arguments.ComponentArgument;
-import net.minecraft.network.chat.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.jetbrains.annotations.NotNull;
 
-@CommandPath("impactor messaging action-bar")
-@Alias("message")
-public class ActionBar implements ImpactorCommand.Argument<Component> {
+import static net.kyori.adventure.text.Component.text;
+
+@CommandPath("impactor adventure")
+@Alias("book")
+public class Book implements ImpactorCommand {
     @Override
     public @NotNull CommandResult execute(CommandContext context) throws CommandSyntaxException {
-        PlatformSource source = context.source().asPlatform();
-        source.sendActionBar(AdventureTranslator.fromNative(context.argument("message", Component.class)));
-        return CommandResult.successful();
-    }
+        context.source().openBook(net.kyori.adventure.inventory.Book.book(
+                text("Testing a Packet Based Book").color(NamedTextColor.YELLOW),
+                text("NickImpact"),
+                text("This is a generated book, sent through ")
+                        .append(text("adventure").color(TextColor.color(0x00ffff)))
+                        .append(text("! In other words, this book was packet generated!"))
+        ));
 
-    @Override
-    public ArgumentType<Component> type() {
-        return ComponentArgument.textComponent();
+        return CommandResult.successful();
     }
 }

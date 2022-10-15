@@ -25,12 +25,23 @@
 
 package net.impactdev.impactor.game.platform;
 
+import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
+import net.impactdev.impactor.api.items.extensions.BookStack;
 import net.impactdev.impactor.api.platform.players.transactions.ItemTransaction;
 import net.impactdev.impactor.game.items.stacks.ItemStackTranslator;
 import net.impactdev.impactor.platform.players.ImpactorPlatformPlayer;
 import net.impactdev.impactor.platform.players.transactions.ImpactorItemTransaction;
+import net.kyori.adventure.inventory.Book;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.network.protocol.game.ClientboundOpenBookPacket;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -56,5 +67,26 @@ public abstract class ImpactorGamePlatformPlayer extends ImpactorPlatformPlayer 
                     );
                 })
                 .orElse(null);
+    }
+
+    @Override
+    @SuppressWarnings("StaticPseudoFunctionalStyleMethod")
+    public void openBook(@NotNull Book book) {
+        this.asMinecraftPlayer().ifPresent(target -> {
+            final ServerGamePacketListenerImpl connection = target.connection;
+            final Inventory inventory = target.inventory;
+            final int slot = inventory.items.size() + inventory.selected;
+
+            final BookStack item = ImpactorItemStack.book()
+                    .title(GlobalTranslator.render(book.title(), this.locale()))
+                    .author(LegacyComponentSerializer.legacyAmpersand().serialize(GlobalTranslator.render(book.author(), this.locale())))
+                    .pages(Lists.transform(book.pages(), page -> GlobalTranslator.render(page, this.locale())))
+                    .build();
+            final ItemStack vanilla = ItemStackTranslator.translate(item);
+
+            connection.send(new ClientboundContainerSetSlotPacket(0, slot, vanilla));
+            connection.send(new ClientboundOpenBookPacket(InteractionHand.MAIN_HAND));
+            connection.send(new ClientboundContainerSetSlotPacket(0, slot, inventory.getSelected()));
+        });
     }
 }
