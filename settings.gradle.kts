@@ -10,7 +10,6 @@ pluginManagement {
 }
 
 rootProject.name = "Impactor"
-include("api")
 include("common")
 //include("bukkit") // Requires > 1.16.5 (No Mojang Mappings available)
 include("forge")
