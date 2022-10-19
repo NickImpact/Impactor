@@ -26,7 +26,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":game"))
 
-    modImplementation("ca.landonjw:GooeyLibs:1.16.5-2.3.3-SNAPSHOT")
+    modImplementation("ca.landonjw.gooeylibs:forge:3.0.0-1.18.2-SNAPSHOT")
 }
 
 tasks {
@@ -50,7 +50,7 @@ tasks {
             include(dependency("org.spongepowered:math:.*"))
             include(dependency("com.github.ben-manes.caffeine:caffeine:.*"))
             include(dependency("io.leangen.geantyref:geantyref:.*"))
-            include(dependency("loom_mappings_1_16_5_layered_hash_40359_v2_forge_1_16_5_36_2_34_forge.ca.landonjw:GooeyLibs:1.16.5-2.3.3-SNAPSHOT"))
+            include(dependency("loom_mappings_1_18_2_layered_hash_40359_v2_forge_1_18_2_40_1_0_forge.ca.landonjw.gooeylibs:fabric:3.0.0-1.18.2-SNAPSHOT"))
             exclude("forge-client-extra.jar")
             exclude("ca/landonjw/gooeylibs2/GooeyLibs.class")
         }

@@ -27,6 +27,7 @@ package net.impactdev.impactor.fabric.ui.gooey;
 
 import ca.landonjw.gooeylibs2.api.button.ButtonClick;
 import ca.landonjw.gooeylibs2.api.button.GooeyButton;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.utilities.context.Context;
 import net.impactdev.impactor.game.items.stacks.ItemStackTranslator;
@@ -38,7 +39,7 @@ public class GooeyIcon extends GooeyButton {
         super(ItemStackTranslator.translate(icon.display().get()), action -> {
             Context context = Context.empty();
             context.with(icon.context())
-//                    .append(PlatformPlayer.class, action.getPlayer()) // TODO - Forge platform player translator
+                    .append(PlatformPlayer.class, PlatformPlayer.getOrCreate(action.getPlayer().getUUID()))
                     .append(ButtonClick.class, action.getClickType());
 
             icon.listeners().forEach(processor -> processor.process(context));

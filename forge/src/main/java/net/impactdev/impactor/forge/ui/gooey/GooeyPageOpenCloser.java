@@ -29,7 +29,7 @@ import ca.landonjw.gooeylibs2.api.UIManager;
 import ca.landonjw.gooeylibs2.api.page.GooeyPage;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -38,12 +38,12 @@ public interface GooeyPageOpenCloser {
 
     default void openPage(GooeyPage page, PlatformPlayer viewer) {
         @Nullable ServerPlayer forge = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(viewer.uuid());
-        UIManager.openUIForcefully(Objects.requireNonNull(forge), page);
+//        UIManager.openUIForcefully(Objects.requireNonNull(forge), page);
     }
 
     default void closePage(PlatformPlayer viewer) {
         @Nullable ServerPlayer forge = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(viewer.uuid());
-        UIManager.closeUI(Objects.requireNonNull(forge));
+//        UIManager.closeUI(Objects.requireNonNull(forge));
     }
 
 }

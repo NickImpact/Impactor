@@ -3,7 +3,7 @@ plugins {
 }
 
 minecraft {
-    version("1.16.5")
+    version("1.18.2")
 }
 
 repositories {
@@ -21,7 +21,7 @@ dependencies {
     api(project(":common"))
     api(project(":game"))
 
-    implementation("org.spongepowered:spongeapi:8.1.0")
+    implementation("org.spongepowered:spongeapi:9.0.0")
 }
 
 tasks {

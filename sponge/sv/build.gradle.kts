@@ -13,7 +13,7 @@ dependencies {
 
     minecraft("com.mojang:minecraft:${rootProject.property("minecraft")}")
     mappings(loom.officialMojangMappings())
-    modImplementation("net.fabricmc:fabric-loader:${rootProject.property("fabric")}")
+    modImplementation("net.fabricmc:fabric-loader:${rootProject.property("fabric-loader")}")
 
     implementation(project(":sponge:common"))
 }

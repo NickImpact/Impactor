@@ -66,15 +66,8 @@ public final class MiniMessageProcessor implements TextProcessor {
     }
 
     private List<TagResolver> locate(String raw, Context context, Map<String, PlaceholderParser> parsers) {
-        // TODO - With Java 9+ implementation, switch to Matcher#results()
-        List<MatchResult> matches = Lists.newArrayList();
-        Matcher matcher = this.TAG.matcher(raw);
-        while(matcher.find()) {
-            matches.add(matcher.toMatchResult());
-        }
-
         return PairStream.from(parsers)
-                .filter((key, parser) -> matches.stream()
+                .filter((key, parser) -> this.TAG.matcher(raw).results()
                         .map(mr -> {
                             String match = mr.group(1);
                             return match.substring(0, match.contains(":") ? match.indexOf(":") : match.length());

@@ -32,6 +32,8 @@ import net.impactdev.impactor.api.APIRegister;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.ImpactorService;
 import net.impactdev.impactor.modules.ImpactorModule;
+import net.minecraft.SharedConstants;
+import net.minecraft.server.Bootstrap;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
@@ -56,6 +58,9 @@ public class TestInitializer implements BeforeAllCallback, ExtensionContext.Stor
             if(!initialized) {
                 initialized = true;
                 context.getRoot().getStore(ExtensionContext.Namespace.GLOBAL).put("Impactor", this);
+
+                SharedConstants.tryDetectVersion();
+                Bootstrap.bootStrap();
 
                 // Initialization
                 Impactor impactor = new ImpactorService();

@@ -39,6 +39,7 @@ import net.impactdev.impactor.commands.dev.adventure.Chat;
 import net.impactdev.impactor.commands.dev.adventure.Title;
 import net.impactdev.impactor.commands.dev.performance.PerformanceCheck;
 import net.impactdev.impactor.commands.dev.player.PlayerLocaleTest;
+import net.impactdev.impactor.commands.dev.ui.ChestViewTest;
 import net.impactdev.impactor.game.items.ItemsModule;
 import net.impactdev.impactor.game.ui.UIModule;
 import net.impactdev.impactor.modules.ImpactorModule;
@@ -78,7 +79,8 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
                     new Chat(),
                     new ActionBar(),
                     new Title(),
-                    new Book()
+                    new Book(),
+                    new ChestViewTest()
             );
         });
     }

@@ -36,7 +36,7 @@ import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
 
 import java.util.Optional;
 import java.util.Set;
@@ -79,7 +79,7 @@ public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorP
         return Optional.ofNullable(this.server);
     }
 
-    private void onServerAboutToStart(FMLServerAboutToStartEvent event) {
+    private void onServerAboutToStart(ServerStartingEvent event) {
         this.server = event.getServer();
     }
 
