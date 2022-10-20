@@ -12,10 +12,11 @@ pluginManagement {
 rootProject.name = "Impactor"
 include("api")
 include("common")
+include("game")
+
 //include("bukkit") // Requires > 1.16.5 (No Mojang Mappings available)
 include("forge")
 include("fabric")
 include("sponge:common")
 include("sponge:sf")
 include("sponge:sv")
-include("game")
