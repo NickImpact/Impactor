@@ -52,7 +52,7 @@ public class ForgePlatformModule implements ImpactorModule {
 
     @Override
     public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new ForgePlatformInfo()));
+        provider.register(Platform.class, new ForgePlatform());
     }
 
 }

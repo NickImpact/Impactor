@@ -32,6 +32,7 @@ import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
@@ -56,8 +57,6 @@ public class ForgePlatformSource implements PlatformSource {
 
     @Override
     public void sendMessage(@NotNull Identity source, @NotNull Component message, @NotNull MessageType type) {
-        ((ForgeImpactorPlugin) BaseImpactorPlugin.instance()).server().ifPresent(server -> {
-            server.sendMessage(AdventureTranslator.toNative(message), source.uuid());
-        });
+        ServerLifecycleHooks.getCurrentServer().sendMessage(AdventureTranslator.toNative(message), source.uuid());
     }
 }

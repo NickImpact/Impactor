@@ -27,8 +27,7 @@ package net.impactdev.impactor.sponge;
 
 import com.google.inject.Inject;
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.commands.PermissionsService;
-import net.impactdev.impactor.api.events.provided.RegisterPlaceholdersEvent;
+import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.api.placeholders.PlaceholderParser;
 import net.impactdev.impactor.api.placeholders.PlaceholderService;
@@ -38,18 +37,18 @@ import net.impactdev.impactor.commands.permissions.NoOpPermissionsService;
 import net.impactdev.impactor.placeholders.ImpactorPlaceholderService;
 import net.impactdev.impactor.placeholders.ImpactorRegisterPlaceholdersEvent;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import net.impactdev.impactor.sponge.services.economy.ImpactorSpongeEconomyService;
 import net.kyori.adventure.key.Key;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.Command;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
-import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
+import org.spongepowered.api.event.lifecycle.ProvideServiceEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.placeholder.PlaceholderContext;
-import org.spongepowered.api.registry.RegistryEntry;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 @Plugin("impactor")
@@ -68,11 +67,6 @@ public class SpongeImpactorBootstrap extends ImpactorBootstrapper {
     @Listener
     public void onConstruct(ConstructPluginEvent event) {
         this.construct();
-    }
-
-    @Listener
-    public void onCommandRegistration(RegisterCommandEvent<Command.Raw> event) {
-
     }
 
     @Listener
@@ -100,6 +94,11 @@ public class SpongeImpactorBootstrap extends ImpactorBootstrapper {
 
         Impactor.instance().services().register(PlaceholderService.class, service);
         Impactor.instance().events().post(new ImpactorRegisterPlaceholdersEvent(service));
+    }
+
+    @Listener
+    public void suggestEconomyService(ProvideServiceEvent<EconomyService> event) {
+        event.suggest(ImpactorSpongeEconomyService::new);
     }
 
 }

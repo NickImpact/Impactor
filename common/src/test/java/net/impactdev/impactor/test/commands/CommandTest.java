@@ -33,7 +33,7 @@ import io.github.classgraph.ScanResult;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandRegistrationEvent;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
-import net.impactdev.impactor.api.commands.PermissionsService;
+import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.impactdev.impactor.api.commands.executors.CommandSource;
 import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.platform.players.PlatformSource;

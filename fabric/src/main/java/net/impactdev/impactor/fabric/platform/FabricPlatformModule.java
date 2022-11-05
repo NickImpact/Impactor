@@ -50,6 +50,6 @@ public class FabricPlatformModule implements ImpactorModule {
 
     @Override
     public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new FabricPlatformInfo()));
+        provider.register(Platform.class, new FabricPlatform());
     }
 }

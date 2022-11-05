@@ -32,7 +32,8 @@ dependencies {
     setOf(
         "fabric-api-base",
         "fabric-command-api-v1",
-        "fabric-lifecycle-events-v1"
+        "fabric-lifecycle-events-v1",
+        "fabric-networking-api-v1"
     ).forEach { modImplementation(fabricApi.module(it, FABRIC_API_VERSION)) }
 
     implementation(project(":api"))
@@ -52,6 +53,15 @@ tasks {
             include(dependency("com.github.ben-manes.caffeine:caffeine:.*"))
             include(dependency("io.leangen.geantyref:geantyref:.*"))
 //            include(dependency("io.github.classgraph:classgraph:.*"))
+            include(dependency("org.spongepowered:configurate-core:.*"))
+            include(dependency("org.spongepowered:configurate-gson:.*"))
+            include(dependency("org.spongepowered:configurate-yml:.*"))
+            include(dependency("org.spongepowered:configurate-hocon:.*"))
+            include(dependency("com.zaxxer:HikariCP:.*"))
+            include(dependency("com.h2database:h2:.*"))
+            include(dependency("mysql:mysql-connector-java:.*"))
+            include(dependency("org.mariadb.jdbc:mariadb-java-client:.*"))
+            include(dependency("org.mongodb:mongo-java-driver:.*"))
             include(dependency("loom_mappings_1_16_5_layered_hash_40359_v2.ca.landonjw.gooeylibs:api:3.0.0-SNAPSHOT"))
             include(dependency("loom_mappings_1_16_5_layered_hash_40359_v2.ca.landonjw.gooeylibs:fabric:3.0.0-SNAPSHOT"))
             exclude("ca/landonjw/gooeylibs2/GooeyLibs.class")
@@ -65,6 +75,13 @@ tasks {
         relocate ("io.leangen.geantyref", "net.impactdev.impactor.relocations.geantyref")
         relocate ("net.kyori", "net.impactdev.impactor.relocations.kyori")
         relocate ("com.github.benmanes.caffeine", "net.impactdev.impactor.relocations.caffeine")
+        relocate ("org.spongepowered.configurate", "net.impactdev.impactor.relocations.configurate")
+        relocate ("com.mongodb", "net.impactdev.impactor.relocations.mongodb")
+        relocate ("com.mysql", "net.impactdev.impactor.relocations.mysql")
+        relocate ("com.zaxxer.hikari", "net.impactdev.impactor.relocations.hikari")
+        relocate ("org.bson", "net.impactdev.impactor.relocations.bson")
+        relocate ("org.h2", "net.impactdev.impactor.relocations.h2")
+        relocate ("org.mariadb", "net.impactdev.impactor.relocations.mariadb")
     }
 
     remapJar {

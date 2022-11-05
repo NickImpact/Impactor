@@ -30,7 +30,7 @@ import net.impactdev.impactor.api.ui.containers.views.ChestView;
 public interface ChestViewService extends ViewingService<ChestView> {
 
     @Override
-    default String getServiceName() {
+    default String name() {
         return "Chest View Manager";
     }
 

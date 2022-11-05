@@ -30,6 +30,7 @@ import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
 import net.impactdev.impactor.forge.ForgeImpactorPlugin;
 import net.impactdev.impactor.platform.performance.SparkPerformanceMonitor;
 import net.impactdev.impactor.plugin.BaseImpactorPlugin;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 public class ForgePerformanceMonitorFactory implements PerformanceMonitor.Factory {
     @Override
@@ -38,9 +39,6 @@ public class ForgePerformanceMonitorFactory implements PerformanceMonitor.Factor
             return new SparkPerformanceMonitor();
         }
 
-        return ((ForgeImpactorPlugin) BaseImpactorPlugin.instance())
-                .server()
-                .map(server -> (PerformanceMonitor) server)
-                .orElseThrow(() -> new IllegalStateException("Server is not yet available..."));
+        return (PerformanceMonitor) ServerLifecycleHooks.getCurrentServer();
     }
 }

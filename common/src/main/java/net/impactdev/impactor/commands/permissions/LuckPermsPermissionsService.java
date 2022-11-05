@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.commands.permissions;
 
-import net.impactdev.impactor.api.commands.PermissionsService;
+import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.impactdev.impactor.api.platform.players.PlatformSource;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -44,7 +44,7 @@ public final class LuckPermsPermissionsService implements PermissionsService {
     }
 
     @Override
-    public String getServiceName() {
+    public String name() {
         return "LuckPerms Permissions Service";
     }
 }

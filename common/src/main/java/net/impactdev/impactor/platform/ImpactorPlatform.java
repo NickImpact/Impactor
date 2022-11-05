@@ -26,15 +26,17 @@
 package net.impactdev.impactor.platform;
 
 import com.google.common.base.Suppliers;
+import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.platform.PlatformInfo;
 import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class ImpactorPlatform implements Platform {
+public abstract class ImpactorPlatform implements Platform {
 
     private final PlatformInfo info;
     private final Supplier<PerformanceMonitor> performance;

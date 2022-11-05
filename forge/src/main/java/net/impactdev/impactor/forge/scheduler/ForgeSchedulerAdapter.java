@@ -27,6 +27,7 @@ package net.impactdev.impactor.forge.scheduler;
 
 import net.impactdev.impactor.api.scheduler.AbstractJavaScheduler;
 import net.impactdev.impactor.forge.ForgeImpactorPlugin;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import java.util.concurrent.Executor;
 
@@ -60,7 +61,7 @@ public class ForgeSchedulerAdapter extends AbstractJavaScheduler {
 
     public ForgeSchedulerAdapter(ForgeImpactorPlugin plugin) {
         super(plugin);
-        this.sync = r -> plugin.server().orElseThrow(() -> new IllegalStateException("Server not ready")).executeBlocking(r);
+        this.sync = r -> ServerLifecycleHooks.getCurrentServer().executeBlocking(r);
     }
 
     @Override

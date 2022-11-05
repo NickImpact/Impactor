@@ -30,7 +30,7 @@ import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.Secti
 public interface SectionedPaginationViewService extends ViewingService<SectionedPagination> {
 
     @Override
-    default String getServiceName() {
+    default String name() {
         return "Sectioned Pagination View Manager";
     }
 

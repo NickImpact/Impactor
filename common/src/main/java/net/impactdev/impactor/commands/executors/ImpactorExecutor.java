@@ -29,7 +29,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.commands.PermissionsService;
+import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.impactdev.impactor.api.commands.annotations.permissions.Permission;
 import net.impactdev.impactor.api.commands.annotations.permissions.Phase;
 import net.impactdev.impactor.api.commands.exceptions.CommandResultException;

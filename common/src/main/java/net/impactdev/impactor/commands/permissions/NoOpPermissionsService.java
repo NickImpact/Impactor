@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.commands.permissions;
 
-import net.impactdev.impactor.api.commands.PermissionsService;
+import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.impactdev.impactor.api.platform.players.PlatformSource;
 
 public final class NoOpPermissionsService implements PermissionsService {
@@ -35,7 +35,7 @@ public final class NoOpPermissionsService implements PermissionsService {
     }
 
     @Override
-    public String getServiceName() {
+    public String name() {
         return "NO-OP Permissions Service";
     }
 }

@@ -50,7 +50,17 @@ tasks {
             include(dependency("org.spongepowered:math:.*"))
             include(dependency("com.github.ben-manes.caffeine:caffeine:.*"))
             include(dependency("io.leangen.geantyref:geantyref:.*"))
+            include(dependency("org.spongepowered:configurate-core:.*"))
+            include(dependency("org.spongepowered:configurate-gson:.*"))
+            include(dependency("org.spongepowered:configurate-yml:.*"))
+            include(dependency("org.spongepowered:configurate-hocon:.*"))
+            include(dependency("com.zaxxer:HikariCP:.*"))
+            include(dependency("com.h2database:h2:.*"))
+            include(dependency("mysql:mysql-connector-java:.*"))
+            include(dependency("org.mariadb.jdbc:mariadb-java-client:.*"))
+            include(dependency("org.mongodb:mongo-java-driver:.*"))
             include(dependency("loom_mappings_1_16_5_layered_hash_40359_v2_forge_1_16_5_36_2_34_forge.ca.landonjw:GooeyLibs:1.16.5-2.3.3-SNAPSHOT"))
+
             exclude("forge-client-extra.jar")
             exclude("ca/landonjw/gooeylibs2/GooeyLibs.class")
         }
@@ -60,6 +70,13 @@ tasks {
         relocate ("io.leangen.geantyref", "net.impactdev.impactor.relocations.geantyref")
         relocate ("net.kyori", "net.impactdev.impactor.relocations.kyori")
         relocate ("com.github.benmanes.caffeine", "net.impactdev.impactor.relocations.caffeine")
+        relocate ("org.spongepowered.configurate", "net.impactdev.impactor.relocations.configurate")
+        relocate ("com.mongodb", "net.impactdev.impactor.relocations.mongodb")
+        relocate ("com.mysql", "net.impactdev.impactor.relocations.mysql")
+        relocate ("com.zaxxer.hikari", "net.impactdev.impactor.relocations.hikari")
+        relocate ("org.bson", "net.impactdev.impactor.relocations.bson")
+        relocate ("org.h2", "net.impactdev.impactor.relocations.h2")
+        relocate ("org.mariadb", "net.impactdev.impactor.relocations.mariadb")
     }
 
     remapJar {

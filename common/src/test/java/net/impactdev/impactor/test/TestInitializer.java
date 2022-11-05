@@ -31,7 +31,10 @@ import io.github.classgraph.ScanResult;
 import net.impactdev.impactor.api.APIRegister;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.ImpactorService;
+import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.modules.ImpactorModule;
+import net.impactdev.impactor.test.provided.TestBootstrap;
+import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
@@ -58,28 +61,8 @@ public class TestInitializer implements BeforeAllCallback, ExtensionContext.Stor
                 context.getRoot().getStore(ExtensionContext.Namespace.GLOBAL).put("Impactor", this);
 
                 // Initialization
-                Impactor impactor = new ImpactorService();
-                APIRegister.register(impactor);
-
-                ClassGraph graph = new ClassGraph().acceptPackages("net.impactdev.impactor").enableClassInfo();
-                try (ScanResult scan = graph.scan()) {
-                    ClassInfoList list = scan.getClassesImplementing(ImpactorModule.class);
-                        list.stream()
-                            .map(info -> info.loadClass(ImpactorModule.class))
-                            .map(type -> {
-                                try {
-                                    return type.newInstance();
-                                }
-                                catch (Exception e) {
-                                    throw new RuntimeException(e);
-                                }
-                            })
-                            .forEach(module -> {
-                                module.factories(impactor.factories());
-                                module.builders(impactor.builders());
-                                module.services(impactor.services());
-                            });
-                }
+                TestBootstrap bootstrap = new TestBootstrap(new Log4jLogger(LogManager.getLogger("Impactor Testing")));
+                bootstrap.init();
             }
         } finally {
             LOCK.unlock();

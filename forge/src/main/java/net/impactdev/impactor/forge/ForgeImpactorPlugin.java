@@ -43,11 +43,8 @@ import java.util.Set;
 
 public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorPlugin {
 
-    private MinecraftServer server;
-
     public ForgeImpactorPlugin(ImpactorBootstrapper bootstrapper) {
         super(bootstrapper);
-        MinecraftForge.EVENT_BUS.addListener(this::onServerAboutToStart);
     }
 
     @Override
@@ -73,14 +70,6 @@ public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorP
     @Override
     public void shutdown() throws Exception {
 
-    }
-
-    public Optional<MinecraftServer> server() {
-        return Optional.ofNullable(this.server);
-    }
-
-    private void onServerAboutToStart(FMLServerAboutToStartEvent event) {
-        this.server = event.getServer();
     }
 
 }

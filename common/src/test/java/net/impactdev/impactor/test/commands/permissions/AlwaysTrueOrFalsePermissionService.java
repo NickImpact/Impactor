@@ -25,9 +25,8 @@
 
 package net.impactdev.impactor.test.commands.permissions;
 
-import net.impactdev.impactor.api.commands.PermissionsService;
+import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.impactdev.impactor.api.platform.players.PlatformSource;
-import net.minecraft.commands.CommandSourceStack;
 
 public class AlwaysTrueOrFalsePermissionService implements PermissionsService {
 
@@ -43,7 +42,7 @@ public class AlwaysTrueOrFalsePermissionService implements PermissionsService {
     }
 
     @Override
-    public String getServiceName() {
+    public String name() {
         return "Impactor Test Service";
     }
 

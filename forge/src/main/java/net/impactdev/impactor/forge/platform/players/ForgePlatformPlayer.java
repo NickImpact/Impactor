@@ -32,6 +32,7 @@ import net.impactdev.impactor.forge.ForgeImpactorPlugin;
 import net.impactdev.impactor.game.platform.ImpactorGamePlatformPlayer;
 import net.impactdev.impactor.locale.LocaleProvider;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
@@ -54,9 +55,7 @@ public final class ForgePlatformPlayer extends ImpactorGamePlatformPlayer {
 
     @Override
     public Optional<ServerPlayer> asMinecraftPlayer() {
-        return ((ForgeImpactorPlugin) ForgeImpactorPlugin.instance())
-                .server()
-                .map(server -> server.getPlayerList().getPlayer(this.uuid()));
+        return Optional.ofNullable(ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(this.uuid()));
     }
 
     public static final class ForgePlatformPlayerFactory implements Factory {

@@ -67,7 +67,7 @@ public final class ImpactorPlaceholderService implements PlaceholderService {
     }
 
     @Override
-    public String getServiceName() {
+    public String name() {
         return "Placeholder Service";
     }
 }

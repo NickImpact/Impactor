@@ -28,6 +28,9 @@ package net.impactdev.impactor.sponge.platform.players;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.services.economy.accounts.Account;
+import net.impactdev.impactor.api.services.economy.accounts.AccountHolderReference;
+import net.impactdev.impactor.api.services.economy.currency.Currency;
 import net.impactdev.impactor.game.platform.ImpactorGamePlatformPlayer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
@@ -35,8 +38,10 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.util.locale.LocaleSource;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public final class SpongePlatformPlayer extends ImpactorGamePlatformPlayer {
 

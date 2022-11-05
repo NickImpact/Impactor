@@ -30,7 +30,7 @@ import net.impactdev.impactor.api.ui.containers.views.pagination.Pagination;
 public interface PaginationService extends ViewingService<Pagination> {
 
     @Override
-    default String getServiceName() {
+    default String name() {
         return "Pagination View Manager";
     }
 

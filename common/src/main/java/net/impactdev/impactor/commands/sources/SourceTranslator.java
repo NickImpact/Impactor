@@ -36,7 +36,7 @@ public final class SourceTranslator implements Service {
     private final Cache<Class<?>, Translator<?>> translators = Caffeine.newBuilder().build();
 
     @Override
-    public String getServiceName() {
+    public String name() {
         return "Source Translator";
     }
 
