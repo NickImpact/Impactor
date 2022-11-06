@@ -23,49 +23,16 @@
  *
  */
 
-package net.impactdev.impactor.sponge.services.economy.currency;
+package net.impactdev.impactor.util;
 
-import net.impactdev.impactor.economy.currency.ImpactorCurrency;
-import net.kyori.adventure.text.Component;
-import org.spongepowered.api.service.economy.Currency;
+import net.minecraft.util.RandomSource;
 
-import java.math.BigDecimal;
+public final class RandomProvider {
 
-public class SpongeCurrencyDelegation implements Currency {
+    private static final RandomSource source = RandomSource.create();
 
-    private final ImpactorCurrency delegate;
-
-    public SpongeCurrencyDelegation(ImpactorCurrency delegate) {
-        this.delegate = delegate;
+    public static long nextLong() {
+        return source.nextLong();
     }
 
-    @Override
-    public Component displayName() {
-        return this.delegate.name();
-    }
-
-    @Override
-    public Component pluralDisplayName() {
-        return this.delegate.plural();
-    }
-
-    @Override
-    public Component symbol() {
-        return this.delegate.symbol();
-    }
-
-    @Override
-    public Component format(BigDecimal amount, int numFractionDigits) {
-        return this.delegate.format(amount);
-    }
-
-    @Override
-    public int defaultFractionDigits() {
-        return this.delegate.decimals();
-    }
-
-    @Override
-    public boolean isDefault() {
-        return this.delegate.primary();
-    }
 }

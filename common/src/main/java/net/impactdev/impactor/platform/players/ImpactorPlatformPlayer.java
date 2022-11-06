@@ -29,6 +29,7 @@ import net.impactdev.impactor.adventure.AdventureTranslator;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.services.economy.accounts.AccountAccessor;
 import net.impactdev.impactor.economy.accounts.accessors.UniqueAccountAccessor;
+import net.impactdev.impactor.util.RandomProvider;
 import net.impactdev.impactor.util.ResourceKeyTranslator;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
@@ -41,12 +42,16 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.protocol.game.ClientboundCustomSoundPacket;
-import net.minecraft.network.protocol.game.ClientboundSetTitlesPacket;
+import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
@@ -55,6 +60,7 @@ import org.spongepowered.math.vector.Vector3d;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 public abstract class ImpactorPlatformPlayer implements PlatformPlayer {
@@ -108,12 +114,17 @@ public abstract class ImpactorPlatformPlayer implements PlatformPlayer {
         Component translated = GlobalTranslator.render(message, this.locale());
         net.minecraft.network.chat.Component vanilla = AdventureTranslator.toNative(translated);
 
-        this.asMinecraftPlayer().ifPresent(target -> target.sendMessage(vanilla, ChatTypeMapping.mapping(type), source.uuid()));
+//        this.asMinecraftPlayer().ifPresent(target -> target.sendMessage(vanilla, ChatTypeMapping.mapping(type), source.uuid()));
+        this.asMinecraftPlayer().ifPresent(target -> target.sendSystemMessage(vanilla));
     }
 
     @Override
     public void sendActionBar(@NotNull Component message) {
-        this.asMinecraftPlayer().ifPresent(target -> target.sendMessage(this.toVanillaComponent(message), ChatType.GAME_INFO, Identity.nil().uuid()));
+//        this.asMinecraftPlayer().ifPresent(target -> target.sendMessage(this.toVanillaComponent(message), ChatType.GAME_INFO, Identity.nil().uuid()));
+        this.asMinecraftPlayer().ifPresent(target -> {
+            ClientboundSetActionBarTextPacket packet = new ClientboundSetActionBarTextPacket(this.toVanillaComponent(message));
+            target.connection.send(packet);
+        });
     }
 
     @Override
@@ -121,20 +132,18 @@ public abstract class ImpactorPlatformPlayer implements PlatformPlayer {
         this.asMinecraftPlayer().ifPresent(target -> {
             if(part == TitlePart.TIMES) {
                 final Title.Times times = (Title.Times) value;
-                target.connection.send(new ClientboundSetTitlesPacket(
+                target.connection.send(new ClientboundSetTitlesAnimationPacket(
                         (int) (times.fadeIn().toMillis() / 50L),
                         (int) (times.stay().toMillis() / 50L),
                         (int) (times.fadeOut().toMillis() / 50L)
                 ));
             } else {
                 if(part == TitlePart.TITLE) {
-                    target.connection.send(new ClientboundSetTitlesPacket(
-                            ClientboundSetTitlesPacket.Type.TITLE,
+                    target.connection.send(new ClientboundSetTitleTextPacket(
                             AdventureTranslator.toNative((Component) value)
                     ));
                 } else {
-                    target.connection.send(new ClientboundSetTitlesPacket(
-                            ClientboundSetTitlesPacket.Type.SUBTITLE,
+                    target.connection.send(new ClientboundSetSubtitleTextPacket(
                             AdventureTranslator.toNative((Component) value)
                     ));
                 }
@@ -152,14 +161,15 @@ public abstract class ImpactorPlatformPlayer implements PlatformPlayer {
         this.asMinecraftPlayer().ifPresent(target -> {
             final Optional<SoundEvent> event = Registry.SOUND_EVENT.getOptional(ResourceKeyTranslator.asResourceLocation(sound.name()));
             if(event.isPresent()) {
-                target.connection.send(new ClientboundSoundPacket(event.get(), AdventureTranslator.asVanilla(sound.source()), x, y, z, sound.volume(), sound.pitch()));
+                target.connection.send(new ClientboundSoundPacket(event.get(), AdventureTranslator.asVanilla(sound.source()), x, y, z, sound.volume(), sound.pitch(), RandomProvider.nextLong()));
             } else {
                 target.connection.send(new ClientboundCustomSoundPacket(
                         ResourceKeyTranslator.asResourceLocation(sound.name()),
                         AdventureTranslator.asVanilla(sound.source()),
                         new net.minecraft.world.phys.Vec3(x, y, z),
                         sound.volume(),
-                        sound.pitch()
+                        sound.pitch(),
+                        RandomProvider.nextLong()
                 ));
             }
         });
@@ -186,7 +196,8 @@ public abstract class ImpactorPlatformPlayer implements PlatformPlayer {
                         AdventureTranslator.asVanilla(sound.source()),
                         tracked,
                         sound.volume(),
-                        sound.pitch()
+                        sound.pitch(),
+                        RandomProvider.nextLong()
                 ));
             }
         });
@@ -203,32 +214,32 @@ public abstract class ImpactorPlatformPlayer implements PlatformPlayer {
         return AdventureTranslator.toNative(GlobalTranslator.render(message, this.locale()));
     }
 
-    private enum ChatTypeMapping {
-        CHAT(ChatType.CHAT, MessageType.CHAT),
-        SYSTEM(ChatType.SYSTEM, MessageType.SYSTEM);
-
-        private final ChatType minecraft;
-        private final MessageType adventure;
-
-        ChatTypeMapping(final ChatType minecraft, final MessageType adventure) {
-            this.minecraft = minecraft;
-            this.adventure = adventure;
-        }
-
-        public static ChatType mapping(MessageType type) {
-            return Arrays.stream(values())
-                    .filter(m -> m.adventure.equals(type))
-                    .map(m -> m.minecraft)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid message type"));
-        }
-
-        public ChatType minecraft() {
-            return this.minecraft;
-        }
-
-        public MessageType adventure() {
-            return this.adventure;
-        }
-    }
+//    private enum ChatTypeMapping {
+//        CHAT(ChatType.CHAT, MessageType.CHAT),
+//        SYSTEM(ChatType.SYSTEM, MessageType.SYSTEM);
+//
+//        private final ChatType minecraft;
+//        private final MessageType adventure;
+//
+//        ChatTypeMapping(final ChatType minecraft, final MessageType adventure) {
+//            this.minecraft = minecraft;
+//            this.adventure = adventure;
+//        }
+//
+//        public static ChatType mapping(MessageType type) {
+//            return Arrays.stream(values())
+//                    .filter(m -> m.adventure.equals(type))
+//                    .map(m -> m.minecraft)
+//                    .findFirst()
+//                    .orElseThrow(() -> new IllegalArgumentException("Invalid message type"));
+//        }
+//
+//        public ChatType minecraft() {
+//            return this.minecraft;
+//        }
+//
+//        public MessageType adventure() {
+//            return this.adventure;
+//        }
+//    }
 }

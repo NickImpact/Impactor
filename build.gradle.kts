@@ -16,6 +16,8 @@ plugins {
     id("org.cadixdev.licenser") version "0.6.1"
     id("net.kyori.blossom") version "1.3.0" apply false
     id("com.github.johnrengelman.shadow") version "7.1.2" apply false
+    id("architectury-plugin") version "3.4-SNAPSHOT" apply false
+    id("dev.architectury.loom") version "0.12.0-SNAPSHOT" apply false
 }
 
 group = "net.impactdev.impactor"
@@ -25,9 +27,7 @@ tasks {
     val collect by registering(Copy::class) {
         val filters = mapOf(
             ":fabric" to "remapJar",
-            ":forge" to "remapJar",
-            ":sponge:sv" to "shadowJar",
-            ":sponge:sf" to "remapJar"
+            ":forge" to "remapJar"
         )
 
         val tasks = subprojects.filter { filters.containsKey(it.path) }.map { it.tasks.named(filters.getValue(it.path)) }
@@ -53,7 +53,7 @@ subprojects {
 
     java {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(8))
+            languageVersion.set(JavaLanguageVersion.of(17))
         }
     }
 

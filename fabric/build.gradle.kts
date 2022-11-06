@@ -1,6 +1,6 @@
-plugins {
-    id("architectury-plugin") version "3.4-SNAPSHOT"
-    id("dev.architectury.loom") version "0.12.0-SNAPSHOT"
+plugins  {
+    id("architectury-plugin")
+    id("dev.architectury.loom")
 }
 
 architectury {
@@ -12,6 +12,8 @@ loom {
     mixin {
         defaultRefmapName.set("mixins.impactor.fabric.refmap.json")
     }
+
+    silentMojangMappingsLicense()
 }
 
 repositories {
@@ -19,19 +21,16 @@ repositories {
 }
 
 dependencies {
-    val loom = project.extensions.getByName<net.fabricmc.loom.api.LoomGradleExtensionAPI>("loom")
-    loom.silentMojangMappingsLicense()
-
     minecraft("com.mojang:minecraft:${rootProject.property("minecraft")}")
     mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc:fabric-loader:${rootProject.property("fabric")}")
-    modImplementation("ca.landonjw.gooeylibs:api:3.0.0-SNAPSHOT")
-    modImplementation("ca.landonjw.gooeylibs:fabric:3.0.0-SNAPSHOT")
+//    modImplementation("ca.landonjw.gooeylibs:api:3.0.0-SNAPSHOT")
+//    modImplementation("ca.landonjw.gooeylibs:fabric:3.0.0-SNAPSHOT")
 
-    val FABRIC_API_VERSION = "0.42.0+1.16" // 1.16.5
+    val FABRIC_API_VERSION = "0.64.0+1.19.2" // 1.19.2
     setOf(
         "fabric-api-base",
-        "fabric-command-api-v1",
+        "fabric-command-api-v2",
         "fabric-lifecycle-events-v1",
         "fabric-networking-api-v1"
     ).forEach { modImplementation(fabricApi.module(it, FABRIC_API_VERSION)) }

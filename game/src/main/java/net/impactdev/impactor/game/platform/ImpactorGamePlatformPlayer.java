@@ -57,7 +57,7 @@ public abstract class ImpactorGamePlatformPlayer extends ImpactorPlatformPlayer 
                 .map(player -> {
                     ItemStack minecraft = ItemStackTranslator.translate(stack);
 
-                    boolean result = player.inventory.add(minecraft);
+                    boolean result = player.getInventory().add(minecraft);
                     player.inventoryMenu.broadcastChanges();
                     return new ImpactorItemTransaction(
                             stack,
@@ -74,7 +74,7 @@ public abstract class ImpactorGamePlatformPlayer extends ImpactorPlatformPlayer 
     public void openBook(@NotNull Book book) {
         this.asMinecraftPlayer().ifPresent(target -> {
             final ServerGamePacketListenerImpl connection = target.connection;
-            final Inventory inventory = target.inventory;
+            final Inventory inventory = target.getInventory();
             final int slot = inventory.items.size() + inventory.selected;
 
             final BookStack item = ImpactorItemStack.book()
@@ -84,9 +84,9 @@ public abstract class ImpactorGamePlatformPlayer extends ImpactorPlatformPlayer 
                     .build();
             final ItemStack vanilla = ItemStackTranslator.translate(item);
 
-            connection.send(new ClientboundContainerSetSlotPacket(0, slot, vanilla));
+            connection.send(new ClientboundContainerSetSlotPacket(0, target.containerMenu.getStateId(), slot, vanilla));
             connection.send(new ClientboundOpenBookPacket(InteractionHand.MAIN_HAND));
-            connection.send(new ClientboundContainerSetSlotPacket(0, slot, inventory.getSelected()));
+            connection.send(new ClientboundContainerSetSlotPacket(0, target.containerMenu.getStateId(), slot, inventory.getSelected()));
         });
     }
 }

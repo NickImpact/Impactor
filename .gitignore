@@ -27,3 +27,7 @@ run
 *.png
 *.gif
 
+common/config/*
+common/logs/*
+game/config/*
+game/logs/*

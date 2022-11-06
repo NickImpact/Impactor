@@ -4,7 +4,7 @@ plugins {
 }
 
 minecraft {
-    version("1.16.5")
+    version("1.19.2")
 }
 
 repositories {

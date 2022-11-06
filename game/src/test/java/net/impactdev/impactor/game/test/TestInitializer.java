@@ -27,6 +27,8 @@ package net.impactdev.impactor.game.test;
 
 import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.game.test.provided.TestBootstrap;
+import net.minecraft.SharedConstants;
+import net.minecraft.server.Bootstrap;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -52,6 +54,10 @@ public class TestInitializer implements BeforeAllCallback, ExtensionContext.Stor
             if(!initialized) {
                 initialized = true;
                 context.getRoot().getStore(ExtensionContext.Namespace.GLOBAL).put("Impactor", this);
+
+                // Initialize Minecraft
+                SharedConstants.tryDetectVersion();
+                Bootstrap.bootStrap();
 
                 // Initialization
                 TestBootstrap bootstrap = new TestBootstrap(new Log4jLogger(LogManager.getLogger("Impactor Testing")));

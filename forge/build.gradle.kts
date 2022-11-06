@@ -1,6 +1,6 @@
 plugins {
-    id("architectury-plugin") version "3.4-SNAPSHOT"
-    id("dev.architectury.loom") version "0.12.0-SNAPSHOT"
+    id("architectury-plugin")
+    id("dev.architectury.loom")
 }
 
 architectury {
@@ -26,7 +26,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":game"))
 
-    modImplementation("ca.landonjw:GooeyLibs:1.16.5-2.3.3-SNAPSHOT")
+//    modImplementation("ca.landonjw:GooeyLibs:1.16.5-2.3.3-SNAPSHOT")
 }
 
 tasks {
