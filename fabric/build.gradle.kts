@@ -56,6 +56,7 @@ tasks {
             include(dependency("org.spongepowered:configurate-gson:.*"))
             include(dependency("org.spongepowered:configurate-yml:.*"))
             include(dependency("org.spongepowered:configurate-hocon:.*"))
+            include(dependency("com.typesafe:config:.*"))
             include(dependency("com.zaxxer:HikariCP:.*"))
             include(dependency("com.h2database:h2:.*"))
             include(dependency("mysql:mysql-connector-java:.*"))

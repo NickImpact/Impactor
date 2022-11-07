@@ -123,17 +123,18 @@ public class EconomyTest {
 
             assertEquals(aa.balance(), aaAccessor.account(currencies.primary()).join().balance());
             assertEquals(ab.balance(), bbAccessor.account(currencies.primary()).join().balance());
-        });
 
-        List<AccountAccessor> sorted = holders.stream()
-                .sorted((r1, r2) -> {
-                    Account a1 = r1.account(currencies.primary()).join();
-                    Account a2 = r2.account(currencies.primary()).join();
+            List<AccountAccessor> sorted = holders.stream()
+                    .sorted((r1, r2) -> {
+                        Account a1 = r1.account(currencies.primary()).join();
+                        Account a2 = r2.account(currencies.primary()).join();
 
                     return a2.balance().compareTo(a1.balance());
                 }).toList();
-        assertEquals(BigDecimal.valueOf(1000.0), sorted.get(0).account(currencies.primary()).join().balance());
-        assertEquals(BigDecimal.valueOf(750.0), sorted.get(1).account(currencies.primary()).join().balance());
+
+            assertEquals(sorted.get(0).account(currencies.primary()).join().balance(), bbAccessor.account(currencies.primary()).join().balance());
+            assertEquals(sorted.get(1).account(currencies.primary()).join().balance(), aaAccessor.account(currencies.primary()).join().balance());
+        });
     }
 
     @Test
