@@ -25,6 +25,7 @@
 
 package net.impactdev.impactor.plugin;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
@@ -37,12 +38,14 @@ import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.configuration.ConfigModule;
+import net.impactdev.impactor.economy.EconomyModule;
 import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.api.utilities.ExceptionPrinter;
 import net.impactdev.impactor.placeholders.PlaceholderModule;
 import net.impactdev.impactor.util.UtilityModule;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -83,12 +86,14 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin {
         APIRegister.register(service);
 
         this.bootstrapper.logger().info("Initializing plugin modules...");
-        Set<Class<? extends ImpactorModule>> modules = Sets.newHashSet(
+        Set<Class<? extends ImpactorModule>> modules = new LinkedHashSet<>(Lists.newArrayList(
                 ConfigModule.class,
                 UtilityModule.class,
                 AdventureModule.class,
-                PlaceholderModule.class
-        );
+                PlaceholderModule.class,
+                EconomyModule.class
+        ));
+
         modules.addAll(Optional.ofNullable(this.modules()).orElse(Collections.emptySet()));
         modules.forEach(type -> {
             try {

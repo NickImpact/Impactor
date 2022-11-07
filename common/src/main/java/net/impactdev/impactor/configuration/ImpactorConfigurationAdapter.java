@@ -27,6 +27,7 @@ package net.impactdev.impactor.configuration;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.configuration.ConfigPath;
 import net.impactdev.impactor.api.configuration.ConfigurationAdapter;
@@ -181,7 +182,10 @@ public class ImpactorConfigurationAdapter implements ConfigurationAdapter {
 
     @Override
     public List<String> getKeys(ConfigPath path, List<String> def) {
-        this.checkMissing(path, def, new TypeToken<List<String>>() {});
+        Map<String, Object> supplier = Maps.newHashMap();
+        def.forEach(key -> supplier.put(key, null));
+
+        this.checkMissing(path, supplier, new TypeToken<Map<String, Object>>() {});
         ConfigurationNode node = resolvePath(path);
         if (node.virtual()) {
             return def;

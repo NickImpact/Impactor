@@ -27,10 +27,15 @@ package net.impactdev.impactor.game.test;
 
 import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.game.test.provided.TestBootstrap;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -40,7 +45,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * files that require further setup will be able to rely on this initializer to provide
  * the API setup for each test event.
  */
-public class TestInitializer implements BeforeAllCallback, ExtensionContext.Store.CloseableResource {
+public class TestInitializer implements BeforeAllCallback, AfterAllCallback, ExtensionContext.Store.CloseableResource {
 
     private static final Lock LOCK = new ReentrantLock();
     private static volatile boolean initialized;
@@ -63,6 +68,29 @@ public class TestInitializer implements BeforeAllCallback, ExtensionContext.Stor
     }
 
     @Override
-    public void close() throws Throwable {}
+    public void afterAll(ExtensionContext context) throws Exception {
+        try {
+            Path config = Paths.get("config");
+            Path logs = Paths.get("logs");
+            Path impactor = Paths.get("impactor");
 
+            if(Files.exists(config)) {
+                FileUtils.cleanDirectory(config.toFile());
+                Files.delete(config);
+            }
+
+            if(Files.exists(logs)) {
+                FileUtils.cleanDirectory(logs.toFile());
+                Files.delete(logs);
+            }
+
+            if(Files.exists(impactor)) {
+                FileUtils.cleanDirectory(impactor.toFile());
+                Files.delete(impactor);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    @Override
+    public void close() throws Throwable {}
 }

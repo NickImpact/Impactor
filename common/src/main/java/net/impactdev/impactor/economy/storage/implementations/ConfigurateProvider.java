@@ -73,7 +73,7 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
 
     public ConfigurateProvider(@NotNull final ConfigurateLoader loader) {
         this.loader = loader;
-        this.root = Paths.get("src").resolve("test").resolve("run").resolve("impactor").resolve("economy");
+        this.root = Paths.get("impactor").resolve("economy");
         this.ioLocks = Caffeine.newBuilder()
                 .expireAfterAccess(10, TimeUnit.MINUTES)
                 .build(key -> new ReentrantLock());

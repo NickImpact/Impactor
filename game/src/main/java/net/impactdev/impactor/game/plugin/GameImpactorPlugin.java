@@ -29,6 +29,8 @@ import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandRegistrationEvent;
 import net.impactdev.impactor.commands.CommandsModule;
+import net.impactdev.impactor.commands.builtin.economy.EconomyBalTopCommand;
+import net.impactdev.impactor.commands.builtin.economy.EconomyBalanceCommand;
 import net.impactdev.impactor.commands.dev.adventure.Book;
 import net.impactdev.impactor.commands.dev.items.BookCommand;
 import net.impactdev.impactor.commands.dev.items.ItemKeyArgument;
@@ -78,7 +80,9 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
                     new Chat(),
                     new ActionBar(),
                     new Title(),
-                    new Book()
+                    new Book(),
+                    new EconomyBalanceCommand(),
+                    new EconomyBalTopCommand()
             );
         });
     }

@@ -34,6 +34,8 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.StringJoiner;
 
+import static net.kyori.adventure.text.Component.text;
+
 public class ImpactorCurrency implements Currency {
 
     private final Key key;
@@ -76,7 +78,7 @@ public class ImpactorCurrency implements Currency {
 
     @Override
     public Component plural() {
-        return null;
+        return this.plural;
     }
 
     @Override
@@ -86,7 +88,7 @@ public class ImpactorCurrency implements Currency {
 
     @Override
     public Component format(BigDecimal amount) {
-        return Component.text(this.formatter.format(amount));
+        return this.symbol.append(text(this.formatter.format(amount)));
     }
 
     @Override

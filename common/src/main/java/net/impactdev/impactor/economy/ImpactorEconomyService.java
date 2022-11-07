@@ -32,6 +32,7 @@ import net.impactdev.impactor.api.services.economy.accounts.Account;
 import net.impactdev.impactor.api.services.economy.accounts.AccountAccessor;
 import net.impactdev.impactor.api.services.economy.currency.CurrencyProvider;
 import net.impactdev.impactor.api.storage.StorageType;
+import net.impactdev.impactor.api.utilities.ExceptionPrinter;
 import net.impactdev.impactor.economy.currency.ImpactorCurrencyProvider;
 import net.impactdev.impactor.economy.storage.EconomyStorage;
 import net.impactdev.impactor.economy.storage.StorageFactory;
@@ -50,6 +51,7 @@ public final class ImpactorEconomyService implements EconomyService {
         Config config = Config.builder()
                 .path(BaseImpactorPlugin.instance().configDirectory().get().resolve("economy.conf"))
                 .providers(EconomyConfig.class)
+                .supply(true)
                 .build();
 
         List<Currency> currencies = config.get(EconomyConfig.CURRENCIES);
@@ -59,6 +61,12 @@ public final class ImpactorEconomyService implements EconomyService {
 
         this.provider = new ImpactorCurrencyProvider(currencies);
         this.storage = StorageFactory.instance(BaseImpactorPlugin.instance(), config.get(EconomyConfig.STORAGE_TYPE), StorageType.JSON);
+
+        try {
+            this.storage.init();
+        } catch (Exception e) {
+            ExceptionPrinter.print(BaseImpactorPlugin.instance(), e);
+        }
     }
 
     @Override
