@@ -37,13 +37,16 @@ import net.impactdev.impactor.api.services.economy.transactions.EconomyTransacti
 import net.impactdev.impactor.api.services.economy.transactions.EconomyTransactionType;
 import net.impactdev.impactor.economy.ImpactorEconomyService;
 import net.impactdev.impactor.economy.accounts.accessors.UniqueAccountAccessor;
-import org.junit.jupiter.api.BeforeAll;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,10 +55,33 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class EconomyTest {
 
-    @BeforeAll
+    @AfterAll
     public static void clean() {
         EconomyService service = Impactor.instance().services().provide(EconomyService.class);
         ((ImpactorEconomyService) service).storage().purge().join();
+
+        try {
+            Path config = Paths.get("config");
+            Path logs = Paths.get("logs");
+            Path impactor = Paths.get("impactor");
+
+            if(Files.exists(config)) {
+                FileUtils.cleanDirectory(config.toFile());
+                Files.delete(config);
+            }
+
+            if(Files.exists(logs)) {
+                FileUtils.cleanDirectory(logs.toFile());
+                Files.delete(logs);
+            }
+
+            if(Files.exists(impactor)) {
+                FileUtils.cleanDirectory(impactor.toFile());
+                Files.delete(impactor);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -105,8 +131,7 @@ public class EconomyTest {
                     Account a2 = r2.account(currencies.primary()).join();
 
                     return a2.balance().compareTo(a1.balance());
-                })
-                .collect(Collectors.toList());
+                }).toList();
         assertEquals(BigDecimal.valueOf(1000.0), sorted.get(0).account(currencies.primary()).join().balance());
         assertEquals(BigDecimal.valueOf(750.0), sorted.get(1).account(currencies.primary()).join().balance());
     }

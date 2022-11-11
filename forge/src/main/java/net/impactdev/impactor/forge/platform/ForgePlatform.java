@@ -28,7 +28,7 @@ package net.impactdev.impactor.forge.platform;
 import com.google.common.collect.ImmutableList;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.platform.ImpactorPlatform;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.List;
 import java.util.stream.Collectors;

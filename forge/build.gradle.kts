@@ -26,7 +26,8 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":game"))
 
-//    modImplementation("ca.landonjw:GooeyLibs:1.16.5-2.3.3-SNAPSHOT")
+    modImplementation("ca.landonjw.gooeylibs:api:3.0.0-1.19.2-SNAPSHOT")
+    modImplementation("ca.landonjw.gooeylibs:forge:3.0.0-1.19.2-SNAPSHOT")
 }
 
 tasks {
@@ -59,10 +60,11 @@ tasks {
             include(dependency("mysql:mysql-connector-java:.*"))
             include(dependency("org.mariadb.jdbc:mariadb-java-client:.*"))
             include(dependency("org.mongodb:mongo-java-driver:.*"))
-            include(dependency("loom_mappings_1_16_5_layered_hash_40359_v2_forge_1_16_5_36_2_34_forge.ca.landonjw:GooeyLibs:1.16.5-2.3.3-SNAPSHOT"))
+            include(dependency("loom_mappings_1_19_2_layered_hash_40359_v2.ca.landonjw.gooeylibs:api:3.0.0-1.19.2-SNAPSHOT"))
+            include(dependency("loom_mappings_1_19_2_layered_hash_40359_v2_forge_1_19_2_43_1_47_forge.ca.landonjw.gooeylibs:forge:3.0.0-1.19.2-SNAPSHOT"))
 
             exclude("forge-client-extra.jar")
-            exclude("ca/landonjw/gooeylibs2/GooeyLibs.class")
+            exclude("ca/landonjw/gooeylibs2/forge/GooeyLibs.class")
         }
 
         relocate ("ca.landonjw.gooeylibs2", "net.impactdev.impactor.relocations.gooeylibs")

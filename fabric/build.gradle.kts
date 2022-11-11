@@ -24,8 +24,8 @@ dependencies {
     minecraft("com.mojang:minecraft:${rootProject.property("minecraft")}")
     mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc:fabric-loader:${rootProject.property("fabric")}")
-//    modImplementation("ca.landonjw.gooeylibs:api:3.0.0-SNAPSHOT")
-//    modImplementation("ca.landonjw.gooeylibs:fabric:3.0.0-SNAPSHOT")
+    modImplementation("ca.landonjw.gooeylibs:api:3.0.0-1.19.2-SNAPSHOT")
+    modImplementation("ca.landonjw.gooeylibs:fabric:3.0.0-1.19.2-SNAPSHOT")
 
     val FABRIC_API_VERSION = "0.64.0+1.19.2" // 1.19.2
     setOf(
@@ -61,9 +61,9 @@ tasks {
             include(dependency("mysql:mysql-connector-java:.*"))
             include(dependency("org.mariadb.jdbc:mariadb-java-client:.*"))
             include(dependency("org.mongodb:mongo-java-driver:.*"))
-            include(dependency("loom_mappings_1_16_5_layered_hash_40359_v2.ca.landonjw.gooeylibs:api:3.0.0-SNAPSHOT"))
-            include(dependency("loom_mappings_1_16_5_layered_hash_40359_v2.ca.landonjw.gooeylibs:fabric:3.0.0-SNAPSHOT"))
-            exclude("ca/landonjw/gooeylibs2/GooeyLibs.class")
+            include(dependency("loom_mappings_1_19_2_layered_hash_40359_v2.ca.landonjw.gooeylibs:api:3.0.0-1.19.2-SNAPSHOT"))
+            include(dependency("loom_mappings_1_19_2_layered_hash_40359_v2.ca.landonjw.gooeylibs:fabric:3.0.0-1.19.2-SNAPSHOT"))
+            exclude("ca/landonjw/gooeylibs2/fabric/GooeyLibs.class")
         }
 
 //        relocate ("io.github.classgraph", "net.impactdev.impactor.relocations.classgraph")

@@ -28,11 +28,10 @@ package net.impactdev.impactor.forge.platform.players;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.forge.ForgeImpactorPlugin;
 import net.impactdev.impactor.game.platform.ImpactorGamePlatformPlayer;
 import net.impactdev.impactor.locale.LocaleProvider;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
@@ -55,7 +54,8 @@ public final class ForgePlatformPlayer extends ImpactorGamePlatformPlayer {
 
     @Override
     public Optional<ServerPlayer> asMinecraftPlayer() {
-        return Optional.ofNullable(ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(this.uuid()));
+        return Optional.ofNullable(ServerLifecycleHooks.getCurrentServer())
+                .map(server -> server.getPlayerList().getPlayer(this.uuid()));
     }
 
     public static final class ForgePlatformPlayerFactory implements Factory {

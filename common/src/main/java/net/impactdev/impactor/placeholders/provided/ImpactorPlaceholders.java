@@ -39,7 +39,8 @@ import static net.kyori.adventure.text.Component.text;
 @SuppressWarnings("unused")
 public final class ImpactorPlaceholders {
 
-    private static final DecimalFormat FORMATTER = new DecimalFormat("0.###");
+    private static final DecimalFormat TWO_DECIMALS = new DecimalFormat("0.00");
+    private static final DecimalFormat THREE_DECIMALS = new DecimalFormat("0.000");
 
     public static final ImpactorPlaceholder NAME = new ImpactorPlaceholder(
             impactor("name"),
@@ -58,11 +59,11 @@ public final class ImpactorPlaceholders {
 
     public static final ImpactorPlaceholder TPS = new ImpactorPlaceholder(
             impactor("tps"),
-            ctx -> text(Impactor.instance().platform().performance().ticksPerSecond())
+            ctx -> text(TWO_DECIMALS.format(Impactor.instance().platform().performance().ticksPerSecond()))
     );
     public static final ImpactorPlaceholder MSPT = new ImpactorPlaceholder(
             impactor("mspt"),
-            ctx -> text(FORMATTER.format(Impactor.instance().platform().performance().averageTickDuration()))
+            ctx -> text(THREE_DECIMALS.format(Impactor.instance().platform().performance().averageTickDuration()))
     );
 
     public static final ImpactorPlaceholder MEMORY_USAGE = new ImpactorPlaceholder(

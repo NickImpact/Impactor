@@ -25,26 +25,38 @@
 
 package net.impactdev.impactor.forge.listeners;
 
+import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.adventure.TextProcessor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.scheduler.SchedulerTask;
+import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ConnectionListener {
 
+    private static final Map<UUID, SchedulerTask> tasks = Maps.newHashMap();
+
     @SubscribeEvent
-    public void onJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        PlatformPlayer player = PlatformPlayer.getOrCreate(event.getPlayer().getUUID());
+    public static void onJoin(PlayerEvent.PlayerLoggedInEvent event) {
+        PlatformPlayer player = PlatformPlayer.getOrCreate(event.getEntity().getUUID());
         TextProcessor processor = TextProcessor.legacy('&');
 
-        Impactor.instance().scheduler().asyncRepeating(() -> {
-            player.sendMessage(processor.parse("&aTPS: {{impactor:tps}} (MSPT: {{impactor:mspt}} ms)"));
-        }, 50, TimeUnit.MILLISECONDS);
+        tasks.put(event.getEntity().getUUID(), Impactor.instance().scheduler().asyncRepeating(() -> {
+            player.sendActionBar(processor.parse("&aTPS: {{impactor:tps}} (MSPT: {{impactor:mspt}} ms)"));
+        }, 50, TimeUnit.MILLISECONDS));
+    }
+
+    @SubscribeEvent
+    public static void onLeave(PlayerEvent.PlayerLoggedOutEvent event) {
+        tasks.remove(event.getEntity().getUUID()).cancel();
     }
 
 }

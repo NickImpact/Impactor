@@ -27,7 +27,7 @@ package net.impactdev.impactor.forge.scheduler;
 
 import net.impactdev.impactor.api.scheduler.AbstractJavaScheduler;
 import net.impactdev.impactor.forge.ForgeImpactorPlugin;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.concurrent.Executor;
 

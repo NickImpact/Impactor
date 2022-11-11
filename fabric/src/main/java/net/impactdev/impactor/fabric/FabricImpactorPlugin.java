@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.fabric;
 
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
@@ -58,7 +58,7 @@ public class FabricImpactorPlugin extends GameImpactorPlugin {
     public void construct() throws Exception {
         super.construct();
 
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+        CommandRegistrationCallback.EVENT.register((dispatcher, accessor, environment) -> {
             Impactor.instance().services()
                     .provide(SourceTranslator.class)
                     .register(CommandSourceStack.class, new CommandSourceStackTranslator());

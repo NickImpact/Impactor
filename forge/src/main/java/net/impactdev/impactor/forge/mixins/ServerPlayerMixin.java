@@ -44,7 +44,7 @@ public abstract class ServerPlayerMixin implements LocaleProvider {
 
     @Inject(method = "updateOptions", at = @At("TAIL"))
     public void impactor$updateClientLanguage(ServerboundClientInformationPacket packet, CallbackInfo ci) {
-        ServerboundClientInformationPacketAccessor accessor = (ServerboundClientInformationPacketAccessor) packet;
+        ServerboundClientInformationPacketAccessor accessor = (ServerboundClientInformationPacketAccessor) (Object) packet;
         this.impactor$language = LocaleCache.getLocale(accessor.impactor$accessor$language());
     }
 

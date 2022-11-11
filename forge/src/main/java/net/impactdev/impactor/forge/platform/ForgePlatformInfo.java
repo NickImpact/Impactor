@@ -59,11 +59,11 @@ public class ForgePlatformInfo extends ImpactorPlatformInfo {
         }
 
         printer.hr('-').add("Mods: ");
-        List<ModInfo> mods = ModList.get().getMods()
+        List<IModInfo> mods = ModList.get().getMods()
                 .stream()
                 .filter(info -> !this.exclusions.contains(info.getModId()))
-                .collect(Collectors.toList());
-        for(ModInfo info : mods) {
+                .toList();
+        for(IModInfo info : mods) {
             printer.add("%s - %s", info.getDisplayName(), info.getVersion());
         }
     }

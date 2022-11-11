@@ -34,11 +34,7 @@ import net.impactdev.impactor.forge.ui.ForgeUIModule;
 import net.impactdev.impactor.game.plugin.GameImpactorPlugin;
 import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 
-import java.util.Optional;
 import java.util.Set;
 
 public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorPlugin {
@@ -69,7 +65,7 @@ public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorP
 
     @Override
     public void shutdown() throws Exception {
-
+        Impactor.instance().scheduler().shutdownExecutor();
     }
 
 }

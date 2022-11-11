@@ -32,18 +32,17 @@ import net.impactdev.impactor.commands.event.ImpactorCommandRegistrationEvent;
 import net.impactdev.impactor.commands.registration.CommandManager;
 import net.impactdev.impactor.commands.sources.SourceTranslator;
 import net.impactdev.impactor.game.commands.CommandSourceStackTranslator;
-import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
 import net.kyori.event.PostResult;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 
@@ -71,7 +70,7 @@ public class ForgeImpactorBootstrap extends ImpactorBootstrapper {
         this.construct();
     }
 
-    public void onServerShutdown(FMLServerStoppingEvent event) {
+    public void onServerShutdown(ServerStoppingEvent event) {
         this.shutdown();
     }
 
