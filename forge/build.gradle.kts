@@ -51,6 +51,7 @@ tasks {
             include(dependency("org.spongepowered:math:.*"))
             include(dependency("com.github.ben-manes.caffeine:caffeine:.*"))
             include(dependency("io.leangen.geantyref:geantyref:.*"))
+            include(dependency("com.typesafe:config:.*"))
             include(dependency("org.spongepowered:configurate-core:.*"))
             include(dependency("org.spongepowered:configurate-gson:.*"))
             include(dependency("org.spongepowered:configurate-yml:.*"))

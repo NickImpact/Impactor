@@ -25,12 +25,11 @@
 
 package net.impactdev.impactor.game.test;
 
-import net.impactdev.impactor.api.logging.Log4jLogger;
+import net.impactdev.impactor.api.logging.NoOpLogger;
 import net.impactdev.impactor.game.test.provided.TestBootstrap;
 import org.apache.commons.io.FileUtils;
 import net.minecraft.SharedConstants;
 import net.minecraft.server.Bootstrap;
-import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -65,7 +64,7 @@ public class TestInitializer implements BeforeAllCallback, AfterAllCallback, Ext
                 Bootstrap.bootStrap();
 
                 // Initialization
-                TestBootstrap bootstrap = new TestBootstrap(new Log4jLogger(LogManager.getLogger("Impactor Testing")));
+                TestBootstrap bootstrap = new TestBootstrap(new NoOpLogger());
                 bootstrap.init();
             }
         } finally {

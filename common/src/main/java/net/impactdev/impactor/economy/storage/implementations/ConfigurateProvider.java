@@ -86,7 +86,8 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
 
     @Override
     public void init() throws Exception {
-        this.createDirectoriesIfNotExists(this.root);
+        this.createDirectoriesIfNotExists(Group.USERS.root(this.root));
+        this.createDirectoriesIfNotExists(Group.VIRTUAL.root(this.root));
     }
 
     @Override

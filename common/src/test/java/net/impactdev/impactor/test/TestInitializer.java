@@ -25,19 +25,16 @@
 
 package net.impactdev.impactor.test;
 
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ClassInfoList;
-import io.github.classgraph.ScanResult;
-import net.impactdev.impactor.api.APIRegister;
-import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.ImpactorService;
-import net.impactdev.impactor.api.logging.Log4jLogger;
-import net.impactdev.impactor.modules.ImpactorModule;
+import net.impactdev.impactor.api.logging.NoOpLogger;
 import net.impactdev.impactor.test.provided.TestBootstrap;
-import org.apache.logging.log4j.LogManager;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -47,7 +44,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * files that require further setup will be able to rely on this initializer to provide
  * the API setup for each test event.
  */
-public class TestInitializer implements BeforeAllCallback, ExtensionContext.Store.CloseableResource {
+public class TestInitializer implements BeforeAllCallback, AfterAllCallback, ExtensionContext.Store.CloseableResource {
 
     private static final Lock LOCK = new ReentrantLock();
     private static volatile boolean initialized;
@@ -61,11 +58,31 @@ public class TestInitializer implements BeforeAllCallback, ExtensionContext.Stor
                 context.getRoot().getStore(ExtensionContext.Namespace.GLOBAL).put("Impactor", this);
 
                 // Initialization
-                TestBootstrap bootstrap = new TestBootstrap(new Log4jLogger(LogManager.getLogger("Impactor Testing")));
+                TestBootstrap bootstrap = new TestBootstrap(new NoOpLogger());
                 bootstrap.init();
             }
         } finally {
             LOCK.unlock();
+        }
+    }
+
+    @Override
+    public void afterAll(ExtensionContext context) throws Exception {
+        try {
+            Path config = Paths.get("config");
+            Path impactor = Paths.get("impactor");
+
+            if(Files.exists(config)) {
+                FileUtils.cleanDirectory(config.toFile());
+                Files.delete(config);
+            }
+
+            if(Files.exists(impactor)) {
+                FileUtils.cleanDirectory(impactor.toFile());
+                Files.delete(impactor);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
