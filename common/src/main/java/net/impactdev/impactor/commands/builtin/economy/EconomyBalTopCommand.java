@@ -26,6 +26,7 @@
 package net.impactdev.impactor.commands.builtin.economy;
 
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.ImpactorCommand;
@@ -37,7 +38,6 @@ import net.impactdev.impactor.api.services.economy.EconomyService;
 import net.impactdev.impactor.api.services.economy.accounts.Account;
 import net.impactdev.impactor.api.services.economy.accounts.AccountAccessor;
 import net.impactdev.impactor.api.services.economy.currency.Currency;
-import net.impactdev.impactor.commands.builtin.economy.arguments.CurrencyArgumentType;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +58,7 @@ public class EconomyBalTopCommand implements ImpactorCommand.Argument<String> {
 
         @SuppressWarnings({"PatternValidation", "OptionalGetWithoutIsPresent"})
         Currency target = service.currencies().currency(Key.key(
-                "impactor", context.argument("currency", String.class)
+                "impactor", context.argument("currency", String.class).toLowerCase()
         )).get();
 
         context.source().sendMessage(text("Composing top balances...").color(NamedTextColor.GRAY));
@@ -71,7 +71,7 @@ public class EconomyBalTopCommand implements ImpactorCommand.Argument<String> {
                         return b.balance().compareTo(a.balance());
                     })
                     .limit(5)
-                    .collect(Collectors.toList());
+                    .toList();
 
             context.source().sendMessage(text("+============ Top Balances ============+").color(NamedTextColor.YELLOW));
             for(int i = 0; i < top5.size(); i++) {
@@ -89,7 +89,7 @@ public class EconomyBalTopCommand implements ImpactorCommand.Argument<String> {
 
     @Override
     public ArgumentType<String> type() {
-        return new CurrencyArgumentType();
+        return StringArgumentType.word();
     }
 
 }

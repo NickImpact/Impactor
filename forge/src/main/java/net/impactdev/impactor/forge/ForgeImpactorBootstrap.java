@@ -25,6 +25,8 @@
 
 package net.impactdev.impactor.forge;
 
+import ca.landonjw.gooeylibs2.bootstrap.GooeyBootstrapper;
+import ca.landonjw.gooeylibs2.forge.ForgeBootstrapper;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
@@ -49,16 +51,15 @@ import org.apache.logging.log4j.LogManager;
 @Mod("impactor")
 public class ForgeImpactorBootstrap extends ImpactorBootstrapper {
 
-    private final ModContainer container;
-
     public ForgeImpactorBootstrap() {
         super(new Log4jLogger(LogManager.getLogger("Impactor")));
-        this.container = ModList.get().getModContainerById("impactor")
-                .orElseThrow(() -> new IllegalStateException("Impactor not found by forge"));
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onSetup);
         MinecraftForge.EVENT_BUS.addListener(this::onServerShutdown);
         MinecraftForge.EVENT_BUS.register(new RegistryEvents());
+
+        GooeyBootstrapper bootstrapper = new ForgeBootstrapper();
+        bootstrapper.bootstrap();
     }
 
     @Override

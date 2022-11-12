@@ -40,7 +40,8 @@ public class GooeyIcon extends GooeyButton {
             Context context = Context.empty();
             context.with(icon.context())
                     .append(PlatformPlayer.class, PlatformPlayer.getOrCreate(action.getPlayer().getUUID()))
-                    .append(ButtonClick.class, action.getClickType());
+                    .append(ButtonClick.class, action.getClickType())
+                    .append(Integer.class, action.getSlot());
 
             icon.listeners().forEach(processor -> processor.process(context));
         });

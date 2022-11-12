@@ -72,7 +72,6 @@ public final class ForgeChestView extends ImpactorChestView implements GooeyPage
         this.closePage(viewer);
     }
 
-
     public static final class ForgeImpactorChestViewBuilder extends ImpactorChestViewBuilder {
         @Override
         public ChestView build() {

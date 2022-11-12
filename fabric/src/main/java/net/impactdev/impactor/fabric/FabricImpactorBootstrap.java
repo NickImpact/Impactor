@@ -25,6 +25,8 @@
 
 package net.impactdev.impactor.fabric;
 
+import ca.landonjw.gooeylibs2.bootstrap.GooeyBootstrapper;
+import ca.landonjw.gooeylibs2.fabric.FabricBootstrapper;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
@@ -35,6 +37,9 @@ public class FabricImpactorBootstrap extends ImpactorBootstrapper implements Ded
 
     public FabricImpactorBootstrap() {
         super(new Log4jLogger(LogManager.getLogger("Impactor")));
+
+        GooeyBootstrapper bootstrapper = new FabricBootstrapper();
+        bootstrapper.bootstrap();
     }
 
     @Override

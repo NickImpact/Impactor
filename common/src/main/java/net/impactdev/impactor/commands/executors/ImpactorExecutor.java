@@ -37,6 +37,7 @@ import net.impactdev.impactor.api.commands.executors.CommandContext;
 import net.impactdev.impactor.api.commands.executors.CommandResult;
 import net.impactdev.impactor.api.commands.executors.CommandSource;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -86,9 +87,9 @@ public final class ImpactorExecutor<S> implements Command<S> {
             printer.hr('-').add("Tracked Exception Stacktrace:");
             printer.add(tracked.getCause());
 
-            printer.print(System.err);
+            printer.log(BaseImpactorPlugin.instance().logger());
             throw new RuntimeException("Tracked Exception", tracked.getCause());
-        } catch (RuntimeException unexpected) {
+        } catch (Throwable unexpected) {
             PrettyPrinter printer = new PrettyPrinter(80);
             printer.title("Command Parsing Exception");
             printer.add("An unexpected exception occurred while attempting to process");
@@ -101,7 +102,7 @@ public final class ImpactorExecutor<S> implements Command<S> {
             printer.hr('-').add("Exception Stacktrace:");
             printer.add(unexpected);
 
-            printer.print(System.err);
+            printer.log(BaseImpactorPlugin.instance().logger());
             throw unexpected;
         }
     }

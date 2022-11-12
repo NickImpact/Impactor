@@ -31,16 +31,6 @@ import net.impactdev.impactor.api.commands.CommandRegistrationEvent;
 import net.impactdev.impactor.commands.CommandsModule;
 import net.impactdev.impactor.commands.builtin.economy.EconomyBalTopCommand;
 import net.impactdev.impactor.commands.builtin.economy.EconomyBalanceCommand;
-import net.impactdev.impactor.commands.dev.adventure.Book;
-import net.impactdev.impactor.commands.dev.items.BookCommand;
-import net.impactdev.impactor.commands.dev.items.ItemKeyArgument;
-import net.impactdev.impactor.commands.dev.items.skulls.SkullSkinArgument;
-import net.impactdev.impactor.commands.dev.items.skulls.SkullTextureArgument;
-import net.impactdev.impactor.commands.dev.adventure.ActionBar;
-import net.impactdev.impactor.commands.dev.adventure.Chat;
-import net.impactdev.impactor.commands.dev.adventure.Title;
-import net.impactdev.impactor.commands.dev.performance.PerformanceCheck;
-import net.impactdev.impactor.commands.dev.player.PlayerLocaleTest;
 import net.impactdev.impactor.game.items.ItemsModule;
 import net.impactdev.impactor.game.ui.UIModule;
 import net.impactdev.impactor.modules.ImpactorModule;
@@ -71,16 +61,6 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
         Impactor.instance().events().subscribe(CommandRegistrationEvent.class, event -> {
             this.logger().info("Received registration event, generating...");
             event.register(
-                    new ItemKeyArgument(),
-                    new BookCommand(),
-                    new SkullSkinArgument(),
-                    new SkullTextureArgument(),
-                    new PlayerLocaleTest(),
-                    new PerformanceCheck(),
-                    new Chat(),
-                    new ActionBar(),
-                    new Title(),
-                    new Book(),
                     new EconomyBalanceCommand(),
                     new EconomyBalTopCommand()
             );

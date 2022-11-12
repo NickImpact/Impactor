@@ -61,7 +61,7 @@ tasks {
             include(dependency("mysql:mysql-connector-java:.*"))
             include(dependency("org.mariadb.jdbc:mariadb-java-client:.*"))
             include(dependency("org.mongodb:mongo-java-driver:.*"))
-            include(dependency("loom_mappings_1_19_2_layered_hash_40359_v2.ca.landonjw.gooeylibs:api:3.0.0-1.19.2-SNAPSHOT"))
+            include(dependency("loom_mappings_1_19_2_layered_hash_40359_v2_forge_1_19_2_43_1_47_forge.ca.landonjw.gooeylibs:api:3.0.0-1.19.2-SNAPSHOT"))
             include(dependency("loom_mappings_1_19_2_layered_hash_40359_v2_forge_1_19_2_43_1_47_forge.ca.landonjw.gooeylibs:forge:3.0.0-1.19.2-SNAPSHOT"))
 
             exclude("forge-client-extra.jar")
