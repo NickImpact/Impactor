@@ -25,6 +25,8 @@
 
 name: Impactor
 version: '${version}'
-main: net.impactdev.impactor.spigot.SpigotImpactorEntry
-api-version: 1.16
+main: net.impactdev.impactor.spigot.launch.SpigotImpactorEntry
+api-version: 1.19
 authors: [ NickImpact ]
+softdepend:
+  - "vault"

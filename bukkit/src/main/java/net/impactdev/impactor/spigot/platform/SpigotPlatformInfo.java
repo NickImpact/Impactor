@@ -27,6 +27,7 @@ package net.impactdev.impactor.spigot.platform;
 
 import net.impactdev.impactor.api.platform.PlatformComponent;
 import net.impactdev.impactor.api.platform.PlatformType;
+import net.impactdev.impactor.api.plugin.PluginMetadata;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
 import net.impactdev.impactor.platform.ImpactorPlatformInfo;
 import net.impactdev.impactor.spigot.platform.components.SpigotComponent;
@@ -34,6 +35,8 @@ import net.impactdev.impactor.spigot.platform.components.SpigotMinecraftComponen
 import org.bukkit.Bukkit;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class SpigotPlatformInfo extends ImpactorPlatformInfo {
@@ -59,5 +62,30 @@ public class SpigotPlatformInfo extends ImpactorPlatformInfo {
     protected void specifyComponents(Set<PlatformComponent> set) {
         set.add(new SpigotMinecraftComponent());
         set.add(new SpigotComponent());
+    }
+
+    @Override
+    public List<PluginMetadata> plugins() {
+        return Arrays.stream(Bukkit.getPluginManager().getPlugins())
+                .map(plugin -> PluginMetadata.builder()
+                        .id(plugin.getName())
+                        .name(plugin.getName())
+                        .version(plugin.getDescription().getVersion())
+                        .description(plugin.getDescription().getDescription())
+                        .build()
+                )
+                .toList();
+    }
+
+    @Override
+    public Optional<PluginMetadata> plugin(String id) {
+        return Optional.ofNullable(Bukkit.getPluginManager().getPlugin(id))
+                .map(plugin -> PluginMetadata.builder()
+                        .id(plugin.getName())
+                        .name(plugin.getName())
+                        .version(plugin.getDescription().getVersion())
+                        .description(plugin.getDescription().getDescription())
+                        .build()
+                );
     }
 }

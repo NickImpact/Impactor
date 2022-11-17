@@ -46,7 +46,7 @@ public class SpigotPlatformModule implements ImpactorModule {
 
     @Override
     public void services(ServiceProvider provider) {
-        provider.register(Platform.class, new ImpactorPlatform(new SpigotPlatformInfo()));
+        provider.register(Platform.class, new SpigotPlatform());
     }
 
 }

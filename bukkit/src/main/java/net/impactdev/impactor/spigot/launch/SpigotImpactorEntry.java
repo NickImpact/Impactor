@@ -23,25 +23,29 @@
  *
  */
 
-package net.impactdev.impactor.economy;
+package net.impactdev.impactor.spigot.launch;
 
-import net.impactdev.impactor.api.providers.BuilderProvider;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.api.services.economy.EconomyService;
-import net.impactdev.impactor.api.services.economy.currency.Currency;
-import net.impactdev.impactor.economy.currency.ImpactorCurrency;
-import net.impactdev.impactor.modules.ImpactorModule;
+import net.impactdev.impactor.api.logging.JavaLogger;
+import net.impactdev.impactor.api.logging.PluginLogger;
+import net.impactdev.impactor.spigot.SpigotImpactorBootstrap;
+import org.bukkit.plugin.java.JavaPlugin;
 
-public class EconomyModule implements ImpactorModule {
-    @Override
-    public void factories(FactoryProvider provider) {}
+public final class SpigotImpactorEntry extends JavaPlugin {
 
-    @Override
-    public void builders(BuilderProvider provider) {
-        provider.register(Currency.CurrencyBuilder.class, ImpactorCurrency.ImpactorCurrencyBuilder::new);
+    private final SpigotImpactorBootstrap bootstrap;
+
+    public SpigotImpactorEntry() {
+        PluginLogger logger = new JavaLogger(this.getLogger());
+        this.bootstrap = new SpigotImpactorBootstrap(this, logger);
     }
 
     @Override
-    public void services(ServiceProvider provider) {}
+    public void onEnable() {
+        this.bootstrap.construct();
+    }
+
+    @Override
+    public void onDisable() {
+        this.bootstrap.shutdown();
+    }
 }

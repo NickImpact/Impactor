@@ -28,16 +28,23 @@ package net.impactdev.impactor.spigot;
 import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class SpigotImpactorBootstrap extends ImpactorBootstrapper {
 
-    public SpigotImpactorBootstrap(PluginLogger logger) {
+    private final JavaPlugin plugin;
+
+    public SpigotImpactorBootstrap(JavaPlugin plugin, PluginLogger logger) {
         super(logger);
+        this.plugin = plugin;
     }
 
     @Override
     protected ImpactorPlugin createPlugin() {
-        return new SpigotImpactorPlugin(this);
+        return new SpigotImpactorPlugin(this, this.plugin);
     }
 
+    public JavaPlugin plugin() {
+        return this.plugin;
+    }
 }

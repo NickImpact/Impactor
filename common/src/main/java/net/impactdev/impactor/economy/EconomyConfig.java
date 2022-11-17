@@ -38,12 +38,15 @@ import org.intellij.lang.annotations.Subst;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static net.impactdev.impactor.api.configuration.ConfigKeyTypes.booleanKey;
 import static net.impactdev.impactor.api.configuration.ConfigKeyTypes.customKey;
 import static net.impactdev.impactor.api.configuration.ConfigPath.path;
 import static net.kyori.adventure.text.Component.text;
 
 @KeyProvider
 public final class EconomyConfig {
+
+    public static final ConfigKey<Boolean> DEBUG = booleanKey(path("debug"), false);
 
     public static final ConfigKey<StorageType> STORAGE_TYPE = customKey(adapter ->
             StorageType.parse(adapter.getString(path("storage-method"), "json"))

@@ -35,7 +35,9 @@ import net.impactdev.impactor.api.services.economy.currency.CurrencyProvider;
 import net.impactdev.impactor.api.services.economy.transactions.EconomyResultType;
 import net.impactdev.impactor.api.services.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.services.economy.transactions.EconomyTransactionType;
+import net.impactdev.impactor.economy.ImpactorEconomyService;
 import net.impactdev.impactor.economy.accounts.accessors.UniqueAccountAccessor;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -48,6 +50,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class EconomyTest {
+
+    @BeforeAll
+    public static void provide() {
+        Impactor.instance().services().register(EconomyService.class, new ImpactorEconomyService());
+    }
 
     @Test
     public void base() {

@@ -37,6 +37,8 @@ public interface EconomyStorageImplementation extends StorageConnection {
 
     Account account(UUID uuid, Currency currency) throws Exception;
 
+    Account account(String identifier, Currency currency) throws Exception;
+
     boolean saveAccount(UUID uuid, Account account) throws Exception;
 
     List<AccountAccessor> accessors() throws Exception;

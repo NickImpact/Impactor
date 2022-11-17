@@ -27,7 +27,8 @@ tasks {
     val collect by registering(Copy::class) {
         val filters = mapOf(
             ":fabric" to "remapJar",
-            ":forge" to "remapJar"
+            ":forge" to "remapJar",
+            ":bukkit" to "shadowJar"
         )
 
         val tasks = subprojects.filter { filters.containsKey(it.path) }.map { it.tasks.named(filters.getValue(it.path)) }

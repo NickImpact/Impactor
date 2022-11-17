@@ -14,6 +14,6 @@ include("api")
 include("common")
 include("game")
 
-//include("bukkit") // Requires > 1.16.5 (No Mojang Mappings available)
+include("bukkit")
 include("forge")
 include("fabric")

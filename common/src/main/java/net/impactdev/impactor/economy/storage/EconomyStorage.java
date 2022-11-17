@@ -66,6 +66,10 @@ public final class EconomyStorage implements Storage {
         return supply(() -> this.implementation.account(uuid, currency));
     }
 
+    public CompletableFuture<Account> account(String identifier, Currency currency) {
+        return supply(() -> this.implementation.account(identifier, currency));
+    }
+
     public CompletableFuture<Boolean> saveAccount(UUID uuid, Account account) {
         return supply(() -> this.implementation.saveAccount(uuid, account));
     }

@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":common"))
 
     // Utility
+    implementation("com.github.MilkBowl:VaultAPI:1.7.1")
 //    implementation 'me.lucko:commodore:2.2'
 }
 
@@ -33,6 +34,12 @@ java {
 
 tasks {
     shadowJar {
+        val minecraft = rootProject.property("minecraft")
+
+        archiveBaseName.set("Impactor-Bukkit")
+        archiveClassifier.set("")
+        archiveVersion.set("$minecraft-${rootProject.version}")
+
         dependencies {
             include(project(":api"))
             include(project(":common"))
@@ -41,8 +48,14 @@ tasks {
             include(dependency("org.spongepowered:math:.*"))
             include(dependency("com.github.ben-manes.caffeine:caffeine:.*"))
             include(dependency("io.leangen.geantyref:geantyref:.*"))
+            include(dependency("org.spongepowered:configurate-core:.*"))
+            include(dependency("org.spongepowered:configurate-gson:.*"))
+            include(dependency("org.spongepowered:configurate-yml:.*"))
+            include(dependency("org.spongepowered:configurate-hocon:.*"))
+            include(dependency("com.typesafe:config:.*"))
         }
 
+        relocate ("com.typesafe", "net.impactdev.impactor.relocations.typesafe")
         relocate ("org.spongepowered", "net.impactdev.impactor.relocations.spongepowered")
         relocate ("io.leangen.geantyref", "net.impactdev.impactor.relocations.geantyref")
         relocate ("net.kyori", "net.impactdev.impactor.relocations.kyori")

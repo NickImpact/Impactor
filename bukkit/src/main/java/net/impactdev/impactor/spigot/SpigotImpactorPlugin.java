@@ -27,18 +27,26 @@ package net.impactdev.impactor.spigot;
 
 import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.services.economy.EconomyService;
 import net.impactdev.impactor.api.utilities.printing.PrettyPrinter;
+import net.impactdev.impactor.economy.ImpactorEconomyService;
 import net.impactdev.impactor.modules.ImpactorModule;
 import net.impactdev.impactor.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.plugin.ImpactorBootstrapper;
+import net.impactdev.impactor.spigot.economy.vault.VaultEconomyLink;
 import net.impactdev.impactor.spigot.platform.SpigotPlatformModule;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Set;
 
 public class SpigotImpactorPlugin extends BaseImpactorPlugin {
 
-    public SpigotImpactorPlugin(ImpactorBootstrapper bootstrapper) {
+    private final JavaPlugin plugin;
+
+    public SpigotImpactorPlugin(ImpactorBootstrapper bootstrapper, JavaPlugin plugin) {
         super(bootstrapper);
+        this.plugin = plugin;
     }
 
     @Override
@@ -49,6 +57,12 @@ public class SpigotImpactorPlugin extends BaseImpactorPlugin {
         printer.title("Platform Information");
         Impactor.instance().platform().info().print(printer);
         printer.log(this.logger(), PrettyPrinter.Level.INFO);
+
+        if(Bukkit.getPluginManager().isPluginEnabled("vault")) {
+            Impactor.instance().services().register(EconomyService.class, new VaultEconomyLink(this.plugin));
+        } else {
+            Impactor.instance().services().register(EconomyService.class, new ImpactorEconomyService());
+        }
     }
 
     @Override

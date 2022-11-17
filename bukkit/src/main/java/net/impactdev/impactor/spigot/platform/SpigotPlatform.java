@@ -23,23 +23,24 @@
  *
  */
 
-package net.impactdev.impactor.spigot;
+package net.impactdev.impactor.spigot.platform;
 
-import net.impactdev.impactor.api.logging.Log4jLogger;
-import org.apache.logging.log4j.LogManager;
-import org.bukkit.plugin.java.JavaPlugin;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.platform.ImpactorPlatform;
+import org.bukkit.Bukkit;
 
-public final class SpigotImpactorEntry extends JavaPlugin {
+import java.util.List;
 
-    private final SpigotImpactorBootstrap bootstrap = new SpigotImpactorBootstrap(new Log4jLogger(LogManager.getLogger("Impactor")));
-
-    @Override
-    public void onEnable() {
-        this.bootstrap.construct();
+public class SpigotPlatform extends ImpactorPlatform {
+    public SpigotPlatform() {
+        super(new SpigotPlatformInfo());
     }
 
     @Override
-    public void onDisable() {
-        this.bootstrap.shutdown();
+    public List<PlatformPlayer> onlinePlayers() {
+        return Bukkit.getServer().getOnlinePlayers()
+                .stream()
+                .map(player -> PlatformPlayer.getOrCreate(player.getUniqueId()))
+                .toList();
     }
 }
