@@ -1,0 +1,26 @@
+modLoader = "javafml"
+loaderVersion = "[36,)"
+license = "MIT"
+
+[[mods]]
+modId = "impactor"
+version = "${version}"
+displayName = "Impactor"
+description = '''
+
+'''
+
+[[dependencies.impactor]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.16.5]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.impactor]]
+modId = "forge"
+mandatory = true
+versionRange = "[36,)"
+ordering = "NONE"
+side = "BOTH"
+

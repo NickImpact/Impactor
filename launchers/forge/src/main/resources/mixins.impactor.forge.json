@@ -1,0 +1,21 @@
+{
+  "required": true,
+  "package": "net.impactdev.impactor.forge.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.8",
+  "mixins": [
+    "core.ServerboundClientInformationPacketAccessor",
+    "core.ServerPlayerMixin",
+    "core.MinecraftServerMixin",
+    "cloud.CommandSelectionAccessor_Cloud",
+    "cloud.CloudStringReaderMixin_Cloud",
+    "cloud.MessageArgumentMessageAccess_Cloud",
+    "cloud.MessageArgumentPartAccess_Cloud",
+    "cloud.EntitySelectorMixin_Cloud",
+    "cloud.EntitySelectorParser_Cloud"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "mixins.impactor.forge.refmap.json"
+}
