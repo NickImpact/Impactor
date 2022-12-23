@@ -32,19 +32,6 @@ tasks {
 
     shadowJar {
         dependencies {
-            include(project(":api:core"))
-            include(project(":api:config"))
-            include(project(":api:commands"))
-            include(project(":api:economy"))
-            include(project(":api:items"))
-            include(project(":api:plugins"))
-            include(project(":api:storage"))
-            include(project(":api:text"))
-            include(project(":api:ui"))
-            include(project(":impactor"))
-            include(project(":game"))
-
-            include(dependency("net.impactdev:json:.*"))
             include(dependency("net.kyori:.*:.*"))
             include(dependency("org.spongepowered:math:.*"))
             include(dependency("com.github.ben-manes.caffeine:caffeine:.*"))

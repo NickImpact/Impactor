@@ -23,20 +23,19 @@
  *
  */
 
-package net.impactdev.impactor.forge.platform;
+package net.impactdev.impactor.minecraft.platform.sources;
 
-import net.impactdev.impactor.minecraft.platform.GamePlatform;
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.impactdev.impactor.api.platform.sources.PlatformPlayer;
+import net.impactdev.impactor.api.platform.sources.PlatformPlayerService;
+import org.jetbrains.annotations.NotNull;
 
-public final class ForgePlatform extends GamePlatform {
+import java.util.UUID;
 
-    public ForgePlatform() {
-        super(new ForgePlatformInfo());
-    }
+public abstract class ImpactorPlatformPlayerService implements PlatformPlayerService {
 
     @Override
-    public MinecraftServer server() {
-        return ServerLifecycleHooks.getCurrentServer();
+    public PlatformPlayer getOrCreate(@NotNull UUID uuid) {
+        return PlatformPlayer.getOrCreate(uuid);
     }
+
 }

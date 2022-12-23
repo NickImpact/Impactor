@@ -17,4 +17,5 @@ dependencies {
     implementation("me.lucko:spark-api:0.1-SNAPSHOT")
     implementation("commons-io:commons-io:2.5")
     implementation("org.apache.commons:commons-lang3:3.5")
+    implementation("com.mojang:brigadier:1.0.18")
 }

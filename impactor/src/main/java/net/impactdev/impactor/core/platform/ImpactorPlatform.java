@@ -29,9 +29,7 @@ import com.google.common.base.Suppliers;
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.platform.PlatformInfo;
 import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
-import net.impactdev.impactor.api.platform.sources.PlatformPlayer;
 
-import java.util.UUID;
 import java.util.function.Supplier;
 
 public abstract class ImpactorPlatform implements Platform {
@@ -52,11 +50,6 @@ public abstract class ImpactorPlatform implements Platform {
     @Override
     public PerformanceMonitor performance() {
         return this.performance.get();
-    }
-
-    @Override
-    public PlatformPlayer player(UUID target) {
-        return PlatformPlayer.getOrCreate(target);
     }
 
 }

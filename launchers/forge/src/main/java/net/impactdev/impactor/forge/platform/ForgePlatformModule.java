@@ -28,12 +28,16 @@ package net.impactdev.impactor.forge.platform;
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
 import net.impactdev.impactor.api.platform.sources.PlatformPlayer;
+import net.impactdev.impactor.api.platform.sources.PlatformPlayerService;
+import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.platform.sources.metadata.MetadataKey;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.platform.sources.metadata.MetadataKeyFactory;
 import net.impactdev.impactor.forge.platform.performance.ForgePerformanceMonitorFactory;
+import net.impactdev.impactor.forge.platform.sources.ForgePlatformFactory;
+import net.impactdev.impactor.forge.platform.sources.ForgePlatformPlayerService;
 import net.impactdev.impactor.forge.platform.sources.ForgePlatformSource;
 
 @SuppressWarnings("unused")
@@ -41,14 +45,18 @@ public class ForgePlatformModule implements ImpactorModule {
 
     @Override
     public void factories(FactoryProvider provider) {
-        provider.register(PlatformPlayer.Factory.class, new ForgePlatformSource.ForgePlatformSourceFactory());
         provider.register(PerformanceMonitor.Factory.class, new ForgePerformanceMonitorFactory());
         provider.register(MetadataKey.Factory.class, new MetadataKeyFactory());
+
+        ForgePlatformFactory sources = new ForgePlatformFactory();
+        provider.register(PlatformSource.Factory.class, sources);
+        provider.register(PlatformPlayer.Factory.class, sources);
     }
 
     @Override
     public void services(ServiceProvider provider) {
         provider.register(Platform.class, new ForgePlatform());
+        provider.register(PlatformPlayerService.class, new ForgePlatformPlayerService());
     }
 
 }

@@ -10,5 +10,6 @@ minecraft {
 dependencies {
     api(project(":impactor"))
     api(project(":api:items"))
+    api(project(":api:players"))
     api(project(":api:ui"))
 }

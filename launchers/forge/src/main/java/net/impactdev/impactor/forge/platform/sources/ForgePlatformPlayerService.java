@@ -23,20 +23,23 @@
  *
  */
 
-package net.impactdev.impactor.forge.platform;
+package net.impactdev.impactor.forge.platform.sources;
 
-import net.impactdev.impactor.minecraft.platform.GamePlatform;
-import net.minecraft.server.MinecraftServer;
+import com.google.common.collect.ImmutableSet;
+import net.impactdev.impactor.api.platform.sources.PlatformPlayer;
+import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayerService;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
-public final class ForgePlatform extends GamePlatform {
+import java.util.Set;
+import java.util.stream.Collectors;
 
-    public ForgePlatform() {
-        super(new ForgePlatformInfo());
-    }
-
+public final class ForgePlatformPlayerService extends ImpactorPlatformPlayerService {
     @Override
-    public MinecraftServer server() {
-        return ServerLifecycleHooks.getCurrentServer();
+    public Set<PlatformPlayer> online() {
+        return ImmutableSet.copyOf(ServerLifecycleHooks.getCurrentServer().getPlayerList()
+                .getPlayers()
+                .stream()
+                .map(player -> this.getOrCreate(player.getUUID()))
+                .collect(Collectors.toSet()));
     }
 }

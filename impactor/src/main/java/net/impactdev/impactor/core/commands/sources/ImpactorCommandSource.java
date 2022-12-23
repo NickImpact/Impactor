@@ -26,7 +26,6 @@
 package net.impactdev.impactor.core.commands.sources;
 
 import net.impactdev.impactor.api.commands.CommandSource;
-import net.impactdev.impactor.api.platform.sources.PlatformPlayer;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
@@ -60,15 +59,6 @@ public final class ImpactorCommandSource implements CommandSource {
     @Override
     public PlatformSource source() {
         return this.source;
-    }
-
-    @Override
-    public PlatformPlayer player() {
-        if(this.source instanceof PlatformPlayer) {
-            return (PlatformPlayer) this.source;
-        }
-
-        throw new IllegalStateException("Source is not a player");
     }
 
     @Override

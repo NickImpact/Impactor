@@ -25,31 +25,14 @@
 
 package net.impactdev.impactor.forge.platform.sources;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import net.impactdev.impactor.api.platform.sources.PlatformPlayer;
-import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.platform.sources.SourceType;
-import net.impactdev.impactor.api.platform.sources.metadata.MetadataKeys;
 import net.impactdev.impactor.core.platform.sources.ImpactorPlatformSource;
-import net.impactdev.impactor.minecraft.platform.metadata.GameMetadataKeys;
 import net.impactdev.impactor.minecraft.text.AdventureTranslator;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.PlayerList;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.math.vector.Vector2d;
-import org.spongepowered.math.vector.Vector3d;
 
 import java.util.UUID;
 
@@ -62,72 +45,5 @@ public final class ForgePlatformSource extends ImpactorPlatformSource {
     @Override
     public void sendMessage(@NotNull Identity source, @NotNull Component message, @NotNull MessageType type) {
         ServerLifecycleHooks.getCurrentServer().sendMessage(AdventureTranslator.toNative(message), source.uuid());
-    }
-
-    public static final class ForgePlatformSourceFactory implements Factory {
-
-        private final Cache<UUID, PlatformSource> cache = Caffeine.newBuilder().build();
-
-        @Override
-        public PlatformSource console() {
-            return this.cache.get(
-                    PlatformSource.CONSOLE_UUID,
-                    uuid -> new ForgePlatformSource(PlatformSource.CONSOLE_UUID, SourceType.CONSOLE)
-            );
-        }
-
-        @Override
-        public PlatformSource entity(UUID uuid) {
-            return this.cache.get(uuid, id -> {
-                PlayerList players = ServerLifecycleHooks.getCurrentServer().getPlayerList();
-                ServerPlayer player = players.getPlayer(id);
-                if(player != null) {
-                    PlatformPlayer source = new ForgePlatformPlayer(id);
-
-                    this.cache.put(id, source);
-                    return source;
-                }
-
-                for(ServerLevel level : ServerLifecycleHooks.getCurrentServer().getAllLevels()) {
-                    Entity entity = level.getEntity(id);
-                    if(entity != null) {
-                        PlatformSource source = new ForgePlatformSource(id, SourceType.ENTITY);
-                        source.offer(MetadataKeys.WORLD, () -> {
-                            ResourceKey<Level> key = level.dimension();
-                            return Key.key(key.location().getNamespace(), key.location().getPath());
-                        });
-                        source.offer(GameMetadataKeys.ENTITY, () -> entity);
-                        source.offer(MetadataKeys.POSITION, () -> {
-                            Vec3 vec3 = entity.position();
-                            return new Vector3d(vec3.x, vec3.y, vec3.z);
-                        });
-                        source.offer(MetadataKeys.ROTATION, () -> {
-                            Vec2 vec2 = entity.getRotationVector();
-                            return new Vector2d(vec2.x, vec2.y);
-                        });
-
-                        this.cache.put(id, source);
-                        return source;
-                    }
-                }
-
-                throw new IllegalArgumentException("Could not locate a valid entity with this ID");
-            });
-        }
-
-        @Override
-        public PlatformPlayer player(UUID uuid) {
-            return (PlatformPlayer) this.cache.get(uuid, ForgePlatformPlayer::new);
-        }
-
-        @Override
-        public void invalidate(UUID uuid) {
-            this.cache.invalidate(uuid);
-        }
-
-        @Override
-        public void invalidateAll() {
-            this.cache.invalidateAll();
-        }
     }
 }
