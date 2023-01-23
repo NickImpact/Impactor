@@ -26,7 +26,7 @@
 package net.impactdev.impactor.core.economy.registration;
 
 import net.impactdev.impactor.api.economy.EconomyService;
-import net.impactdev.impactor.api.platform.PluginMetadata;
+import net.impactdev.impactor.api.platform.plugins.PluginMetadata;
 import net.impactdev.impactor.core.economy.ImpactorEconomyService;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 

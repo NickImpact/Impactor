@@ -50,7 +50,7 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
     }
 
     @Override
-    public void construct() throws Exception {
+    public void construct() {
         super.construct();
     }
 }

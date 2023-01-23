@@ -33,7 +33,7 @@ import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.forge.ui.gooey.GooeyIcon;
 import net.impactdev.impactor.forge.ui.gooey.GooeyPageOpenCloser;
 import net.impactdev.impactor.minecraft.text.AdventureTranslator;
-import net.impactdev.impactor.minecraft.ui.containers.views.ImpactorChestView;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.ImpactorChestView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -64,11 +64,13 @@ public final class ForgeChestView extends ImpactorChestView implements GooeyPage
 
     @Override
     public void open(PlatformPlayer viewer) {
+        super.open(viewer);
         this.openPage(this.delegate, viewer);
     }
 
     @Override
     public void close(PlatformPlayer viewer) {
+        super.close(viewer);
         this.closePage(viewer);
     }
 

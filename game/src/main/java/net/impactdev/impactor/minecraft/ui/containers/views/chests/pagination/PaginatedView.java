@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.ui.containers.views.pagination;
+package net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination;
 
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRuleset;

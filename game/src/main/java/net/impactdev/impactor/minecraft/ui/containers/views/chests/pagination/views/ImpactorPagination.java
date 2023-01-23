@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.ui.containers.views.pagination.views;
+package net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.views;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
@@ -37,10 +37,10 @@ import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRu
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.utility.collections.lists.CircularLinkedList;
 import net.impactdev.impactor.minecraft.ui.containers.views.builders.ImpactorBaseViewBuilder;
-import net.impactdev.impactor.minecraft.ui.containers.views.layers.ImpactorView;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.ImpactorContextRuleset;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.PaginatedView;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.layers.PageManager;
+import net.impactdev.impactor.minecraft.ui.containers.views.ImpactorView;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.ImpactorContextRuleset;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.PaginatedView;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.layers.PageManager;
 import net.kyori.adventure.util.TriState;
 import org.checkerframework.common.value.qual.IntRange;
 import org.jetbrains.annotations.Nullable;

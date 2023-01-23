@@ -23,14 +23,14 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.ui.containers.views;
+package net.impactdev.impactor.minecraft.ui.containers.views.chests;
 
 import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.api.utility.Context;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
+import net.impactdev.impactor.minecraft.ui.containers.views.ImpactorView;
 import net.impactdev.impactor.minecraft.ui.containers.views.builders.ImpactorBaseViewBuilder;
-import net.impactdev.impactor.minecraft.ui.containers.views.layers.ImpactorView;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.checkerframework.common.value.qual.IntRange;
 import org.spongepowered.math.vector.Vector2i;

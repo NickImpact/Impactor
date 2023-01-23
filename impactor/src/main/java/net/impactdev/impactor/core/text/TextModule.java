@@ -25,12 +25,16 @@
 
 package net.impactdev.impactor.core.text;
 
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.api.text.placeholders.PlaceholderService;
 import net.impactdev.impactor.core.modules.ImpactorModule;
+import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.text.placeholders.ImpactorPlaceholderService;
+import net.impactdev.impactor.core.text.placeholders.ImpactorRegisterPlaceholdersEvent;
 
 public final class TextModule implements ImpactorModule {
     @Override
@@ -41,5 +45,14 @@ public final class TextModule implements ImpactorModule {
     @Override
     public void services(ServiceProvider provider) {
         provider.register(PlaceholderService.class, new ImpactorPlaceholderService());
+    }
+
+    @Override
+    public void init(Impactor impactor, PluginLogger logger) throws Exception {
+        Impactor api = Impactor.instance();
+        PlaceholderService service = api.services().provide(PlaceholderService.class);
+
+        BaseImpactorPlugin.instance().logger().info("Firing placeholder registration event");
+        api.events().post(new ImpactorRegisterPlaceholdersEvent(service));
     }
 }

@@ -1,5 +1,6 @@
 plugins {
     id("impactor.loom-conventions")
+    id("impactor.publishing-conventions")
 }
 
 architectury {
@@ -36,12 +37,15 @@ tasks {
             include(dependency("org.spongepowered:math:.*"))
             include(dependency("com.github.ben-manes.caffeine:caffeine:.*"))
             include(dependency("io.leangen.geantyref:geantyref:.*"))
+            include(dependency("io.github.classgraph:classgraph:.*"))
 
             include(dependency("com.typesafe:config:.*"))
             include(dependency("org.spongepowered:configurate-core:.*"))
             include(dependency("org.spongepowered:configurate-gson:.*"))
             include(dependency("org.spongepowered:configurate-yml:.*"))
             include(dependency("org.spongepowered:configurate-hocon:.*"))
+
+            include(dependency("org.spongepowered:math:.*"))
 
             include(dependency("com.zaxxer:HikariCP:.*"))
             include(dependency("com.h2database:h2:.*"))
@@ -64,6 +68,7 @@ tasks {
         relocate ("ca.landonjw.gooeylibs2", "net.impactdev.impactor.relocations.gooeylibs")
         relocate ("org.spongepowered.math", "net.impactdev.impactor.relocations.spongepowered.math")
         relocate ("io.leangen.geantyref", "net.impactdev.impactor.relocations.geantyref")
+        relocate ("io.github.classgraph", "net.impactdev.impactor.relocations.classgraph")
         relocate ("net.kyori", "net.impactdev.impactor.relocations.kyori")
         relocate ("com.github.benmanes.caffeine", "net.impactdev.impactor.relocations.caffeine")
         relocate ("org.spongepowered.configurate", "net.impactdev.impactor.relocations.configurate")

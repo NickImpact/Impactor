@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.ui.containers.views.pagination.views.sectioned;
+package net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.views.sectioned;
 
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.views.pagination.Page;
@@ -31,9 +31,9 @@ import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRu
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.sections.Section;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.utility.collections.lists.CircularLinkedList;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.PaginatedView;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.layers.PageManager;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.views.sectioned.builders.ImpactorSectionBuilder;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.PaginatedView;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.layers.PageManager;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.views.sectioned.builders.ImpactorSectionBuilder;
 import org.spongepowered.math.vector.Vector2i;
 
 import java.util.List;

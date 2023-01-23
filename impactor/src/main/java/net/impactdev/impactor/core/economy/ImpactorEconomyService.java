@@ -26,6 +26,7 @@
 package net.impactdev.impactor.core.economy;
 
 import net.impactdev.impactor.api.configuration.Config;
+import net.impactdev.impactor.core.configuration.ImpactorConfig;
 import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.accounts.AccountAccessor;
@@ -49,9 +50,8 @@ public final class ImpactorEconomyService implements EconomyService {
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     public ImpactorEconomyService() {
         Config config = Config.builder()
-                .path(BaseImpactorPlugin.instance().configDirectory().get().resolve("economy.conf"))
-                .providers(EconomyConfig.class)
-                .supply(true)
+                .path(BaseImpactorPlugin.instance().configurationDirectory().resolve("economy.conf"))
+                .provider(EconomyConfig.class)
                 .build();
 
         List<Currency> currencies = config.get(EconomyConfig.CURRENCIES);

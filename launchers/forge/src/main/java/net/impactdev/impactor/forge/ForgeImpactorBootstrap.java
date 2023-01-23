@@ -28,13 +28,18 @@ package net.impactdev.impactor.forge;
 import ca.landonjw.gooeylibs2.bootstrap.GooeyBootstrapper;
 import ca.landonjw.gooeylibs2.forge.ForgeBootstrapper;
 import net.impactdev.impactor.api.logging.Log4jLogger;
-import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
+import net.impactdev.impactor.forge.commands.ForgeCommandManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
@@ -45,7 +50,8 @@ public class ForgeImpactorBootstrap extends ImpactorBootstrapper {
     public ForgeImpactorBootstrap() {
         super(new Log4jLogger(LogManager.getLogger("Impactor")));
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onConstruct);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(EventPriority.HIGHEST, this::onConstruct);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(EventPriority.HIGHEST, this::onCommonSetup);
         MinecraftForge.EVENT_BUS.addListener(this::onServerShutdown);
         MinecraftForge.EVENT_BUS.register(new RegistryEvents());
 
@@ -54,12 +60,16 @@ public class ForgeImpactorBootstrap extends ImpactorBootstrapper {
     }
 
     @Override
-    protected ImpactorPlugin createPlugin() {
+    protected BaseImpactorPlugin createPlugin() {
         return new ForgeImpactorPlugin(this);
     }
 
     public void onConstruct(FMLConstructModEvent event) {
         this.construct();
+    }
+
+    private void onCommonSetup(FMLCommonSetupEvent event) {
+        this.setup();
     }
 
     public void onServerShutdown(FMLServerStoppingEvent event) {
@@ -71,7 +81,7 @@ public class ForgeImpactorBootstrap extends ImpactorBootstrapper {
 
         @SubscribeEvent
         public void onCommandRegistration(final RegisterCommandsEvent event) {
-//            ForgeCommandManager.activate(event);
+            ForgeCommandManager.activate(event);
         }
 
     }

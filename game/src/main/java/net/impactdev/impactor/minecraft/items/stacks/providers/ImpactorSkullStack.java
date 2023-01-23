@@ -71,7 +71,7 @@ public final class ImpactorSkullStack extends AbstractedItemStack implements Sku
 
     @Override
     public CompoundBinaryTag nbt() {
-        CompoundBinaryTag nbt =  super.nbt();
+        CompoundBinaryTag nbt = super.nbt();
         if(this.playerMetadata().isPresent()) {
             if (this.metadata.username().isPresent()) {
                 if (!this.metadata.texture().isPresent()) {
@@ -87,8 +87,8 @@ public final class ImpactorSkullStack extends AbstractedItemStack implements Sku
             } else {
                 if (this.metadata.texture().isPresent()) {
                     CompoundBinaryTag owner = CompoundBinaryTag.empty();
-                    owner.putIntArray("Id", NbtUtils.createUUID(UUID.randomUUID()).getAsIntArray());
-                    this.properties(owner);
+                    owner = owner.putIntArray("Id", NbtUtils.createUUID(UUID.randomUUID()).getAsIntArray());
+                    owner = this.properties(owner);
 
                     nbt = nbt.put("SkullOwner", owner);
                 }
@@ -98,16 +98,16 @@ public final class ImpactorSkullStack extends AbstractedItemStack implements Sku
         return nbt;
     }
 
-    private void properties(CompoundBinaryTag nbt) {
+    private CompoundBinaryTag properties(CompoundBinaryTag nbt) {
         CompoundBinaryTag properties = CompoundBinaryTag.empty();
         ListBinaryTag textures = ListBinaryTag.empty();
 
         CompoundBinaryTag value = CompoundBinaryTag.empty();
-        value.putString("Value", this.metadata.texture().orElseThrow(() -> new IllegalStateException("No available texture")));
-        textures.add(value);
-        properties.put("textures", textures);
+        value = value.putString("Value", this.metadata.texture().orElseThrow(() -> new IllegalStateException("No available texture")));
+        textures = textures.add(value);
+        properties = properties.put("textures", textures);
 
-        nbt.put("Properties", properties);
+        return nbt.put("Properties", properties);
     }
 
     public static class ImpactorPlayerHeadMetadata implements PlayerHeadMetadata {

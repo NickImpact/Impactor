@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.ui.containers.views.pagination.views.sectioned.builders;
+package net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.views.sectioned.builders;
 
 import com.google.common.collect.Sets;
 import net.impactdev.impactor.api.ui.containers.Icon;
@@ -31,7 +31,7 @@ import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRu
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.builders.SectionBuilder;
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.builders.SectionedPaginationBuilder;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.views.sectioned.ImpactorSection;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.views.sectioned.ImpactorSection;
 import net.kyori.adventure.util.TriState;
 import org.spongepowered.math.vector.Vector2i;
 

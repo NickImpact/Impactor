@@ -26,6 +26,7 @@
 package net.impactdev.impactor.core.commands.sources;
 
 import net.impactdev.impactor.api.commands.CommandSource;
+import net.impactdev.impactor.api.platform.sources.PlatformPlayer;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
@@ -38,7 +39,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public final class ImpactorCommandSource implements CommandSource {
+public abstract class ImpactorCommandSource implements CommandSource {
 
     private final PlatformSource source;
 
@@ -62,18 +63,20 @@ public final class ImpactorCommandSource implements CommandSource {
     }
 
     @Override
-    public SourceMetadata metadata() {
-        return new SourceMetadata() {
-            @Override
-            public boolean acceptsSuccess() {
-                return true;
-            }
+    public PlatformPlayer player() {
+        if(this.source instanceof PlatformPlayer) {
+            return (PlatformPlayer) this.source;
+        }
 
-            @Override
-            public boolean acceptsFailure() {
-                return true;
-            }
-        };
+        throw new IllegalStateException("Source is not a player");
+    }
+
+    protected boolean isConsole() {
+        return this.uuid().equals(PlatformSource.CONSOLE_UUID);
+    }
+
+    protected boolean isPlayer() {
+        return this.source instanceof PlatformPlayer || this.uuid().equals(PlatformSource.CONSOLE_UUID);
     }
 
     @Override

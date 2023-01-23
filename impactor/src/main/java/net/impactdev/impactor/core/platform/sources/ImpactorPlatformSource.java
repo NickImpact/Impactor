@@ -80,6 +80,11 @@ public abstract class ImpactorPlatformSource implements PlatformSource {
 
     @Override
     public <T> void offer(MetadataKey<T> key, Supplier<T> instance) {
+        if(instance == null) {
+            this.metadata.remove(key);
+            return;
+        }
+
         this.metadata.put(key, instance);
     }
 

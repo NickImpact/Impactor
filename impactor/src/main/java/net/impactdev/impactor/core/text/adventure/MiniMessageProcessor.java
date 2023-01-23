@@ -25,71 +25,20 @@
 
 package net.impactdev.impactor.core.text.adventure;
 
-import com.google.common.base.Suppliers;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.text.TextProcessor;
-import net.impactdev.impactor.api.text.placeholders.ComponentModifiers;
-import net.impactdev.impactor.api.text.placeholders.PlaceholderParser;
-import net.impactdev.impactor.api.text.placeholders.PlaceholderService;
-import net.impactdev.impactor.api.utility.Context;
-import net.impactdev.impactor.api.utility.collections.mappings.PairStream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+public final class MiniMessageProcessor extends ImpactorTextProcessor {
 
-public final class MiniMessageProcessor implements TextProcessor {
-
-    private final Supplier<PlaceholderService> service = Suppliers.memoize(() -> Impactor.instance().services().provide(PlaceholderService.class));
     private final MiniMessage mini = MiniMessage.miniMessage();
-    private final Pattern TAG = Pattern.compile("<(?<tag>\\w+(-[-_\\w:]+)?)>");
 
     @Override
-    public @NotNull Component parse(String raw, Context context) {
-        Map<String, PlaceholderParser> parsers = this.service.get().parsers().entrySet().stream()
-                .map(entry -> Maps.immutableEntry(entry.getKey().asString().replace(":", "-"), entry.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        List<TagResolver> placeholders = this.locate(raw, context, parsers);
-        return mini.deserialize(raw, placeholders.toArray(new TagResolver[0]));
+    protected String serialize(Component component) {
+        return this.mini.serialize(component);
     }
 
-    private List<TagResolver> locate(String raw, Context context, Map<String, PlaceholderParser> parsers) {
-        // TODO - With Java 9+ implementation, switch to Matcher#results()
-        List<MatchResult> matches = Lists.newArrayList();
-        Matcher matcher = this.TAG.matcher(raw);
-        while(matcher.find()) {
-            matches.add(matcher.toMatchResult());
-        }
-
-        return PairStream.from(parsers)
-                .filter((key, parser) -> matches.stream()
-                        .map(mr -> {
-                            String match = mr.group(1);
-                            return match.substring(0, match.contains(":") ? match.indexOf(":") : match.length());
-                        })
-                        .anyMatch(s -> s.equals(key))
-                )
-                .map((key, parser) -> TagResolver.resolver(key, (args, ctx) -> {
-                    Component result = parser.parse(context);
-                    while(args.hasNext()) {
-                        result = ComponentModifiers.transform(args.pop().value().charAt(0), result);
-                    }
-
-                    return Tag.selfClosingInserting(result);
-                }))
-                .collect(Collectors.toList());
+    @Override
+    protected Component deserialize(String raw) {
+        return this.mini.deserialize(raw);
     }
-
 }

@@ -30,17 +30,19 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.metadata.EconomyMetadataKeys;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.extensions.BookStack;
-import net.impactdev.impactor.api.items.platform.ItemCarrier;
 import net.impactdev.impactor.api.items.platform.ItemTransaction;
 import net.impactdev.impactor.api.platform.sources.PlatformPlayer;
 import net.impactdev.impactor.api.platform.sources.SourceType;
 import net.impactdev.impactor.api.platform.sources.metadata.MetadataKeys;
+import net.impactdev.impactor.api.ui.containers.View;
+import net.impactdev.impactor.api.ui.metadata.UIMetadataKeys;
 import net.impactdev.impactor.core.economy.accounts.ImpactorAccountAccessor;
 import net.impactdev.impactor.core.platform.sources.ImpactorPlatformSource;
 import net.impactdev.impactor.minecraft.items.stacks.ItemStackTranslator;
 import net.impactdev.impactor.minecraft.items.transactions.ImpactorItemTransaction;
 import net.impactdev.impactor.minecraft.platform.GamePlatform;
 import net.impactdev.impactor.minecraft.text.AdventureTranslator;
+import net.impactdev.impactor.minecraft.ui.containers.views.ImpactorView;
 import net.impactdev.impactor.minecraft.utility.ResourceKeyTranslator;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
@@ -79,7 +81,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource implements PlatformPlayer, ItemCarrier {
+public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource implements PlatformPlayer {
 
     public ImpactorPlatformPlayer(UUID uuid) {
         super(uuid, SourceType.PLAYER);
@@ -129,8 +131,7 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
                 .map(player -> {
                     ItemStack minecraft = ItemStackTranslator.translate(stack);
 
-                    boolean result = player.inventory.add(minecraft);
-                    player.inventoryMenu.broadcastChanges();
+                    boolean result = player.addItem(minecraft);
                     return new ImpactorItemTransaction(
                             stack,
                             minecraft.getCount(),
@@ -142,8 +143,8 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
     }
 
     @Override
-    public boolean take(ImpactorItemStack stack) {
-        return false;
+    public ItemTransaction take(ImpactorItemStack stack) {
+        return null;
     }
 
     @Override

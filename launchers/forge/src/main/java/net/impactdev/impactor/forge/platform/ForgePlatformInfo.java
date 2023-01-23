@@ -28,7 +28,7 @@ package net.impactdev.impactor.forge.platform;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.platform.PlatformComponent;
 import net.impactdev.impactor.api.platform.PlatformType;
-import net.impactdev.impactor.api.platform.PluginMetadata;
+import net.impactdev.impactor.api.platform.plugins.PluginMetadata;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.platform.ImpactorPlatformInfo;
 import net.impactdev.impactor.forge.platform.components.ForgeComponent;

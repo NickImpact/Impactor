@@ -134,9 +134,8 @@ public abstract class ImpactorCommandManager<S> {
 
                 printer.log(BaseImpactorPlugin.instance().logger(), PrettyPrinter.Level.ERROR);
 
-                if (source.metadata().acceptsFailure()) {
-                    Component detail = Component.text(
-                            "An internal error occurred while attempting to perform this command.");
+                if (source.communicates(CommandSource.Communicator.FAILURE)) {
+                    Component detail = Component.text("An internal error occurred while attempting to perform this command.");
                     Style style = detail.style();
 
                     final StringWriter writer = new StringWriter();

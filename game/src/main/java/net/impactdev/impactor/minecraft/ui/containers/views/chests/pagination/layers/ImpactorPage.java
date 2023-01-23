@@ -23,16 +23,17 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.ui.containers.views.pagination.layers;
+package net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.layers;
 
 import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.views.pagination.Page;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdater;
 import net.impactdev.impactor.api.ui.containers.views.pagination.updaters.PageUpdaterType;
 import net.impactdev.impactor.api.utility.builders.Builder;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.PaginatedView;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.PaginatedView;
 import net.kyori.adventure.util.TriState;
 import org.spongepowered.math.vector.Vector2i;
 
@@ -102,7 +103,10 @@ public class ImpactorPage implements Page {
         }
 
         for(; slot < builder.zone.x() * builder.zone.y(); slot++) {
-            results.put(this.calculateTargetSlot(slot, builder.zone, builder.offsets), null);
+            results.put(
+                    this.calculateTargetSlot(slot, builder.zone, builder.offsets),
+                    Icon.builder().display(ImpactorItemStack::empty).build()
+            );
         }
 
         return results;

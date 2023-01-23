@@ -27,13 +27,15 @@ package net.impactdev.impactor.forge.ui.containers;
 
 import ca.landonjw.gooeylibs2.api.page.GooeyPage;
 import ca.landonjw.gooeylibs2.api.template.types.ChestTemplate;
+import net.impactdev.impactor.api.platform.sources.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.SectionedPagination;
+import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.forge.ui.gooey.GooeyIcon;
 import net.impactdev.impactor.forge.ui.gooey.GooeyPageOpenCloser;
 import net.impactdev.impactor.minecraft.text.AdventureTranslator;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.views.sectioned.ImpactorSectionedPagination;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.views.sectioned.ImpactorSectionedPagination;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -69,12 +71,14 @@ public class ForgeSectionedPaginationView extends ImpactorSectionedPagination im
     }
 
     @Override
-    public void open() {
+    public void open(PlatformPlayer viewer) {
+        super.open(viewer);
         this.openPage(this.delegate, this.viewer);
     }
 
     @Override
-    public void close() {
+    public void close(PlatformPlayer viewer) {
+        super.close(viewer);
         this.closePage(this.viewer);
     }
 

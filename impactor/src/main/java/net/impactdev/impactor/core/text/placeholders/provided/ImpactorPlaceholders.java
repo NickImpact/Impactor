@@ -44,14 +44,14 @@ public final class ImpactorPlaceholders {
 
     public static final ImpactorPlaceholder NAME = new ImpactorPlaceholder(
             impactor("name"),
-            ctx -> ctx.request(PlatformSource.class)
+            (viewer, ctx) -> ctx.request(PlatformSource.class)
                     .map(PlatformSource::name)
                     .orElse(empty())
     );
 
     public static final ImpactorPlaceholder UUID = new ImpactorPlaceholder(
             impactor("uuid"),
-            ctx -> ctx.request(PlatformSource.class)
+            (viewer, ctx) -> ctx.request(PlatformSource.class)
                     .map(PlatformSource::uuid)
                     .map(id -> text(id.toString()))
                     .orElse(empty())
@@ -59,24 +59,24 @@ public final class ImpactorPlaceholders {
 
     public static final ImpactorPlaceholder TPS = new ImpactorPlaceholder(
             impactor("tps"),
-            ctx -> text(TWO_DECIMALS.format(Impactor.instance().platform().performance().ticksPerSecond()))
+            (viewer, ctx) -> text(TWO_DECIMALS.format(Impactor.instance().platform().performance().ticksPerSecond()))
     );
     public static final ImpactorPlaceholder MSPT = new ImpactorPlaceholder(
             impactor("mspt"),
-            ctx -> text(THREE_DECIMALS.format(Impactor.instance().platform().performance().averageTickDuration()))
+            (viewer, ctx) -> text(THREE_DECIMALS.format(Impactor.instance().platform().performance().averageTickDuration()))
     );
 
     public static final ImpactorPlaceholder MEMORY_USAGE = new ImpactorPlaceholder(
             impactor("memory_used"),
-            ctx -> text(Impactor.instance().platform().performance().memory().current())
+            (viewer, ctx) -> text(Impactor.instance().platform().performance().memory().current())
     );
     public static final ImpactorPlaceholder MEMORY_ALLOCATED = new ImpactorPlaceholder(
             impactor("memory_allocated"),
-            ctx -> text(Impactor.instance().platform().performance().memory().allocated())
+            (viewer, ctx) -> text(Impactor.instance().platform().performance().memory().allocated())
     );
     public static final ImpactorPlaceholder MEMORY_TOTAL = new ImpactorPlaceholder(
             impactor("memory_total"),
-            ctx -> text(Impactor.instance().platform().performance().memory().max())
+            (viewer, ctx) -> text(Impactor.instance().platform().performance().memory().max())
     );
 
     private static Key impactor(@Subst("dummy") @Pattern("[a-z0-9_\\-./]+") String key) {

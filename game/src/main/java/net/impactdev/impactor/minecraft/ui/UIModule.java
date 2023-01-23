@@ -27,15 +27,14 @@ package net.impactdev.impactor.minecraft.ui;
 
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.pagination.rules.ContextRuleset;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.minecraft.ui.containers.ImpactorIcon;
 import net.impactdev.impactor.minecraft.ui.containers.layouts.ImpactorChestLayout;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.ImpactorContextRuleset;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.layers.ImpactorPage;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.ImpactorContextRuleset;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.layers.ImpactorPage;
 
 @SuppressWarnings("unused")
 public class UIModule implements ImpactorModule {
@@ -52,11 +51,6 @@ public class UIModule implements ImpactorModule {
 
         // Layouts
         provider.register(ChestLayout.ChestLayoutBuilder.class, ImpactorChestLayout.ImpactorChestLayoutBuilder::new);
-    }
-
-    @Override
-    public void services(ServiceProvider provider) {
-
     }
 
 }

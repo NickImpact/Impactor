@@ -26,42 +26,40 @@
 package net.impactdev.impactor.core.economy;
 
 import com.google.common.collect.Lists;
-import net.impactdev.impactor.api.configuration.ConfigKey;
-import net.impactdev.impactor.api.configuration.ConfigPath;
-import net.impactdev.impactor.api.configuration.loader.KeyProvider;
+import net.impactdev.impactor.api.configuration.key.ConfigKey;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.storage.StorageType;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.StringJoiner;
 
-import static net.impactdev.impactor.api.configuration.ConfigKeyTypes.booleanKey;
-import static net.impactdev.impactor.api.configuration.ConfigKeyTypes.customKey;
-import static net.impactdev.impactor.api.configuration.ConfigPath.path;
+import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.booleanKey;
+import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.key;
 import static net.kyori.adventure.text.Component.text;
 
-@KeyProvider
 public final class EconomyConfig {
 
-    public static final ConfigKey<Boolean> DEBUG = booleanKey(path("debug"), false);
+    public static final ConfigKey<Boolean> DEBUG = booleanKey("debug", false);
 
-    public static final ConfigKey<StorageType> STORAGE_TYPE = customKey(adapter ->
-            StorageType.parse(adapter.getString(path("storage-method"), "json"))
+    public static final ConfigKey<StorageType> STORAGE_TYPE = key(adapter ->
+            StorageType.parse(adapter.getString("storage-method", "json"))
     );
-    public static final ConfigKey<List<Currency>> CURRENCIES = customKey(adapter -> {
+    public static final ConfigKey<List<Currency>> CURRENCIES = key(adapter -> {
         List<Currency> results = Lists.newArrayList();
-        ConfigPath path = path("currencies");
-        for(String option : adapter.getKeys(path, Lists.newArrayList("dollars"))) {
-            ConfigPath config = path.resolve(option);
+        for(String option : adapter.getKeys("currencies", Lists.newArrayList("dollars"))) {
+            StringJoiner joiner = new StringJoiner(".")
+                    .add("currencies")
+                    .add(option);
 
             results.add(Currency.builder()
                     .key(option)
-                    .primary(adapter.getBoolean(config.resolve("primary"), true))
-                    .name(text(adapter.getString(config.resolve("name"), "Dollar")))
-                    .plural(text(adapter.getString(config.resolve("plural"), "Dollars")))
-                    .symbol(text(adapter.getString(config.resolve("symbol"), "$")))
-                    .decimals(adapter.getInteger(config.resolve("decimals"), 2))
-                    .starting(BigDecimal.valueOf(adapter.getDouble(config.resolve("starting"), 500)))
+                    .primary(adapter.getBoolean(joiner.add("primary").toString(), true))
+                    .name(text(adapter.getString(joiner.add("name").toString(), "Dollar")))
+                    .plural(text(adapter.getString(joiner.add("plural").toString(), "Dollars")))
+                    .symbol(text(adapter.getString(joiner.add("symbol").toString(), "$")))
+                    .decimals(adapter.getInteger(joiner.add("decimals").toString(), 2))
+                    .starting(BigDecimal.valueOf(adapter.getDouble(joiner.add("starting").toString(), 500)))
                     .build()
             );
         }

@@ -23,11 +23,14 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.ui.containers.views.layers;
+package net.impactdev.impactor.minecraft.ui.containers.views;
 
+import com.google.common.base.Suppliers;
+import net.impactdev.impactor.api.platform.sources.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.View;
 import net.impactdev.impactor.api.ui.containers.processors.ClickProcessor;
 import net.impactdev.impactor.api.ui.containers.processors.CloseProcessor;
+import net.impactdev.impactor.api.ui.metadata.UIMetadataKeys;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 
@@ -72,4 +75,15 @@ public abstract class ImpactorView implements View {
     public CloseProcessor closeProcessor() {
         return this.close;
     }
+
+    @Override
+    public void open(PlatformPlayer viewer) {
+        viewer.offer(UIMetadataKeys.OPENED_VIEW, Suppliers.memoize(() -> this));
+    }
+
+    @Override
+    public void close(PlatformPlayer viewer) {
+        viewer.offer(UIMetadataKeys.OPENED_VIEW, null);
+    }
+
 }

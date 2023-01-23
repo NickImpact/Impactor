@@ -23,12 +23,12 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.ui.containers.views.pagination.layers;
+package net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.layers;
 
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.views.pagination.Page;
 import net.impactdev.impactor.api.utility.collections.lists.CircularLinkedList;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.PaginatedView;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.PaginatedView;
 
 import java.util.Collections;
 import java.util.List;
@@ -85,7 +85,7 @@ public class PageManager {
         if(results.empty()) {
             ImpactorPage page = ImpactorPage.builder()
                     .parent(this.parent)
-                    .contents(Collections.EMPTY_LIST)
+                    .contents(Collections.emptyList())
                     .index(1)
                     .updaters(this.parent.updaters())
                     .pages(pages)

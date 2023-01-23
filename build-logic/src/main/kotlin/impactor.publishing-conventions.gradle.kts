@@ -1,5 +1,12 @@
 plugins {
+    java
+    `java-library`
     id("maven-publish")
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
 
 publishing {
@@ -14,10 +21,12 @@ publishing {
     }
 
     publications {
-        create<MavenPublication>("${project.name}") {
+        create<MavenPublication>(project.name) {
             from(components["java"])
-            groupId = "net.impactdev.impactor.api"
-            artifactId = "${project.name}"
+
+            val root = project.property("publication-root")!!.toString()
+            groupId = "net.impactdev.impactor.$root"
+            artifactId = project.name
             version = "${rootProject.version}"
         }
     }

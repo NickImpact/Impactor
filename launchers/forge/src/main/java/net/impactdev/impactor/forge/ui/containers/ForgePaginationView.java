@@ -28,12 +28,13 @@ package net.impactdev.impactor.forge.ui.containers;
 import ca.landonjw.gooeylibs2.api.page.GooeyPage;
 import ca.landonjw.gooeylibs2.api.template.types.ChestTemplate;
 import com.google.common.base.Preconditions;
+import net.impactdev.impactor.api.platform.sources.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.views.pagination.Pagination;
 import net.impactdev.impactor.forge.ui.gooey.GooeyIcon;
 import net.impactdev.impactor.forge.ui.gooey.GooeyPageOpenCloser;
 import net.impactdev.impactor.minecraft.text.AdventureTranslator;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.views.ImpactorPagination;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.views.ImpactorPagination;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -67,12 +68,14 @@ public final class ForgePaginationView extends ImpactorPagination implements Goo
     }
 
     @Override
-    public void open() {
+    public void open(PlatformPlayer viewer) {
+        super.open(this.viewer);
         this.openPage(this.delegate, this.viewer);
     }
 
     @Override
-    public void close() {
+    public void close(PlatformPlayer viewer) {
+        super.close(viewer);
         this.closePage(this.viewer);
     }
 

@@ -26,27 +26,38 @@
 package net.impactdev.impactor.core.plugin;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.plugin.PluginRegistry;
+import net.impactdev.impactor.core.configuration.ImpactorConfig;
 import net.impactdev.impactor.api.logging.PluginLogger;
-import net.impactdev.impactor.api.platform.PluginMetadata;
+import net.impactdev.impactor.api.platform.Platform;
+import net.impactdev.impactor.api.platform.plugins.PluginMetadata;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+import net.impactdev.impactor.api.plugin.components.Configurable;
+import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.api.APIRegister;
 import net.impactdev.impactor.core.api.ImpactorService;
+import net.impactdev.impactor.core.commands.permissions.LuckPermsPermissionsService;
+import net.impactdev.impactor.core.commands.permissions.NoOpPermissionsService;
 import net.impactdev.impactor.core.configuration.ConfigModule;
 import net.impactdev.impactor.core.economy.EconomyModule;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.text.TextModule;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public abstract class BaseImpactorPlugin implements ImpactorPlugin {
+public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable {
 
     private static ImpactorPlugin instance;
 
@@ -57,13 +68,15 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin {
             .version("@version@")
             .build();
 
+    private final Set<ImpactorModule> modules = Sets.newHashSet();
+
     public BaseImpactorPlugin(ImpactorBootstrapper bootstrapper) {
         instance = this;
         this.bootstrapper = bootstrapper;
     }
 
-    public static ImpactorPlugin instance() {
-        return instance;
+    public static BaseImpactorPlugin instance() {
+        return (BaseImpactorPlugin) instance;
     }
 
     @Override
@@ -77,20 +90,30 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin {
     }
 
     @Override
-    public void construct() throws Exception {
+    public Path configurationDirectory() {
+        return Paths.get("impactor");
+    }
+
+    @Override
+    public ImpactorConfig configuration() {
+        return null;
+    }
+
+    @Override
+    public void construct() {
         this.bootstrapper.logger().info("Initializing API...");
         Impactor service = new ImpactorService();
         APIRegister.register(service);
 
-        this.bootstrapper.logger().info("Initializing plugin modules...");
+        this.bootstrapper.logger().info("Registering modules...");
         Set<Class<? extends ImpactorModule>> modules = new LinkedHashSet<>(Lists.newArrayList(
                 ConfigModule.class,
-                TextModule.class,
-                EconomyModule.class
+                EconomyModule.class,
+                TextModule.class
         ));
 
         modules.addAll(Optional.ofNullable(this.modules()).orElse(Collections.emptySet()));
-        modules.stream().map(type -> {
+        Set<ImpactorModule> collection = modules.stream().map(type -> {
             try {
                 return type.getConstructor().newInstance();
             } catch (Exception e) {
@@ -101,7 +124,32 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin {
             module.builders(service.builders());
             module.services(service.services());
             module.subscribe(service.events());
-        }).forEach(module -> {
+        }).collect(Collectors.toSet());
+
+        Platform platform = Impactor.instance().platform();
+        if(platform.info().plugin("luckperms").isPresent()) {
+            service.services().register(PermissionsService.class, new LuckPermsPermissionsService());
+        } else {
+            service.services().register(PermissionsService.class, new NoOpPermissionsService());
+        }
+
+        this.modules.addAll(collection);
+
+        PluginRegistry.lock();
+        PluginRegistry.allInLoadOrder().forEach((metadata, plugin) -> {
+            try {
+                plugin.construct();
+            } catch (Exception e) {
+                ExceptionPrinter.print(plugin.logger(), e);
+            }
+        });
+    }
+
+    public void setup() {
+        this.bootstrapper.logger().info("Initializing modules...");
+
+        Impactor service = Impactor.instance();
+        this.modules.forEach(module -> {
             try {
                 module.init(service, this.logger());
             }
@@ -109,12 +157,50 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin {
                 throw new RuntimeException(e);
             }
         });
+
+        PluginRegistry.allInLoadOrder().forEach((metadata, plugin) -> {
+            try {
+                plugin.setup();
+            } catch (Exception e) {
+                ExceptionPrinter.print(plugin.logger(), e);
+            }
+        });
+    }
+
+    @Override
+    public void starting() {
+        PluginRegistry.allInLoadOrder().forEach((metadata, plugin) -> {
+            try {
+                plugin.starting();
+            } catch (Exception e) {
+                ExceptionPrinter.print(plugin.logger(), e);
+            }
+        });
+    }
+
+    @Override
+    public void started() {
+        PluginRegistry.allInLoadOrder().forEach((metadata, plugin) -> {
+            try {
+                plugin.started();
+            } catch (Exception e) {
+                ExceptionPrinter.print(plugin.logger(), e);
+            }
+        });
+    }
+
+    @Override
+    public void shutdown() {
+        PluginRegistry.allInLoadOrder().forEach((metadata, plugin) -> {
+            try {
+                plugin.shutdown();
+            } catch (Exception e) {
+                ExceptionPrinter.print(plugin.logger(), e);
+            }
+        });
     }
 
     protected abstract Set<Class<? extends ImpactorModule>> modules();
-
-    @Override
-    public void shutdown() throws Exception {}
 
     /**
      * For 1.16.5, this code works perfectly in a non-forge environment. However, with forge, there's

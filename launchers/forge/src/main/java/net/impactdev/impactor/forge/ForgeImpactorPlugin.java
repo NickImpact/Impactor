@@ -44,7 +44,7 @@ public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorP
     }
 
     @Override
-    public void construct() throws Exception {
+    public void construct() {
         super.construct();
 
         PrettyPrinter printer = new PrettyPrinter(80);
@@ -64,7 +64,7 @@ public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorP
     }
 
     @Override
-    public void shutdown() throws Exception {
+    public void shutdown() {
         Impactor.instance().scheduler().shutdownExecutor();
     }
 

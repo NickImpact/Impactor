@@ -264,7 +264,6 @@ public abstract class ForgeCloudCommandManager<C, S extends SharedSuggestionProv
             final Class<?> target = GenericTypeReflector.erase(value);
 
             if(seen.contains(target)) {
-                BaseImpactorPlugin.instance().logger().debug("Encountered duplicate type in registry");
                 continue;
             }
 

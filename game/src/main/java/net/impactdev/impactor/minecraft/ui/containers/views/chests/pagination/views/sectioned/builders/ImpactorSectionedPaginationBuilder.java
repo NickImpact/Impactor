@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.ui.containers.views.pagination.views.sectioned.builders;
+package net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.views.sectioned.builders;
 
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.platform.sources.PlatformPlayer;

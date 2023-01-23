@@ -30,7 +30,6 @@ import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.platform.sources.PlatformPlayer;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.platform.sources.metadata.MetadataKeys;
-import net.impactdev.impactor.core.commands.sources.ImpactorCommandSource;
 import net.impactdev.impactor.core.platform.sources.ImpactorPlatformSource;
 import net.impactdev.impactor.minecraft.platform.GamePlatform;
 import net.impactdev.impactor.minecraft.text.AdventureTranslator;
@@ -57,11 +56,11 @@ public class CommandSourceStackTranslator {
     public static @NotNull CommandSource impactor(final @NotNull CommandSourceStack delegate) {
         @Nullable Entity entity = delegate.getEntity();
         if(entity == null) {
-            return new ImpactorCommandSource(PlatformSource.console());
+            return new GameCommandSource(PlatformSource.console());
         }
 
         if(entity instanceof ServerPlayer) {
-            return new ImpactorCommandSource(PlatformPlayer.getOrCreate(entity.getUUID()));
+            return new GameCommandSource(PlatformPlayer.getOrCreate(entity.getUUID()));
         } else {
             throw new UnsupportedOperationException("Pending source translation");
         }

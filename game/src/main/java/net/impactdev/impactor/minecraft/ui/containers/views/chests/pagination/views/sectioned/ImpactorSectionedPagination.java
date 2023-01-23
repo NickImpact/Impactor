@@ -23,14 +23,14 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.ui.containers.views.pagination.views.sectioned;
+package net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.views.sectioned;
 
 import net.impactdev.impactor.api.platform.sources.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.layouts.ChestLayout;
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.SectionedPagination;
 import net.impactdev.impactor.api.ui.containers.views.pagination.sectioned.sections.Section;
-import net.impactdev.impactor.minecraft.ui.containers.views.layers.ImpactorView;
-import net.impactdev.impactor.minecraft.ui.containers.views.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
+import net.impactdev.impactor.minecraft.ui.containers.views.ImpactorView;
+import net.impactdev.impactor.minecraft.ui.containers.views.chests.pagination.views.sectioned.builders.ImpactorSectionedPaginationBuilder;
 import org.checkerframework.common.value.qual.IntRange;
 import org.spongepowered.math.vector.Vector2i;
 

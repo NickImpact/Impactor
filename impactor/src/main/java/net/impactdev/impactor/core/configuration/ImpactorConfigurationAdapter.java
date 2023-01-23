@@ -27,10 +27,9 @@ package net.impactdev.impactor.core.configuration;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.leangen.geantyref.TypeToken;
-import net.impactdev.impactor.api.configuration.ConfigPath;
-import net.impactdev.impactor.api.configuration.ConfigurationAdapter;
+import net.impactdev.impactor.api.configuration.adapter.ConfigurationAdapter;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
@@ -38,35 +37,38 @@ import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class ImpactorConfigurationAdapter implements ConfigurationAdapter {
 
     private final Path path;
-    private ConfigurationNode root;
+    private CommentedConfigurationNode root;
     private ConfigurationLoader<CommentedConfigurationNode> loader;
 
-    /** Whether the config should update and insert new keys as they are added */
-    private final boolean update;
-
-    public ImpactorConfigurationAdapter(Path path, boolean update) {
+    public ImpactorConfigurationAdapter(Path path, @Nullable Supplier<InputStream> supplier) {
         this.path = path;
-        this.update = update;
-        this.createConfigIfMissing();
+        this.createConfigIfMissing(supplier);
         reload();
     }
 
-    private void createConfigIfMissing() {
+    private void createConfigIfMissing(@Nullable Supplier<InputStream> supplier) {
         if(!Files.exists(this.path)) {
             try {
                 this.createDirectoriesIfNotExists(this.path.getParent());
-                Files.createFile(this.path);
+
+                if(supplier != null) {
+                    Files.copy(supplier.get(), this.path);
+                } else {
+                    Files.createFile(this.path);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -81,13 +83,13 @@ public class ImpactorConfigurationAdapter implements ConfigurationAdapter {
         Files.createDirectories(path);
     }
 
-    private ConfigurationLoader<? extends ConfigurationNode> createLoader(Path path) {
-        return (this.loader = HoconConfigurationLoader.builder().path(path).build());
+    private ConfigurationLoader<? extends CommentedConfigurationNode> createLoader(Path path) {
+        return this.loader = HoconConfigurationLoader.builder().path(path).build();
     }
 
     @Override
     public void reload() {
-        ConfigurationLoader<? extends ConfigurationNode> loader = createLoader(this.path);
+        ConfigurationLoader<? extends CommentedConfigurationNode> loader = createLoader(this.path);
         try {
             this.root = loader.load();
         } catch (IOException e) {
@@ -95,78 +97,41 @@ public class ImpactorConfigurationAdapter implements ConfigurationAdapter {
         }
     }
 
-    private <T> void checkMissing(ConfigPath path, T def) {
-        if (update && !this.contains(path)) {
-            try {
-                resolvePath(path).set(def);
-                this.loader.save(root);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private <T> void checkMissing(ConfigPath path, T def, TypeToken<T> type) {
-        if (update && !this.contains(path)) {
-            try {
-                resolvePath(path).set(type.getType(), def);
-                this.loader.save(root);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean contains(ConfigPath path) {
-        return !resolvePath(path).virtual();
-    }
-
-    private ConfigurationNode resolvePath(ConfigPath path) {
+    private CommentedConfigurationNode resolvePath(String path) {
         if (this.root == null) {
             throw new RuntimeException("Config is not loaded.");
         }
 
-        if(path.split()) {
-            return this.root.node(Splitter.on('.').splitToList(path.target()).toArray());
-        } else {
-            return this.root.node(path.target());
-        }
+        return this.root.node(Splitter.on('.').splitToList(path).toArray());
     }
 
     @Override
-    public String getString(ConfigPath path, String def) {
-        this.checkMissing(path, def);
+    public String getString(String path, String def) {
         return resolvePath(path).getString(def);
     }
 
     @Override
-    public int getInteger(ConfigPath path, int def) {
-        this.checkMissing(path, def);
+    public int getInteger(String path, int def) {
         return resolvePath(path).getInt(def);
     }
 
     @Override
-    public long getLong(ConfigPath path, long def) {
-        this.checkMissing(path, def);
+    public long getLong(String path, long def) {
         return resolvePath(path).getLong(def);
     }
 
     @Override
-    public double getDouble(ConfigPath path, double def) {
-        this.checkMissing(path, def);
+    public double getDouble(String path, double def) {
         return resolvePath(path).getDouble(def);
     }
 
     @Override
-    public boolean getBoolean(ConfigPath path, boolean def) {
-        this.checkMissing(path, def);
+    public boolean getBoolean(String path, boolean def) {
         return resolvePath(path).getBoolean(def);
     }
 
     @Override
-    public List<String> getStringList(ConfigPath path, List<String> def) {
-        this.checkMissing(path, def, new TypeToken<List<String>>() {});
+    public List<String> getStringList(String path, List<String> def) {
         ConfigurationNode node = resolvePath(path);
         if (node.virtual()) {
             return def;
@@ -181,11 +146,7 @@ public class ImpactorConfigurationAdapter implements ConfigurationAdapter {
     }
 
     @Override
-    public List<String> getKeys(ConfigPath path, List<String> def) {
-        Map<String, Object> supplier = Maps.newHashMap();
-        def.forEach(key -> supplier.put(key, null));
-
-        this.checkMissing(path, supplier, new TypeToken<Map<String, Object>>() {});
+    public List<String> getKeys(String path, List<String> def) {
         ConfigurationNode node = resolvePath(path);
         if (node.virtual()) {
             return def;
@@ -195,8 +156,7 @@ public class ImpactorConfigurationAdapter implements ConfigurationAdapter {
     }
 
     @Override
-    public Map<String, String> getStringMap(ConfigPath path, Map<String, String> def) {
-        this.checkMissing(path, def, new TypeToken<Map<String, String>>() {});
+    public Map<String, String> getStringMap(String path, Map<String, String> def) {
         ConfigurationNode node = resolvePath(path);
         if (node.virtual()) {
             return def;
@@ -214,8 +174,12 @@ public class ImpactorConfigurationAdapter implements ConfigurationAdapter {
     }
 
     @Override
-    public List<? extends ConfigurationNode> getNodeList(ConfigPath path) {
-        this.checkMissing(path, Lists.newArrayList());
+    public ConfigurationNode getNode(String path) {
+        return resolvePath(path);
+    }
+
+    @Override
+    public List<? extends ConfigurationNode> getNodeList(String path) {
         ConfigurationNode node = resolvePath(path);
         if(node.virtual() || !node.isList()) {
             return Lists.newArrayList();
