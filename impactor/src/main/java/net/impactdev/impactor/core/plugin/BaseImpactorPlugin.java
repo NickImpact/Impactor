@@ -134,6 +134,7 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         }
 
         this.modules.addAll(collection);
+        this.bootstrapper.logger().info("Construction complete, delegating construction to registered plugins...");
 
         PluginRegistry.lock();
         PluginRegistry.allInLoadOrder().forEach((metadata, plugin) -> {

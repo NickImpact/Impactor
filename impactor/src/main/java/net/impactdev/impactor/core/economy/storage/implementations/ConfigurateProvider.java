@@ -89,20 +89,18 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
     public void shutdown() throws Exception {}
 
     @Override
-    public PrettyPrinter.IPrettyPrintable meta() {
-        return printer -> {
-            printer.add("File Counts:");
-            long totalSize = 0;
-            for(Group group : Group.values()) {
-                try (Stream<Path> files = Files.walk(group.transformer.apply(this.root))) {
-                    long count = files.filter(path -> Files.isRegularFile(path) && path.endsWith(".conf")).count();
-                    printer.add("  %s: %d (%s)", group.name(), count, totalSize += this.size(files));
-                } catch (Exception e) {
-                    printer.add("  %s: Unknown", group.name());
-                }
+    public void meta(PrettyPrinter printer) throws Exception {
+        printer.add("File Counts:");
+        long totalSize = 0;
+        for(Group group : Group.values()) {
+            try (Stream<Path> files = Files.walk(group.transformer.apply(this.root))) {
+                long count = files.filter(path -> Files.isRegularFile(path) && path.endsWith(".conf")).count();
+                printer.add("  %s: %d (%s)", group.name(), count, totalSize += this.size(files));
+            } catch (Exception e) {
+                printer.add("  %s: Unknown", group.name());
             }
-            printer.newline().add("Total Used Space: %d", totalSize);
-        };
+        }
+        printer.newline().add("Total Used Space: %d", totalSize);
     }
 
     private void createDirectoriesIfNotExists(Path path) throws IOException {

@@ -58,8 +58,8 @@ public final class EconomyStorage implements Storage {
     }
 
     @Override
-    public CompletableFuture<PrettyPrinter.IPrettyPrintable> meta() {
-        return CompletableFuture.supplyAsync(this.implementation::meta);
+    public CompletableFuture<Void> meta(PrettyPrinter printer) {
+        return run(() -> this.implementation.meta(printer));
     }
 
     public CompletableFuture<Account> account(UUID uuid, Currency currency) {
@@ -79,8 +79,27 @@ public final class EconomyStorage implements Storage {
     }
 
     @FunctionalInterface
+    private interface ThrowingRunnable {
+        void run() throws Exception;
+    }
+
+    @FunctionalInterface
     private interface ThrowingSupplier<T> {
         T supply() throws Exception;
+    }
+
+    private static CompletableFuture<Void> run(ThrowingRunnable runnable) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                runnable.run();
+            } catch (Exception e) {
+                ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
+                if (e instanceof RuntimeException) {
+                    throw (RuntimeException) e;
+                }
+                throw new CompletionException(e);
+            }
+        }, Impactor.instance().scheduler().async());
     }
 
     private static <T> CompletableFuture<T> supply(ThrowingSupplier<T> supplier) {
