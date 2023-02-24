@@ -27,17 +27,19 @@ package net.impactdev.impactor.core.economy.storage.implementations;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.accounts.Account;
-import net.impactdev.impactor.api.economy.accounts.AccountAccessor;
 import net.impactdev.impactor.api.economy.currency.Currency;
+import net.impactdev.impactor.api.economy.currency.CurrencyProvider;
 import net.impactdev.impactor.api.storage.connection.configurate.ConfigurateLoader;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.economy.accounts.ImpactorAccount;
-import net.impactdev.impactor.core.economy.accounts.ImpactorAccountAccessor;
-import net.impactdev.impactor.core.economy.accounts.translators.AccountTranslator;
 import net.impactdev.impactor.core.economy.storage.EconomyStorageImplementation;
-import net.impactdev.json.JObject;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import net.kyori.adventure.key.Key;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,17 +48,15 @@ import org.spongepowered.configurate.ConfigurationNode;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ConfigurateProvider implements EconomyStorageImplementation {
@@ -81,8 +81,7 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
 
     @Override
     public void init() throws Exception {
-        this.createDirectoriesIfNotExists(Group.USERS.root(this.root));
-        this.createDirectoriesIfNotExists(Group.VIRTUAL.root(this.root));
+        this.createDirectoriesIfNotExists(this.root.resolve("accounts"));
     }
 
     @Override
@@ -92,14 +91,14 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
     public void meta(PrettyPrinter printer) throws Exception {
         printer.add("File Counts:");
         long totalSize = 0;
-        for(Group group : Group.values()) {
-            try (Stream<Path> files = Files.walk(group.transformer.apply(this.root))) {
-                long count = files.filter(path -> Files.isRegularFile(path) && path.endsWith(".conf")).count();
-                printer.add("  %s: %d (%s)", group.name(), count, totalSize += this.size(files));
-            } catch (Exception e) {
-                printer.add("  %s: Unknown", group.name());
-            }
-        }
+//        for(Group group : Group.values()) {
+//            try (Stream<Path> files = Files.walk(group.transformer.apply(this.root))) {
+//                long count = files.filter(path -> Files.isRegularFile(path) && path.endsWith(".conf")).count();
+//                printer.add("  %s: %d (%s)", group.name(), count, totalSize += this.size(files));
+//            } catch (Exception e) {
+//                printer.add("  %s: Unknown", group.name());
+//            }
+//        }
         printer.newline().add("Total Used Space: %d", totalSize);
     }
 
@@ -112,71 +111,82 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
     }
 
     @Override
-    public Account account(UUID uuid, Currency currency) throws Exception {
-        Path target = Group.USERS.root(this.root)
+    public Account account(Currency currency, UUID uuid, Account.AccountModifier modifier) throws Exception {
+        Path target = this.root.resolve("accounts")
                 .resolve(uuid.toString().substring(0, 2))
-                .resolve(uuid.toString())
-                .resolve(PlainTextComponentSerializer.plainText().serialize(currency.name()) + ".conf");
+                .resolve(uuid + ".conf");
 
         if(Files.exists(target)) {
-            ConfigurationNode node = this.read(target);
-            JObject json = new JObject().add("balance", node.node("balance").getDouble());
+            ConfigurationNode node = this.read(target).node(currency.key().asString());
+            if(!node.virtual()) {
+                return ImpactorAccount.load(currency, uuid, BigDecimal.valueOf(node.getDouble()));
+            } else {
+                Account.AccountBuilder builder = new ImpactorAccount.ImpactorAccountBuilder();
+                builder.currency(currency).owner(uuid);
+                builder = modifier.modify(builder);
 
-            return AccountTranslator.deserialize(uuid, currency, json.toJson());
+                Account account = builder.build();
+                this.save(account);
+
+                return account;
+            }
         } else {
-            Account account = ImpactorAccount.create(uuid, currency);
-            this.saveAccount(uuid, account);
+            Account.AccountBuilder builder = new ImpactorAccount.ImpactorAccountBuilder();
+            builder.currency(currency).owner(uuid);
+            builder = modifier.modify(builder);
+
+            Account account = builder.build();
+            this.save(account);
 
             return account;
         }
     }
 
     @Override
-    public boolean saveAccount(UUID uuid, Account account) throws Exception {
-        Path target = Group.USERS.root(this.root)
-                .resolve(uuid.toString().substring(0, 2))
-                .resolve(uuid.toString())
-                .resolve(PlainTextComponentSerializer.plainText().serialize(account.currency().name()) + ".conf");
+    public boolean save(Account account) throws Exception {
+        Path target = this.root.resolve("accounts")
+                .resolve(account.owner().toString().substring(0, 2))
+                .resolve(account.owner() + ".conf");
 
         this.saveOrDelete(target, account);
         return true;
     }
 
     @Override
-    public List<AccountAccessor> accessors() throws Exception {
-        List<AccountAccessor> results = new ArrayList<>();
+    public Multimap<Currency, Account> accounts() throws Exception {
+        Multimap<Currency, Account> accounts = ArrayListMultimap.create();
+        Path root = this.root.resolve("accounts");
 
-        Path base = Group.USERS.root(this.root);
-        try(Stream<Path> paths = Files.walk(base, 1).filter(in -> !base.equals(in))) {
-            for(Path parent : paths.collect(Collectors.toSet())) {
-                try(Stream<Path> uuids = Files.walk(parent, 1).filter(in -> !parent.equals(in))) {
-                    uuids.forEach(uuid -> results.add(new ImpactorAccountAccessor(UUID.fromString(uuid.getFileName().toString()))));
-                }
-            }
+        EconomyService service = Impactor.instance().services().provide(EconomyService.class);
+        CurrencyProvider currencies = service.currencies();
+        try(Stream<Path> files = Files.walk(root)) {
+            files.filter(path -> path.getFileName().toString().endsWith(".conf"))
+                    .forEach(path -> {
+                        try {
+                            String name = path.getFileName().toString();
+                            UUID owner = UUID.fromString(name.substring(0, name.indexOf(".")));
+
+                            ConfigurationNode data = this.read(path);
+                            for(Object key : data.childrenMap().keySet()) {
+                                Optional<Currency> currency = currencies.currency(Key.key((String) key));
+                                if(currency.isPresent()) {
+                                    Account account = ImpactorAccount.load(currency.get(), owner, BigDecimal.valueOf(data.node(key).getDouble()));
+                                    accounts.put(account.currency(), account);
+                                }
+                            }
+                        } catch (Exception e) {
+                            BaseImpactorPlugin.instance().logger().severe("Economy: Failed to read account file: " + path.getFileName());
+                            e.printStackTrace();
+                        }
+                    });
         }
-
-        return results;
+        return accounts;
     }
 
     @Override
     public boolean purge() throws Exception {
         FileUtils.cleanDirectory(this.root.toFile());
         return true;
-    }
-
-    private enum Group {
-        USERS(root -> root.resolve("users")),
-        VIRTUAL(root -> root.resolve("virtual"));
-
-        private final Function<Path, Path> transformer;
-
-        Group(Function<Path, Path> transformer) {
-            this.transformer = transformer;
-        }
-
-        public Path root(Path parent) {
-            return this.transformer.apply(parent);
-        }
     }
 
     private long size(Stream<Path> paths) throws IOException {
@@ -217,10 +227,17 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
                 return;
             }
 
-            ConfigurationNode node = BasicConfigurationNode.root();
-            node.node("balance").set(account.balance());
+            ConfigurationNode node;
+            if(Files.exists(target)) {
+                node = this.loader.loader(target).load();
+            } else {
+                node = BasicConfigurationNode.root();
+            }
 
+            node.node(account.currency().key().asString()).set(account.balance().doubleValue());
             this.loader.loader(target).save(node);
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             lock.unlock();
         }

@@ -24,9 +24,8 @@ publishing {
         create<MavenPublication>(project.name) {
             from(components["java"])
 
-            val root = project.property("publication-root")!!.toString()
-            groupId = "net.impactdev.impactor.$root"
-            artifactId = project.name
+            groupId = "net.impactdev.impactor${project.findProperty("maven.root")?.let { ".$it" } ?: ""}"
+            artifactId = project.findProperty("maven.artifactID")?.toString() ?: project.name
             version = "${rootProject.version}"
         }
     }

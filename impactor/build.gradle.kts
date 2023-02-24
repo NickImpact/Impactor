@@ -19,4 +19,16 @@ dependencies {
     implementation("commons-io:commons-io:2.5")
     implementation("org.apache.commons:commons-lang3:3.5")
     implementation("com.mojang:brigadier:1.0.18")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
+    testImplementation("org.mockito:mockito-core:4.7.0")
+}
+
+tasks.withType(Test::class) {
+    useJUnitPlatform()
+
+    // Allow JUnit to find our TestInitializer and invoke its
+    // before all callback for all tests
+    jvmArgs("-Djunit.jupiter.extensions.autodetection.enabled=true")
 }

@@ -34,7 +34,7 @@ import net.impactdev.impactor.api.utility.builders.Builder;
 
 import java.math.BigDecimal;
 
-public class ImpactorEconomyTransaction implements EconomyTransaction {
+public final class ImpactorEconomyTransaction implements EconomyTransaction {
 
     private final Account account;
     private final Currency currency;

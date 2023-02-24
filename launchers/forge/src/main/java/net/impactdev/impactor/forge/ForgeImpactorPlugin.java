@@ -25,7 +25,10 @@
 
 package net.impactdev.impactor.forge;
 
+import cloud.commandframework.meta.CommandMeta;
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.commands.CommandSource;
+import net.impactdev.impactor.api.commands.events.CommandRegistrationEvent;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.modules.ImpactorModule;
@@ -34,6 +37,7 @@ import net.impactdev.impactor.forge.platform.ForgePlatformModule;
 import net.impactdev.impactor.forge.scheduler.ForgeSchedulerModule;
 import net.impactdev.impactor.forge.ui.ForgeUIModule;
 import net.impactdev.impactor.minecraft.plugin.GameImpactorPlugin;
+import net.kyori.adventure.text.Component;
 
 import java.util.Set;
 
@@ -51,6 +55,17 @@ public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorP
         printer.title("Platform Information");
         Impactor.instance().platform().info().print(printer);
         printer.log(this.logger(), PrettyPrinter.Level.INFO);
+
+        Impactor.instance().events().subscribe(CommandRegistrationEvent.class, event -> {
+            event.register(
+                    "impactor",
+                    CommandMeta.simple().build(),
+                    builder -> builder.handler(context -> {
+                        CommandSource source = context.getSender();
+                        source.sendMessage(Component.text("Using locale: " + source.source().locale().getDisplayName()));
+                    }).build()
+            );
+        });
     }
 
     @Override

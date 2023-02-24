@@ -28,17 +28,17 @@ package net.impactdev.impactor.core.text;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.impactdev.impactor.api.text.TextProcessor;
-import net.impactdev.impactor.core.text.adventure.LegacyProcessor;
-import net.impactdev.impactor.core.text.adventure.MiniMessageProcessor;
+import net.impactdev.impactor.core.text.processors.LegacyTextProcessor;
+import net.impactdev.impactor.core.text.processors.MiniMessageProcessor;
 
 import java.util.concurrent.TimeUnit;
 
 public class TextProcessorFactory implements TextProcessor.Factory {
 
     private final MiniMessageProcessor mini = new MiniMessageProcessor();
-    private final LoadingCache<Character, LegacyProcessor> legacy = Caffeine.newBuilder()
+    private final LoadingCache<Character, LegacyTextProcessor> legacy = Caffeine.newBuilder()
             .expireAfterAccess(15, TimeUnit.MINUTES)
-            .build(LegacyProcessor::new);
+            .build(LegacyTextProcessor::new);
 
     @Override
     public TextProcessor mini() {

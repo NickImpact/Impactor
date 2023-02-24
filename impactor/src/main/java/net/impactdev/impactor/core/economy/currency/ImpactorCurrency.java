@@ -25,53 +25,50 @@
 
 package net.impactdev.impactor.core.economy.currency;
 
-import com.google.common.base.Strings;
 import net.impactdev.impactor.api.economy.currency.Currency;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.util.StringJoiner;
+import java.util.Locale;
 
 import static net.kyori.adventure.text.Component.text;
 
 public class ImpactorCurrency implements Currency {
 
-    private final String key;
-    private final boolean primary;
+    private final Key key;
 
     private final Component name;
     private final Component plural;
     private final Component symbol;
     private final BigDecimal starting;
     private final int decimals;
+    private final SymbolFormatting formatting;
+    private final boolean primary;
 
-    private final DecimalFormat formatter;
+    private final String pattern;
 
     private ImpactorCurrency(final ImpactorCurrencyBuilder builder) {
         this.key = builder.key;
-        this.primary = builder.primary;
         this.name = builder.name;
         this.plural = builder.plural;
         this.symbol = builder.symbol;
         this.starting = builder.starting;
         this.decimals = builder.decimals;
+        this.formatting = builder.formatting;
+        this.primary = builder.primary;
 
-        this.formatter = this.createFormatter();
+        this.pattern = "%." + this.decimals + "f";
     }
 
     @Override
-    public String key() {
+    public Key key() {
         return this.key;
     }
 
     @Override
-    public boolean primary() {
-        return this.primary;
-    }
-
-    @Override
-    public Component name() {
+    public Component singular() {
         return this.name;
     }
 
@@ -86,12 +83,26 @@ public class ImpactorCurrency implements Currency {
     }
 
     @Override
-    public Component format(BigDecimal amount) {
-        return this.symbol.append(text(this.formatter.format(amount)));
+    public SymbolFormatting formatting() {
+        return this.formatting;
     }
 
     @Override
-    public BigDecimal starting() {
+    public Component format(BigDecimal amount, boolean condensed, Locale locale) {
+        Component value = text(String.format(locale, this.pattern, amount.doubleValue()));
+        if(condensed) {
+            return this.formatting.modify(this, value);
+        }
+
+        if(amount.doubleValue() == 1) {
+            return value.append(Component.space()).append(this.singular());
+        } else {
+            return value.append(Component.space()).append(this.plural());
+        }
+    }
+
+    @Override
+    public BigDecimal defaultAccountBalance() {
         return this.starting;
     }
 
@@ -100,57 +111,55 @@ public class ImpactorCurrency implements Currency {
         return this.decimals;
     }
 
-    private DecimalFormat createFormatter() {
-        StringJoiner joiner = new StringJoiner(".");
-        joiner.add("0");
-        joiner.add(Strings.repeat("#", this.decimals()));
-
-        return new DecimalFormat(joiner.toString());
+    @Override
+    public boolean primary() {
+        return this.primary;
     }
 
     public static class ImpactorCurrencyBuilder implements CurrencyBuilder {
 
-        private String key;
-        private boolean primary;
+        private Key key;
 
         private Component name;
         private Component plural;
         private Component symbol;
+        private SymbolFormatting formatting;
         private BigDecimal starting;
         private int decimals;
+        private boolean primary;
 
         @Override
-        public CurrencyBuilder key(String key) {
+        public CurrencyBuilder key(@NotNull Key key) {
             this.key = key;
             return this;
         }
 
         @Override
-        public CurrencyBuilder primary(boolean primary) {
-            this.primary = primary;
-            return this;
-        }
-
-        @Override
-        public CurrencyBuilder name(Component name) {
+        public CurrencyBuilder name(@NotNull Component name) {
             this.name = name;
             return this;
         }
 
         @Override
-        public CurrencyBuilder plural(Component plural) {
+        public CurrencyBuilder plural(@NotNull Component plural) {
             this.plural = plural;
             return this;
         }
 
         @Override
-        public CurrencyBuilder symbol(Component symbol) {
+        public CurrencyBuilder symbol(@NotNull Component symbol) {
             this.symbol = symbol;
             return this;
         }
 
         @Override
-        public CurrencyBuilder starting(BigDecimal amount) {
+        public CurrencyBuilder formatting(@NotNull SymbolFormatting format) {
+            this.formatting = format;
+            return this;
+        }
+
+        @Override
+        public CurrencyBuilder starting(@NotNull BigDecimal amount) {
             this.starting = amount;
             return this;
         }
@@ -158,6 +167,12 @@ public class ImpactorCurrency implements Currency {
         @Override
         public CurrencyBuilder decimals(int decimals) {
             this.decimals = decimals;
+            return this;
+        }
+
+        @Override
+        public CurrencyBuilder primary() {
+            this.primary = true;
             return this;
         }
 

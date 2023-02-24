@@ -23,26 +23,37 @@
  *
  */
 
-package net.impactdev.impactor.core.text.adventure;
+package net.impactdev.impactor.test;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.impactdev.impactor.api.logging.Log4jLogger;
+import org.apache.logging.log4j.LogManager;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
-public final class LegacyProcessor extends ImpactorTextProcessor {
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-    private final LegacyComponentSerializer serializer;
+public final class TestInitializer implements BeforeAllCallback, ExtensionContext.Store.CloseableResource {
 
-    public LegacyProcessor(char character) {
-        this.serializer = LegacyComponentSerializer.builder().character(character).hexColors().build();
+    private static final Lock LOCK = new ReentrantLock();
+    private static volatile boolean initialized;
+
+    @Override
+    public void beforeAll(ExtensionContext context) throws Exception {
+        LOCK.lock();
+        try {
+            if(!initialized) {
+                initialized = true;
+                context.getRoot().getStore(ExtensionContext.Namespace.GLOBAL).put("Impactor", this);
+
+                TestBootstrapper bootstrapper = new TestBootstrapper(new Log4jLogger(LogManager.getLogger("Impactor Test Suite")));
+                bootstrapper.launch();
+            }
+        } finally {
+            LOCK.unlock();
+        }
     }
 
     @Override
-    protected String serialize(Component component) {
-        return this.serializer.serialize(component);
-    }
-
-    @Override
-    protected Component deserialize(String raw) {
-        return this.serializer.deserialize(raw);
-    }
+    public void close() throws Throwable {}
 }

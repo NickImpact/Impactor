@@ -25,26 +25,33 @@
 
 package net.impactdev.impactor.core.economy.storage;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.google.common.collect.Multimap;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.accounts.Account;
-import net.impactdev.impactor.api.economy.accounts.AccountAccessor;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.storage.Storage;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 
-import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.TimeUnit;
 
 public final class EconomyStorage implements Storage {
 
     private final EconomyStorageImplementation implementation;
+    private final Cache<AccountKey, Account> accounts;
 
     public EconomyStorage(EconomyStorageImplementation implementation) {
         this.implementation = implementation;
+        this.accounts = Caffeine.newBuilder()
+                .expireAfterAccess(1, TimeUnit.HOURS)
+                .build();
     }
 
     @Override
@@ -62,16 +69,21 @@ public final class EconomyStorage implements Storage {
         return run(() -> this.implementation.meta(printer));
     }
 
-    public CompletableFuture<Account> account(UUID uuid, Currency currency) {
-        return supply(() -> this.implementation.account(uuid, currency));
+    public CompletableFuture<Account> account(Currency currency, UUID uuid, Account.AccountModifier modifier) {
+        Account account = this.accounts.getIfPresent(new AccountKey(currency, uuid));
+        if(account != null) {
+            return CompletableFuture.completedFuture(account);
+        }
+
+        return supply(() -> this.implementation.account(currency, uuid, modifier));
     }
 
-    public CompletableFuture<Boolean> saveAccount(UUID uuid, Account account) {
-        return supply(() -> this.implementation.saveAccount(uuid, account));
+    public CompletableFuture<Boolean> save(Account account) {
+        return supply(() -> this.implementation.save(account));
     }
 
-    public CompletableFuture<List<AccountAccessor>> accessors() {
-        return supply(this.implementation::accessors);
+    public CompletableFuture<Multimap<Currency, Account>> accounts() {
+        return supply(this.implementation::accounts);
     }
 
     public CompletableFuture<Boolean> purge() {
@@ -114,5 +126,28 @@ public final class EconomyStorage implements Storage {
                 throw new CompletionException(e);
             }
         }, Impactor.instance().scheduler().async());
+    }
+
+    private static final class AccountKey {
+        private final Currency currency;
+        private final UUID owner;
+
+        public AccountKey(Currency currency, UUID owner) {
+            this.currency = currency;
+            this.owner = owner;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            AccountKey that = (AccountKey) o;
+            return currency.equals(that.currency) && owner.equals(that.owner);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(currency, owner);
+        }
     }
 }

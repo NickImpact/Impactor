@@ -4,4 +4,4 @@ plugins {
 }
 
 group = "net.impactdev.impactor"
-version = "5.0.0-SNAPSHOT"
+version = properties["plugin"]!!

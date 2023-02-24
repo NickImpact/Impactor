@@ -23,22 +23,38 @@
  *
  */
 
-package net.impactdev.impactor.core.text.adventure;
+package net.impactdev.gts.fabric.commands;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import cloud.commandframework.CommandManager;
+import cloud.commandframework.fabric.FabricServerCommandManager;
+import net.impactdev.impactor.api.commands.CommandSource;
+import net.impactdev.impactor.core.commands.ImpactorCommandManager;
+import net.impactdev.impactor.minecraft.commands.CommandSourceStackTranslator;
+import net.minecraft.commands.CommandSourceStack;
 
-public final class MiniMessageProcessor extends ImpactorTextProcessor {
+public final class FabricCommandManager extends ImpactorCommandManager<CommandSourceStack> {
 
-    private final MiniMessage mini = MiniMessage.miniMessage();
-
-    @Override
-    protected String serialize(Component component) {
-        return this.mini.serialize(component);
+    public static void activate() {
+        FabricCommandManager manager = new FabricCommandManager();
+        manager.initialize();
     }
 
     @Override
-    protected Component deserialize(String raw) {
-        return this.mini.deserialize(raw);
+    protected CommandManager<CommandSource> create(Coordinator coordinator) {
+        return new FabricServerCommandManager<>(
+                coordinator,
+                this.impactor(),
+                this.platform()
+        );
+    }
+
+    @Override
+    protected ToImpactor<CommandSourceStack> impactor() {
+        return CommandSourceStackTranslator::impactor;
+    }
+
+    @Override
+    protected ToNative<CommandSourceStack> platform() {
+        return CommandSourceStackTranslator::minecraft;
     }
 }

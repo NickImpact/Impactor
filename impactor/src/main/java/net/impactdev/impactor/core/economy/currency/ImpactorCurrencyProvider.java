@@ -29,6 +29,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.currency.CurrencyProvider;
+import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -41,7 +42,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ImpactorCurrencyProvider implements CurrencyProvider {
 
     private final Currency primary;
-    private final Cache<String, Currency> currencies = Caffeine.newBuilder().build();
+    private final Cache<Key, Currency> currencies = Caffeine.newBuilder().build();
     private final ReentrantLock lock = new ReentrantLock();
 
     public ImpactorCurrencyProvider(List<Currency> currencies) {
@@ -58,7 +59,7 @@ public class ImpactorCurrencyProvider implements CurrencyProvider {
     }
 
     @Override
-    public Optional<Currency> currency(String key) {
+    public Optional<Currency> currency(Key key) {
         return Optional.ofNullable(this.currencies.getIfPresent(key));
     }
 
@@ -68,7 +69,7 @@ public class ImpactorCurrencyProvider implements CurrencyProvider {
     }
 
     @Override
-    public CompletableFuture<Boolean> registerCurrency(Currency currency) {
+    public CompletableFuture<Boolean> register(Currency currency) {
         return CompletableFuture.supplyAsync(() -> {
             this.lock.lock();
             try {

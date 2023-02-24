@@ -23,24 +23,29 @@
  *
  */
 
-package net.impactdev.impactor.core.economy.accounts.translators;
+package net.impactdev.impactor.test;
 
-import com.google.gson.JsonObject;
-import net.impactdev.impactor.api.economy.accounts.Account;
-import net.impactdev.impactor.api.economy.currency.Currency;
-import net.impactdev.impactor.core.economy.accounts.ImpactorAccount;
-import net.impactdev.json.JObject;
+import com.google.common.collect.Sets;
+import net.impactdev.impactor.core.modules.ImpactorModule;
+import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
+import net.impactdev.impactor.test.dummies.TestPlatform;
+import net.impactdev.impactor.test.dummies.TestScheduler;
 
-import java.util.UUID;
+import java.util.Set;
 
-public final class AccountTranslator {
+public class TestPlugin extends BaseImpactorPlugin {
 
-    public static JsonObject serialize(Account account) {
-        return new JObject().add("balance", account.balance()).toJson();
+    public TestPlugin(ImpactorBootstrapper bootstrapper) {
+        super(bootstrapper);
     }
 
-    public static Account deserialize(UUID uuid, Currency currency, JsonObject json) {
-        return ImpactorAccount.load(uuid, currency, json.get("balance").getAsBigDecimal());
+    @Override
+    protected Set<Class<? extends ImpactorModule>> modules() {
+        return Sets.newHashSet(
+                TestPlatform.TestPlatformModule.class,
+                TestScheduler.TestSchedulerModule.class
+        );
     }
 
 }

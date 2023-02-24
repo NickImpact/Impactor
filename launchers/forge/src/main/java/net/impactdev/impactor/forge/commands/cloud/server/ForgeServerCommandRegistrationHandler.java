@@ -81,7 +81,6 @@ public class ForgeServerCommandRegistrationHandler<C> extends ForgeCommandRegist
 
     private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {
         final StaticArgument<C> first = ((StaticArgument<C>) command.getArguments().get(0));
-        BaseImpactorPlugin.instance().logger().info("Registering command: " + first.getName());
 
         final CommandNode<CommandSourceStack> baseNode = this.manager().brigadierManager().createLiteralCommandNode(
                 first.getName(),

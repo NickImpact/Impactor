@@ -1,11 +1,11 @@
 plugins {
     id("impactor.base-conventions")
     id("impactor.publishing-conventions")
-    id("org.spongepowered.gradle.vanilla") version "0.2.1-SNAPSHOT"
+    id("org.spongepowered.gradle.vanilla") version("0.2.1-SNAPSHOT")
 }
 
 minecraft {
-    version("${rootProject.property("minecraft")}")
+    version("1.16.5")
 }
 
 dependencies {

@@ -45,7 +45,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 
 @Mod("impactor")
-public class ForgeImpactorBootstrap extends ImpactorBootstrapper {
+public final class ForgeImpactorBootstrap extends ImpactorBootstrapper {
 
     public ForgeImpactorBootstrap() {
         super(new Log4jLogger(LogManager.getLogger("Impactor")));

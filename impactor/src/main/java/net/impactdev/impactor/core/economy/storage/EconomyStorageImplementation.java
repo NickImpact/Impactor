@@ -25,21 +25,20 @@
 
 package net.impactdev.impactor.core.economy.storage;
 
+import com.google.common.collect.Multimap;
 import net.impactdev.impactor.api.economy.accounts.Account;
-import net.impactdev.impactor.api.economy.accounts.AccountAccessor;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.storage.connection.StorageConnection;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface EconomyStorageImplementation extends StorageConnection {
 
-    Account account(UUID uuid, Currency currency) throws Exception;
+    Account account(Currency currency, UUID uuid, Account.AccountModifier modifier) throws Exception;
 
-    boolean saveAccount(UUID uuid, Account account) throws Exception;
+    boolean save(Account account) throws Exception;
 
-    List<AccountAccessor> accessors() throws Exception;
+    Multimap<Currency, Account> accounts() throws Exception;
 
     boolean purge() throws Exception;
 

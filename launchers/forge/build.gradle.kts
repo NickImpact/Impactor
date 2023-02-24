@@ -1,5 +1,5 @@
 plugins {
-    id("impactor.loom-conventions")
+    id("impactor.launcher-conventions")
     id("impactor.publishing-conventions")
 }
 
@@ -8,12 +8,28 @@ architectury {
     forge()
 }
 
+loom {
+    forge {
+        runs {
+            val client = maybeCreate("client")
+            client.vmArgs("-Dmixin.debug.export=true")
+
+            val server = maybeCreate("server")
+            server.vmArgs("-Dmixin.debug.export=true")
+        }
+
+        mixinConfig("mixins.impactor.forge.json")
+    }
+}
+
 dependencies {
     forge("net.minecraftforge:forge:${rootProject.property("minecraft")}-${rootProject.property("forge")}")
 
-    implementation(project(":game"))
-
-    modImplementation("ca.landonjw.gooeylibs:api:3.0.0-SNAPSHOT")
+    implementation(project(":minecraft"))
+    "developmentForge"(project(":minecraft")) {
+        isTransitive = false
+    }
+    "developmentForge"("ca.landonjw.gooeylibs:api:3.0.0-SNAPSHOT")
     modImplementation("ca.landonjw.gooeylibs:forge:3.0.0-SNAPSHOT")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
@@ -31,6 +47,7 @@ tasks {
         }
     }
 
+    // TODO - With 1.18+, switch to using JarInJar system instead to avoid relocation
     shadowJar {
         dependencies {
             include(dependency("net.kyori:.*:.*"))
@@ -53,9 +70,6 @@ tasks {
             include(dependency("org.mariadb.jdbc:mariadb-java-client:.*"))
             include(dependency("org.mongodb:mongo-java-driver:.*"))
 
-            include(dependency("loom_mappings_1_16_5_layered_hash_40359_v2_forge_1_16_5_36_2_34_forge.ca.landonjw.gooeylibs:api:.*"))
-            include(dependency("loom_mappings_1_16_5_layered_hash_40359_v2_forge_1_16_5_36_2_34_forge.ca.landonjw.gooeylibs:forge:.*"))
-
             include(dependency("cloud.commandframework:cloud-core:.*"))
             include(dependency("cloud.commandframework:cloud-annotations:.*"))
             include(dependency("cloud.commandframework:cloud-brigadier:.*"))
@@ -65,11 +79,10 @@ tasks {
             exclude("ca/landonjw/gooeylibs2/forge/GooeyLibs.class")
         }
 
-        relocate ("ca.landonjw.gooeylibs2", "net.impactdev.impactor.relocations.gooeylibs")
+        relocate ("net.kyori", "net.impactdev.impactor.relocations.kyori")
         relocate ("org.spongepowered.math", "net.impactdev.impactor.relocations.spongepowered.math")
         relocate ("io.leangen.geantyref", "net.impactdev.impactor.relocations.geantyref")
         relocate ("io.github.classgraph", "net.impactdev.impactor.relocations.classgraph")
-        relocate ("net.kyori", "net.impactdev.impactor.relocations.kyori")
         relocate ("com.github.benmanes.caffeine", "net.impactdev.impactor.relocations.caffeine")
         relocate ("org.spongepowered.configurate", "net.impactdev.impactor.relocations.configurate")
         relocate ("com.mongodb", "net.impactdev.impactor.relocations.mongodb")

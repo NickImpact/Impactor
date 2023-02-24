@@ -31,7 +31,7 @@ import net.impactdev.impactor.api.utility.ExceptionPrinter;
 
 public abstract class ImpactorBootstrapper {
 
-    private final BaseImpactorPlugin plugin;
+    protected final BaseImpactorPlugin plugin;
     private final PluginLogger logger;
 
     public ImpactorBootstrapper(PluginLogger logger) {

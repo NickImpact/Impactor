@@ -12,6 +12,7 @@ pluginManagement {
 }
 
 rootProject.name = "Impactor"
+
 include("api:core")
 include("api:config")
 include("api:commands")
@@ -24,7 +25,7 @@ include("api:text")
 include("api:ui")
 
 include("impactor")
-include("game")
+include("minecraft")
 include("launchers")
 include("launchers:forge")
-//include("launchers:fabric")
+include("launchers:fabric")

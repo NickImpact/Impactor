@@ -46,7 +46,7 @@ public final class EconomyRegistrationProvider {
     }
 
     public void suggest(PluginMetadata metadata, int priority, Supplier<EconomyService> supplier) {
-        if(this.suggestion == null || this.suggestion.priority < priority) {
+        if(this.suggestion == null || this.suggestion.priority() < priority) {
             this.suggestion = this.createSuggestion(metadata, priority, supplier);
         }
     }

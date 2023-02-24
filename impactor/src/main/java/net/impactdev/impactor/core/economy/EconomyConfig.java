@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.configuration.key.ConfigKey;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.storage.StorageType;
+import net.kyori.adventure.key.Key;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -45,6 +46,8 @@ public final class EconomyConfig {
     public static final ConfigKey<StorageType> STORAGE_TYPE = key(adapter ->
             StorageType.parse(adapter.getString("storage-method", "json"))
     );
+
+    @SuppressWarnings("PatternValidation")
     public static final ConfigKey<List<Currency>> CURRENCIES = key(adapter -> {
         List<Currency> results = Lists.newArrayList();
         for(String option : adapter.getKeys("currencies", Lists.newArrayList("dollars"))) {
@@ -52,16 +55,23 @@ public final class EconomyConfig {
                     .add("currencies")
                     .add(option);
 
-            results.add(Currency.builder()
-                    .key(option)
-                    .primary(adapter.getBoolean(joiner.add("primary").toString(), true))
+            Currency.CurrencyBuilder builder = Currency.builder()
+                    .key(Key.key(adapter.getString(joiner.add("key").toString(), "impactor:dollars")))
                     .name(text(adapter.getString(joiner.add("name").toString(), "Dollar")))
                     .plural(text(adapter.getString(joiner.add("plural").toString(), "Dollars")))
-                    .symbol(text(adapter.getString(joiner.add("symbol").toString(), "$")))
+                    .symbol(text(adapter.getString(joiner.add("symbol").add("character").toString(), "$")))
+                    .formatting(Currency.SymbolFormatting.fromIdentifier(adapter.getString(
+                            joiner.add("symbol").add("placement").toString(),
+                            Currency.SymbolFormatting.BEFORE.name().toLowerCase()
+                    )))
                     .decimals(adapter.getInteger(joiner.add("decimals").toString(), 2))
-                    .starting(BigDecimal.valueOf(adapter.getDouble(joiner.add("starting").toString(), 500)))
-                    .build()
-            );
+                    .starting(BigDecimal.valueOf(adapter.getDouble(joiner.add("starting").toString(), 500)));
+
+            if(adapter.getBoolean("primary", false)) {
+                builder.primary();
+            }
+
+            results.add(builder.build());
         }
 
         return results;
