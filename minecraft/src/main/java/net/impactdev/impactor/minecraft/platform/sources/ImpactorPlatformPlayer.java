@@ -27,22 +27,17 @@ package net.impactdev.impactor.minecraft.platform.sources;
 
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.economy.metadata.EconomyMetadataKeys;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.extensions.BookStack;
 import net.impactdev.impactor.api.items.platform.ItemTransaction;
 import net.impactdev.impactor.api.platform.sources.PlatformPlayer;
 import net.impactdev.impactor.api.platform.sources.SourceType;
 import net.impactdev.impactor.api.platform.sources.metadata.MetadataKeys;
-import net.impactdev.impactor.api.ui.containers.View;
-import net.impactdev.impactor.api.ui.metadata.UIMetadataKeys;
-import net.impactdev.impactor.core.economy.accounts.ImpactorAccountAccessor;
 import net.impactdev.impactor.core.platform.sources.ImpactorPlatformSource;
 import net.impactdev.impactor.minecraft.items.stacks.ItemStackTranslator;
 import net.impactdev.impactor.minecraft.items.transactions.ImpactorItemTransaction;
 import net.impactdev.impactor.minecraft.platform.GamePlatform;
 import net.impactdev.impactor.minecraft.text.AdventureTranslator;
-import net.impactdev.impactor.minecraft.ui.containers.views.ImpactorView;
 import net.impactdev.impactor.minecraft.utility.ResourceKeyTranslator;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
@@ -101,7 +96,6 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
                 .map(vec2 -> new Vector2d(vec2.x, vec2.y))
                 .orElse(Vector2d.ZERO)
         );
-        this.offer(EconomyMetadataKeys.ACCOUNT_ACCESSOR, () -> new ImpactorAccountAccessor(this.uuid()));
         this.offer(MetadataKeys.PERMISSION_LEVEL, () -> this.asMinecraftPlayer()
                 .map(player -> {
                     MinecraftServer server = ((GamePlatform) Impactor.instance().platform()).server();

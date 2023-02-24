@@ -25,8 +25,6 @@
 
 package net.impactdev.impactor.core.economy;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.Multimap;
 import net.impactdev.impactor.api.configuration.Config;
 import net.impactdev.impactor.api.economy.EconomyService;
@@ -41,29 +39,28 @@ import net.impactdev.impactor.core.economy.storage.StorageFactory;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 public final class ImpactorEconomyService implements EconomyService {
 
     private final CurrencyProvider provider;
     private final EconomyStorage storage;
+    private final Config config;
 
     public ImpactorEconomyService() {
-        Config config = Config.builder()
+        this.config = Config.builder()
                 .path(BaseImpactorPlugin.instance().configurationDirectory().resolve("economy.conf"))
                 .provider(EconomyConfig.class)
                 .build();
 
-        List<Currency> currencies = config.get(EconomyConfig.CURRENCIES);
+        List<Currency> currencies = this.config.get(EconomyConfig.CURRENCIES);
         if(currencies.isEmpty()) {
             throw new IllegalStateException("No currencies defined");
         }
 
         this.provider = new ImpactorCurrencyProvider(currencies);
-        this.storage = StorageFactory.instance(BaseImpactorPlugin.instance(), config.get(EconomyConfig.STORAGE_TYPE), StorageType.JSON);
+        this.storage = StorageFactory.instance(BaseImpactorPlugin.instance(), this.config.get(EconomyConfig.STORAGE_TYPE), StorageType.JSON);
 
         try {
             this.storage.init();
@@ -84,6 +81,10 @@ public final class ImpactorEconomyService implements EconomyService {
 
     public EconomyStorage storage() {
         return this.storage;
+    }
+
+    public Config config() {
+        return this.config;
     }
 
     @Override

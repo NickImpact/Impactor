@@ -27,6 +27,8 @@ package net.impactdev.impactor.core.economy.accounts;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.configuration.Config;
+import net.impactdev.impactor.api.configuration.key.ConfigKey;
 import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
@@ -38,6 +40,7 @@ import net.impactdev.impactor.api.economy.transactions.EconomyTransactionType;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransferTransaction;
 import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
+import net.impactdev.impactor.core.economy.EconomyConfig;
 import net.impactdev.impactor.core.economy.ImpactorEconomyService;
 import net.impactdev.impactor.core.economy.events.ImpactorEconomyTransactionEvent;
 import net.impactdev.impactor.core.economy.events.ImpactorEconomyTransferTransactionEvent;
@@ -141,6 +144,13 @@ public final class ImpactorAccount implements Account {
             }
 
             BigDecimal result = this.balance.subtract(amount);
+            if(this.restriction(EconomyConfig.APPLY_RESTRICTIONS).orElse(false)) {
+                Optional<BigDecimal> minimum = this.restriction(EconomyConfig.MIN_BALANCE);
+                if(minimum.isPresent() && minimum.get().compareTo(result) > 0) {
+                    return this.createAndFirePost(builder.result(EconomyResultType.NOT_ENOUGH_FUNDS).build());
+                }
+            }
+
             if(result.signum() < 0) {
                 return this.createAndFirePost(builder.result(EconomyResultType.NOT_ENOUGH_FUNDS).build());
             }
@@ -172,7 +182,15 @@ public final class ImpactorAccount implements Account {
                 return builder.result(EconomyResultType.CANCELLED).build();
             }
 
-            this.balance = this.balance.add(amount);
+            BigDecimal result = this.balance.add(amount);
+            if(this.restriction(EconomyConfig.APPLY_RESTRICTIONS).orElse(false)) {
+                Optional<BigDecimal> maximum = this.restriction(EconomyConfig.MAX_BALANCE);
+                if(maximum.isPresent() && maximum.get().compareTo(result) < 0) {
+                    return this.createAndFirePost(builder.result(EconomyResultType.NO_REMAINING_SPACE).build());
+                }
+            }
+
+            this.balance = result;
             this.save();
             return this.createAndFirePost(builder.result(EconomyResultType.SUCCESS).build());
         }, () -> ImpactorEconomyTransaction.builder()
@@ -206,7 +224,24 @@ public final class ImpactorAccount implements Account {
                 return builder.result(EconomyResultType.CANCELLED).build();
             }
 
-            // TODO - Validate
+            BigDecimal withdraw = this.balance.subtract(amount);
+            BigDecimal deposit = to.balance().add(amount);
+            if(this.restriction(EconomyConfig.APPLY_RESTRICTIONS).orElse(false)) {
+                Optional<BigDecimal> minimum = this.restriction(EconomyConfig.MIN_BALANCE);
+                Optional<BigDecimal> maximum = this.restriction(EconomyConfig.MAX_BALANCE);
+                if(maximum.isPresent() && maximum.get().compareTo(deposit) < 0) {
+                    EconomyTransferTransactionEvent.Post post = new ImpactorEconomyTransferTransactionEvent.Post(builder.result(EconomyResultType.NO_REMAINING_SPACE).build());
+                    this.postAndVerify(post);
+                    return post.transaction();
+                }
+
+                if(minimum.isPresent() && minimum.get().compareTo(withdraw) > 0) {
+                    EconomyTransferTransactionEvent.Post post = new ImpactorEconomyTransferTransactionEvent.Post(builder.result(EconomyResultType.NOT_ENOUGH_FUNDS).build());
+                    this.postAndVerify(post);
+                    return post.transaction();
+                }
+            }
+
             this.balance = this.balance.subtract(amount);
             ((ImpactorAccount) to).quietSet(to.balance().add(amount));
 
@@ -301,6 +336,16 @@ public final class ImpactorAccount implements Account {
                     });
             return fallback.get();
         }
+    }
+
+    private <T> Optional<T> restriction(ConfigKey<T> key) {
+        EconomyService service = Impactor.instance().services().provide(EconomyService.class);
+        if(service instanceof ImpactorEconomyService) {
+            Config config = ((ImpactorEconomyService) service).config();
+            return Optional.of(config.get(key));
+        }
+
+        return Optional.empty();
     }
 
     @FunctionalInterface

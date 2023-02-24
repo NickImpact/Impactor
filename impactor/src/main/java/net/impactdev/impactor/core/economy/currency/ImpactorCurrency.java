@@ -88,7 +88,7 @@ public class ImpactorCurrency implements Currency {
     }
 
     @Override
-    public Component format(BigDecimal amount, boolean condensed, Locale locale) {
+    public Component format(@NotNull BigDecimal amount, boolean condensed, @NotNull Locale locale) {
         Component value = text(String.format(locale, this.pattern, amount.doubleValue()));
         if(condensed) {
             return this.formatting.modify(this, value);

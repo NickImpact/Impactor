@@ -36,16 +36,25 @@ import java.util.List;
 import java.util.StringJoiner;
 
 import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.booleanKey;
+import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.doubleKey;
 import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.key;
 import static net.kyori.adventure.text.Component.text;
 
 public final class EconomyConfig {
 
-    public static final ConfigKey<Boolean> DEBUG = booleanKey("debug", false);
-
     public static final ConfigKey<StorageType> STORAGE_TYPE = key(adapter ->
             StorageType.parse(adapter.getString("storage-method", "json"))
     );
+
+    public static final ConfigKey<Boolean> APPLY_RESTRICTIONS = booleanKey("restrictions.enabled", true);
+    public static final ConfigKey<BigDecimal> MIN_BALANCE = key(adapter -> {
+        double value = adapter.getDouble("restrictions.minimum-balance", 0.0);
+        return BigDecimal.valueOf(value);
+    });
+    public static final ConfigKey<BigDecimal> MAX_BALANCE = key(adapter -> {
+        double value = adapter.getDouble("restrictions.maximum-balance", 100000000000.0);
+        return BigDecimal.valueOf(value);
+    });
 
     @SuppressWarnings("PatternValidation")
     public static final ConfigKey<List<Currency>> CURRENCIES = key(adapter -> {
@@ -65,7 +74,7 @@ public final class EconomyConfig {
                             Currency.SymbolFormatting.BEFORE.name().toLowerCase()
                     )))
                     .decimals(adapter.getInteger(joiner.add("decimals").toString(), 2))
-                    .starting(BigDecimal.valueOf(adapter.getDouble(joiner.add("starting").toString(), 500)));
+                    .starting(BigDecimal.valueOf(adapter.getDouble(joiner.add("default-balance").toString(), 500)));
 
             if(adapter.getBoolean("primary", false)) {
                 builder.primary();

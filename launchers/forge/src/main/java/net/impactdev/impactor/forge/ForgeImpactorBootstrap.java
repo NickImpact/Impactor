@@ -37,9 +37,12 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
@@ -50,8 +53,9 @@ public final class ForgeImpactorBootstrap extends ImpactorBootstrapper {
     public ForgeImpactorBootstrap() {
         super(new Log4jLogger(LogManager.getLogger("Impactor")));
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(EventPriority.HIGHEST, this::onConstruct);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(EventPriority.HIGHEST, this::onCommonSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onConstruct);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onDedicatedServerSetup);
         MinecraftForge.EVENT_BUS.addListener(this::onServerShutdown);
         MinecraftForge.EVENT_BUS.register(new RegistryEvents());
 
@@ -68,7 +72,11 @@ public final class ForgeImpactorBootstrap extends ImpactorBootstrapper {
         this.construct();
     }
 
-    private void onCommonSetup(FMLCommonSetupEvent event) {
+    public void onDedicatedServerSetup(FMLDedicatedServerSetupEvent event) {
+        this.setup();
+    }
+
+    public void onClientSetup(FMLClientSetupEvent event) {
         this.setup();
     }
 

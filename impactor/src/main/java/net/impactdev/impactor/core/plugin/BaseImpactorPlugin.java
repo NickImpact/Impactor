@@ -134,16 +134,6 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         }
 
         this.modules.addAll(collection);
-        this.bootstrapper.logger().info("Construction complete, delegating construction to registered plugins...");
-
-        PluginRegistry.lock();
-        PluginRegistry.allInLoadOrder().forEach((metadata, plugin) -> {
-            try {
-                plugin.construct();
-            } catch (Exception e) {
-                ExceptionPrinter.print(plugin.logger(), e);
-            }
-        });
     }
 
     public void setup() {
@@ -158,47 +148,21 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
                 throw new RuntimeException(e);
             }
         });
-
-        PluginRegistry.allInLoadOrder().forEach((metadata, plugin) -> {
-            try {
-                plugin.setup();
-            } catch (Exception e) {
-                ExceptionPrinter.print(plugin.logger(), e);
-            }
-        });
     }
 
     @Override
     public void starting() {
-        PluginRegistry.allInLoadOrder().forEach((metadata, plugin) -> {
-            try {
-                plugin.starting();
-            } catch (Exception e) {
-                ExceptionPrinter.print(plugin.logger(), e);
-            }
-        });
+
     }
 
     @Override
     public void started() {
-        PluginRegistry.allInLoadOrder().forEach((metadata, plugin) -> {
-            try {
-                plugin.started();
-            } catch (Exception e) {
-                ExceptionPrinter.print(plugin.logger(), e);
-            }
-        });
+
     }
 
     @Override
     public void shutdown() {
-        PluginRegistry.allInLoadOrder().forEach((metadata, plugin) -> {
-            try {
-                plugin.shutdown();
-            } catch (Exception e) {
-                ExceptionPrinter.print(plugin.logger(), e);
-            }
-        });
+
     }
 
     protected abstract Set<Class<? extends ImpactorModule>> modules();
