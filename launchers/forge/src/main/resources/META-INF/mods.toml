@@ -1,0 +1,32 @@
+modLoader = "javafml"
+loaderVersion = "[40,)"
+license = "MIT"
+
+[[mods]]
+modId = "impactor"
+version = "${version}"
+displayName = "Impactor"
+description = '''
+
+'''
+
+[[dependencies.impactor]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.18.2]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.impactor]]
+modId = "forge"
+mandatory = true
+versionRange = "[40,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.impactor]]
+modId = "gooeylibs2"
+mandatory = true
+versionRange = "[3.0.0-SNAPSHOT,)"
+ordering = "NONE"
+side = "BOTH"

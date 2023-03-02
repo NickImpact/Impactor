@@ -9,15 +9,25 @@ pluginManagement {
         maven("https://maven.minecraftforge.net/")
         maven("https://repo.papermc.io/repository/maven-public/")
     }
+
+    includeBuild("build-logic")
 }
 
 rootProject.name = "Impactor"
-include("api")
-include("common")
-//include("bukkit") // Requires > 1.16.5 (No Mojang Mappings available)
-include("forge")
-include("fabric")
-//include("sponge:common")
-//include("sponge:sf")
-//include("sponge:sv")
-include("game")
+
+include("api:core")
+include("api:config")
+include("api:commands")
+include("api:economy")
+include("api:items")
+include("api:players")
+include("api:plugins")
+include("api:storage")
+include("api:text")
+include("api:ui")
+
+include("impactor")
+include("minecraft")
+include("launchers")
+include("launchers:forge")
+include("launchers:fabric")

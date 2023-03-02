@@ -1,0 +1,132 @@
+versions:
+
+  # jetbains
+  kotlin: 1.7.10
+  coroutines: 1.6.1
+  annotations: 23.0.0
+  serialization: 1.3.2
+
+  # plugins
+  licenser: 0.6.1
+  shadow: 7.1.2
+  blossom: 1.3.1
+  loom: 1.0-SNAPSHOT
+  architectury-plugin: 3.4-SNAPSHOT
+
+  # fabric/remap
+  fabric-loader: 0.14.16
+  fabric-api: 0.75.1+1.18.2
+
+  # forge
+  forge: 1.18.2-40.1.0
+
+  # architectury
+  architectury: 6.3.49
+
+  # test
+  junit: 5.9.0
+  mockito: 3.3.3
+  mockk: 1.12.1
+
+dependencies:
+
+  # build-logic
+  kotlin:
+    group: org.jetbrains.kotlin
+    name: kotlin-gradle-plugin
+    version: { ref: kotlin }
+  licenser:
+    group: gradle.plugin.org.cadixdev.gradle
+    name: licenser
+    version: { ref: licenser }
+  shadow:
+    group: gradle.plugin.com.github.johnrengelman
+    name: shadow
+    version: { ref: shadow }
+  blossom:
+    group: net.kyori
+    name: blossom
+    version: { ref: blossom }
+  loom:
+    group: dev.architectury
+    name: architectury-loom
+    version: { ref: loom }
+  architecturyPlugin:
+    group: architectury-plugin
+    name: architectury-plugin.gradle.plugin
+    version: { ref: architectury-plugin }
+
+  # Jetbrains // Core Stuff
+  stdlib:
+    group: org.jetbrains.kotlin
+    name: kotlin-stdlib-jdk8
+    version: { ref: kotlin }
+  reflect:
+    group: org.jetbrains.kotlin
+    name: kotlin-reflect
+    version: { ref: kotlin }
+  jetbrainsAnnotations:
+    group: org.jetbrains
+    name: annotations
+    version: { ref: annotations }
+  serializationCore:
+    group: org.jetbrains.kotlinx
+    name: kotlinx-serialization-core-jvm
+    version: { ref: serialization }
+  serializationJson:
+    group: org.jetbrains.kotlinx
+    name: kotlinx-serialization-json-jvm
+    version: { ref: serialization }
+  fabricLoader:
+    group: net.fabricmc
+    name: fabric-loader
+    version: { ref: fabric-loader }
+
+  # common module
+  architectury:
+    group: dev.architectury
+    name: architectury
+    version: { ref: architectury }
+
+
+  # fabric
+  fabricApi:
+    group: net.fabricmc.fabric-api
+    name: fabric-api
+    version: { ref: fabric-api }
+  architecturyFabric:
+    group: dev.architectury
+    name: architectury-fabric
+    version: { ref: architectury }
+
+  # forge
+  forge:
+    group: net.minecraftforge
+    name: forge
+    version: { ref: forge }
+  architecturyForge:
+    group: dev.architectury
+    name: architectury-forge
+    version: { ref: architectury }
+
+  # test
+  junitEngine:
+    group: org.junit.jupiter
+    name: junit-jupiter-engine
+    version: { ref: junit }
+  junitApi:
+    group: org.junit.jupiter
+    name: junit-jupiter-api
+    version: { ref: junit }
+  junitParams:
+    group: org.junit.jupiter
+    name: junit-jupiter-params
+    version: { ref: junit }
+  mockito:
+    group: org.mockito
+    name: mockito-core
+    version: { ref: mockito }
+  mockk:
+    group: io.mockk
+    name: mockk
+    version: { ref: mockk }
