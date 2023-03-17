@@ -49,7 +49,8 @@ public class CommandRegistrationEventImpl implements CommandRegistrationEvent {
 
     @Override
     public CommandRegistrationEvent register(String name, CommandMeta meta, CommandProvider provider, String... aliases) {
-        return this.manager.command(provider.construct(this.manager.commandBuilder(name, meta, aliases)));
+        this.manager.command(provider.construct(this.manager.commandBuilder(name, meta, aliases)));
+        return this;
     }
 
     @Override
