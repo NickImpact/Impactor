@@ -27,9 +27,11 @@ package net.impactdev.impactor.core.economy.transactions;
 
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
-import net.impactdev.impactor.api.economy.transactions.EconomyResultType;
+import net.impactdev.impactor.api.economy.transactions.details.EconomyResultType;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransferTransaction;
 import net.impactdev.impactor.api.utility.builders.Builder;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 
@@ -40,6 +42,7 @@ public final class ImpactorEconomyTransferTransaction implements EconomyTransfer
     private final Account to;
     private final BigDecimal amount;
     private final EconomyResultType result;
+    private final Component message;
 
     public ImpactorEconomyTransferTransaction(TransactionBuilder builder) {
         this.currency = builder.currency;
@@ -47,6 +50,7 @@ public final class ImpactorEconomyTransferTransaction implements EconomyTransfer
         this.to = builder.to;
         this.amount = builder.amount;
         this.result = builder.result;
+        this.message = builder.message;
     }
 
     @Override
@@ -74,6 +78,11 @@ public final class ImpactorEconomyTransferTransaction implements EconomyTransfer
         return this.result;
     }
 
+    @Override
+    public @Nullable Component message() {
+        return this.message;
+    }
+
     public static TransactionBuilder builder() {
         return new TransactionBuilder();
     }
@@ -85,6 +94,7 @@ public final class ImpactorEconomyTransferTransaction implements EconomyTransfer
         private Account to;
         private BigDecimal amount;
         private EconomyResultType result;
+        private Component message;
 
         public TransactionBuilder currency(final Currency currency) {
             this.currency = currency;
@@ -108,6 +118,11 @@ public final class ImpactorEconomyTransferTransaction implements EconomyTransfer
 
         public TransactionBuilder result(EconomyResultType result) {
             this.result = result;
+            return this;
+        }
+
+        public TransactionBuilder message(Component message) {
+            this.message = message;
             return this;
         }
 

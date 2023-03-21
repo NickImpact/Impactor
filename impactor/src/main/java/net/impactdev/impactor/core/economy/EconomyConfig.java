@@ -55,6 +55,7 @@ public final class EconomyConfig {
         double value = adapter.getDouble("restrictions.maximum-balance", 100000000000.0);
         return BigDecimal.valueOf(value);
     });
+    public static final ConfigKey<Boolean> ALLOW_TRANSFER_CROSS_CURRENCY = booleanKey("restrictions.allow-cross-currency-transfers", false);
 
     @SuppressWarnings("PatternValidation")
     public static final ConfigKey<List<Currency>> CURRENCIES = key(adapter -> {

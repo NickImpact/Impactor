@@ -31,13 +31,20 @@ import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.events.EconomyTransactionEvent;
-import net.impactdev.impactor.api.economy.transactions.EconomyResultType;
+import net.impactdev.impactor.api.economy.transactions.EconomyTransferTransaction;
+import net.impactdev.impactor.api.economy.transactions.composer.TransactionComposer;
+import net.impactdev.impactor.api.economy.transactions.details.EconomyResultType;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
-import net.impactdev.impactor.api.economy.transactions.EconomyTransactionType;
+import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 import net.impactdev.impactor.core.economy.ImpactorEconomyService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.MessageType;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -54,9 +61,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -105,6 +114,7 @@ public class BasicEconomyTest {
         assertTrue(Files.exists(Paths.get("impactor")
                 .resolve("economy")
                 .resolve("accounts")
+                .resolve("users")
                 .resolve(account.owner().toString().substring(0, 2))
                 .resolve(account.owner() + ".conf")
         ));
@@ -116,6 +126,7 @@ public class BasicEconomyTest {
         assertTrue(Files.exists(Paths.get("impactor")
                 .resolve("economy")
                 .resolve("accounts")
+                .resolve("users")
                 .resolve(target.toString().substring(0, 2))
                 .resolve(target + ".conf")
         ));
@@ -215,5 +226,108 @@ public class BasicEconomyTest {
 
         condensed = currency.format(amount, true, Locale.CANADA_FRENCH);
         assertEquals("$17,38", PlainTextComponentSerializer.plainText().serialize(condensed));
+    }
+
+    @Test
+    @Order(6)
+    public void transactionManipulation() {
+        EconomyService service = Impactor.instance().services().provide(EconomyService.class);
+        Currency currency = service.currencies().primary();
+
+        Account account = service.account(currency, target).join();
+        EconomyTransaction set = account.set(BigDecimal.ONE);
+        assertTrue(set.successful());
+        BigDecimal amount = new BigDecimal("1.00");
+
+        EconomyTransaction transaction = EconomyTransaction.compose()
+                .account(account)
+                .type(EconomyTransactionType.WITHDRAW)
+                .amount(amount)
+                .message(EconomyResultType.SUCCESS, Component.text("Transaction succeeded!"))
+                .message(EconomyResultType.NOT_ENOUGH_FUNDS, Component.text("Account did not have enough funds..."))
+                .message(EconomyResultType.FAILED, Component.text("A failure occurred while processing this transaction"))
+                .build();
+
+        assertTrue(transaction.successful());
+        assertEquals(0, account.balance().intValue());
+
+        AtomicReference<Component> message = new AtomicReference<>(Component.empty());
+        Audience audience = new Audience() {
+            @Override
+            public void sendMessage(@NotNull Identity source, @NotNull Component msg, @NotNull MessageType type) {
+                message.set(msg);
+            }
+        };
+
+        transaction.inform(audience);
+        assertEquals("Transaction succeeded!", PlainTextComponentSerializer.plainText().serialize(message.get()));
+
+        Account a = service.account(currency, UUID.randomUUID()).join();
+        EconomyTransferTransaction transfer = EconomyTransferTransaction.compose()
+                .from(a)
+                .to(account)
+                .amount(new BigDecimal(250))
+                .message(EconomyResultType.SUCCESS, Component.text("Transaction completed!"))
+                .build();
+
+        transfer.inform(audience);
+        assertEquals("Transaction completed!", PlainTextComponentSerializer.plainText().serialize(message.get()));
+
+        Currency secondary = Currency.builder()
+                .key(Key.key("impactor:test"))
+                .name(Component.text("Test"))
+                .plural(Component.text("Test"))
+                .decimals(3)
+                .formatting(Currency.SymbolFormatting.BEFORE)
+                .symbol(Component.text('$'))
+                .starting(BigDecimal.TEN)
+                .build();
+        Account b = service.account(secondary, UUID.randomUUID()).join();
+        EconomyTransferTransaction failure = EconomyTransferTransaction.compose()
+                .from(a)
+                .to(b)
+                .amount(BigDecimal.TEN)
+                .message(EconomyResultType.INVALID, Component.text("Mismatched currencies..."))
+                .build();
+
+        failure.inform(audience);
+        assertEquals("Mismatched currencies...", PlainTextComponentSerializer.plainText().serialize(message.get()));
+    }
+
+    @Test
+    @Order(7)
+    public void delete() {
+        EconomyService service = Impactor.instance().services().provide(EconomyService.class);
+        Currency primary = service.currencies().primary();
+        Currency secondary = Currency.builder()
+                .key(Key.key("impactor:test"))
+                .name(Component.text("Test"))
+                .plural(Component.text("Test"))
+                .decimals(3)
+                .formatting(Currency.SymbolFormatting.BEFORE)
+                .symbol(Component.text('$'))
+                .starting(BigDecimal.TEN)
+                .build();
+
+        service.account(primary, target).join();
+        service.account(secondary, target).join();
+
+        assertTrue(service.hasAccount(primary, target).join());
+        assertTrue(service.hasAccount(secondary, target).join());
+
+        service.deleteAccount(secondary, target).join();
+        assertTrue(service.hasAccount(primary, target).join());
+        assertFalse(service.hasAccount(secondary, target).join());
+    }
+
+    @Test
+    public void virtualAccounts() {
+        EconomyService service = Impactor.instance().services().provide(EconomyService.class);
+
+        Account account = service.account(UUID.randomUUID(), Account.AccountBuilder::virtual).join();
+        assertTrue(account.virtual());
+
+        Account existing = service.account(target, Account.AccountBuilder::virtual).join();
+        assertFalse(existing.virtual());
     }
 }

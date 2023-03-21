@@ -27,7 +27,6 @@ package net.impactdev.impactor.core.api;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.ImpactorServiceProvider;
-import net.impactdev.impactor.api.events.LazySubscriber;
 
 import java.lang.reflect.Method;
 
@@ -36,8 +35,6 @@ public class APIRegister {
     private static final Method REGISTER;
     private static final Method UNREGISTER;
 
-    private static final Method REGISTER_EVENTS;
-
     static {
         try {
             REGISTER = ImpactorServiceProvider.class.getDeclaredMethod("register", Impactor.class);
@@ -45,9 +42,6 @@ public class APIRegister {
 
             UNREGISTER = ImpactorServiceProvider.class.getDeclaredMethod("unregister");
             UNREGISTER.setAccessible(true);
-
-            REGISTER_EVENTS = LazySubscriber.class.getDeclaredMethod("registerAll");
-            REGISTER_EVENTS.setAccessible(true);
         } catch (NoSuchMethodException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -56,7 +50,6 @@ public class APIRegister {
     public static Impactor register(Impactor service) {
         try {
             REGISTER.invoke(null, service);
-            registerEvents();
 
             return service;
         } catch (Exception e) {
@@ -68,14 +61,6 @@ public class APIRegister {
     public static void unregister() {
         try {
             UNREGISTER.invoke(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void registerEvents() {
-        try {
-            REGISTER_EVENTS.invoke(null);
         } catch (Exception e) {
             e.printStackTrace();
         }

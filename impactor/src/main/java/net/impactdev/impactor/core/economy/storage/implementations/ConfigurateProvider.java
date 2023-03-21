@@ -64,6 +64,21 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
     private final ConfigurateLoader loader;
     private final Path root;
 
+    private enum Group {
+        Users("users"),
+        Virtual("virtual");
+
+        private final String directory;
+
+        Group(String directory) {
+            this.directory = directory;
+        }
+
+        private Path transform(Path parent) {
+            return parent.resolve(this.directory);
+        }
+    }
+
     private final LoadingCache<Path, ReentrantLock> ioLocks;
 
     public ConfigurateProvider(@NotNull final ConfigurateLoader loader) {
@@ -81,7 +96,9 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
 
     @Override
     public void init() throws Exception {
-        this.createDirectoriesIfNotExists(this.root.resolve("accounts"));
+        Path accounts = this.root.resolve("accounts");
+        this.createDirectoriesIfNotExists(Group.Users.transform(accounts));
+        this.createDirectoriesIfNotExists(Group.Virtual.transform(accounts));
     }
 
     @Override
@@ -111,45 +128,67 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
     }
 
     @Override
-    public Account account(Currency currency, UUID uuid, Account.AccountModifier modifier) throws Exception {
-        Path target = this.root.resolve("accounts")
-                .resolve(uuid.toString().substring(0, 2))
-                .resolve(uuid + ".conf");
+    public boolean hasAccount(Currency currency, UUID uuid) throws Exception {
+        for(Group group : Group.values()) {
+            Path target = group.transform(this.root.resolve("accounts"))
+                    .resolve(uuid.toString().substring(0, 2))
+                    .resolve(uuid + ".conf");
 
-        if(Files.exists(target)) {
-            ConfigurationNode node = this.read(target).node(currency.key().asString());
-            if(!node.virtual()) {
-                return ImpactorAccount.load(currency, uuid, BigDecimal.valueOf(node.getDouble()));
-            } else {
-                Account.AccountBuilder builder = new ImpactorAccount.ImpactorAccountBuilder();
+            if(Files.exists(target)) {
+                ConfigurationNode node = this.read(target).node(currency.key().asString());
+                return !node.virtual();
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public Account account(Currency currency, UUID uuid, Account.AccountModifier modifier) throws Exception {
+        for(Group group : Group.values()) {
+            Path target = group.transform(this.root.resolve("accounts"))
+                    .resolve(uuid.toString().substring(0, 2))
+                    .resolve(uuid + ".conf");
+
+            if(Files.exists(target)) {
+                ConfigurationNode node = this.read(target).node(currency.key().asString());
+                if(!node.virtual()) {
+                    return ImpactorAccount.load(currency, uuid, group == Group.Virtual, BigDecimal.valueOf(node.getDouble()));
+                }
+
+                ImpactorAccount.ImpactorAccountBuilder builder = new ImpactorAccount.ImpactorAccountBuilder();
                 builder.currency(currency).owner(uuid);
-                builder = modifier.modify(builder);
+                modifier.modify(builder);
+
+                if(group == Group.Users) {
+                    builder.overrideVirtuality(false);
+                }
 
                 Account account = builder.build();
                 this.save(account);
 
                 return account;
             }
-        } else {
-            Account.AccountBuilder builder = new ImpactorAccount.ImpactorAccountBuilder();
-            builder.currency(currency).owner(uuid);
-            builder = modifier.modify(builder);
-
-            Account account = builder.build();
-            this.save(account);
-
-            return account;
         }
+
+        Account.AccountBuilder builder = new ImpactorAccount.ImpactorAccountBuilder();
+        builder.currency(currency).owner(uuid);
+        builder = modifier.modify(builder);
+
+        Account account = builder.build();
+        this.save(account);
+
+        return account;
     }
 
     @Override
-    public boolean save(Account account) throws Exception {
-        Path target = this.root.resolve("accounts")
+    public void save(Account account) throws Exception {
+        Path accounts = this.root.resolve("accounts");
+        Path target = (account.virtual() ? Group.Virtual.transform(accounts) : Group.Users.transform(accounts))
                 .resolve(account.owner().toString().substring(0, 2))
                 .resolve(account.owner() + ".conf");
 
-        this.saveOrDelete(target, account);
-        return true;
+        this.save(target, account);
     }
 
     @Override
@@ -163,6 +202,7 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
             files.filter(path -> path.getFileName().toString().endsWith(".conf"))
                     .forEach(path -> {
                         try {
+                            boolean virtual = path.getParent().getParent().getFileName().toString().equals("virtual");
                             String name = path.getFileName().toString();
                             UUID owner = UUID.fromString(name.substring(0, name.indexOf(".")));
 
@@ -170,7 +210,7 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
                             for(Object key : data.childrenMap().keySet()) {
                                 Optional<Currency> currency = currencies.currency(Key.key((String) key));
                                 if(currency.isPresent()) {
-                                    Account account = ImpactorAccount.load(currency.get(), owner, BigDecimal.valueOf(data.node(key).getDouble()));
+                                    Account account = ImpactorAccount.load(currency.get(), owner, virtual, BigDecimal.valueOf(data.node(key).getDouble()));
                                     accounts.put(account.currency(), account);
                                 }
                             }
@@ -181,6 +221,33 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
                     });
         }
         return accounts;
+    }
+
+    @Override
+    public void delete(Currency currency, UUID uuid) throws Exception {
+        for(Group group : Group.values()) {
+            Path target = group.transform(this.root.resolve("accounts"))
+                    .resolve(uuid.toString().substring(0, 2))
+                    .resolve(uuid + ".conf");
+
+            if(Files.exists(target)) {
+                ConfigurationNode root = this.read(target);
+                ConfigurationNode data = root.node(currency.key().asString());
+                if (!data.virtual()) {
+                    if (!root.removeChild(data.key())) {
+                        throw new IllegalStateException("Failed to delete account...");
+                    }
+
+                    this.loader.loader(target).save(root);
+                }
+
+                if (root.empty()) {
+                    Files.delete(target);
+                }
+
+                return;
+            }
+        }
     }
 
     @Override
@@ -216,17 +283,12 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
         }
     }
 
-    private void saveOrDelete(Path target, @Nullable Account account) throws IOException {
+    private void save(Path target, @NotNull Account account) throws IOException {
         this.createDirectoriesIfNotExists(target.getParent());
         ReentrantLock lock = Objects.requireNonNull(this.ioLocks.get(target));
         lock.lock();
 
         try {
-            if(account == null) {
-                Files.deleteIfExists(target);
-                return;
-            }
-
             ConfigurationNode node;
             if(Files.exists(target)) {
                 node = this.loader.loader(target).load();
@@ -242,4 +304,5 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
             lock.unlock();
         }
     }
+
 }

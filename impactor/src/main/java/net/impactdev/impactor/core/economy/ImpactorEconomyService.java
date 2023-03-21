@@ -88,6 +88,11 @@ public final class ImpactorEconomyService implements EconomyService {
     }
 
     @Override
+    public CompletableFuture<Boolean> hasAccount(Currency currency, UUID uuid) {
+        return this.storage.hasAccount(currency, uuid);
+    }
+
+    @Override
     public CompletableFuture<Account> account(Currency currency, UUID uuid) {
         return this.storage.account(currency, uuid, builder -> builder);
     }
@@ -100,5 +105,10 @@ public final class ImpactorEconomyService implements EconomyService {
     @Override
     public CompletableFuture<Multimap<Currency, Account>> accounts() {
         return this.storage.accounts();
+    }
+
+    @Override
+    public CompletableFuture<Void> deleteAccount(Currency currency, UUID uuid) {
+        return this.storage.delete(currency, uuid);
     }
 }

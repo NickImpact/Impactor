@@ -69,6 +69,10 @@ public final class EconomyStorage implements Storage {
         return run(() -> this.implementation.meta(printer));
     }
 
+    public CompletableFuture<Boolean> hasAccount(Currency currency, UUID uuid) {
+        return supply(() -> this.implementation.hasAccount(currency, uuid));
+    }
+
     public CompletableFuture<Account> account(Currency currency, UUID uuid, Account.AccountModifier modifier) {
         Account account = this.accounts.getIfPresent(new AccountKey(currency, uuid));
         if(account != null) {
@@ -78,12 +82,16 @@ public final class EconomyStorage implements Storage {
         return supply(() -> this.implementation.account(currency, uuid, modifier));
     }
 
-    public CompletableFuture<Boolean> save(Account account) {
-        return supply(() -> this.implementation.save(account));
+    public CompletableFuture<Void> save(Account account) {
+        return run(() -> this.implementation.save(account));
     }
 
     public CompletableFuture<Multimap<Currency, Account>> accounts() {
         return supply(this.implementation::accounts);
+    }
+
+    public CompletableFuture<Void> delete(Currency currency, UUID uuid) {
+        return run(() -> this.implementation.delete(currency, uuid));
     }
 
     public CompletableFuture<Boolean> purge() {

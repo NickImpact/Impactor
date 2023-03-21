@@ -43,11 +43,11 @@ public final class CaptionRegistrationEventImpl implements CaptionRegistrationEv
     }
 
     @Override
-    public CaptionRegistrationEvent register(@NotNull Key key, @NotNull String format) {
+    public CaptionRegistrationEvent register(@NotNull Caption key, @NotNull String format) {
         final CaptionRegistry<CommandSource> registry = this.manager.getCaptionRegistry();
         if(registry instanceof FactoryDelegatingCaptionRegistry) {
             FactoryDelegatingCaptionRegistry<CommandSource> delegate = (FactoryDelegatingCaptionRegistry<CommandSource>) registry;
-            delegate.registerMessageFactory(Caption.of(key.asString()), (context, caption) -> format);
+            delegate.registerMessageFactory(key, (context, caption) -> format);
         }
 
         return this;

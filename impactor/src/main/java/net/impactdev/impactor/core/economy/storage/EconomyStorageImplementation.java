@@ -34,11 +34,15 @@ import java.util.UUID;
 
 public interface EconomyStorageImplementation extends StorageConnection {
 
+    boolean hasAccount(Currency currency, UUID uuid) throws Exception;
+
     Account account(Currency currency, UUID uuid, Account.AccountModifier modifier) throws Exception;
 
-    boolean save(Account account) throws Exception;
+    void save(Account account) throws Exception;
 
     Multimap<Currency, Account> accounts() throws Exception;
+
+    void delete(Currency currency, UUID uuid) throws Exception;
 
     boolean purge() throws Exception;
 

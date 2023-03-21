@@ -29,7 +29,7 @@ import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.events.EconomyTransactionEvent;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
-import net.impactdev.impactor.api.economy.transactions.EconomyTransactionType;
+import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 
 import java.math.BigDecimal;
 

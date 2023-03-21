@@ -34,9 +34,10 @@ import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.events.EconomyTransactionEvent;
 import net.impactdev.impactor.api.economy.events.EconomyTransferTransactionEvent;
-import net.impactdev.impactor.api.economy.transactions.EconomyResultType;
+import net.impactdev.impactor.api.economy.transactions.composer.TransactionComposer;
+import net.impactdev.impactor.api.economy.transactions.details.EconomyResultType;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
-import net.impactdev.impactor.api.economy.transactions.EconomyTransactionType;
+import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransferTransaction;
 import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
@@ -46,11 +47,15 @@ import net.impactdev.impactor.core.economy.events.ImpactorEconomyTransactionEven
 import net.impactdev.impactor.core.economy.events.ImpactorEconomyTransferTransactionEvent;
 import net.impactdev.impactor.core.economy.transactions.ImpactorEconomyTransaction;
 import net.impactdev.impactor.core.economy.transactions.ImpactorEconomyTransferTransaction;
+import net.impactdev.impactor.core.economy.transactions.composers.BaseTransactionComposer;
+import net.impactdev.impactor.core.economy.transactions.composers.TransferTransactionComposer;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.event.PostResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -64,20 +69,22 @@ public final class ImpactorAccount implements Account {
 
     private final UUID owner;
     private final Currency currency;
+    private final boolean virtual;
     private BigDecimal balance;
 
     private ImpactorAccount(ImpactorAccountBuilder builder) {
-        this(builder.currency, builder.owner, Optional.ofNullable(builder.balance).orElse(builder.currency.defaultAccountBalance()));
+        this(builder.currency, builder.owner, builder.virtual, Optional.ofNullable(builder.balance).orElse(builder.currency.defaultAccountBalance()));
     }
 
-    private ImpactorAccount(Currency currency, UUID owner, BigDecimal balance) {
+    private ImpactorAccount(Currency currency, UUID owner, boolean virtual, BigDecimal balance) {
         this.owner = owner;
         this.currency = currency;
         this.balance = balance;
+        this.virtual = virtual;
     }
 
-    public static ImpactorAccount load(Currency currency, UUID uuid, BigDecimal balance) {
-        return new ImpactorAccount(currency, uuid, balance);
+    public static ImpactorAccount load(Currency currency, UUID uuid, boolean virtual, BigDecimal balance) {
+        return new ImpactorAccount(currency, uuid, virtual, balance);
     }
 
     @Override
@@ -91,202 +98,262 @@ public final class ImpactorAccount implements Account {
     }
 
     @Override
+    public boolean virtual() {
+        return this.virtual;
+    }
+
+    @Override
     public @NotNull BigDecimal balance() {
         return this.balance;
     }
 
     @Override
     public @NotNull EconomyTransaction set(BigDecimal amount) {
-        return this.enact(amount, EconomyTransactionType.SET, () -> {
-            ImpactorEconomyTransaction.TransactionBuilder builder = ImpactorEconomyTransaction.builder()
-                    .account(this)
-                    .currency(this.currency)
-                    .amount(amount)
-                    .type(EconomyTransactionType.SET);
-
-            EconomyTransactionEvent.Pre pre = this.createAndFirePre(amount, EconomyTransactionType.SET);
-            if(pre.cancelled()) {
-                return builder.result(EconomyResultType.CANCELLED).build();
-            }
-
-            if(amount.signum() < 0) {
-                return this.createAndFirePost(builder.result(EconomyResultType.FAILED).build());
-            } else if(amount.doubleValue() >= 0) {
-                return this.createAndFirePost(builder.result(EconomyResultType.NO_REMAINING_SPACE).build());
-            } else {
-                this.balance = amount;
-                this.save();
-                return this.createAndFirePost(builder.result(EconomyResultType.SUCCESS).build());
-            }
-        }, () -> ImpactorEconomyTransaction.builder()
-                .currency(this.currency)
+        return EconomyTransaction.compose()
                 .account(this)
-                .amount(amount)
                 .type(EconomyTransactionType.SET)
-                .result(EconomyResultType.FAILED)
-                .build()
-        );
+                .amount(amount)
+                .build();
+    }
 
+    public @NotNull EconomyTransaction set(BaseTransactionComposer composer) {
+        final BigDecimal amount = composer.amount();
+        return this.enact(amount, EconomyTransactionType.SET, () -> {
+                ImpactorEconomyTransaction.TransactionBuilder builder = ImpactorEconomyTransaction.builder()
+                        .account(this)
+                        .currency(this.currency)
+                        .amount(amount)
+                        .type(EconomyTransactionType.SET);
+
+                EconomyTransactionEvent.Pre pre = this.createAndFirePre(amount, EconomyTransactionType.SET);
+                if(pre.cancelled()) {
+                    return this.complete(builder, EconomyResultType.CANCELLED, composer.messages());
+                }
+
+                boolean restrict = this.restriction(EconomyConfig.APPLY_RESTRICTIONS).orElse(false);
+                if(amount.signum() < 0) {
+                    return this.createAndFirePost(this.complete(builder, EconomyResultType.INVALID, composer.messages()));
+                } else if(restrict && this.restriction(EconomyConfig.MAX_BALANCE).map(value -> amount.compareTo(value) > 0).orElse(false)) {
+                    return this.createAndFirePost(this.complete(builder, EconomyResultType.INVALID, composer.messages()));
+                } else {
+                    this.balance = amount;
+                    this.save();
+                    return this.createAndFirePost(this.complete(builder, EconomyResultType.SUCCESS, composer.messages()));
+                }
+            }, () -> ImpactorEconomyTransaction.builder()
+                    .currency(this.currency)
+                    .account(this)
+                    .amount(amount)
+                    .type(EconomyTransactionType.SET)
+                    .result(EconomyResultType.FAILED)
+                    .build()
+        );
     }
 
     @Override
     public @NotNull EconomyTransaction withdraw(BigDecimal amount) {
-        return this.enact(amount, EconomyTransactionType.WITHDRAW, () -> {
-            ImpactorEconomyTransaction.TransactionBuilder builder = ImpactorEconomyTransaction.builder()
-                    .account(this)
-                    .currency(this.currency)
-                    .amount(amount)
-                    .type(EconomyTransactionType.WITHDRAW);
-
-            EconomyTransactionEvent.Pre pre = this.createAndFirePre(amount, EconomyTransactionType.WITHDRAW);
-            if(pre.cancelled()) {
-                return builder.result(EconomyResultType.CANCELLED).build();
-            }
-
-            BigDecimal result = this.balance.subtract(amount);
-            if(this.restriction(EconomyConfig.APPLY_RESTRICTIONS).orElse(false)) {
-                Optional<BigDecimal> minimum = this.restriction(EconomyConfig.MIN_BALANCE);
-                if(minimum.isPresent() && minimum.get().compareTo(result) > 0) {
-                    return this.createAndFirePost(builder.result(EconomyResultType.NOT_ENOUGH_FUNDS).build());
-                }
-            }
-
-            if(result.signum() < 0) {
-                return this.createAndFirePost(builder.result(EconomyResultType.NOT_ENOUGH_FUNDS).build());
-            }
-
-            this.balance = result;
-            this.save();
-            return this.createAndFirePost(builder.result(EconomyResultType.SUCCESS).build());
-        }, () -> ImpactorEconomyTransaction.builder()
-                .currency(this.currency)
+        return EconomyTransaction.compose()
                 .account(this)
-                .amount(amount)
                 .type(EconomyTransactionType.WITHDRAW)
-                .result(EconomyResultType.FAILED)
-                .build()
+                .amount(amount)
+                .build();
+    }
+
+    public @NotNull EconomyTransaction withdraw(BaseTransactionComposer composer) {
+        final BigDecimal amount = composer.amount();
+        return this.enact(amount, EconomyTransactionType.WITHDRAW, () -> {
+                    ImpactorEconomyTransaction.TransactionBuilder builder = ImpactorEconomyTransaction.builder()
+                            .account(this)
+                            .currency(this.currency)
+                            .amount(amount)
+                            .type(EconomyTransactionType.WITHDRAW);
+
+                    EconomyTransactionEvent.Pre pre = this.createAndFirePre(amount, EconomyTransactionType.WITHDRAW);
+                    if(pre.cancelled()) {
+                        return this.complete(builder, EconomyResultType.CANCELLED, composer.messages());
+                    }
+
+                    BigDecimal result = this.balance.subtract(amount);
+                    if(this.restriction(EconomyConfig.APPLY_RESTRICTIONS).orElse(false)) {
+                        Optional<BigDecimal> minimum = this.restriction(EconomyConfig.MIN_BALANCE);
+                        if(minimum.isPresent() && minimum.get().compareTo(result) > 0) {
+                            return this.createAndFirePost(this.complete(builder, EconomyResultType.NOT_ENOUGH_FUNDS, composer.messages()));
+                        }
+                    }
+
+                    if(result.signum() < 0) {
+                        return this.createAndFirePost(this.complete(builder, EconomyResultType.NOT_ENOUGH_FUNDS, composer.messages()));
+                    }
+
+                    this.balance = result;
+                    this.save();
+                    return this.createAndFirePost(this.complete(builder, EconomyResultType.SUCCESS, composer.messages()));
+                }, () -> ImpactorEconomyTransaction.builder()
+                        .currency(this.currency)
+                        .account(this)
+                        .amount(amount)
+                        .type(EconomyTransactionType.WITHDRAW)
+                        .result(EconomyResultType.FAILED)
+                        .build()
         );
     }
 
     @Override
     public @NotNull EconomyTransaction deposit(BigDecimal amount) {
-        return this.enact(amount, EconomyTransactionType.DEPOSIT, () -> {
-            ImpactorEconomyTransaction.TransactionBuilder builder = ImpactorEconomyTransaction.builder()
-                    .account(this)
-                    .currency(this.currency)
-                    .amount(amount)
-                    .type(EconomyTransactionType.DEPOSIT);
-
-            EconomyTransactionEvent.Pre pre = this.createAndFirePre(amount, EconomyTransactionType.SET);
-            if(pre.cancelled()) {
-                return builder.result(EconomyResultType.CANCELLED).build();
-            }
-
-            BigDecimal result = this.balance.add(amount);
-            if(this.restriction(EconomyConfig.APPLY_RESTRICTIONS).orElse(false)) {
-                Optional<BigDecimal> maximum = this.restriction(EconomyConfig.MAX_BALANCE);
-                if(maximum.isPresent() && maximum.get().compareTo(result) < 0) {
-                    return this.createAndFirePost(builder.result(EconomyResultType.NO_REMAINING_SPACE).build());
-                }
-            }
-
-            this.balance = result;
-            this.save();
-            return this.createAndFirePost(builder.result(EconomyResultType.SUCCESS).build());
-        }, () -> ImpactorEconomyTransaction.builder()
-                .currency(this.currency)
+        return EconomyTransaction.compose()
                 .account(this)
-                .amount(amount)
                 .type(EconomyTransactionType.DEPOSIT)
-                .result(EconomyResultType.FAILED)
-                .build()
+                .amount(amount)
+                .build();
+    }
+
+    public @NotNull EconomyTransaction deposit(BaseTransactionComposer composer) {
+        final BigDecimal amount = composer.amount();
+        return this.enact(amount, EconomyTransactionType.DEPOSIT, () -> {
+                    ImpactorEconomyTransaction.TransactionBuilder builder = ImpactorEconomyTransaction.builder()
+                            .account(this)
+                            .currency(this.currency)
+                            .amount(amount)
+                            .type(EconomyTransactionType.DEPOSIT);
+
+                    EconomyTransactionEvent.Pre pre = this.createAndFirePre(amount, EconomyTransactionType.SET);
+                    if(pre.cancelled()) {
+                        return this.complete(builder, EconomyResultType.CANCELLED, composer.messages());
+                    }
+
+                    BigDecimal result = this.balance.add(amount);
+                    if(this.restriction(EconomyConfig.APPLY_RESTRICTIONS).orElse(false)) {
+                        Optional<BigDecimal> maximum = this.restriction(EconomyConfig.MAX_BALANCE);
+                        if(maximum.isPresent() && maximum.get().compareTo(result) < 0) {
+                            return this.createAndFirePost(this.complete(builder, EconomyResultType.NO_REMAINING_SPACE, composer.messages()));
+                        }
+                    }
+
+                    this.balance = result;
+                    this.save();
+                    return this.createAndFirePost(this.complete(builder, EconomyResultType.SUCCESS, composer.messages()));
+                }, () -> ImpactorEconomyTransaction.builder()
+                        .currency(this.currency)
+                        .account(this)
+                        .amount(amount)
+                        .type(EconomyTransactionType.DEPOSIT)
+                        .result(EconomyResultType.FAILED)
+                        .build()
         );
     }
 
     @Override
     public @NotNull EconomyTransferTransaction transfer(Account to, BigDecimal amount) {
-        return this.enact(amount, EconomyTransactionType.TRANSFER, () -> {
-            ImpactorEconomyTransferTransaction.TransactionBuilder builder = ImpactorEconomyTransferTransaction.builder()
-                    .currency(this.currency)
-                    .from(this)
-                    .to(to)
-                    .amount(amount);
-
-            EconomyTransferTransactionEvent.Pre event = new ImpactorEconomyTransferTransactionEvent.Pre(
-                    this.currency,
-                    this,
-                    to,
-                    amount
-            );
-
-            this.postAndVerify(event);
-            if(event.cancelled()) {
-                return builder.result(EconomyResultType.CANCELLED).build();
-            }
-
-            BigDecimal withdraw = this.balance.subtract(amount);
-            BigDecimal deposit = to.balance().add(amount);
-            if(this.restriction(EconomyConfig.APPLY_RESTRICTIONS).orElse(false)) {
-                Optional<BigDecimal> minimum = this.restriction(EconomyConfig.MIN_BALANCE);
-                Optional<BigDecimal> maximum = this.restriction(EconomyConfig.MAX_BALANCE);
-                if(maximum.isPresent() && maximum.get().compareTo(deposit) < 0) {
-                    EconomyTransferTransactionEvent.Post post = new ImpactorEconomyTransferTransactionEvent.Post(builder.result(EconomyResultType.NO_REMAINING_SPACE).build());
-                    this.postAndVerify(post);
-                    return post.transaction();
-                }
-
-                if(minimum.isPresent() && minimum.get().compareTo(withdraw) > 0) {
-                    EconomyTransferTransactionEvent.Post post = new ImpactorEconomyTransferTransactionEvent.Post(builder.result(EconomyResultType.NOT_ENOUGH_FUNDS).build());
-                    this.postAndVerify(post);
-                    return post.transaction();
-                }
-            }
-
-            this.balance = this.balance.subtract(amount);
-            ((ImpactorAccount) to).quietSet(to.balance().add(amount));
-
-            this.save();
-            ((ImpactorAccount) to).save();
-
-            EconomyTransferTransactionEvent.Post post = new ImpactorEconomyTransferTransactionEvent.Post(
-                    builder.result(EconomyResultType.SUCCESS).build()
-            );
-            this.postAndVerify(post);
-            return post.transaction();
-        }, () -> ImpactorEconomyTransferTransaction.builder()
-                .currency(this.currency)
+        return EconomyTransferTransaction.compose()
                 .from(this)
                 .to(to)
                 .amount(amount)
-                .result(EconomyResultType.FAILED)
-                .build()
+                .build();
+    }
+
+    public @NotNull EconomyTransferTransaction transfer(TransferTransactionComposer composer) {
+        final BigDecimal amount = composer.amount();
+        final Account to = composer.target();
+
+        return this.enact(amount, EconomyTransactionType.TRANSFER, () -> {
+                    ImpactorEconomyTransferTransaction.TransactionBuilder builder = ImpactorEconomyTransferTransaction.builder()
+                            .currency(this.currency)
+                            .from(this)
+                            .to(to)
+                            .amount(amount);
+
+                    if(!this.currency.key().equals(to.currency().key())) {
+                        if(!this.restriction(EconomyConfig.ALLOW_TRANSFER_CROSS_CURRENCY).orElse(true)) {
+                            return this.complete(builder, EconomyResultType.INVALID, composer.messages());
+                        }
+                    }
+
+                    EconomyTransferTransactionEvent.Pre event = new ImpactorEconomyTransferTransactionEvent.Pre(
+                            this.currency,
+                            this,
+                            to,
+                            amount
+                    );
+
+                    this.postAndVerify(event);
+                    if(event.cancelled()) {
+                        return this.complete(builder, EconomyResultType.CANCELLED, composer.messages());
+                    }
+
+                    BigDecimal withdraw = this.balance.subtract(amount);
+                    BigDecimal deposit = to.balance().add(amount);
+                    if(this.restriction(EconomyConfig.APPLY_RESTRICTIONS).orElse(false)) {
+                        Optional<BigDecimal> minimum = this.restriction(EconomyConfig.MIN_BALANCE);
+                        Optional<BigDecimal> maximum = this.restriction(EconomyConfig.MAX_BALANCE);
+                        if(maximum.isPresent() && maximum.get().compareTo(deposit) < 0) {
+                            EconomyTransferTransactionEvent.Post post = new ImpactorEconomyTransferTransactionEvent.Post(
+                                    this.complete(builder, EconomyResultType.NO_REMAINING_SPACE, composer.messages())
+                            );
+                            this.postAndVerify(post);
+                            return post.transaction();
+                        }
+
+                        if(minimum.isPresent() && minimum.get().compareTo(withdraw) > 0) {
+                            EconomyTransferTransactionEvent.Post post = new ImpactorEconomyTransferTransactionEvent.Post(
+                                    this.complete(builder, EconomyResultType.NOT_ENOUGH_FUNDS, composer.messages())
+                            );
+                            this.postAndVerify(post);
+                            return post.transaction();
+                        }
+                    }
+
+                    this.balance = this.balance.subtract(amount);
+                    ((ImpactorAccount) to).quietSet(to.balance().add(amount));
+
+                    this.save();
+                    ((ImpactorAccount) to).save();
+
+                    EconomyTransferTransactionEvent.Post post = new ImpactorEconomyTransferTransactionEvent.Post(
+                            this.complete(builder, EconomyResultType.SUCCESS, composer.messages())
+                    );
+                    this.postAndVerify(post);
+                    return post.transaction();
+                }, () -> ImpactorEconomyTransferTransaction.builder()
+                        .currency(this.currency)
+                        .from(this)
+                        .to(to)
+                        .amount(amount)
+                        .result(EconomyResultType.FAILED)
+                        .build()
         );
     }
 
     @Override
     public @NotNull EconomyTransaction reset() {
-        return this.enact(this.currency.defaultAccountBalance(), EconomyTransactionType.RESET, () -> {
-            ImpactorEconomyTransaction.TransactionBuilder builder = ImpactorEconomyTransaction.builder()
-                    .account(this)
-                    .currency(this.currency)
-                    .amount(this.currency.defaultAccountBalance())
-                    .type(EconomyTransactionType.DEPOSIT);
-
-            EconomyTransactionEvent.Pre pre = this.createAndFirePre(this.currency.defaultAccountBalance(), EconomyTransactionType.RESET);
-            if(pre.cancelled()) {
-                return builder.result(EconomyResultType.CANCELLED).build();
-            }
-
-            this.balance = this.currency.defaultAccountBalance();
-            this.save();
-            return this.createAndFirePost(builder.result(EconomyResultType.SUCCESS).build());
-        }, () -> ImpactorEconomyTransaction.builder()
-                .currency(this.currency)
+        return EconomyTransaction.compose()
                 .account(this)
-                .amount(this.currency.defaultAccountBalance())
-                .type(EconomyTransactionType.DEPOSIT)
-                .result(EconomyResultType.FAILED)
-                .build()
+                .type(EconomyTransactionType.RESET)
+                .build();
+    }
+
+    public @NotNull EconomyTransaction reset(BaseTransactionComposer composer) {
+        return this.enact(this.currency.defaultAccountBalance(), EconomyTransactionType.RESET, () -> {
+                    ImpactorEconomyTransaction.TransactionBuilder builder = ImpactorEconomyTransaction.builder()
+                            .account(this)
+                            .currency(this.currency)
+                            .amount(this.currency.defaultAccountBalance())
+                            .type(EconomyTransactionType.DEPOSIT);
+
+                    EconomyTransactionEvent.Pre pre = this.createAndFirePre(this.currency.defaultAccountBalance(), EconomyTransactionType.RESET);
+                    if(pre.cancelled()) {
+                        return builder.result(EconomyResultType.CANCELLED).build();
+                    }
+
+                    this.balance = this.currency.defaultAccountBalance();
+                    this.save();
+                    return this.createAndFirePost(builder.result(EconomyResultType.SUCCESS).build());
+                }, () -> ImpactorEconomyTransaction.builder()
+                        .currency(this.currency)
+                        .account(this)
+                        .amount(this.currency.defaultAccountBalance())
+                        .type(EconomyTransactionType.DEPOSIT)
+                        .result(EconomyResultType.FAILED)
+                        .build()
         );
     }
 
@@ -348,6 +415,14 @@ public final class ImpactorAccount implements Account {
         return Optional.empty();
     }
 
+    private EconomyTransaction complete(ImpactorEconomyTransaction.TransactionBuilder builder, EconomyResultType type, Map<EconomyResultType, Component> messages) {
+        return builder.result(type).message(messages.getOrDefault(type, null)).build();
+    }
+
+    private EconomyTransferTransaction complete(ImpactorEconomyTransferTransaction.TransactionBuilder builder, EconomyResultType type, Map<EconomyResultType, Component> messages) {
+        return builder.result(type).message(messages.getOrDefault(type, null)).build();
+    }
+
     @FunctionalInterface
     private interface TransactionProcessor<T> {
 
@@ -379,6 +454,7 @@ public final class ImpactorAccount implements Account {
         private Currency currency;
         private UUID owner;
         private BigDecimal balance;
+        private boolean virtual;
 
         @Override
         public @NotNull AccountBuilder currency(@NotNull Currency currency) {
@@ -395,6 +471,17 @@ public final class ImpactorAccount implements Account {
         @Override
         public @NotNull AccountBuilder balance(@NotNull BigDecimal balance) {
             this.balance = balance;
+            return this;
+        }
+
+        @Override
+        public @NotNull AccountBuilder virtual() {
+            this.virtual = true;
+            return this;
+        }
+
+        public AccountBuilder overrideVirtuality(boolean value) {
+            this.virtual = value;
             return this;
         }
 

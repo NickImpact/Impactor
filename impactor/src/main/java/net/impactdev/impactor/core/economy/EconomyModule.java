@@ -27,6 +27,8 @@ package net.impactdev.impactor.core.economy;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.EconomyService;
+import net.impactdev.impactor.api.economy.transactions.composer.TransactionComposer;
+import net.impactdev.impactor.api.economy.transactions.composer.TransferComposer;
 import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.providers.BuilderProvider;
@@ -36,35 +38,29 @@ import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.core.economy.currency.ImpactorCurrency;
 import net.impactdev.impactor.core.economy.registration.EconomyRegistrationProvider;
 import net.impactdev.impactor.core.economy.registration.ImpactorSuggestEconomyServiceEvent;
+import net.impactdev.impactor.core.economy.transactions.composers.BaseTransactionComposer;
+import net.impactdev.impactor.core.economy.transactions.composers.TransferTransactionComposer;
 import net.impactdev.impactor.core.modules.ImpactorModule;
+import net.kyori.adventure.text.Component;
 import net.kyori.event.EventBus;
 
 public class EconomyModule implements ImpactorModule {
-    @Override
-    public void factories(FactoryProvider provider) {}
 
     @Override
     public void builders(BuilderProvider provider) {
         provider.register(Currency.CurrencyBuilder.class, ImpactorCurrency.ImpactorCurrencyBuilder::new);
+
+        provider.register(TransactionComposer.class, BaseTransactionComposer::new);
+        provider.register(TransferComposer.class, TransferTransactionComposer::new);
     }
 
     @Override
-    public void services(ServiceProvider provider) {}
-
-    @Override
-    public void subscribe(EventBus<ImpactorEvent> bus) {
-
-    }
-
-    @Override
-    public void init(Impactor service, PluginLogger logger) throws Exception {
+    public void init(Impactor api, PluginLogger logger) throws Exception {
         EconomyRegistrationProvider economy = new EconomyRegistrationProvider();
-        service.events().post(new ImpactorSuggestEconomyServiceEvent(economy));
+        api.events().post(new ImpactorSuggestEconomyServiceEvent(economy));
 
-        logger.info("Registering economy service (Provider: "
-                + economy.suggestion().metadata().name().orElse(economy.suggestion().metadata().id())
-                + ")"
-        );
-        service.services().register(EconomyService.class, economy.suggestion().supplier().get());
+        String service = economy.suggestion().metadata().name().orElse(economy.suggestion().metadata().id());
+        logger.info("Registering economy service (Provider: " + service + ")");
+        api.services().register(EconomyService.class, economy.suggestion().supplier().get());
     }
 }
