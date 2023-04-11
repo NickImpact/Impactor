@@ -53,11 +53,8 @@ public interface ImpactorTranslations {
             .build();
 
     TranslationProvider<Component> ECONOMY_BALANCE = TranslationProvider.create(MANAGER, "economy.account.balance");
-    TranslationProvider<Component> ECONOMY_WITHDRAW = TranslationProvider.create(MANAGER, "economy.account.withdraw");
-    TranslationProvider<Component> ECONOMY_DEPOSIT = TranslationProvider.create(MANAGER, "economy.account.deposit");
+    TranslationProvider<Component> ECONOMY_TRANSACTION = TranslationProvider.create(MANAGER, "economy.account.transaction");
     TranslationProvider<Component> ECONOMY_TRANSFER = TranslationProvider.create(MANAGER, "economy.account.transfer");
-    TranslationProvider<Component> ECONOMY_SET = TranslationProvider.create(MANAGER, "economy.account.set");
-    TranslationProvider<Component> ECONOMY_RESET = TranslationProvider.create(MANAGER, "economy.account.reset");
 
     static <T> TranslationProvider<T> create(final @NotNull String key) {
         return TranslationProvider.create(MANAGER, key);

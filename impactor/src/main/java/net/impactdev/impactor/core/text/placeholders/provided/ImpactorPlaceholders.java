@@ -122,6 +122,14 @@ public final class ImpactorPlaceholders {
                 Account account = ctx.require(Account.class);
                 TransactionContext transaction = ctx.require(TransactionContext.class);
 
+                String option = arguments.pop();
+                switch (option) {
+                    case "type":
+                        return text(transaction.type().name());
+                    case "before":
+                        return account.currency().format(transaction.before());
+                }
+
                 return empty();
             }
     );

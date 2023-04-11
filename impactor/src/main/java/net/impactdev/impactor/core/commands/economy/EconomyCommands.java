@@ -26,6 +26,7 @@
 package net.impactdev.impactor.core.commands.economy;
 
 import cloud.commandframework.annotations.Argument;
+import cloud.commandframework.annotations.CommandDescription;
 import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.CommandPermission;
 import cloud.commandframework.annotations.processing.CommandContainer;
@@ -35,29 +36,23 @@ import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
-import net.impactdev.impactor.api.items.ImpactorItemStack;
-import net.impactdev.impactor.api.items.extensions.SkullStack;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.utility.Context;
 import net.impactdev.impactor.core.economy.context.TransactionContext;
 import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 
-import static net.kyori.adventure.text.Component.newline;
-import static net.kyori.adventure.text.Component.text;
-
+@SuppressWarnings({"DuplicatedCode", "unused"})
 @CommandContainer
 @CommandPermission("impactor.commands.economy.base")
 public final class EconomyCommands {
 
     @CommandMethod("economy|eco balance [target] [currency]")
     @CommandPermission("impactor.commands.economy.balance")
+    @CommandDescription("Fetches the balance of the source or identified target")
     public void balance(final @NotNull CommandSource source, @Nullable @Argument("target") PlatformSource target, @Nullable @Argument("currency") Currency currency) {
         EconomyService service = EconomyService.instance();
         Currency c = currency != null ? currency : service.currencies().primary();
@@ -71,6 +66,7 @@ public final class EconomyCommands {
         ImpactorTranslations.ECONOMY_BALANCE.send(source, context);
     }
 
+    // TODO - Consolidate down to one method, with withdraw/deposit/etc being an argument instead
     @CommandMethod("economy|eco withdraw <amount> [target] [currency]")
     @CommandPermission("impactor.commands.economy.withdraw")
     public void withdraw(
@@ -83,12 +79,6 @@ public final class EconomyCommands {
         Currency c = currency != null ? currency : service.currencies().primary();
         PlatformSource focus = target != null ? target : source.source();
 
-        if(!service.hasAccount(c, focus.uuid()).join()) {
-            throw new IllegalArgumentException(
-                    (target != null ? "The target does " : "You do ") + "not have an account for the target currency..."
-            );
-        }
-
         Account account = service.account(c, focus.uuid()).join();
         BigDecimal before = account.balance();
 
@@ -97,26 +87,91 @@ public final class EconomyCommands {
             throw new RuntimeException("The transaction failed with reason: " + transaction.result().name());
         }
 
-//        BigDecimal after = account.balance();
-//        Component message = text("Transaction completed successfully!");
-//        Component hover = text("Transaction Type: ")
-//                .append(text(transaction.type().name()).color(NamedTextColor.YELLOW))
-//                .append(newline())
-//                .append(text("Before: ").color(NamedTextColor.GRAY))
-//                .append(c.format(before).color(NamedTextColor.GREEN))
-//                .append(newline())
-//                .append(text("After: ").color(NamedTextColor.GRAY))
-//                .append(c.format(after).color(NamedTextColor.GREEN));
-//
-//        message = message.hoverEvent(HoverEvent.showText(hover));
-//
-//        source.sendMessage(message);
-
         Context context = Context.empty();
         context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.WITHDRAW, before, account.balance()));
         context.append(Currency.class, c);
         context.append(Account.class, account);
 
-        ImpactorTranslations.ECONOMY_WITHDRAW.send(source, context);
+        ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
     }
+
+    @CommandMethod("economy|eco deposit <amount> [target] [currency]")
+    @CommandPermission("impactor.commands.economy.deposit")
+    public void deposit(
+            final @NotNull CommandSource source,
+            @Argument("amount") double amount,
+            @Nullable @Argument("target") PlatformSource target,
+            @Nullable @Argument("currency") Currency currency
+    ) {
+        EconomyService service = EconomyService.instance();
+        Currency c = currency != null ? currency : service.currencies().primary();
+        PlatformSource focus = target != null ? target : source.source();
+
+        Account account = service.account(c, focus.uuid()).join();
+        BigDecimal before = account.balance();
+
+        EconomyTransaction transaction = account.deposit(new BigDecimal(amount));
+        if(!transaction.successful()) {
+            throw new RuntimeException("The transaction failed with reason: " + transaction.result().name());
+        }
+
+        Context context = Context.empty();
+        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.DEPOSIT, before, account.balance()));
+        context.append(Currency.class, c);
+        context.append(Account.class, account);
+        ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
+    }
+
+    @CommandMethod("economy|eco set <amount> [target] [currency]")
+    @CommandPermission("impactor.commands.economy.set")
+    public void set(
+            final @NotNull CommandSource source,
+            @Argument("amount") double amount,
+            @Nullable @Argument("target") PlatformSource target,
+            @Nullable @Argument("currency") Currency currency
+    ) {
+        EconomyService service = EconomyService.instance();
+        Currency c = currency != null ? currency : service.currencies().primary();
+        PlatformSource focus = target != null ? target : source.source();
+
+        Account account = service.account(c, focus.uuid()).join();
+        BigDecimal before = account.balance();
+
+        EconomyTransaction transaction = account.deposit(new BigDecimal(amount));
+        if(!transaction.successful()) {
+            throw new RuntimeException("The transaction failed with reason: " + transaction.result().name());
+        }
+
+        Context context = Context.empty();
+        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.SET, before, account.balance()));
+        context.append(Currency.class, c);
+        context.append(Account.class, account);
+        ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
+    }
+    @CommandMethod("economy|eco reset [target] [currency]")
+    @CommandPermission("impactor.commands.economy.set")
+    public void reset(
+            final @NotNull CommandSource source,
+            @Nullable @Argument("target") PlatformSource target,
+            @Nullable @Argument("currency") Currency currency
+    ) {
+        EconomyService service = EconomyService.instance();
+        Currency c = currency != null ? currency : service.currencies().primary();
+        PlatformSource focus = target != null ? target : source.source();
+
+        Account account = service.account(c, focus.uuid()).join();
+        BigDecimal before = account.balance();
+
+        EconomyTransaction transaction = account.reset();
+        if(!transaction.successful()) {
+            throw new RuntimeException("The transaction failed with reason: " + transaction.result().name());
+        }
+
+        Context context = Context.empty();
+        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.RESET, before, account.balance()));
+        context.append(Currency.class, c);
+        context.append(Account.class, account);
+        ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
+    }
+
 }

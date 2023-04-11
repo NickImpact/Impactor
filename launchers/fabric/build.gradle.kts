@@ -14,6 +14,10 @@ architectury {
     fabric()
 }
 
+repositories {
+    maven("https://maven.nucleoid.xyz/") { name = "Nucleoid" }
+}
+
 dependencies {
     modImplementation("net.fabricmc:fabric-loader:${rootProject.property("fabric-loader")}")
     listOf(
@@ -36,6 +40,12 @@ dependencies {
     modImplementation("cloud.commandframework:cloud-fabric:1.7.1") {
         exclude("net.fabricmc.fabric-api")
     }
+    modApi("cloud.commandframework:cloud-minecraft-extras:1.7.1") {
+        exclude("net.kyori")
+    }
+
+    modImplementation("eu.pb4:placeholder-api:2.0.0-pre.1+1.19.2")
+    include("eu.pb4:placeholder-api:2.0.0-pre.1+1.19.2")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")

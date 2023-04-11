@@ -1,5 +1,4 @@
 {
     "economy.account.balance": "<hover:show_text:'<gray>Currency: <yellow><impactor:currency><newline><gray>Account: <yellow><impactor:account:name> <gray>(<aqua><impactor:account:uuid><gray>)'><gray>Balance: <green><impactor:account:balance>",
-    "economy.account.withdraw": "<hover:show_text:'<gray>Transaction Type: <yellow><impactor:economy_transaction:type><newline><gray>Before: <yellow><impactor:economy_transaction:before><newline><gray>After: <yellow><impactor:account:balance>'><gray>Transaction completed successfully! Hover for transaction info!",
-    "economy.account.deposit": ""
+    "economy.account.transaction": "<hover:show_text:'<gray>Transaction Type: <yellow><impactor:economy_transaction:type><newline><gray>Before: <yellow><impactor:economy_transaction:before><newline><gray>After: <yellow><impactor:account:balance>'><gray>Transaction completed successfully! Hover for transaction info!"
 }

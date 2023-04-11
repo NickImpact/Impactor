@@ -26,9 +26,14 @@
 package net.impactdev.impactor.core.commands;
 
 import cloud.commandframework.annotations.AnnotationParser;
+import cloud.commandframework.arguments.parser.ParserParameter;
+import cloud.commandframework.arguments.parser.ParserParameters;
+import cloud.commandframework.arguments.parser.StandardParameters;
+import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import com.google.common.collect.Lists;
 import io.leangen.geantyref.TypeToken;
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.commands.ImpactorCommandManager;
 import net.impactdev.impactor.api.economy.currency.Currency;
@@ -40,6 +45,7 @@ import net.impactdev.impactor.core.commands.parsers.PlatformSourceParser;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 
 import java.util.List;
+import java.util.Map;
 
 public final class ImpactorCommandRegistry {
 
@@ -85,7 +91,18 @@ public final class ImpactorCommandRegistry {
         AnnotationParser<CommandSource> parser = new AnnotationParser<>(
                 this.manager.delegate(),
                 CommandSource.class,
-                parameters -> SimpleCommandMeta.empty()
+                parameters -> {
+                    SimpleCommandMeta.Builder meta = CommandMeta.simple();
+                    if(!parameters.has(StandardParameters.DESCRIPTION)) {
+                        meta.with(CommandMeta.DESCRIPTION, parameters.get(StandardParameters.DESCRIPTION, ""));
+                    }
+
+                    if(parameters.has(StandardParameters.HIDDEN)) {
+                        meta.with(CommandMeta.HIDDEN, parameters.get(StandardParameters.HIDDEN, false));
+                    }
+
+                    return meta.build();
+                }
         );
 
         return parser;

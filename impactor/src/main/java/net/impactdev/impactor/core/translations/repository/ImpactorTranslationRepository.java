@@ -111,7 +111,7 @@ public class ImpactorTranslationRepository implements TranslationRepository {
                 return false;
             }
 
-            this.downloadAndInstall(this.available().join(), Audience.empty(), true);
+            this.downloadAndInstall(this.available().join(), Audience.empty(), true).join();
             return true;
         });
     }
