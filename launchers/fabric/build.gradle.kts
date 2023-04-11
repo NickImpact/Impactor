@@ -3,6 +3,12 @@ plugins {
     id("impactor.publishing-conventions")
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 architectury {
     platformSetupLoomIde()
     fabric()
@@ -19,8 +25,14 @@ dependencies {
     implementation(project(":minecraft"))
     modImplementation("ca.landonjw.gooeylibs:fabric:3.0.0-1.19.2-SNAPSHOT@jar")
 
-    include("cloud.commandframework:cloud-annotations:1.7.1")
-    include("cloud.commandframework:cloud-fabric:1.7.1")
+    modImplementation("net.impactdev.impactor.commands:fabric:5.0.0+1.19.2-SNAPSHOT") {
+        exclude("net.impactdev.impactor.api", "config")
+        exclude("net.impactdev.impactor.api", "core")
+        exclude("net.impactdev.impactor.api", "items")
+        exclude("net.impactdev.impactor.api", "players")
+        exclude("net.impactdev.impactor.api", "plugins")
+        exclude("net.impactdev.impactor.api", "storage")
+    }
     modImplementation("cloud.commandframework:cloud-fabric:1.7.1") {
         exclude("net.fabricmc.fabric-api")
     }
@@ -50,6 +62,5 @@ tasks {
             "org.apache.maven",
             "ca.landonjw.gooeylibs2"
         ).forEach { relocate(it, "$prefix.$it") }
-
     }
 }

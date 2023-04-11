@@ -17,13 +17,13 @@ rootProject.name = "Impactor"
 
 include("api:core")
 include("api:config")
-include("api:commands")
 include("api:economy")
 include("api:items")
 include("api:players")
 include("api:plugins")
 include("api:storage")
 include("api:text")
+include("api:translations")
 include("api:ui")
 
 include("impactor")

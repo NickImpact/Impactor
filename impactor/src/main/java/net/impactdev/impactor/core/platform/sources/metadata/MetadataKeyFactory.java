@@ -37,7 +37,7 @@ public final class MetadataKeyFactory implements MetadataKey.Factory {
 
     @Override
     public <T> MetadataKey<T> create(Key key) {
-        return (MetadataKey<T>) this.cache.get(key, in -> new ImpactorMetadataKey<T>(key, new TypeToken<T>() {}));
+        return (MetadataKey<T>) this.cache.get(key, in -> new ImpactorMetadataKey<T>(key));
     }
 
 }

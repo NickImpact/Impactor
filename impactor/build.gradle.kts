@@ -11,17 +11,18 @@ repositories {
 dependencies {
     api(project(":api:core"))
     api(project(":api:config"))
-    api(project(":api:commands"))
     api(project(":api:economy"))
+    api(project(":api:players"))
     api(project(":api:plugins"))
     api(project(":api:storage"))
     api(project(":api:text"))
+    api(project(":api:translations"))
 
-    // Cloud Command Framework
-    api("cloud.commandframework:cloud-core:1.7.1")
-    api("cloud.commandframework:cloud-annotations:1.7.1")
-    api("cloud.commandframework:cloud-brigadier:1.7.1")
-    implementation("com.mojang:brigadier:1.0.18")
+    api("net.impactdev.impactor.api:commands:5.0.0+1.19.2-SNAPSHOT") {
+        exclude("net.impactdev.impactor.api", "core")
+        exclude("net.impactdev.impactor.api", "items")
+        exclude("net.impactdev.impactor.api", "players")
+    }
 
     // Databases
     api("com.zaxxer:HikariCP:4.0.3")
@@ -38,6 +39,9 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("com.mojang:brigadier:1.0.18")
 
+    implementation("com.squareup.okhttp3:okhttp:3.14.9")
+    implementation("com.squareup.okio:okio:1.17.5")
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
     testImplementation("org.mockito:mockito-core:4.7.0")
@@ -49,4 +53,13 @@ tasks.withType(Test::class) {
     // Allow JUnit to find our TestInitializer and invoke its
     // before all callback for all tests
     jvmArgs("-Djunit.jupiter.extensions.autodetection.enabled=true")
+}
+
+sourceSets {
+    test {
+        resources {
+            srcDirs.add(File("src/main/resources"))
+            srcDirs.add(File("src/test/resources"))
+        }
+    }
 }

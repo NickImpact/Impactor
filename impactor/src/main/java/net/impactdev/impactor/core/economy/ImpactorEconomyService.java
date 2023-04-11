@@ -52,6 +52,7 @@ public final class ImpactorEconomyService implements EconomyService {
         this.config = Config.builder()
                 .path(BaseImpactorPlugin.instance().configurationDirectory().resolve("economy.conf"))
                 .provider(EconomyConfig.class)
+                .provideIfMissing(() -> BaseImpactorPlugin.instance().resource(root -> root.resolve("economy.conf")))
                 .build();
 
         List<Currency> currencies = this.config.get(EconomyConfig.CURRENCIES);

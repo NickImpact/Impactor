@@ -23,12 +23,14 @@
  *
  */
 
-package net.impactdev.impactor.core.locale;
+package net.impactdev.impactor.core.translations.locale;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import net.impactdev.impactor.api.translations.TranslationManager;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.core.translations.ImpactorTranslationManager;
 import org.apache.commons.lang3.LocaleUtils;
 
 import java.util.Locale;
@@ -36,33 +38,9 @@ import java.util.function.Function;
 
 public final class LocaleCache {
 
-    private static final Function<String, Locale> LOCALE_TRANSLATOR = new Function<String, Locale>() {
-        @Override
-        public Locale apply(String key) {
-            try {
-                return LocaleUtils.toLocale(key);
-            } catch (final IllegalArgumentException ignored) {
-                // Ignore the first exception and try again, this time using a "fixed" key.
-                final String fixedKey = this.fixLocaleKey(key);
-                try {
-                    return LocaleUtils.toLocale(fixedKey);
-                } catch (final IllegalArgumentException e) {
-                    ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
-                    throw e;
-                }
-            }
-        }
-
-        private String fixLocaleKey(final String key) {
-            final String[] parts = key.split("_");
-            if (parts.length == 2) {
-                return parts[0] + '_' + parts[1].toUpperCase();
-            }
-            return key;
-        }
-    };
-
-    private static final LoadingCache<String, Locale> LOCALE_CACHE = Caffeine.newBuilder().build(LOCALE_TRANSLATOR::apply);
+    private static final LoadingCache<String, Locale> LOCALE_CACHE = Caffeine.newBuilder().build(
+            TranslationManager::parseLocale
+    );
 
     /**
      * Gets a locale from the cache.

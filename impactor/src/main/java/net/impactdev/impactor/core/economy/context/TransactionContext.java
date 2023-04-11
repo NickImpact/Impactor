@@ -23,19 +23,34 @@
  *
  */
 
-package net.impactdev.impactor.core.commands.permissions;
+package net.impactdev.impactor.core.economy.context;
 
-import net.impactdev.impactor.api.platform.sources.PlatformSource;
-import net.impactdev.impactor.api.services.permissions.PermissionsService;
+import net.impactdev.impactor.api.economy.accounts.Account;
+import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 
-public final class NoOpPermissionsService implements PermissionsService {
-    @Override
-    public boolean hasPermission(PlatformSource source, String permission) {
-        return true;
+import java.math.BigDecimal;
+
+public final class TransactionContext {
+
+    private final EconomyTransactionType type;
+    private final BigDecimal before;
+    private final BigDecimal after;
+
+    public TransactionContext(EconomyTransactionType type, BigDecimal before, BigDecimal after) {
+        this.type = type;
+        this.before = before;
+        this.after = after;
     }
 
-    @Override
-    public String name() {
-        return "NO-OP Permissions Service";
+    public EconomyTransactionType type() {
+        return this.type;
+    }
+
+    public BigDecimal before() {
+        return this.before;
+    }
+
+    public BigDecimal after() {
+        return this.after;
     }
 }

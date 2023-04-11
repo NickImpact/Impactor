@@ -27,7 +27,9 @@ package net.impactdev.impactor.core.economy.storage;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
@@ -35,6 +37,8 @@ import net.impactdev.impactor.api.storage.Storage;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.core.utility.future.ThrowingRunnable;
+import net.impactdev.impactor.core.utility.future.ThrowingSupplier;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -69,12 +73,18 @@ public final class EconomyStorage implements Storage {
         return run(() -> this.implementation.meta(printer));
     }
 
+    @CanIgnoreReturnValue
     public CompletableFuture<Boolean> hasAccount(Currency currency, UUID uuid) {
+        if(this.accounts.getIfPresent(AccountKey.of(currency, uuid)) != null) {
+            return CompletableFuture.completedFuture(true);
+        }
+
         return supply(() -> this.implementation.hasAccount(currency, uuid));
     }
 
+    @CanIgnoreReturnValue
     public CompletableFuture<Account> account(Currency currency, UUID uuid, Account.AccountModifier modifier) {
-        Account account = this.accounts.getIfPresent(new AccountKey(currency, uuid));
+        Account account = this.accounts.getIfPresent(AccountKey.of(currency, uuid));
         if(account != null) {
             return CompletableFuture.completedFuture(account);
         }
@@ -82,30 +92,30 @@ public final class EconomyStorage implements Storage {
         return supply(() -> this.implementation.account(currency, uuid, modifier));
     }
 
+    @CanIgnoreReturnValue
     public CompletableFuture<Void> save(Account account) {
         return run(() -> this.implementation.save(account));
     }
 
+    @CanIgnoreReturnValue
     public CompletableFuture<Multimap<Currency, Account>> accounts() {
-        return supply(this.implementation::accounts);
+        Multimap<Currency, Account> results = ArrayListMultimap.create();
+        this.accounts.asMap().forEach((key, account) -> results.put(key.currency, account));
+
+        return run(() -> this.implementation.accounts(results)).thenApply(ignore -> results);
     }
 
+    @CanIgnoreReturnValue
     public CompletableFuture<Void> delete(Currency currency, UUID uuid) {
-        return run(() -> this.implementation.delete(currency, uuid));
+        return run(() -> {
+            this.implementation.delete(currency, uuid);
+            this.accounts.invalidate(AccountKey.of(currency, uuid));
+        });
     }
 
+    @CanIgnoreReturnValue
     public CompletableFuture<Boolean> purge() {
         return supply(this.implementation::purge);
-    }
-
-    @FunctionalInterface
-    private interface ThrowingRunnable {
-        void run() throws Exception;
-    }
-
-    @FunctionalInterface
-    private interface ThrowingSupplier<T> {
-        T supply() throws Exception;
     }
 
     private static CompletableFuture<Void> run(ThrowingRunnable runnable) {
@@ -143,6 +153,10 @@ public final class EconomyStorage implements Storage {
         public AccountKey(Currency currency, UUID owner) {
             this.currency = currency;
             this.owner = owner;
+        }
+
+        public static AccountKey of(Currency currency, UUID owner) {
+            return new AccountKey(currency, owner);
         }
 
         @Override

@@ -40,7 +40,7 @@ public interface EconomyStorageImplementation extends StorageConnection {
 
     void save(Account account) throws Exception;
 
-    Multimap<Currency, Account> accounts() throws Exception;
+    void accounts(Multimap<Currency, Account> cache) throws Exception;
 
     void delete(Currency currency, UUID uuid) throws Exception;
 

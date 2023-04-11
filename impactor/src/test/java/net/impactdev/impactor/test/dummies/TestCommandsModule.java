@@ -23,38 +23,16 @@
  *
  */
 
-package net.impactdev.impactor.fabric.commands;
+package net.impactdev.impactor.test.dummies;
 
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.fabric.FabricServerCommandManager;
-import net.impactdev.impactor.api.commands.CommandSource;
-import net.impactdev.impactor.core.commands.ImpactorCommandManager;
-import net.impactdev.impactor.minecraft.commands.CommandSourceStackTranslator;
-import net.minecraft.commands.CommandSourceStack;
+import net.impactdev.impactor.api.commands.ImpactorCommandManager;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.core.modules.ImpactorModule;
 
-public final class FabricCommandManager extends ImpactorCommandManager<CommandSourceStack> {
-
-    public static void activate() {
-        FabricCommandManager manager = new FabricCommandManager();
-        manager.initialize();
-    }
+public class TestCommandsModule implements ImpactorModule {
 
     @Override
-    protected CommandManager<CommandSource> create(Coordinator coordinator) {
-        return new FabricServerCommandManager<>(
-                coordinator,
-                this.impactor(),
-                this.platform()
-        );
-    }
-
-    @Override
-    protected ToImpactor<CommandSourceStack> impactor() {
-        return CommandSourceStackTranslator::impactor;
-    }
-
-    @Override
-    protected ToNative<CommandSourceStack> platform() {
-        return CommandSourceStackTranslator::minecraft;
+    public void factories(FactoryProvider provider) {
+        provider.register(ImpactorCommandManager.Factory.class, new TestCommandManagerFactory());
     }
 }

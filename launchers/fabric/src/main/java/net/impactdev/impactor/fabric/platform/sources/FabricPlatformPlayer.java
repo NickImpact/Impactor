@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.fabric.platform.sources;
 
-import net.impactdev.impactor.core.locale.LocaleProvider;
+import net.impactdev.impactor.core.translations.locale.LocaleProvider;
 import net.impactdev.impactor.fabric.FabricImpactorBootstrap;
 import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
 import net.minecraft.server.level.ServerPlayer;

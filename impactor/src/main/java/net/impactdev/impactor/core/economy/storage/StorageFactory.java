@@ -46,15 +46,12 @@ public final class StorageFactory {
 
     private static EconomyStorageImplementation createNewImplementation(StorageType type) {
         switch (type) {
-            case JSON -> {
+            case JSON:
                 return new ConfigurateProvider(new JsonLoader());
-            }
-            case YAML -> {
+            case YAML:
                 return new ConfigurateProvider(new YamlLoader());
-            }
-            case HOCON -> {
+            case HOCON:
                 return new ConfigurateProvider(new HoconLoader());
-            }
         }
 
         throw new IllegalArgumentException("Unsupported storage type: " + type);

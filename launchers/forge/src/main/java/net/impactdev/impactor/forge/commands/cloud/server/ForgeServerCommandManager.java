@@ -32,7 +32,7 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
 import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.commands.CommandSource;
+import net.impactdev.impactor.api.commands.execution.CommandSource;
 import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.impactdev.impactor.forge.commands.cloud.ForgeCloudCommandManager;
 import net.impactdev.impactor.forge.commands.cloud.ForgeParserParameters;

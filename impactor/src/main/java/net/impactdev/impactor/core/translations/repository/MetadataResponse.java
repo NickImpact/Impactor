@@ -23,26 +23,28 @@
  *
  */
 
-package net.impactdev.impactor.core.commands.event;
+package net.impactdev.impactor.core.translations.repository;
 
-import cloud.commandframework.CommandManager;
-import net.impactdev.impactor.api.commands.CommandSource;
-import net.impactdev.impactor.api.commands.events.ArgumentRegistrationEvent;
-import net.impactdev.impactor.api.commands.events.CaptionRegistrationEvent;
-import net.impactdev.impactor.api.commands.events.CommandRegistrationEvent;
+import net.impactdev.impactor.api.translations.metadata.LanguageInfo;
 
-public final class CommandFrameworkEvents {
+import java.util.Set;
 
-    public static CaptionRegistrationEvent captions(CommandManager<CommandSource> manager) {
-        return new CaptionRegistrationEventImpl(manager);
+public final class MetadataResponse {
+
+    private final long age;
+    private final Set<LanguageInfo> languages;
+
+    MetadataResponse(long age, Set<LanguageInfo> languages) {
+        this.age = age;
+        this.languages = languages;
     }
 
-    public static ArgumentRegistrationEvent arguments(CommandManager<CommandSource> manager) {
-        return new ArgumentRegistrationEventImpl(manager);
+    public long age() {
+        return this.age;
     }
 
-    public static CommandRegistrationEvent commands(CommandManager<CommandSource> manager) {
-        return new CommandRegistrationEventImpl(manager);
+    public Set<LanguageInfo> languages() {
+        return this.languages;
     }
 
 }

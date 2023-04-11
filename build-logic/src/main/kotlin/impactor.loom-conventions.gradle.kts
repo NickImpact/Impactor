@@ -55,7 +55,9 @@ tasks {
                 "org.mariadb.jdbc:mariadb-java-client:.*",
                 "org.mongodb:mongo-java-driver:.*",
                 "com.github.ben-manes.caffeine:caffeine:.*",
-                "io.github.classgraph:classgraph:.*"
+                "io.github.classgraph:classgraph:.*",
+                "com.squareup.okhttp:okhttp:.*",
+                "com.squareup.okio:okio:.*"
             ).forEach { include(dependency(it)) }
         }
 
@@ -70,7 +72,9 @@ tasks {
             "org.mariadb.jdbc",
             "com.mongodb",
             "org.bson",
-            "nonapi.io.github.classgraph"
+            "nonapi.io.github.classgraph",
+            "okhttp3",
+            "okio"
         ).forEach { relocate(it, "$prefix.$it") }
     }
 

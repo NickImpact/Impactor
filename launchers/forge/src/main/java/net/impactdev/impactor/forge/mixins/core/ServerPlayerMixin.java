@@ -25,8 +25,8 @@
 
 package net.impactdev.impactor.forge.mixins.core;
 
-import net.impactdev.impactor.core.locale.LocaleCache;
-import net.impactdev.impactor.core.locale.LocaleProvider;
+import net.impactdev.impactor.core.translations.locale.LocaleCache;
+import net.impactdev.impactor.core.translations.locale.LocaleProvider;
 import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
 import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;

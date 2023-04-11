@@ -23,12 +23,17 @@
  *
  */
 
-package net.impactdev.impactor.core.locale;
+package net.impactdev.impactor.core.translations.components;
 
-import java.util.Locale;
+import net.impactdev.impactor.api.text.TextProcessor;
+import net.impactdev.impactor.api.utility.Context;
+import net.kyori.adventure.audience.Audience;
+import org.jetbrains.annotations.NotNull;
 
-public interface LocaleProvider {
+public interface Translation<T> {
 
-    Locale locale();
+    T build(final @NotNull TextProcessor processor, final @NotNull Context context);
+
+    void send(final @NotNull Audience audience, final @NotNull TextProcessor processor, final @NotNull Context context);
 
 }

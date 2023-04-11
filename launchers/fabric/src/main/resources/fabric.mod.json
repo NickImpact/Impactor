@@ -13,9 +13,14 @@
       "net.impactdev.impactor.fabric.FabricImpactorBootstrap"
     ]
   },
+  "mixins": [
+    "mixins.impactor.fabric.json"
+  ],
   "depends": {
     "fabricloader": ">=0.14.9",
-    "minecraft": ">=1.18.2",
-    "java": ">=17"
+    "minecraft": ">=1.19.2",
+    "java": ">=17",
+
+    "impactor-commands-api": "5.0.0+1.19.2-SNAPSHOT"
   }
 }

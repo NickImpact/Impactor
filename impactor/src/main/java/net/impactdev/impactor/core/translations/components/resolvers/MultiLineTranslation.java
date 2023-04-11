@@ -23,28 +23,43 @@
  *
  */
 
-package net.impactdev.impactor.core.commands.permissions;
+package net.impactdev.impactor.core.translations.components.resolvers;
 
-import net.impactdev.impactor.api.platform.sources.PlatformSource;
-import net.impactdev.impactor.api.services.permissions.PermissionsService;
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.LuckPermsProvider;
+import net.impactdev.impactor.api.text.TextProcessor;
+import net.impactdev.impactor.api.utility.Context;
+import net.impactdev.impactor.core.translations.components.Translation;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
+import java.util.List;
 
-public final class LuckPermsPermissionsService implements PermissionsService {
+public class MultiLineTranslation implements Translation<List<Component>> {
 
-    private static final LuckPerms API = LuckPermsProvider.get();
+    private final List<String> template;
 
-    @Override
-    public boolean hasPermission(PlatformSource source, String permission) {
-        return Optional.ofNullable(API.getUserManager().getUser(source.uuid()))
-                .map(user -> user.getCachedData().getPermissionData().checkPermission(permission).asBoolean())
-                .orElse(true);
+    public MultiLineTranslation(final List<String> template) {
+        this.template = template;
     }
 
     @Override
-    public String name() {
-        return "LuckPerms Permissions Service";
+    public List<Component> build(final @NotNull TextProcessor processor, @NotNull Context context) {
+        return processor.parse(this.template, context);
     }
+
+    @Override
+    public void send(@NotNull Audience audience, final @NotNull TextProcessor processor, @NotNull Context context) {
+        if(this.template.isEmpty()) {
+            return;
+        }
+
+        List<Component> built = this.build(processor, context);
+        Component result = built.get(0);
+        for(int i = 1; i < built.size(); i++) {
+            result = result.append(Component.newline()).append(built.get(i));
+        }
+
+        audience.sendMessage(result);
+    }
+
 }

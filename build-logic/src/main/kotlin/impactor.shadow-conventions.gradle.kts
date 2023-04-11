@@ -11,7 +11,6 @@ tasks {
         dependencies {
             include(project(":api:core"))
             include(project(":api:config"))
-            include(project(":api:commands"))
             include(project(":api:economy"))
             include(project(":api:items"))
             include(project(":api:players"))

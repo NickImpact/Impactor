@@ -26,7 +26,7 @@
 package net.impactdev.impactor.forge.commands;
 
 import cloud.commandframework.CommandManager;
-import net.impactdev.impactor.api.commands.CommandSource;
+import net.impactdev.impactor.api.commands.execution.CommandSource;
 import net.impactdev.impactor.core.commands.ImpactorCommandManager;
 import net.impactdev.impactor.forge.commands.cloud.server.ForgeServerCommandManager;
 import net.impactdev.impactor.forge.commands.cloud.server.ForgeServerCommandRegistrationHandler;

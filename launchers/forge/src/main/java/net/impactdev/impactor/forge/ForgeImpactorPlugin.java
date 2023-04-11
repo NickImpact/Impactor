@@ -27,10 +27,9 @@ package net.impactdev.impactor.forge;
 
 import cloud.commandframework.meta.CommandMeta;
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.commands.CommandSource;
+import net.impactdev.impactor.api.commands.execution.CommandSource;
 import net.impactdev.impactor.api.commands.events.CommandRegistrationEvent;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
 import net.impactdev.impactor.forge.platform.ForgePlatformModule;
@@ -50,11 +49,6 @@ public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorP
     @Override
     public void construct() {
         super.construct();
-
-        PrettyPrinter printer = new PrettyPrinter(80);
-        printer.title("Platform Information");
-        Impactor.instance().platform().info().print(printer);
-        printer.log(this.logger(), PrettyPrinter.Level.INFO);
 
         Impactor.instance().events().subscribe(CommandRegistrationEvent.class, event -> {
             event.register(

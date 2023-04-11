@@ -29,6 +29,23 @@ import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.platform.sources.metadata.MetadataKey;
 import net.kyori.adventure.key.Key;
 
-public record ImpactorMetadataKey<T>(Key key, TypeToken<T> type) implements MetadataKey<T> {
+public class ImpactorMetadataKey<T> implements MetadataKey<T> {
 
+    private final Key key;
+    private final TypeToken<T> type;
+
+    public ImpactorMetadataKey(Key key) {
+        this.key = key;
+        this.type = new TypeToken<T>() {};
+    }
+
+    @Override
+    public Key key() {
+        return this.key;
+    }
+
+    @Override
+    public TypeToken<T> type() {
+        return this.type;
+    }
 }

@@ -23,29 +23,17 @@
  *
  */
 
-package net.impactdev.impactor.core.commands.event;
+package net.impactdev.impactor.fabric.commands;
 
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import io.leangen.geantyref.TypeToken;
-import net.impactdev.impactor.api.commands.CommandSource;
-import net.impactdev.impactor.api.commands.events.ArgumentRegistrationEvent;
+import net.impactdev.impactor.api.commands.ImpactorCommandManager;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.core.modules.ImpactorModule;
 
-public final class ArgumentRegistrationEventImpl implements ArgumentRegistrationEvent {
-
-    private final CommandManager<CommandSource> manager;
-
-    ArgumentRegistrationEventImpl(CommandManager<CommandSource> registrar) {
-        this.manager = registrar;
-    }
+public final class FabricCommandModule implements ImpactorModule {
 
     @Override
-    public <T> ArgumentRegistrationEvent register(TypeToken<T> type, ArgumentParser<CommandSource, T> parser) {
-        this.manager.getParserRegistry().registerParserSupplier(
-                type,
-                options -> parser
-        );
-        return this;
+    public void factories(FactoryProvider provider) {
+        provider.register(ImpactorCommandManager.Factory.class, new FabricCommandManagerFactory());
     }
 
 }

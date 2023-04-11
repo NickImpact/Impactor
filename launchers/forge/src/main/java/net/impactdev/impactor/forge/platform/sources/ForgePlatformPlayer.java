@@ -25,7 +25,7 @@
 
 package net.impactdev.impactor.forge.platform.sources;
 
-import net.impactdev.impactor.core.locale.LocaleProvider;
+import net.impactdev.impactor.core.translations.locale.LocaleProvider;
 import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.server.ServerLifecycleHooks;

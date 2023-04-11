@@ -25,15 +25,21 @@
 
 package net.impactdev.impactor.fabric;
 
+import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
+import net.impactdev.impactor.core.commands.ImpactorCommandRegistry;
+import net.impactdev.impactor.core.commands.parsers.CurrencyParser;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
+import net.impactdev.impactor.fabric.commands.BrigadierMapper;
+import net.impactdev.impactor.fabric.commands.FabricCommandManager;
+import net.impactdev.impactor.fabric.commands.FabricCommandModule;
 import net.impactdev.impactor.fabric.platform.FabricPlatformModule;
 import net.impactdev.impactor.fabric.scheduler.FabricSchedulerModule;
 import net.impactdev.impactor.fabric.ui.FabricUIModule;
 import net.impactdev.impactor.minecraft.plugin.GameImpactorPlugin;
+import net.kyori.adventure.key.Key;
 
 import java.util.Set;
 
@@ -46,11 +52,13 @@ public final class FabricImpactorPlugin extends GameImpactorPlugin implements Im
     @Override
     public void construct() {
         super.construct();
+    }
 
-        PrettyPrinter printer = new PrettyPrinter(80);
-        printer.title("Platform Information");
-        Impactor.instance().platform().info().print(printer);
-        printer.log(this.logger(), PrettyPrinter.Level.INFO);
+    @Override
+    protected void registerCommandMappings(ImpactorCommandRegistry registry) {
+        FabricCommandManager manager = (FabricCommandManager) registry.manager();
+        BrigadierMapper mapper = manager.mapper();
+        mapper.map(TypeToken.get(CurrencyParser.class), Key.key("minecraft:resource_location"), true);
     }
 
     @Override
@@ -59,6 +67,7 @@ public final class FabricImpactorPlugin extends GameImpactorPlugin implements Im
         parent.add(FabricSchedulerModule.class);
         parent.add(FabricUIModule.class);
         parent.add(FabricPlatformModule.class);
+        parent.add(FabricCommandModule.class);
 
         return parent;
     }

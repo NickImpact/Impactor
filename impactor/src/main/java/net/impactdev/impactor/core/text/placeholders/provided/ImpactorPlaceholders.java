@@ -26,7 +26,11 @@
 package net.impactdev.impactor.core.text.placeholders.provided;
 
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.economy.accounts.Account;
+import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
+import net.impactdev.impactor.api.text.placeholders.PlaceholderArguments;
+import net.impactdev.impactor.core.economy.context.TransactionContext;
 import net.kyori.adventure.key.Key;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
@@ -77,6 +81,49 @@ public final class ImpactorPlaceholders {
     public static final ImpactorPlaceholder MEMORY_TOTAL = new ImpactorPlaceholder(
             impactor("memory_total"),
             (viewer, ctx) -> text(Impactor.instance().platform().performance().memory().max())
+    );
+    public static final ImpactorPlaceholder ECONOMY_ACCOUNT = new ImpactorPlaceholder(
+            impactor("account"),
+            (viewer, ctx) -> {
+                PlaceholderArguments arguments = ctx.require(PlaceholderArguments.class);
+                if(!arguments.hasNext()) {
+                    return empty();
+                }
+
+                Account account = ctx.require(Account.class);
+                String option = arguments.pop();
+                switch (option) {
+                    case "balance":
+                        // TODO - Argument support for short or long
+                        return account.currency().format(account.balance());
+                    case "name":
+                        // TODO
+                        return empty();
+                    case "uuid":
+                        return text(account.owner().toString());
+                }
+
+                return empty();
+            }
+    );
+    public static final ImpactorPlaceholder ECONOMY_CURRENCY = new ImpactorPlaceholder(
+            impactor("currency"),
+            // TODO - Argument support for singular or plural
+            (viewer, ctx) -> ctx.require(Currency.class).plural()
+    );
+    public static final ImpactorPlaceholder ECONOMY_TRANSACTION = new ImpactorPlaceholder(
+            impactor("economy_transaction"),
+            (viewer, ctx) -> {
+                PlaceholderArguments arguments = ctx.require(PlaceholderArguments.class);
+                if(!arguments.hasNext()) {
+                    return empty();
+                }
+
+                Account account = ctx.require(Account.class);
+                TransactionContext transaction = ctx.require(TransactionContext.class);
+
+                return empty();
+            }
     );
 
     private static Key impactor(@Subst("dummy") @Pattern("[a-z0-9_\\-./]+") String key) {

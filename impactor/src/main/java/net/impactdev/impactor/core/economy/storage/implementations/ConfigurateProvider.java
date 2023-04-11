@@ -52,6 +52,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -192,8 +193,7 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
     }
 
     @Override
-    public Multimap<Currency, Account> accounts() throws Exception {
-        Multimap<Currency, Account> accounts = ArrayListMultimap.create();
+    public void accounts(Multimap<Currency, Account> cache) throws Exception {
         Path root = this.root.resolve("accounts");
 
         EconomyService service = Impactor.instance().services().provide(EconomyService.class);
@@ -210,8 +210,11 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
                             for(Object key : data.childrenMap().keySet()) {
                                 Optional<Currency> currency = currencies.currency(Key.key((String) key));
                                 if(currency.isPresent()) {
-                                    Account account = ImpactorAccount.load(currency.get(), owner, virtual, BigDecimal.valueOf(data.node(key).getDouble()));
-                                    accounts.put(account.currency(), account);
+                                    Collection<Account> registered = cache.get(currency.get());
+                                    if(registered.stream().noneMatch(account -> account.owner().equals(owner))) {
+                                        Account account = ImpactorAccount.load(currency.get(), owner, virtual, BigDecimal.valueOf(data.node(key).getDouble()));
+                                        cache.put(account.currency(), account);
+                                    }
                                 }
                             }
                         } catch (Exception e) {
@@ -220,7 +223,6 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
                         }
                     });
         }
-        return accounts;
     }
 
     @Override

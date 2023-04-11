@@ -37,12 +37,16 @@ import net.impactdev.impactor.api.utility.Context;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public final class MiniMessageProcessor implements TextProcessor {
@@ -59,29 +63,73 @@ public final class MiniMessageProcessor implements TextProcessor {
     private TagResolver[] createResolvers(PlatformSource viewer, Context context) {
         Map<Key, PlaceholderParser> parsers = service.get().parsers();
         Map<String, TagResolver> resolvers = Maps.newHashMap();
+        Map<PlaceholderResolver, Component> results = Maps.newHashMap();
 
-        for(Key key : parsers.keySet()) {
-            resolvers.computeIfAbsent(key.namespace(), in -> TagResolver.resolver(in, (args, ctx) -> {
-                final Tag.Argument path = args.popOr("Invalid placeholder key, no path specified");
-                Key target = Key.key(key.namespace(), path.lowerValue());
+        parsers.keySet().stream()
+                .map(Key::namespace)
+                .distinct()
+                .forEach(namespace -> {
+                    resolvers.computeIfAbsent(namespace, in -> TagResolver.resolver(in, (args, ctx) -> {
+                        final Tag.Argument path = args.popOr("Invalid placeholder key, no path specified");
+                        Key target = Key.key(namespace, path.lowerValue());
 
-                PlaceholderArguments arguments = null;
-                context.append(PlaceholderArguments.class, arguments);
+                        PlaceholderArguments arguments = PlaceholderArguments.create(args);
+                        context.append(PlaceholderArguments.class, arguments);
 
+                        PlaceholderResolver resolver = new PlaceholderResolver(target, arguments);
+                        Component result = results.computeIfAbsent(resolver, r -> {
+                            return r.resolve(target, viewer, arguments, context, parsers);
+                        });
+
+                        return Tag.selfClosingInserting(result);
+                    }));
+                });
+
+        return resolvers.values().toArray(new TagResolver[]{});
+    }
+
+    private static final class PlaceholderResolver {
+
+        private final Key key;
+        private final PlaceholderArguments arguments;
+
+        @MonotonicNonNull private Component resolved;
+
+        public PlaceholderResolver(Key key, PlaceholderArguments arguments) {
+            this.key = key;
+            this.arguments = arguments;
+        }
+
+        @NotNull
+        public Component resolve(Key target, PlatformSource viewer, PlaceholderArguments arguments, Context context, Map<Key, PlaceholderParser> parsers) {
+            if(this.resolved == null) {
                 PlaceholderParser parser = parsers.get(target);
-                if(parser == null) {
-                    StringBuilder placeholder = new StringBuilder("<" + key.namespace() + ":" + path.lowerValue());
-                    while(args.hasNext()) {
-                        placeholder.append(":").append(args.pop());
+                if (parser == null) {
+                    StringBuilder placeholder = new StringBuilder("<" + target.asString());
+                    while (arguments.hasNext()) {
+                        placeholder.append(":").append(arguments.pop());
                     }
                     placeholder.append(">");
 
-                    return Tag.inserting(Component.text(placeholder.toString()));
+                    return (this.resolved = Component.text(placeholder.toString()));
                 }
-                return Tag.inserting(parser.parse(viewer, context));
-            }));
+                return (this.resolved = parser.parse(viewer, context));
+            }
+
+            return this.resolved;
         }
 
-        return resolvers.values().toArray(new TagResolver[]{});
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            PlaceholderResolver that = (PlaceholderResolver) o;
+            return Objects.equals(key, that.key) && Objects.equals(arguments, that.arguments);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(key, arguments);
+        }
     }
 }

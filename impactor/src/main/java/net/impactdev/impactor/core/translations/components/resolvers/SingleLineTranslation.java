@@ -23,33 +23,31 @@
  *
  */
 
-package net.impactdev.impactor.core.commands.event;
+package net.impactdev.impactor.core.translations.components.resolvers;
 
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.captions.Caption;
-import cloud.commandframework.captions.CaptionRegistry;
-import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
-import net.impactdev.impactor.api.commands.CommandSource;
-import net.impactdev.impactor.api.commands.events.CaptionRegistrationEvent;
-import net.kyori.adventure.key.Key;
+import net.impactdev.impactor.api.text.TextProcessor;
+import net.impactdev.impactor.api.utility.Context;
+import net.impactdev.impactor.core.translations.components.Translation;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
-public final class CaptionRegistrationEventImpl implements CaptionRegistrationEvent {
+public class SingleLineTranslation implements Translation<Component> {
 
-    private final CommandManager<CommandSource> manager;
+    private final String template;
 
-    CaptionRegistrationEventImpl(CommandManager<CommandSource> registrar) {
-        this.manager = registrar;
+    public SingleLineTranslation(String template) {
+        this.template = template;
     }
 
     @Override
-    public CaptionRegistrationEvent register(@NotNull Caption key, @NotNull String format) {
-        final CaptionRegistry<CommandSource> registry = this.manager.getCaptionRegistry();
-        if(registry instanceof FactoryDelegatingCaptionRegistry) {
-            FactoryDelegatingCaptionRegistry<CommandSource> delegate = (FactoryDelegatingCaptionRegistry<CommandSource>) registry;
-            delegate.registerMessageFactory(key, (context, caption) -> format);
-        }
-
-        return this;
+    public @NotNull Component build(final @NotNull TextProcessor processor, @NotNull Context context) {
+        return processor.parse(this.template, context);
     }
+
+    @Override
+    public void send(@NotNull Audience audience, final @NotNull TextProcessor processor, @NotNull Context context) {
+        audience.sendMessage(this.build(processor, context));
+    }
+
 }

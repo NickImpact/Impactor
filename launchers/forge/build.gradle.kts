@@ -3,6 +3,12 @@ plugins {
     id("impactor.publishing-conventions")
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 architectury {
     platformSetupLoomIde()
     forge()
