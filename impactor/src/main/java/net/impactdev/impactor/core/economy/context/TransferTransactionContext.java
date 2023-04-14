@@ -23,22 +23,26 @@
  *
  */
 
-package net.impactdev.impactor.forge.commands.cloud.internal;
+package net.impactdev.impactor.core.economy.context;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import java.math.BigDecimal;
 
-public interface EntitySelectorAccess {
-    /**
-     * Get the last parsed input string
-     *
-     * @return input string
-     */
-    @NonNull String inputString();
+public final class TransferTransactionContext {
 
-    /**
-     * Set the last parsed input string
-     *
-     * @param inputString input string
-     */
-    void inputString(@NonNull String inputString);
+    private final TransactionContext from;
+    private final TransactionContext to;
+
+    public TransferTransactionContext(TransactionContext from, TransactionContext to) {
+        this.from = from;
+        this.to = to;
+    }
+
+    public TransactionContext from() {
+        return this.from;
+    }
+
+    public TransactionContext to() {
+        return this.to;
+    }
+
 }

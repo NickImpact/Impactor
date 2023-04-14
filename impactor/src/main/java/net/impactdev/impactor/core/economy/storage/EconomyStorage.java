@@ -33,6 +33,8 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
+import net.impactdev.impactor.api.platform.Platform;
+import net.impactdev.impactor.api.platform.players.PlatformPlayerService;
 import net.impactdev.impactor.api.storage.Storage;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
@@ -89,7 +91,12 @@ public final class EconomyStorage implements Storage {
             return CompletableFuture.completedFuture(account);
         }
 
-        return supply(() -> this.implementation.account(currency, uuid, modifier));
+        return supply(() -> {
+            Account result = this.implementation.account(currency, uuid, modifier);
+//            this.accounts.put(AccountKey.of(currency, uuid), result);
+
+            return result;
+        });
     }
 
     @CanIgnoreReturnValue

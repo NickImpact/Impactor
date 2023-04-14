@@ -1,4 +1,16 @@
 {
     "economy.account.balance": "<hover:show_text:'<gray>Currency: <yellow><impactor:currency><newline><gray>Account: <yellow><impactor:account:name> <gray>(<aqua><impactor:account:uuid><gray>)'><gray>Balance: <green><impactor:account:balance>",
-    "economy.account.transaction": "<hover:show_text:'<gray>Transaction Type: <yellow><impactor:economy_transaction:type><newline><gray>Before: <yellow><impactor:economy_transaction:before><newline><gray>After: <yellow><impactor:account:balance>'><gray>Transaction completed successfully! Hover for transaction info!"
+    "economy.account.transaction": "<hover:show_text:'<gray>Transaction Type: <yellow><impactor:economy_transaction:type><newline><gray>Before: <yellow><impactor:economy_transaction:before><newline><gray>After: <yellow><impactor:account:balance>'><gray>Transaction completed successfully! Hover for transaction info!",
+
+    "translations.searching": "<gray>Checking available languages...",
+    "translations.installing": "<gray>Attempting to install translations now...",
+    "translations.installing-language": "<gray>Installing language: <yellow><impactor:language:id> <gray>[<green><impactor:language:name><gray>]",
+    "translations.install-complete": "<gray>Installation complete!",
+    "translations.install-failed": "<red>Installation has failed...",
+    "translations.info.header-footer": "<st><gradient:#32a852:#326da8>==========================</gradient><gradient:#326da8:#32a852>===========================",
+    "translations.info.language": "<gray>Language: <yellow><impactor:language:id> <gray>[<green><impactor:language:name><gray>]",
+    "translations.info.progress": "<gray>Progress: <impactor:language:progress>",
+    "translations.info.contributor.header": "<gray>Contributors:",
+    "translations.info.contributor.name": "<yellow>* <impactor:language:contributor>",
+    "translations.info.invalid-locale": "<red>Invalid locale specified!"
 }

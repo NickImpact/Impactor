@@ -25,6 +25,7 @@
 
 package net.impactdev.impactor.core.translations.internal;
 
+import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.api.translations.TranslationManager;
 import net.impactdev.impactor.api.translations.TranslationProvider;
@@ -36,27 +37,48 @@ import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.Map;
 
 public interface ImpactorTranslations {
 
     TranslationManager MANAGER = TranslationManager.builder()
             .path(Paths.get("impactor").resolve("translations"))
-            .defaultLocale(Locale.US)
+            .fallback(Locale.US)
             .processor(TextProcessor.mini())
             .repository(TranslationRepository.builder()
                     .endpoint(TranslationEndpoint.LANGUAGE_SET, "https://metadata.impactdev.net/impactor/translations")
                     .endpoint(TranslationEndpoint.DOWNLOADABLE_LANGUAGE, "https://metadata.impactdev.net/impactor/translation/%s")
-                    .refreshRule(() -> true) // TODO - Config for auto install flag
+                    .refreshWhen(() -> true) // TODO - Config for auto install flag
                     .build()
             )
             .provided(() -> BaseImpactorPlugin.instance().resource(root -> root.resolve("en_us.json")))
             .build();
 
-    TranslationProvider<Component> ECONOMY_BALANCE = TranslationProvider.create(MANAGER, "economy.account.balance");
-    TranslationProvider<Component> ECONOMY_TRANSACTION = TranslationProvider.create(MANAGER, "economy.account.transaction");
-    TranslationProvider<Component> ECONOMY_TRANSFER = TranslationProvider.create(MANAGER, "economy.account.transfer");
+    Map<String, TranslationProvider<?>> REGISTERED = Maps.newHashMap();
+
+    // Economy
+    TranslationProvider<Component> ECONOMY_BALANCE = create("economy.account.balance");
+    TranslationProvider<Component> ECONOMY_TRANSACTION = create("economy.account.transaction");
+    TranslationProvider<Component> ECONOMY_TRANSFER = create("economy.account.transfer");
+
+    // Translations
+    TranslationProvider<Component> TRANSLATIONS_SEARCHING = create("translations.searching");
+    TranslationProvider<Component> TRANSLATIONS_INFO_HEADER_FOOTER = create("translations.info.header-footer");
+    TranslationProvider<Component> TRANSLATIONS_INFO_LANGUAGE = create("translations.info.language");
+    TranslationProvider<Component> TRANSLATIONS_INFO_PROGRESS = create("translations.info.progress");
+    TranslationProvider<Component> TRANSLATIONS_INFO_CONTRIBUTOR_HEADER = create("translations.info.contributor.header");
+    TranslationProvider<Component> TRANSLATIONS_INFO_CONTRIBUTOR_NAME = create("translations.info.contributor.name");
+    TranslationProvider<Component> TRANSLATIONS_INVALID_LOCALE = create("translations.invalid-locale");
+
+    TranslationProvider<Component> TRANSLATIONS_INSTALLING = create("translations.installing");
+    TranslationProvider<Component> TRANSLATIONS_INSTALLING_LANGUAGE = create("translations.installing-language");
+    TranslationProvider<Component> TRANSLATIONS_INSTALL_COMPLETE = create("translations.install-complete");
+    TranslationProvider<Component> TRANSLATIONS_INSTALL_FAILED = create("translations.install-failed");
 
     static <T> TranslationProvider<T> create(final @NotNull String key) {
-        return TranslationProvider.create(MANAGER, key);
+        TranslationProvider<T> provider = TranslationProvider.create(MANAGER, key);
+        REGISTERED.put(key, provider);
+
+        return provider;
     }
 }

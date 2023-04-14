@@ -106,6 +106,19 @@ public class ImpactorTranslationManager implements TranslationManager {
     }
 
     @Override
+    public void refresh() {
+        this.repository.refresh().whenComplete((result, tracked) -> {
+            if(tracked != null) {
+                ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), tracked);
+            }
+
+            if(result) {
+                this.reload();
+            }
+        });
+    }
+
+    @Override
     public TextProcessor processor() {
         return this.processor;
     }
@@ -145,15 +158,7 @@ public class ImpactorTranslationManager implements TranslationManager {
                 Files.createDirectories(custom);
             }
 
-            this.repository.refresh().whenComplete((result, tracked) -> {
-                if(tracked != null) {
-                    ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), tracked);
-                }
-
-                if(!result) {
-                    this.reload();
-                }
-            });
+            this.reload();
         } catch (Exception exception) {
             ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), exception);
         }

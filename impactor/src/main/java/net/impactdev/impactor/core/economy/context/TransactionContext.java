@@ -25,7 +25,6 @@
 
 package net.impactdev.impactor.core.economy.context;
 
-import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 
 import java.math.BigDecimal;

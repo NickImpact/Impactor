@@ -29,7 +29,9 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
+import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.api.text.placeholders.PlaceholderArguments;
+import net.impactdev.impactor.api.translations.metadata.LanguageInfo;
 import net.impactdev.impactor.core.economy.context.TransactionContext;
 import net.kyori.adventure.key.Key;
 import org.intellij.lang.annotations.Pattern;
@@ -128,6 +130,31 @@ public final class ImpactorPlaceholders {
                         return text(transaction.type().name());
                     case "before":
                         return account.currency().format(transaction.before());
+                }
+
+                return empty();
+            }
+    );
+    public static final ImpactorPlaceholder LANGUAGE = new ImpactorPlaceholder(
+            impactor("language"),
+            (viewer, ctx) -> {
+                PlaceholderArguments arguments = ctx.require(PlaceholderArguments.class);
+                if(!arguments.hasNext()) {
+                    return empty();
+                }
+
+                LanguageInfo info = ctx.require(LanguageInfo.class);
+                switch (arguments.pop()) {
+                    case "id":
+                        return text(info.locale().toLanguageTag());
+                    case "name":
+                        return text(info.locale().getDisplayName());
+                    case "progress":
+                        int progress = info.progress();
+                        return TextProcessor.mini().parse("<transition:red:yellow:green:" + progress / 100.0 + ">" + progress + "%");
+                    case "contributor":
+                        String contributor = ctx.require(String.class);
+                        return text(contributor);
                 }
 
                 return empty();

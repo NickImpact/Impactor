@@ -37,12 +37,6 @@ dependencies {
         exclude("net.impactdev.impactor.api", "plugins")
         exclude("net.impactdev.impactor.api", "storage")
     }
-    modImplementation("cloud.commandframework:cloud-fabric:1.7.1") {
-        exclude("net.fabricmc.fabric-api")
-    }
-    modApi("cloud.commandframework:cloud-minecraft-extras:1.7.1") {
-        exclude("net.kyori")
-    }
 
     modImplementation("eu.pb4:placeholder-api:2.0.0-pre.1+1.19.2")
     include("eu.pb4:placeholder-api:2.0.0-pre.1+1.19.2")
@@ -63,6 +57,9 @@ tasks {
     shadowJar {
         val mapped = "loom_mappings_1_19_2_layered_hash_40359_v2"
         dependencies {
+            include(dependency("net.impactdev.impactor.commands:common:.*"))
+            include(dependency("$mapped.net.impactdev.impactor.commands:fabric:.*"))
+
             include(dependency("org.apache.maven:maven-artifact:.*"))
             include(dependency("$mapped.ca.landonjw.gooeylibs:fabric:.*"))
         }

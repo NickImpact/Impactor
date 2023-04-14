@@ -88,9 +88,8 @@ public final class CurrencyParser implements ArgumentParser<CommandSource, Curre
         currencies.registered().forEach(currency -> {
             if(currency.key().value().startsWith(input)) {
                 results.add(currency.key().value());
-            }
-
-            if(currency.key().asString().startsWith(input)) {
+                results.add(currency.key().asString());
+            } else if(currency.key().asString().startsWith(input)) {
                 results.add(currency.key().asString());
             }
         });

@@ -25,6 +25,7 @@ loom {
         }
 
         mixinConfig("mixins.impactor.forge.json")
+        mixinConfig("mixins.impactor.forge.commands.json")
     }
 }
 
@@ -36,38 +37,44 @@ dependencies {
 
     include("io.leangen.geantyref:geantyref:1.3.13")
 
+    modImplementation("net.impactdev.impactor.commands:forge:5.0.0+1.19.2-SNAPSHOT") {
+        exclude("net.impactdev.impactor.api", "config")
+        exclude("net.impactdev.impactor.api", "core")
+        exclude("net.impactdev.impactor.api", "items")
+        exclude("net.impactdev.impactor.api", "players")
+        exclude("net.impactdev.impactor.api", "plugins")
+        exclude("net.impactdev.impactor.api", "storage")
+    }
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }
 
 tasks {
-    jar {
-        manifest {
-            attributes(
-                "MixinConfigs" to "mixins.impactor.forge.json",
-                "TweakOrder" to 0,
-                "TweakClass" to "org.spongepowered.asm.launch.MixinTweaker"
-            )
-        }
-    }
-
     shadowJar {
         val mapped = "loom_mappings_1_19_2_layered_hash_40359_v2_forge_1_19_2_43_1_47_forge"
         dependencies {
+            include(dependency("$mapped.net.impactdev.impactor.commands:common:.*"))
+            include(dependency("$mapped.net.impactdev.impactor.commands:forge:.*"))
+
             include(dependency("$mapped.ca.landonjw.gooeylibs:forge:.*"))
             include(dependency("cloud.commandframework:cloud-core:.*"))
             include(dependency("cloud.commandframework:cloud-annotations:.*"))
             include(dependency("cloud.commandframework:cloud-brigadier:.*"))
             include(dependency("cloud.commandframework:cloud-services:.*"))
+            include(dependency("cloud.commandframework:cloud-minecraft-extras:.*"))
 
             exclude("forge-client-extra.jar")
             exclude("ca/landonjw/gooeylibs2/forge/GooeyLibs.class")
+            exclude("**/PlatformMethods.class")
         }
 
         val prefix = "net.impactdev.impactor.relocations"
         listOf(
             "ca.landonjw.gooeylibs2",
-            "cloud.commandframework"
+            "cloud.commandframework",
+            "okio",
+            "okhttp"
         ).forEach { relocate(it, "$prefix.$it") }
 
     }

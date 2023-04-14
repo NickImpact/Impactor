@@ -25,19 +25,26 @@
 
 package net.impactdev.impactor.forge;
 
-import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.minecraft.extras.MinecraftHelp;
+import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.commands.execution.CommandSource;
-import net.impactdev.impactor.api.commands.events.CommandRegistrationEvent;
+import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+import net.impactdev.impactor.core.commands.ImpactorCommandRegistry;
+import net.impactdev.impactor.core.commands.parsers.CurrencyParser;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
+import net.impactdev.impactor.forge.commands.BrigadierMapper;
+import net.impactdev.impactor.forge.commands.ForgeCommandManager;
+import net.impactdev.impactor.forge.commands.ForgeCommandModule;
 import net.impactdev.impactor.forge.platform.ForgePlatformModule;
 import net.impactdev.impactor.forge.scheduler.ForgeSchedulerModule;
 import net.impactdev.impactor.forge.ui.ForgeUIModule;
 import net.impactdev.impactor.minecraft.plugin.GameImpactorPlugin;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.key.Key;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorPlugin {
@@ -49,17 +56,29 @@ public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorP
     @Override
     public void construct() {
         super.construct();
+    }
 
-        Impactor.instance().events().subscribe(CommandRegistrationEvent.class, event -> {
-            event.register(
-                    "impactor",
-                    CommandMeta.simple().build(),
-                    builder -> builder.handler(context -> {
-                        CommandSource source = context.getSender();
-                        source.sendMessage(Component.text("Using locale: " + source.source().locale().getDisplayName()));
-                    }).build()
-            );
-        });
+    @Override
+    protected void registerCommandMappings(ImpactorCommandRegistry registry) {
+        ForgeCommandManager manager = (ForgeCommandManager) registry.manager();
+        BrigadierMapper mapper = manager.mapper();
+        mapper.map(TypeToken.get(CurrencyParser.class), Key.key("minecraft:resource_location"), true);
+
+        MinecraftHelp<CommandSource> helper = new MinecraftHelp<>(
+                "/impactor help",
+                CommandSource::source,
+                registry.manager().delegate()
+        );
+
+        registry.manager().delegate().command(registry.manager()
+                .delegate()
+                .commandBuilder("impactor")
+                .literal("help")
+                .argument(StringArgument.optional("query", StringArgument.StringMode.GREEDY))
+                .handler(context -> {
+                    helper.queryCommands(Objects.requireNonNull(context.getOrDefault("query", "")), context.getSender());
+                })
+        );
     }
 
     @Override
@@ -68,6 +87,7 @@ public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorP
         parent.add(ForgeSchedulerModule.class);
         parent.add(ForgeUIModule.class);
         parent.add(ForgePlatformModule.class);
+        parent.add(ForgeCommandModule.class);
 
         return parent;
     }

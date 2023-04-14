@@ -30,11 +30,8 @@ import ca.landonjw.gooeylibs2.forge.ForgeBootstrapper;
 import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
-import net.impactdev.impactor.forge.commands.ForgeCommandManager;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
@@ -52,7 +49,6 @@ public final class ForgeImpactorBootstrap extends ImpactorBootstrapper {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onDedicatedServerSetup);
         MinecraftForge.EVENT_BUS.addListener(this::onServerShutdown);
-        MinecraftForge.EVENT_BUS.register(new RegistryEvents());
 
         GooeyBootstrapper bootstrapper = new ForgeBootstrapper();
         bootstrapper.bootstrap();
@@ -79,13 +75,4 @@ public final class ForgeImpactorBootstrap extends ImpactorBootstrapper {
         this.shutdown();
     }
 
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class RegistryEvents {
-
-        @SubscribeEvent
-        public void onCommandRegistration(final RegisterCommandsEvent event) {
-            ForgeCommandManager.activate(event);
-        }
-
-    }
 }

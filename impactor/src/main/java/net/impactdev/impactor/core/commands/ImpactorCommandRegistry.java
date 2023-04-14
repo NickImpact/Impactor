@@ -41,10 +41,13 @@ import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.commands.parsers.CurrencyParser;
 import net.impactdev.impactor.core.commands.economy.EconomyCommands;
+import net.impactdev.impactor.core.commands.parsers.LocaleParser;
 import net.impactdev.impactor.core.commands.parsers.PlatformSourceParser;
+import net.impactdev.impactor.core.commands.translations.TranslationCommands;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public final class ImpactorCommandRegistry {
@@ -62,7 +65,8 @@ public final class ImpactorCommandRegistry {
         AnnotationParser<CommandSource> parser = this.createParser();
 
         List<Class<?>> containers = Lists.newArrayList(
-                EconomyCommands.class
+                EconomyCommands.class,
+                TranslationCommands.class
         );
 
         containers.forEach(container -> {
@@ -84,6 +88,11 @@ public final class ImpactorCommandRegistry {
         this.manager.delegate().parserRegistry().registerParserSupplier(
                 TypeToken.get(PlatformSource.class),
                 options -> new PlatformSourceParser()
+        );
+
+        this.manager.delegate().parserRegistry().registerParserSupplier(
+                TypeToken.get(Locale.class),
+                options -> new LocaleParser()
         );
     }
 

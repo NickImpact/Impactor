@@ -28,6 +28,7 @@ package net.impactdev.impactor.core.translations.components;
 import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.api.utility.Context;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 public interface Translation<T> {

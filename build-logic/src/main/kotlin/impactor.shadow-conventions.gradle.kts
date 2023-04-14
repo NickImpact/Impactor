@@ -17,11 +17,16 @@ tasks {
             include(project(":api:plugins"))
             include(project(":api:storage"))
             include(project(":api:text"))
+            include(project(":api:translations"))
             include(project(":api:ui"))
             include(project(":impactor"))
             include(project(":minecraft"))
 
             include(dependency("net.impactdev:json:.*"))
+            include(dependency("net.impactdev.impactor.api:commands:.*"))
+
+            include(dependency("com.squareup.okhttp3:okhttp:.*"))
+            include(dependency("com.squareup.okio:okio:.*"))
         }
     }
 }

@@ -54,12 +54,7 @@ public class MultiLineTranslation implements Translation<List<Component>> {
         }
 
         List<Component> built = this.build(processor, context);
-        Component result = built.get(0);
-        for(int i = 1; i < built.size(); i++) {
-            result = result.append(Component.newline()).append(built.get(i));
-        }
-
-        audience.sendMessage(result);
+        built.forEach(audience::sendMessage);
     }
 
 }

@@ -23,24 +23,17 @@
  *
  */
 
-package net.impactdev.impactor.forge.commands.cloud.internal;
+package net.impactdev.impactor.forge.commands;
 
-import com.mojang.brigadier.StringReader;
+import net.impactdev.impactor.api.commands.ImpactorCommandManager;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.core.modules.ImpactorModule;
 
-/**
- * An extension to the Brigadier StringReader that also implements Queue (via mixin).
- *
- * <p>See {@link net.impactdev.impactor.forge.mixins.cloud.CloudStringReaderMixin_Cloud} for the
- * {@link java.util.Queue} implementation.</p>
- */
-public final class CloudStringReader extends StringReader {
+public class ForgeCommandModule implements ImpactorModule {
 
-    /**
-     * Create a new reader from text.
-     *
-     * @param input the input
-     */
-    public CloudStringReader(final String input) {
-        super(input);
+    @Override
+    public void factories(FactoryProvider provider) {
+        provider.register(ImpactorCommandManager.Factory.class, new ForgeCommandManagerFactory());
     }
+
 }

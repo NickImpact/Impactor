@@ -53,7 +53,7 @@ public class ImpactorTranslationManagerBuilder implements TranslationManager.Tra
     }
 
     @Override
-    public TranslationManager.TranslationManagerBuilder defaultLocale(@NotNull Locale locale) {
+    public TranslationManager.TranslationManagerBuilder fallback(@NotNull Locale locale) {
         this.defaultLocale = locale;
         return this;
     }

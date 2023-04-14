@@ -149,6 +149,7 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
 
         this.logger().info("Initializing translations...");
         ImpactorTranslations.MANAGER.initialize();
+        ImpactorTranslations.MANAGER.refresh();
     }
 
     protected abstract void registerCommandMappings(ImpactorCommandRegistry registry);

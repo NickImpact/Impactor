@@ -44,16 +44,6 @@ public class ConnectionListener {
     private static final Map<UUID, SchedulerTask> tasks = Maps.newHashMap();
 
     @SubscribeEvent
-    public static void onJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        PlatformPlayer player = PlatformPlayer.getOrCreate(event.getEntity().getUUID());
-        TextProcessor processor = TextProcessor.legacy('&');
-
-        tasks.put(event.getEntity().getUUID(), Impactor.instance().scheduler().asyncRepeating(() -> {
-            player.sendActionBar(processor.parse("&aTPS: {{impactor:tps}} (MSPT: {{impactor:mspt}} ms)"));
-        }, 50, TimeUnit.MILLISECONDS));
-    }
-
-    @SubscribeEvent
     public static void onLeave(PlayerEvent.PlayerLoggedOutEvent event) {
         tasks.remove(event.getEntity().getUUID()).cancel();
     }

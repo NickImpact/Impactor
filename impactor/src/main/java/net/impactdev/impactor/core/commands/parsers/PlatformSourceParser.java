@@ -49,15 +49,12 @@ public final class PlatformSourceParser implements ArgumentParser<CommandSource,
     
     @Override
     public @NonNull ArgumentParseResult<@NonNull PlatformSource> parse(@NonNull CommandContext<@NonNull CommandSource> context, @NonNull Queue<@NonNull String> args) {
-        // TODO - Support console and entity UUIDs
-
         PlatformPlayerService service = Impactor.instance().services().provide(PlatformPlayerService.class);
         Optional<PlatformSource> match = service.online().stream()
                 .filter(player -> this.plain.serialize(player.name()).equals(args.peek()))
                 .findFirst()
                 .map(player -> player);
 
-        // TODO - We need to support offline player lookups, the player service needs this enhancement
         return match.map(player -> {
                     args.remove();
                     return player;

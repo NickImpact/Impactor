@@ -30,16 +30,21 @@ import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.platform.PlatformComponent;
 import net.impactdev.impactor.api.platform.PlatformInfo;
 import net.impactdev.impactor.api.platform.PlatformType;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.PlatformPlayerService;
 import net.impactdev.impactor.api.platform.plugins.PluginMetadata;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.platform.ImpactorPlatform;
 import net.impactdev.impactor.core.platform.ImpactorPlatformInfo;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 public class TestPlatform extends ImpactorPlatform {
     public TestPlatform() {
@@ -81,6 +86,17 @@ public class TestPlatform extends ImpactorPlatform {
         @Override
         public void services(ServiceProvider provider) {
             provider.register(Platform.class, new TestPlatform());
+            provider.register(PlatformPlayerService.class, new PlatformPlayerService() {
+                @Override
+                public PlatformPlayer getOrCreate(@NotNull UUID uuid) {
+                    return PlatformPlayer.getOrCreate(uuid);
+                }
+
+                @Override
+                public Set<PlatformPlayer> online() {
+                    return Collections.emptySet();
+                }
+            });
         }
     }
 }

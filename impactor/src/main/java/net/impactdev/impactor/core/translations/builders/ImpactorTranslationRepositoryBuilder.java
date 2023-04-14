@@ -49,7 +49,7 @@ public class ImpactorTranslationRepositoryBuilder implements TranslationReposito
     }
 
     @Override
-    public TranslationRepository.RepositoryBuilder refreshRule(@NotNull Supplier<Boolean> rule) {
+    public TranslationRepository.RepositoryBuilder refreshWhen(@NotNull Supplier<Boolean> rule) {
         this.rule = rule;
         return this;
     }

@@ -25,20 +25,22 @@
 
 package net.impactdev.impactor.core.permissions;
 
+import com.google.common.base.Suppliers;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public final class LuckPermsPermissionsService implements PermissionsService {
 
-    private static final LuckPerms API = LuckPermsProvider.get();
+    private static final Supplier<LuckPerms> API = Suppliers.memoize(LuckPermsProvider::get);
 
     @Override
     public boolean hasPermission(PlatformSource source, String permission) {
-        return Optional.ofNullable(API.getUserManager().getUser(source.uuid()))
+        return Optional.ofNullable(API.get().getUserManager().getUser(source.uuid()))
                 .map(user -> user.getCachedData().getPermissionData().checkPermission(permission).asBoolean())
                 .orElse(true);
     }

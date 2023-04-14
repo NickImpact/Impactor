@@ -6,13 +6,7 @@
   "mixins": [
     "core.ServerboundClientInformationPacketAccessor",
     "core.ServerPlayerMixin",
-    "core.MinecraftServerMixin",
-    "cloud.CommandSelectionAccessor_Cloud",
-    "cloud.CloudStringReaderMixin_Cloud",
-    "cloud.MessageArgumentMessageAccess_Cloud",
-    "cloud.MessageArgumentPartAccess_Cloud",
-    "cloud.EntitySelectorMixin_Cloud",
-    "cloud.EntitySelectorParser_Cloud"
+    "core.MinecraftServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

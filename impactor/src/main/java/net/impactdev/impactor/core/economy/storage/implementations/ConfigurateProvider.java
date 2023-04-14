@@ -34,6 +34,8 @@ import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.currency.CurrencyProvider;
+import net.impactdev.impactor.api.platform.players.PlatformPlayerService;
+import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.storage.connection.configurate.ConfigurateLoader;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.economy.accounts.ImpactorAccount;
@@ -175,6 +177,13 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
         Account.AccountBuilder builder = new ImpactorAccount.ImpactorAccountBuilder();
         builder.currency(currency).owner(uuid);
         builder = modifier.modify(builder);
+
+        PlatformPlayerService service = Impactor.instance().services().provide(PlatformPlayerService.class);
+        if(PlatformSource.CONSOLE_UUID.equals(uuid)) {
+            builder.virtual();
+        }
+
+        // TODO - Validate against a user cache or UUID lookup if the target UUID is a player
 
         Account account = builder.build();
         this.save(account);

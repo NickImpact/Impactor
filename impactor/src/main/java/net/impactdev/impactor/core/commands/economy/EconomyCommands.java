@@ -30,15 +30,18 @@ import cloud.commandframework.annotations.CommandDescription;
 import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.CommandPermission;
 import cloud.commandframework.annotations.processing.CommandContainer;
+import com.google.common.base.Preconditions;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
+import net.impactdev.impactor.api.economy.transactions.EconomyTransferTransaction;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.utility.Context;
 import net.impactdev.impactor.core.economy.context.TransactionContext;
+import net.impactdev.impactor.core.economy.context.TransferTransactionContext;
 import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +53,7 @@ import java.math.BigDecimal;
 @CommandPermission("impactor.commands.economy.base")
 public final class EconomyCommands {
 
-    @CommandMethod("economy|eco balance [target] [currency]")
+    @CommandMethod("economy|eco balance [currency] [target]")
     @CommandPermission("impactor.commands.economy.balance")
     @CommandDescription("Fetches the balance of the source or identified target")
     public void balance(final @NotNull CommandSource source, @Nullable @Argument("target") PlatformSource target, @Nullable @Argument("currency") Currency currency) {
@@ -66,8 +69,7 @@ public final class EconomyCommands {
         ImpactorTranslations.ECONOMY_BALANCE.send(source, context);
     }
 
-    // TODO - Consolidate down to one method, with withdraw/deposit/etc being an argument instead
-    @CommandMethod("economy|eco withdraw <amount> [target] [currency]")
+    @CommandMethod("economy|eco withdraw <amount> [currency] [target]")
     @CommandPermission("impactor.commands.economy.withdraw")
     public void withdraw(
             final @NotNull CommandSource source,
@@ -95,7 +97,7 @@ public final class EconomyCommands {
         ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
     }
 
-    @CommandMethod("economy|eco deposit <amount> [target] [currency]")
+    @CommandMethod("economy|eco deposit <amount> [currency] [target]")
     @CommandPermission("impactor.commands.economy.deposit")
     public void deposit(
             final @NotNull CommandSource source,
@@ -122,7 +124,7 @@ public final class EconomyCommands {
         ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
     }
 
-    @CommandMethod("economy|eco set <amount> [target] [currency]")
+    @CommandMethod("economy|eco set <amount> [currency] [target]")
     @CommandPermission("impactor.commands.economy.set")
     public void set(
             final @NotNull CommandSource source,
@@ -148,8 +150,9 @@ public final class EconomyCommands {
         context.append(Account.class, account);
         ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
     }
-    @CommandMethod("economy|eco reset [target] [currency]")
-    @CommandPermission("impactor.commands.economy.set")
+
+    @CommandMethod("economy|eco reset [currency] [target]")
+    @CommandPermission("impactor.commands.economy.reset")
     public void reset(
             final @NotNull CommandSource source,
             @Nullable @Argument("target") PlatformSource target,
@@ -174,4 +177,39 @@ public final class EconomyCommands {
         ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
     }
 
+    @CommandMethod("economy|eco pay <amount> <target> [currency] [source]")
+    @CommandPermission("impactor.commands.economy.pay")
+    public void transfer(
+            final @NotNull CommandSource source,
+            @Argument("amount") double amount,
+            @Argument("target") PlatformSource target,
+            @Nullable @Argument("currency") Currency currency,
+            @Nullable @Argument("source") PlatformSource from
+    ) {
+        EconomyService service = EconomyService.instance();
+        Currency c = currency != null ? currency : service.currencies().primary();
+        PlatformSource focus = from != null ? from : source.source();
+
+        Preconditions.checkArgument(focus != target, "Cannot pay yourself!");
+
+        Account sa = service.account(c, focus.uuid()).join();
+        Account ta = service.account(c, target.uuid()).join();
+
+        BigDecimal sb = sa.balance();
+        BigDecimal tb = ta.balance();
+
+        EconomyTransferTransaction transaction = sa.transfer(ta, new BigDecimal(amount));
+        if(!transaction.successful()) {
+            throw new RuntimeException("The transaction failed with reason: " + transaction.result().name());
+        }
+
+        Context context = Context.empty();
+        context.append(TransferTransactionContext.class, new TransferTransactionContext(
+                new TransactionContext(EconomyTransactionType.WITHDRAW, sb, sa.balance()),
+                new TransactionContext(EconomyTransactionType.DEPOSIT, tb, ta.balance())
+        ));
+        context.append(Currency.class, c);
+
+        ImpactorTranslations.ECONOMY_TRANSFER.send(source, context);
+    }
 }

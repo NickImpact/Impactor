@@ -36,6 +36,7 @@ import net.impactdev.impactor.api.economy.transactions.composer.TransactionCompo
 import net.impactdev.impactor.api.economy.transactions.details.EconomyResultType;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
+import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.core.economy.ImpactorEconomyService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.MessageType;
@@ -329,5 +330,8 @@ public class BasicEconomyTest {
 
         Account existing = service.account(target, Account.AccountBuilder::virtual).join();
         assertFalse(existing.virtual());
+
+        Account server = service.account(PlatformSource.CONSOLE_UUID).join();
+        assertTrue(server.virtual());
     }
 }

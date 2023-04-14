@@ -35,10 +35,12 @@ import net.impactdev.impactor.api.translations.TranslationManager;
 import net.impactdev.impactor.api.translations.metadata.LanguageInfo;
 import net.impactdev.impactor.api.translations.repository.TranslationEndpoint;
 import net.impactdev.impactor.api.translations.repository.TranslationRepository;
+import net.impactdev.impactor.api.utility.Context;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.translations.ImpactorTranslationManager;
 import net.impactdev.impactor.core.translations.builders.ImpactorTranslationRepositoryBuilder;
+import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
 import net.impactdev.impactor.core.utility.Futures;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -128,7 +130,10 @@ public class ImpactorTranslationRepository implements TranslationRepository {
             }
 
             for(LanguageInfo language : languages) {
-                audience.sendMessage(Component.text("Downloading translation: " + language.name()));
+                Context context = Context.empty();
+                context.append(LanguageInfo.class, language);
+
+                ImpactorTranslations.TRANSLATIONS_INSTALLING_LANGUAGE.send(audience, context);
 
                 Request request = new Request.Builder()
                         .header("User-Agent", TranslationsClient.USER_AGENT)
@@ -147,6 +152,7 @@ public class ImpactorTranslationRepository implements TranslationRepository {
                         }
                     }
                 } catch (Exception e) {
+                    ImpactorTranslations.TRANSLATIONS_INSTALL_FAILED.send(audience, context);
 //                    Translatables.TRANSLATIONS_DOWNLOAD_FAILED.send(audience, Context.empty().append(Locale.class, language.locale()));
 
                     ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
