@@ -31,7 +31,9 @@ import net.impactdev.impactor.api.translations.TranslationManager;
 import net.impactdev.impactor.api.translations.TranslationProvider;
 import net.impactdev.impactor.api.translations.repository.TranslationEndpoint;
 import net.impactdev.impactor.api.translations.repository.TranslationRepository;
+import net.impactdev.impactor.api.utility.Time;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.core.translations.TranslationsModule;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,7 +50,9 @@ public interface ImpactorTranslations {
             .repository(TranslationRepository.builder()
                     .endpoint(TranslationEndpoint.LANGUAGE_SET, "https://metadata.impactdev.net/impactor/translations")
                     .endpoint(TranslationEndpoint.DOWNLOADABLE_LANGUAGE, "https://metadata.impactdev.net/impactor/translation/%s")
-                    .refreshWhen(() -> true) // TODO - Config for auto install flag
+//                    .refreshWhen(() -> TranslationsModule.config.get(TranslationsConfig.AUTO_INSTALL))
+////                    .maxBundleSize(TranslationsModule.config.get(TranslationsConfig.MAX_BUNDLE_SIZE))
+//                    .maxCacheAge(TranslationsModule.config.get(TranslationsConfig.MAX_CACHE_AGE))
                     .build()
             )
             .provided(() -> BaseImpactorPlugin.instance().resource(root -> root.resolve("en_us.json")))
@@ -68,7 +72,7 @@ public interface ImpactorTranslations {
     TranslationProvider<Component> TRANSLATIONS_INFO_PROGRESS = create("translations.info.progress");
     TranslationProvider<Component> TRANSLATIONS_INFO_CONTRIBUTOR_HEADER = create("translations.info.contributor.header");
     TranslationProvider<Component> TRANSLATIONS_INFO_CONTRIBUTOR_NAME = create("translations.info.contributor.name");
-    TranslationProvider<Component> TRANSLATIONS_INVALID_LOCALE = create("translations.invalid-locale");
+    TranslationProvider<Component> TRANSLATIONS_INVALID_LOCALE = create("translations.info.invalid-locale");
 
     TranslationProvider<Component> TRANSLATIONS_INSTALLING = create("translations.installing");
     TranslationProvider<Component> TRANSLATIONS_INSTALLING_LANGUAGE = create("translations.installing-language");

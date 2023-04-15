@@ -52,7 +52,6 @@ public class ImpactorConfigurationAdapter implements ConfigurationAdapter {
 
     private final Path path;
     private CommentedConfigurationNode root;
-    private ConfigurationLoader<CommentedConfigurationNode> loader;
 
     public ImpactorConfigurationAdapter(Path path, @Nullable Supplier<InputStream> supplier) {
         this.path = path;
@@ -85,7 +84,7 @@ public class ImpactorConfigurationAdapter implements ConfigurationAdapter {
     }
 
     private ConfigurationLoader<? extends CommentedConfigurationNode> createLoader(Path path) {
-        return this.loader = HoconConfigurationLoader.builder().path(path).build();
+        return HoconConfigurationLoader.builder().path(path).build();
     }
 
     @Override

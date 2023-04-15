@@ -35,8 +35,6 @@ dependencies {
     implementation(project(":minecraft"))
     modImplementation("ca.landonjw.gooeylibs:forge:3.0.0-1.19.2-SNAPSHOT@jar")
 
-    include("io.leangen.geantyref:geantyref:1.3.13")
-
     modImplementation("net.impactdev.impactor.commands:forge:5.0.0+1.19.2-SNAPSHOT") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
@@ -63,6 +61,7 @@ tasks {
             include(dependency("cloud.commandframework:cloud-brigadier:.*"))
             include(dependency("cloud.commandframework:cloud-services:.*"))
             include(dependency("cloud.commandframework:cloud-minecraft-extras:.*"))
+            include(dependency("io.leangen.geantyref:geantyref:.*"))
 
             exclude("forge-client-extra.jar")
             exclude("ca/landonjw/gooeylibs2/forge/GooeyLibs.class")
@@ -74,7 +73,8 @@ tasks {
             "ca.landonjw.gooeylibs2",
             "cloud.commandframework",
             "okio",
-            "okhttp"
+            "okhttp",
+            "io.leangen.geantyref"
         ).forEach { relocate(it, "$prefix.$it") }
 
     }

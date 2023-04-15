@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.core.utility;
+package net.impactdev.impactor.core.utility.future;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;

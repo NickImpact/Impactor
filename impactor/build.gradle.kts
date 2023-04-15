@@ -63,3 +63,9 @@ sourceSets {
         }
     }
 }
+
+license {
+    exclude("**/datasize/DataSize.java")
+    exclude("**/datasize/DataSizeUtils.java")
+    exclude("**/datasize/DataUnit.java")
+}

@@ -74,7 +74,6 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
 
     private final Set<ImpactorModule> modules = Sets.newHashSet();
 
-
     public BaseImpactorPlugin(ImpactorBootstrapper bootstrapper) {
         instance = this;
         this.bootstrapper = bootstrapper;
