@@ -38,6 +38,7 @@ import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.translations.builders.ImpactorTranslationManagerBuilder;
 import net.impactdev.impactor.core.translations.builders.ImpactorTranslationRepositoryBuilder;
 import net.impactdev.impactor.core.translations.components.ImpactorTranslationProvider;
+import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
 import net.impactdev.impactor.core.translations.internal.TranslationsConfig;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
@@ -66,5 +67,9 @@ public final class TranslationsModule implements ImpactorModule {
                 .path(Paths.get("config").resolve("impactor").resolve("translations").resolve("translations.conf"))
                 .provideIfMissing(() -> BaseImpactorPlugin.instance().resource(root -> root.resolve("configs").resolve("translations.conf")))
                 .build();
+
+        logger.info("Initializing translations...");
+        ImpactorTranslations.MANAGER.initialize();
+        ImpactorTranslations.MANAGER.refresh();
     }
 }

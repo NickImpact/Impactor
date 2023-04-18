@@ -32,38 +32,42 @@ import net.impactdev.impactor.api.translations.TranslationProvider;
 import net.impactdev.impactor.api.translations.repository.TranslationEndpoint;
 import net.impactdev.impactor.api.translations.repository.TranslationRepository;
 import net.impactdev.impactor.api.utility.Time;
+import net.impactdev.impactor.api.utility.collections.mappings.LoadingMap;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.translations.TranslationsModule;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 public interface ImpactorTranslations {
 
     TranslationManager MANAGER = TranslationManager.builder()
-            .path(Paths.get("impactor").resolve("translations"))
+            .path(Paths.get("config").resolve("impactor").resolve("translations"))
             .fallback(Locale.US)
             .processor(TextProcessor.mini())
             .repository(TranslationRepository.builder()
                     .endpoint(TranslationEndpoint.LANGUAGE_SET, "https://metadata.impactdev.net/impactor/translations")
                     .endpoint(TranslationEndpoint.DOWNLOADABLE_LANGUAGE, "https://metadata.impactdev.net/impactor/translation/%s")
-//                    .refreshWhen(() -> TranslationsModule.config.get(TranslationsConfig.AUTO_INSTALL))
-////                    .maxBundleSize(TranslationsModule.config.get(TranslationsConfig.MAX_BUNDLE_SIZE))
-//                    .maxCacheAge(TranslationsModule.config.get(TranslationsConfig.MAX_CACHE_AGE))
+                    .refreshWhen(() -> TranslationsModule.config.get(TranslationsConfig.AUTO_INSTALL))
+                    .maxBundleSize(TranslationsModule.config.get(TranslationsConfig.MAX_BUNDLE_SIZE))
+                    .maxCacheAge(TranslationsModule.config.get(TranslationsConfig.MAX_CACHE_AGE))
                     .build()
             )
             .provided(() -> BaseImpactorPlugin.instance().resource(root -> root.resolve("en_us.json")))
             .build();
 
-    Map<String, TranslationProvider<?>> REGISTERED = Maps.newHashMap();
+    LoadingMap<String, TranslationProvider<?>> REGISTERED = LoadingMap.of(key -> TranslationProvider.create(MANAGER, key));
 
     // Economy
     TranslationProvider<Component> ECONOMY_BALANCE = create("economy.account.balance");
-    TranslationProvider<Component> ECONOMY_TRANSACTION = create("economy.account.transaction");
-    TranslationProvider<Component> ECONOMY_TRANSFER = create("economy.account.transfer");
+    TranslationProvider<Component> ECONOMY_TRANSFER = create("economy.transactions.transfer.successful");
+    TranslationProvider<Component> ECONOMY_TRANSACTION = create("economy.transactions.successful");
+    TranslationProvider<Component> ECONOMY_CANT_PAY_SELF = create("economy.transactions.cant-pay-self");
+    TranslationProvider<Component> ECONOMY_TRANSACTION_FAILED = create("economy.transactions.failed");
 
     // Translations
     TranslationProvider<Component> TRANSLATIONS_SEARCHING = create("translations.searching");
@@ -79,10 +83,8 @@ public interface ImpactorTranslations {
     TranslationProvider<Component> TRANSLATIONS_INSTALL_COMPLETE = create("translations.install-complete");
     TranslationProvider<Component> TRANSLATIONS_INSTALL_FAILED = create("translations.install-failed");
 
+    @SuppressWarnings("unchecked")
     static <T> TranslationProvider<T> create(final @NotNull String key) {
-        TranslationProvider<T> provider = TranslationProvider.create(MANAGER, key);
-        REGISTERED.put(key, provider);
-
-        return provider;
+        return (TranslationProvider<T>) REGISTERED.get(key);
     }
 }

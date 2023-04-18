@@ -97,12 +97,13 @@ public final class ImpactorCommandRegistry {
     }
 
     private AnnotationParser<CommandSource> createParser() {
-        AnnotationParser<CommandSource> parser = new AnnotationParser<>(
+        return new AnnotationParser<>(
                 this.manager.delegate(),
                 CommandSource.class,
                 parameters -> {
                     SimpleCommandMeta.Builder meta = CommandMeta.simple();
-                    if(!parameters.has(StandardParameters.DESCRIPTION)) {
+
+                    if(parameters.has(StandardParameters.DESCRIPTION)) {
                         meta.with(CommandMeta.DESCRIPTION, parameters.get(StandardParameters.DESCRIPTION, ""));
                     }
 
@@ -113,8 +114,6 @@ public final class ImpactorCommandRegistry {
                     return meta.build();
                 }
         );
-
-        return parser;
     }
 
 }

@@ -18,4 +18,13 @@ tasks {
         archiveBaseName.set("Impactor-${project.name.capitalize()}")
         archiveVersion.set("${minecraft}-${rootProject.version}")
     }
+
+}
+
+tasks.withType<PublishToMavenRepository> {
+    dependsOn(tasks["remapProductionJar"])
+}
+
+tasks.withType<GenerateModuleMetadata> {
+    dependsOn(tasks["remapProductionJar"])
 }

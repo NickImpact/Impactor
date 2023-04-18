@@ -93,7 +93,7 @@ public final class EconomyStorage implements Storage {
 
         return supply(() -> {
             Account result = this.implementation.account(currency, uuid, modifier);
-//            this.accounts.put(AccountKey.of(currency, uuid), result);
+            this.accounts.put(AccountKey.of(currency, uuid), result);
 
             return result;
         });

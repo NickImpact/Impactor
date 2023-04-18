@@ -47,7 +47,7 @@ import java.util.function.Function;
 public final class Futures {
 
     public static final ExecutorService ASYNC_EXECUTOR = Executors.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors(),
+            8,
             new ThreadFactoryBuilder()
                     .setNameFormat("Impactor Async Executor - #%d")
                     .setDaemon(true)

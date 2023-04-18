@@ -25,27 +25,11 @@
 
 package net.impactdev.impactor.forge.listeners;
 
-import com.google.common.collect.Maps;
-import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.scheduler.SchedulerTask;
-import net.impactdev.impactor.api.text.TextProcessor;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ConnectionListener {
 
-    private static final Map<UUID, SchedulerTask> tasks = Maps.newHashMap();
-
-    @SubscribeEvent
-    public static void onLeave(PlayerEvent.PlayerLoggedOutEvent event) {
-        tasks.remove(event.getEntity().getUUID()).cancel();
-    }
+    // TODO - Post connection join to our API
 
 }

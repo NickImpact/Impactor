@@ -22,25 +22,25 @@ dependencies {
     minecraft("net.minecraft:minecraft:${rootProject.property("minecraft")}")
     mappings(loom.officialMojangMappings())
 
-//    listOf(
-//        "net.kyori:examination-api:1.3.0",
-//        "net.kyori:examination-string:1.3.0",
-//        "net.kyori:adventure-api:4.13.0",
-//        "net.kyori:adventure-key:4.13.0",
-//        "net.kyori:adventure-nbt:4.13.0",
-//        "net.kyori:adventure-text-serializer-plain:4.13.0",
-//        "net.kyori:adventure-text-serializer-legacy:4.13.0",
-//        "net.kyori:adventure-text-serializer-gson:4.13.0",
-//        "net.kyori:adventure-text-minimessage:4.13.0",
-//        "net.kyori:adventure-text-logger-slf4j:4.13.0",
-//        "net.kyori:event-api:5.0.0-SNAPSHOT",
-//        "com.typesafe:config:1.4.1",
-//        "org.spongepowered:configurate-core:4.1.2",
-//        "org.spongepowered:configurate-gson:4.1.2",
-//        "org.spongepowered:configurate-hocon:4.1.2",
-//        "org.spongepowered:configurate-yaml:4.1.2",
-//        "org.spongepowered:math:2.0.1"
-//    ).forEach { include(it) }
+    listOf(
+        "net.kyori:examination-api:1.3.0",
+        "net.kyori:examination-string:1.3.0",
+        "net.kyori:adventure-api:4.13.0",
+        "net.kyori:adventure-key:4.13.0",
+        "net.kyori:adventure-nbt:4.13.0",
+        "net.kyori:adventure-text-serializer-plain:4.13.0",
+        "net.kyori:adventure-text-serializer-legacy:4.13.0",
+        "net.kyori:adventure-text-serializer-gson:4.13.0",
+        "net.kyori:adventure-text-minimessage:4.13.0",
+        "net.kyori:adventure-text-logger-slf4j:4.13.0",
+        "net.kyori:event-api:5.0.0-SNAPSHOT",
+        "com.typesafe:config:1.4.1",
+        "org.spongepowered:configurate-core:4.1.2",
+        "org.spongepowered:configurate-gson:4.1.2",
+        "org.spongepowered:configurate-hocon:4.1.2",
+        "org.spongepowered:configurate-yaml:4.1.2",
+        "org.spongepowered:math:2.0.1"
+    ).forEach { include(it) }
 }
 
 tasks {
@@ -56,26 +56,8 @@ tasks {
                 "org.mongodb:mongo-java-driver:.*",
                 "com.github.ben-manes.caffeine:caffeine:.*",
                 "io.github.classgraph:classgraph:.*",
-                "com.squareup.okhttp:okhttp:.*",
-                "com.squareup.okio:okio:.*",
-
-                "net.kyori:examination-api:1.3.0",
-                "net.kyori:examination-string:1.3.0",
-                "net.kyori:adventure-api:4.13.0",
-                "net.kyori:adventure-key:4.13.0",
-                "net.kyori:adventure-nbt:4.13.0",
-                "net.kyori:adventure-text-serializer-plain:4.13.0",
-                "net.kyori:adventure-text-serializer-legacy:4.13.0",
-                "net.kyori:adventure-text-serializer-gson:4.13.0",
-                "net.kyori:adventure-text-minimessage:4.13.0",
-                "net.kyori:adventure-text-logger-slf4j:4.13.0",
-                "net.kyori:event-api:5.0.0-SNAPSHOT",
-                "com.typesafe:config:1.4.1",
-                "org.spongepowered:configurate-core:4.1.2",
-                "org.spongepowered:configurate-gson:4.1.2",
-                "org.spongepowered:configurate-hocon:4.1.2",
-                "org.spongepowered:configurate-yaml:4.1.2",
-                "org.spongepowered:math:2.0.1"
+                "com.squareup.okhttp3:okhttp:.*",
+                "com.squareup.okio:okio:.*"
             ).forEach { include(dependency(it)) }
         }
 
@@ -92,11 +74,7 @@ tasks {
             "org.bson",
             "nonapi.io.github.classgraph",
             "okhttp3",
-            "okio",
-            "net.kyori",
-            "org.spongepowered.configurate",
-            "org.spongepowered.math",
-            "com.typesafe"
+            "okio"
         ).forEach { relocate(it, "$prefix.$it") }
     }
 

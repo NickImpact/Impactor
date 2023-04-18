@@ -95,7 +95,7 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
 
     @Override
     public Path configurationDirectory() {
-        return Paths.get("impactor");
+        return Paths.get("config").resolve("impactor");
     }
 
     @Override
@@ -145,10 +145,6 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         registry.registerArgumentParsers();
         registry.registerAllCommands();
         this.registerCommandMappings(registry);
-
-        this.logger().info("Initializing translations...");
-        ImpactorTranslations.MANAGER.initialize();
-        ImpactorTranslations.MANAGER.refresh();
     }
 
     protected abstract void registerCommandMappings(ImpactorCommandRegistry registry);

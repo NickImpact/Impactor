@@ -24,9 +24,6 @@ tasks {
 
             include(dependency("net.impactdev:json:.*"))
             include(dependency("net.impactdev.impactor.api:commands:.*"))
-
-            include(dependency("com.squareup.okhttp3:okhttp:.*"))
-            include(dependency("com.squareup.okio:okio:.*"))
         }
     }
 }

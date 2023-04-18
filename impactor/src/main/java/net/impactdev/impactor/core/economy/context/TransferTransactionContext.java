@@ -25,16 +25,18 @@
 
 package net.impactdev.impactor.core.economy.context;
 
-import java.math.BigDecimal;
+import net.impactdev.impactor.api.economy.transactions.details.EconomyResultType;
 
 public final class TransferTransactionContext {
 
     private final TransactionContext from;
     private final TransactionContext to;
+    private final EconomyResultType result;
 
-    public TransferTransactionContext(TransactionContext from, TransactionContext to) {
+    public TransferTransactionContext(TransactionContext from, TransactionContext to, EconomyResultType result) {
         this.from = from;
         this.to = to;
+        this.result = result;
     }
 
     public TransactionContext from() {
@@ -43,6 +45,10 @@ public final class TransferTransactionContext {
 
     public TransactionContext to() {
         return this.to;
+    }
+
+    public EconomyResultType result() {
+        return this.result;
     }
 
 }

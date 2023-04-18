@@ -2,6 +2,7 @@ plugins {
     `java-library`
     id("org.cadixdev.licenser")
     id("net.kyori.blossom")
+    kotlin("jvm")
 }
 
 repositories {

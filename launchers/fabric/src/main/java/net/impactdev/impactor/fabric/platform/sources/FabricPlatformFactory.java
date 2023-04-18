@@ -52,10 +52,10 @@ public class FabricPlatformFactory implements PlatformSource.Factory, PlatformPl
     private final Cache<UUID, PlatformSource> cache = Caffeine.newBuilder().build();
 
     @Override
-    public PlatformSource console() {
+    public PlatformSource server() {
         return this.cache.get(
-                PlatformSource.CONSOLE_UUID,
-                uuid -> new FabricPlatformSource(PlatformSource.CONSOLE_UUID, SourceType.CONSOLE)
+                PlatformSource.SERVER_UUID,
+                uuid -> new FabricPlatformSource(PlatformSource.SERVER_UUID, SourceType.SERVER)
         );
     }
 

@@ -25,6 +25,7 @@
 
 package net.impactdev.impactor.core.economy.context;
 
+import net.impactdev.impactor.api.economy.transactions.details.EconomyResultType;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 
 import java.math.BigDecimal;
@@ -34,11 +35,13 @@ public final class TransactionContext {
     private final EconomyTransactionType type;
     private final BigDecimal before;
     private final BigDecimal after;
+    private final EconomyResultType result;
 
-    public TransactionContext(EconomyTransactionType type, BigDecimal before, BigDecimal after) {
+    public TransactionContext(EconomyTransactionType type, BigDecimal before, BigDecimal after, EconomyResultType result) {
         this.type = type;
         this.before = before;
         this.after = after;
+        this.result = result;
     }
 
     public EconomyTransactionType type() {
@@ -51,5 +54,9 @@ public final class TransactionContext {
 
     public BigDecimal after() {
         return this.after;
+    }
+
+    public EconomyResultType result() {
+        return this.result;
     }
 }

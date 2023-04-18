@@ -13,6 +13,10 @@ pluginManagement {
     includeBuild("build-logic")
 }
 
+plugins {
+    id("ca.stellardrift.polyglot-version-catalogs") version "5.0.1"
+}
+
 rootProject.name = "Impactor"
 
 include("api:core")

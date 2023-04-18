@@ -27,6 +27,7 @@ package net.impactdev.impactor.core.translations.internal;
 
 import net.impactdev.impactor.api.configuration.key.ConfigKey;
 import net.impactdev.impactor.api.utility.Time;
+import net.impactdev.impactor.core.utility.datasize.DataSize;
 
 import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.booleanKey;
 import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.key;
@@ -41,7 +42,7 @@ public final class TranslationsConfig {
     public static final ConfigKey<Long> MAX_BUNDLE_SIZE = key(adapter -> {
         String input = adapter.getString("max-bundle-size", "1MB");
 
-        return 0L;
+        return DataSize.parse(input).toBytes();
     });
 
 

@@ -85,14 +85,15 @@ public final class EconomyCommands {
         BigDecimal before = account.balance();
 
         EconomyTransaction transaction = account.withdraw(new BigDecimal(amount));
-        if(!transaction.successful()) {
-            throw new RuntimeException("The transaction failed with reason: " + transaction.result().name());
-        }
-
         Context context = Context.empty();
-        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.WITHDRAW, before, account.balance()));
+        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.WITHDRAW, before, account.balance(), transaction.result()));
         context.append(Currency.class, c);
         context.append(Account.class, account);
+
+        if(!transaction.successful()) {
+            ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
+            return;
+        }
 
         ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
     }
@@ -113,14 +114,15 @@ public final class EconomyCommands {
         BigDecimal before = account.balance();
 
         EconomyTransaction transaction = account.deposit(new BigDecimal(amount));
-        if(!transaction.successful()) {
-            throw new RuntimeException("The transaction failed with reason: " + transaction.result().name());
-        }
-
         Context context = Context.empty();
-        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.DEPOSIT, before, account.balance()));
+        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.DEPOSIT, before, account.balance(), transaction.result()));
         context.append(Currency.class, c);
         context.append(Account.class, account);
+
+        if(!transaction.successful()) {
+            ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
+            return;
+        }
         ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
     }
 
@@ -140,14 +142,15 @@ public final class EconomyCommands {
         BigDecimal before = account.balance();
 
         EconomyTransaction transaction = account.deposit(new BigDecimal(amount));
-        if(!transaction.successful()) {
-            throw new RuntimeException("The transaction failed with reason: " + transaction.result().name());
-        }
-
         Context context = Context.empty();
-        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.SET, before, account.balance()));
+        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.SET, before, account.balance(), transaction.result()));
         context.append(Currency.class, c);
         context.append(Account.class, account);
+
+        if(!transaction.successful()) {
+            ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
+            return;
+        }
         ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
     }
 
@@ -166,14 +169,16 @@ public final class EconomyCommands {
         BigDecimal before = account.balance();
 
         EconomyTransaction transaction = account.reset();
-        if(!transaction.successful()) {
-            throw new RuntimeException("The transaction failed with reason: " + transaction.result().name());
-        }
-
         Context context = Context.empty();
-        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.RESET, before, account.balance()));
+        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.RESET, before, account.balance(), transaction.result()));
         context.append(Currency.class, c);
         context.append(Account.class, account);
+
+        if(!transaction.successful()) {
+            ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
+            return;
+        }
+
         ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
     }
 
@@ -190,7 +195,10 @@ public final class EconomyCommands {
         Currency c = currency != null ? currency : service.currencies().primary();
         PlatformSource focus = from != null ? from : source.source();
 
-        Preconditions.checkArgument(focus != target, "Cannot pay yourself!");
+        if(target == focus) {
+            ImpactorTranslations.ECONOMY_CANT_PAY_SELF.send(source, Context.empty());
+            return;
+        }
 
         Account sa = service.account(c, focus.uuid()).join();
         Account ta = service.account(c, target.uuid()).join();
@@ -199,17 +207,23 @@ public final class EconomyCommands {
         BigDecimal tb = ta.balance();
 
         EconomyTransferTransaction transaction = sa.transfer(ta, new BigDecimal(amount));
+        Context context = Context.empty();
+        context.append(Currency.class, c);
+        context.append(TransferTransactionContext.class, new TransferTransactionContext(
+                new TransactionContext(EconomyTransactionType.WITHDRAW, sb, sa.balance(), transaction.result()),
+                new TransactionContext(EconomyTransactionType.DEPOSIT, tb, ta.balance(), transaction.result()),
+                transaction.result()
+        ));
+
         if(!transaction.successful()) {
-            throw new RuntimeException("The transaction failed with reason: " + transaction.result().name());
+            ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
+            return;
         }
 
-        Context context = Context.empty();
-        context.append(TransferTransactionContext.class, new TransferTransactionContext(
-                new TransactionContext(EconomyTransactionType.WITHDRAW, sb, sa.balance()),
-                new TransactionContext(EconomyTransactionType.DEPOSIT, tb, ta.balance())
-        ));
-        context.append(Currency.class, c);
-
+        // Hover:
+        //   Transaction Type: TRANSFER
+        //     Source: Before --> After
+        //     Recipient: Before --> After
         ImpactorTranslations.ECONOMY_TRANSFER.send(source, context);
     }
 }

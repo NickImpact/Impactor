@@ -31,6 +31,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.translations.TranslationManager;
 import net.impactdev.impactor.api.translations.metadata.LanguageInfo;
 import net.impactdev.impactor.api.translations.repository.TranslationEndpoint;
@@ -99,6 +100,7 @@ public class ImpactorTranslationRepository implements TranslationRepository {
 
             if(this.refreshRule != null) {
                 if(!this.refreshRule.get()) {
+                    System.out.println();
                     return false;
                 }
             }
@@ -112,7 +114,7 @@ public class ImpactorTranslationRepository implements TranslationRepository {
                 return false;
             }
 
-            this.downloadAndInstall(this.available().join(), Audience.empty(), true).join();
+            this.available().thenApply(languages -> this.downloadAndInstall(languages, Audience.empty(), true)).join();
             return true;
         });
     }
@@ -120,49 +122,53 @@ public class ImpactorTranslationRepository implements TranslationRepository {
     @Override
     public CompletableFuture<Void> downloadAndInstall(@NotNull Set<LanguageInfo> languages, @NotNull Audience audience, boolean update) {
         return Futures.execute(() -> {
-            Path target = this.manager.root().resolve("repository");
-            this.clear(target, ImpactorTranslationManager::isConfigurationFile);
             try {
-                Files.createDirectories(target);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                Path target = this.manager.root().resolve("repository");
+                this.clear(target, ImpactorTranslationManager::isConfigurationFile);
+                try {
+                    Files.createDirectories(target);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-            for(LanguageInfo language : languages) {
-                Context context = Context.empty();
-                context.append(LanguageInfo.class, language);
+                for (LanguageInfo language : languages) {
+                    Context context = Context.empty();
+                    context.append(LanguageInfo.class, language);
 
-                ImpactorTranslations.TRANSLATIONS_INSTALLING_LANGUAGE.send(audience, context);
+                    ImpactorTranslations.TRANSLATIONS_INSTALLING_LANGUAGE.send(audience, context);
 
-                Request request = new Request.Builder()
-                        .header("User-Agent", TranslationsClient.USER_AGENT)
-                        .url(String.format(this.urls.get(TranslationEndpoint.DOWNLOADABLE_LANGUAGE), language.id()))
-                        .build();
+                    Request request = new Request.Builder()
+                            .header("User-Agent", TranslationsClient.USER_AGENT)
+                            .url(String.format(this.urls.get(TranslationEndpoint.DOWNLOADABLE_LANGUAGE), language.id()))
+                            .build();
 
-                try (Response response = this.client.makeRequest(request)) {
-                    try (ResponseBody body = response.body()) {
-                        if(body == null) {
-                            throw new IOException("No response from translations server");
-                        }
+                    try (Response response = this.client.makeRequest(request)) {
+                        try (ResponseBody body = response.body()) {
+                            if (body == null) {
+                                throw new IOException("No response from translations server");
+                            }
 
-                        Path file = target.resolve(language.locale() + ".conf");
-                        try (InputStream stream = new LimitedInputStream(body.byteStream(), maxBundleSize)) {
-                            Files.copy(stream, file, StandardCopyOption.REPLACE_EXISTING);
+                            Path file = target.resolve(language.locale() + ".conf");
+                            try (InputStream stream = new LimitedInputStream(body.byteStream(), maxBundleSize)) {
+                                Files.copy(stream, file, StandardCopyOption.REPLACE_EXISTING);
+                            }
                         }
                     }
-                } catch (Exception e) {
-                    ImpactorTranslations.TRANSLATIONS_INSTALL_FAILED.send(audience, context);
-//                    Translatables.TRANSLATIONS_DOWNLOAD_FAILED.send(audience, Context.empty().append(Locale.class, language.locale()));
-
-                    ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
+                    catch (Exception e) {
+                        ImpactorTranslations.TRANSLATIONS_INSTALL_FAILED.send(audience, context);
+                        ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
+                    }
                 }
-            }
 
-            if(update) {
-                writeLastRefreshTime();
-            }
+                if (update) {
+                    writeLastRefreshTime();
+                }
 
-            this.manager.reload();
+                this.manager.reload();
+            } catch (Exception e) {
+                ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
+            }
         });
     }
 

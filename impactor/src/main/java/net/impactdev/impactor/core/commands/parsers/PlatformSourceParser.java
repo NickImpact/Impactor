@@ -38,9 +38,11 @@ import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class PlatformSourceParser implements ArgumentParser<CommandSource, PlatformSource> {
@@ -50,10 +52,14 @@ public final class PlatformSourceParser implements ArgumentParser<CommandSource,
     @Override
     public @NonNull ArgumentParseResult<@NonNull PlatformSource> parse(@NonNull CommandContext<@NonNull CommandSource> context, @NonNull Queue<@NonNull String> args) {
         PlatformPlayerService service = Impactor.instance().services().provide(PlatformPlayerService.class);
-        Optional<PlatformSource> match = service.online().stream()
+        Set<PlatformPlayer> online = service.online();
+        Set<PlatformSource> options = new HashSet<>();
+        options.add(PlatformSource.server());
+        options.addAll(online);
+
+        Optional<PlatformSource> match = options.stream()
                 .filter(player -> this.plain.serialize(player.name()).equals(args.peek()))
-                .findFirst()
-                .map(player -> player);
+                .findFirst();
 
         return match.map(player -> {
                     args.remove();
@@ -66,8 +72,13 @@ public final class PlatformSourceParser implements ArgumentParser<CommandSource,
     @Override
     public @NonNull List<@NonNull String> suggestions(@NonNull CommandContext<CommandSource> context, @NonNull String input) {
         PlatformPlayerService service = Impactor.instance().services().provide(PlatformPlayerService.class);
-        return service.online().stream()
+        List<String> names = service.online().stream()
                 .map(player -> this.plain.serialize(player.name()))
+                .collect(Collectors.toList());
+
+        names.add("Server");
+
+        return names.stream()
                 .filter(name -> name.startsWith(input))
                 .collect(Collectors.toList());
     }

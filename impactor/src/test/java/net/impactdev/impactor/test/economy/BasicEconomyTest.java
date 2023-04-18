@@ -32,7 +32,6 @@ import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.events.EconomyTransactionEvent;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransferTransaction;
-import net.impactdev.impactor.api.economy.transactions.composer.TransactionComposer;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyResultType;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
@@ -80,7 +79,6 @@ public class BasicEconomyTest {
         try {
             Path config = Paths.get("config");
             Path logs = Paths.get("logs");
-            Path impactor = Paths.get("impactor");
 
             if(Files.exists(config)) {
                 FileUtils.cleanDirectory(config.toFile());
@@ -90,11 +88,6 @@ public class BasicEconomyTest {
             if(Files.exists(logs)) {
                 FileUtils.cleanDirectory(logs.toFile());
                 Files.delete(logs);
-            }
-
-            if(Files.exists(impactor)) {
-                FileUtils.cleanDirectory(impactor.toFile());
-                Files.delete(impactor);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,7 +105,8 @@ public class BasicEconomyTest {
         Account account = service.account(currency, target).join();
 
         assertEquals(currency.defaultAccountBalance(), balance = account.balance());
-        assertTrue(Files.exists(Paths.get("impactor")
+        assertTrue(Files.exists(Paths.get("config")
+                .resolve("impactor")
                 .resolve("economy")
                 .resolve("accounts")
                 .resolve("users")
@@ -124,7 +118,8 @@ public class BasicEconomyTest {
     @Test
     @Order(2)
     public void fetchAndUpdate() {
-        assertTrue(Files.exists(Paths.get("impactor")
+        assertTrue(Files.exists(Paths.get("config")
+                .resolve("impactor")
                 .resolve("economy")
                 .resolve("accounts")
                 .resolve("users")
@@ -331,7 +326,7 @@ public class BasicEconomyTest {
         Account existing = service.account(target, Account.AccountBuilder::virtual).join();
         assertFalse(existing.virtual());
 
-        Account server = service.account(PlatformSource.CONSOLE_UUID).join();
+        Account server = service.account(PlatformSource.SERVER_UUID).join();
         assertTrue(server.virtual());
     }
 }

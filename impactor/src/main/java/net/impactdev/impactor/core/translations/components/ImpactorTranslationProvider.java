@@ -48,7 +48,7 @@ public class ImpactorTranslationProvider<T> implements TranslationProvider<T> {
     }
 
     @Override
-    public T resolve(@NotNull Locale locale, @NotNull Context context) {
+    public @NotNull T resolve(@NotNull Locale locale, @NotNull Context context) {
         return this.translation(locale).build(this.manager.processor(), context);
     }
 

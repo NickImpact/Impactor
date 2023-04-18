@@ -66,8 +66,8 @@ public abstract class ImpactorPlatformSource implements PlatformSource {
 
     @Override
     public Component name() {
-        if(this.type == SourceType.CONSOLE) {
-            return Component.text("Console");
+        if(this.type == SourceType.SERVER) {
+            return Component.text("Server");
         }
 
         return Component.empty();

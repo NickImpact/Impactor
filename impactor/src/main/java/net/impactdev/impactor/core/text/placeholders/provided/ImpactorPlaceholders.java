@@ -28,16 +28,24 @@ package net.impactdev.impactor.core.text.placeholders.provided;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
+import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
+import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.api.text.placeholders.PlaceholderArguments;
+import net.impactdev.impactor.api.translations.TranslationManager;
+import net.impactdev.impactor.api.translations.TranslationProvider;
 import net.impactdev.impactor.api.translations.metadata.LanguageInfo;
 import net.impactdev.impactor.core.economy.context.TransactionContext;
+import net.impactdev.impactor.core.economy.context.TransferTransactionContext;
+import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 
 import java.text.DecimalFormat;
+import java.util.Optional;
 
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
@@ -99,8 +107,8 @@ public final class ImpactorPlaceholders {
                         // TODO - Argument support for short or long
                         return account.currency().format(account.balance());
                     case "name":
-                        // TODO
-                        return empty();
+                        PlatformSource source = PlatformSource.factory().entity(account.owner());
+                        return source.name();
                     case "uuid":
                         return text(account.owner().toString());
                 }
@@ -121,15 +129,48 @@ public final class ImpactorPlaceholders {
                     return empty();
                 }
 
-                Account account = ctx.require(Account.class);
-                TransactionContext transaction = ctx.require(TransactionContext.class);
+                Currency currency = ctx.require(Currency.class);
+                Optional<TransactionContext> transaction = ctx.request(TransactionContext.class);
+                if(transaction.isPresent()) {
+                    TransactionContext context = transaction.get();
 
-                String option = arguments.pop();
-                switch (option) {
-                    case "type":
-                        return text(transaction.type().name());
-                    case "before":
-                        return account.currency().format(transaction.before());
+                    String option = arguments.pop();
+                    switch (option) {
+                        case "type":
+                            return text(context.type().name());
+                        case "before":
+                            return currency.format(context.before());
+                        case "after":
+                            return currency.format(context.after());
+                        case "reason":
+                            return text(context.result().name());
+                    }
+                } else {
+                    TransferTransactionContext context = ctx.require(TransferTransactionContext.class);
+
+                    String option = arguments.pop();
+                    switch (option) {
+                        case "type":
+                            return text(EconomyTransactionType.TRANSFER.name());
+                        case "result":
+                            return text(context.result().name());
+                        case "source":
+                            String st = arguments.pop();
+                            switch (st) {
+                                case "before":
+                                    return currency.format(context.from().before());
+                                case "after":
+                                    return currency.format(context.from().after());
+                            }
+                        case "recipient":
+                            String rt = arguments.pop();
+                            switch (rt) {
+                                case "before":
+                                    return currency.format(context.to().before());
+                                case "after":
+                                    return currency.format(context.to().after());
+                            }
+                    }
                 }
 
                 return empty();

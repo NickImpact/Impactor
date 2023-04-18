@@ -11,5 +11,5 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "refmap": "mixins.impactor.forge.refmap.json"
+  "refmap": "mixins.impactor.fabric.refmap.json"
 }

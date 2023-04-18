@@ -52,10 +52,10 @@ public class ForgePlatformFactory implements PlatformSource.Factory, PlatformPla
     private final Cache<UUID, PlatformSource> cache = Caffeine.newBuilder().build();
 
     @Override
-    public PlatformSource console() {
+    public PlatformSource server() {
         return this.cache.get(
-                PlatformSource.CONSOLE_UUID,
-                uuid -> new ForgePlatformSource(PlatformSource.CONSOLE_UUID, SourceType.CONSOLE)
+                PlatformSource.SERVER_UUID,
+                uuid -> new ForgePlatformSource(PlatformSource.SERVER_UUID, SourceType.SERVER)
         );
     }
 

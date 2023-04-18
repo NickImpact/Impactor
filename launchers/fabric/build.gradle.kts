@@ -38,8 +38,15 @@ dependencies {
         exclude("net.impactdev.impactor.api", "storage")
     }
 
+    listOf(
+        libs.cloudAnnotations,
+        libs.cloudMinecraftExtras,
+        libs.cloudFabric
+    ).forEach { include(it) }
+
     modImplementation("eu.pb4:placeholder-api:2.0.0-pre.1+1.19.2")
     include("eu.pb4:placeholder-api:2.0.0-pre.1+1.19.2")
+    include("io.leangen.geantyref:geantyref:1.3.13")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
@@ -62,12 +69,16 @@ tasks {
 
             include(dependency("org.apache.maven:maven-artifact:.*"))
             include(dependency("$mapped.ca.landonjw.gooeylibs:fabric:.*"))
+
+            exclude("**/PlatformMethods.class")
         }
 
         val prefix = "net.impactdev.impactor.relocations"
         listOf(
             "org.apache.maven",
-            "ca.landonjw.gooeylibs2"
+            "ca.landonjw.gooeylibs2",
+            "okio",
+            "okhttp"
         ).forEach { relocate(it, "$prefix.$it") }
     }
 }

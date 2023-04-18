@@ -1,6 +1,9 @@
 {
     "economy.account.balance": "<hover:show_text:'<gray>Currency: <yellow><impactor:currency><newline><gray>Account: <yellow><impactor:account:name> <gray>(<aqua><impactor:account:uuid><gray>)'><gray>Balance: <green><impactor:account:balance>",
-    "economy.account.transaction": "<hover:show_text:'<gray>Transaction Type: <yellow><impactor:economy_transaction:type><newline><gray>Before: <yellow><impactor:economy_transaction:before><newline><gray>After: <yellow><impactor:account:balance>'><gray>Transaction completed successfully! Hover for transaction info!",
+    "economy.transactions.successful": "<hover:show_text:'<gray>Transaction Type: <yellow><impactor:economy_transaction:type><newline><gray>Before: <yellow><impactor:economy_transaction:before><newline><gray>After: <yellow><impactor:account:balance>'><gray>Transaction completed successfully! Hover for transaction info!",
+    "economy.transactions.transfer.successful": "<hover:show_text:'<gray>Transaction Type: <yellow>TRANSFER<newline><gray>Source: <green><impactor:economy_transaction:source:before> <gray>--> <green><impactor:economy_transaction:source:after><newline><gray>Recipient: <green><impactor:economy_transaction:recipient:before> <gray>--> <green><impactor:economy_transaction:recipient:after>'><gray>Transaction completed successfully! Hover for transaction info!",
+    "economy.transactions.failed": "<red>The transaction failed with the given status: <yellow><impactor:economy_transaction:reason>",
+    "economy.transactions.cant-pay-self": "<red>You are unable to pay yourself!",
 
     "translations.searching": "<gray>Checking available languages...",
     "translations.installing": "<gray>Attempting to install translations now...",

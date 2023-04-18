@@ -27,7 +27,6 @@ package net.impactdev.impactor.core.economy.storage.implementations;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.EconomyService;
@@ -44,7 +43,6 @@ import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.kyori.adventure.key.Key;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.configurate.BasicConfigurationNode;
 import org.spongepowered.configurate.ConfigurationNode;
 
@@ -86,7 +84,7 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
 
     public ConfigurateProvider(@NotNull final ConfigurateLoader loader) {
         this.loader = loader;
-        this.root = Paths.get("impactor").resolve("economy");
+        this.root = Paths.get("config").resolve("impactor").resolve("economy");
         this.ioLocks = Caffeine.newBuilder()
                 .expireAfterAccess(10, TimeUnit.MINUTES)
                 .build(key -> new ReentrantLock());
@@ -179,7 +177,7 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
         builder = modifier.modify(builder);
 
         PlatformPlayerService service = Impactor.instance().services().provide(PlatformPlayerService.class);
-        if(PlatformSource.CONSOLE_UUID.equals(uuid)) {
+        if(PlatformSource.SERVER_UUID.equals(uuid)) {
             builder.virtual();
         }
 
