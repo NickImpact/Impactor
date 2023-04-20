@@ -34,12 +34,6 @@ dependencies {
         "net.kyori:adventure-text-minimessage:4.13.0",
         "net.kyori:adventure-text-logger-slf4j:4.13.0",
         "net.kyori:event-api:5.0.0-SNAPSHOT",
-        "com.typesafe:config:1.4.1",
-        "org.spongepowered:configurate-core:4.1.2",
-        "org.spongepowered:configurate-gson:4.1.2",
-        "org.spongepowered:configurate-hocon:4.1.2",
-        "org.spongepowered:configurate-yaml:4.1.2",
-        "org.spongepowered:math:2.0.1"
     ).forEach { include(it) }
 }
 
@@ -57,7 +51,13 @@ tasks {
                 "com.github.ben-manes.caffeine:caffeine:.*",
                 "io.github.classgraph:classgraph:.*",
                 "com.squareup.okhttp3:okhttp:.*",
-                "com.squareup.okio:okio:.*"
+                "com.squareup.okio:okio-jvm:.*",
+                "com.typesafe:config:.*",
+                "org.spongepowered:configurate-core:.*",
+                "org.spongepowered:configurate-gson:.*",
+                "org.spongepowered:configurate-hocon:.*",
+                "org.spongepowered:configurate-yaml:.*",
+                "org.spongepowered:math:.*"
             ).forEach { include(dependency(it)) }
         }
 
@@ -74,7 +74,9 @@ tasks {
             "org.bson",
             "nonapi.io.github.classgraph",
             "okhttp3",
-            "okio"
+            "okio",
+            "org.spongepowered.configurate",
+            "org.spongepowered.math"
         ).forEach { relocate(it, "$prefix.$it") }
     }
 

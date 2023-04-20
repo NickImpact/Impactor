@@ -30,6 +30,7 @@ import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.utility.future.ThrowingRunnable;
 
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -43,6 +44,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public final class Futures {
 
@@ -176,6 +179,28 @@ public final class Futures {
             runnable.run();
             throw new TimeoutException();
         }, executor, timeout, unit);
+    }
+
+    public static void shutdown() {
+        ASYNC_EXECUTOR.shutdown();
+        try {
+            if (!ASYNC_EXECUTOR.awaitTermination(10, TimeUnit.SECONDS)) {
+                BaseImpactorPlugin.instance().logger().severe("Timed out waiting for the Impactor worker thread pool to terminate");
+                reportRunningTasks(thread -> thread.getName().startsWith("Impactor Async Executor"));
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void reportRunningTasks(Predicate<Thread> predicate) {
+        Thread.getAllStackTraces().forEach((thread, stack) -> {
+            if (predicate.test(thread)) {
+                BaseImpactorPlugin.instance().logger().warn("Thread " + thread.getName() + " is blocked, and may be the reason for the slow shutdown!\n" +
+                        Arrays.stream(stack).map(el -> "  " + el).collect(Collectors.joining("\n"))
+                );
+            }
+        });
     }
 
 }

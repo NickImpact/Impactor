@@ -31,7 +31,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.translations.TranslationManager;
 import net.impactdev.impactor.api.translations.metadata.LanguageInfo;
 import net.impactdev.impactor.api.translations.repository.TranslationEndpoint;
@@ -250,5 +249,9 @@ public class ImpactorTranslationRepository implements TranslationRepository {
 
         long cacheMaxAge = jsonResponse.get("timestamp").getAsLong();
         return new MetadataResponse(cacheMaxAge, languages);
+    }
+
+    public void shutdown() {
+        this.client.shutdown();
     }
 }

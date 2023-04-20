@@ -35,12 +35,14 @@ import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+import net.impactdev.impactor.api.scheduler.AbstractJavaScheduler;
 import net.impactdev.impactor.api.text.events.RegisterPlaceholdersEvent;
 import net.impactdev.impactor.api.text.placeholders.PlaceholderArguments;
 import net.impactdev.impactor.core.commands.ImpactorCommandRegistry;
 import net.impactdev.impactor.core.commands.parsers.CurrencyParser;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
+import net.impactdev.impactor.core.utility.future.Futures;
 import net.impactdev.impactor.fabric.commands.BrigadierMapper;
 import net.impactdev.impactor.fabric.commands.FabricCommandManager;
 import net.impactdev.impactor.fabric.commands.FabricCommandModule;
@@ -130,6 +132,13 @@ public final class FabricImpactorPlugin extends GameImpactorPlugin implements Im
 
     @Override
     public void shutdown() {
-        Impactor.instance().scheduler().shutdownExecutor();
+        this.logger().info("Shutting down Impactor scheduler");
+        AbstractJavaScheduler scheduler = (AbstractJavaScheduler) Impactor.instance().scheduler();
+        scheduler.shutdownExecutor();
+        scheduler.shutdownScheduler();
+
+        Futures.shutdown();
+
+        this.logger().info("Scheduler shutdown successfully!");
     }
 }

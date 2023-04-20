@@ -31,6 +31,7 @@ import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+import net.impactdev.impactor.api.scheduler.AbstractJavaScheduler;
 import net.impactdev.impactor.core.commands.ImpactorCommandRegistry;
 import net.impactdev.impactor.core.commands.parsers.CurrencyParser;
 import net.impactdev.impactor.core.modules.ImpactorModule;
@@ -94,7 +95,8 @@ public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorP
 
     @Override
     public void shutdown() {
-        Impactor.instance().scheduler().shutdownExecutor();
+        AbstractJavaScheduler scheduler = (AbstractJavaScheduler) Impactor.instance().scheduler();
+        scheduler.shutdownExecutor();
     }
 
 }

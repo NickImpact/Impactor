@@ -59,6 +59,7 @@ public final class FabricImpactorBootstrap extends ImpactorBootstrapper implemen
     public void onInitialize() {
         this.construct();
         ServerLifecycleEvents.SERVER_STARTING.register(this::onServerStarting);
+        ServerLifecycleEvents.SERVER_STOPPING.register(server -> this.shutdown());
     }
 
     private void onServerStarting(MinecraftServer server) {

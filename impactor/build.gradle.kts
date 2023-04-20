@@ -39,8 +39,8 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("com.mojang:brigadier:1.0.18")
 
-    implementation("com.squareup.okhttp3:okhttp:3.14.9")
-    implementation("com.squareup.okio:okio:1.17.5")
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+//    implementation("com.squareup.okio:okio:3.3.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")

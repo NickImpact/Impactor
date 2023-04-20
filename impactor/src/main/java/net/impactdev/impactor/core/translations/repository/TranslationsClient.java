@@ -25,11 +25,17 @@
 
 package net.impactdev.impactor.core.translations.repository;
 
+import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static net.impactdev.impactor.core.utility.future.Futures.reportRunningTasks;
 
 public class TranslationsClient {
 
@@ -38,6 +44,28 @@ public class TranslationsClient {
     private final OkHttpClient client = new OkHttpClient.Builder()
             .callTimeout(15, TimeUnit.SECONDS)
             .build();
+
+    void shutdown() {
+        ExecutorService service = this.client.dispatcher().executorService();
+        service.shutdown();
+
+        try {
+            this.client.connectionPool().evictAll();
+            Optional.ofNullable(this.client.cache()).ifPresent(cache -> {
+                try {
+                    cache.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            if (!service.awaitTermination(10, TimeUnit.SECONDS)) {
+                BaseImpactorPlugin.instance().logger().severe("Timed out waiting for the Impactor worker thread pool to terminate");
+                reportRunningTasks(thread -> thread.getName().startsWith("OkHttp"));
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     Response makeRequest(Request request) throws Exception {
         Response response = this.client.newCall(request).execute();
