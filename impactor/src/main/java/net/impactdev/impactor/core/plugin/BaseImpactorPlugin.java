@@ -31,6 +31,8 @@ import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.platform.PlatformInfo;
+import net.impactdev.impactor.api.scheduler.AbstractJavaScheduler;
 import net.impactdev.impactor.core.commands.ImpactorCommandRegistry;
 import net.impactdev.impactor.core.configuration.ConfigModule;
 import net.impactdev.impactor.core.configuration.ImpactorConfig;
@@ -43,6 +45,9 @@ import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.api.APIRegister;
 import net.impactdev.impactor.core.api.ImpactorService;
+import net.impactdev.impactor.core.integrations.Dependencies;
+import net.impactdev.impactor.core.integrations.Dependency;
+import net.impactdev.impactor.core.integrations.Integration;
 import net.impactdev.impactor.core.permissions.LuckPermsPermissionsService;
 import net.impactdev.impactor.core.permissions.NoOpPermissionsService;
 import net.impactdev.impactor.core.economy.EconomyModule;
@@ -50,6 +55,7 @@ import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.text.TextModule;
 import net.impactdev.impactor.core.translations.TranslationsModule;
 import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
+import net.impactdev.impactor.core.utility.future.Futures;
 import org.apache.commons.lang3.ThreadUtils;
 
 import java.io.InputStream;
@@ -57,6 +63,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -146,6 +153,9 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         registry.registerArgumentParsers();
         registry.registerAllCommands();
         this.registerCommandMappings(registry);
+
+        this.logger().info("Setting up plugin integrations...");
+        this.integrate();
     }
 
     protected abstract void registerCommandMappings(ImpactorCommandRegistry registry);
@@ -176,7 +186,14 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
 
     @Override
     public void shutdown() {
+        this.logger().info("Shutting down Impactor scheduler");
+        AbstractJavaScheduler scheduler = (AbstractJavaScheduler) Impactor.instance().scheduler();
+        scheduler.shutdownExecutor();
+        scheduler.shutdownScheduler();
 
+        Futures.shutdown();
+
+        this.logger().info("Scheduler shutdown successfully!");
     }
 
     protected abstract Set<Class<? extends ImpactorModule>> modules();
@@ -220,5 +237,42 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         Path path = target.apply(Paths.get("impactor").resolve("assets"));
         return Optional.ofNullable(this.getClass().getClassLoader().getResourceAsStream(path.toString().replace("\\", "/")))
                 .orElseThrow(() -> new IllegalArgumentException("Target resource not located"));
+    }
+
+    private void integrate() {
+        PlatformInfo platform = Impactor.instance().platform().info();
+
+        ClassGraph graph = new ClassGraph().acceptPackages("net.impactdev.impactor");
+        try (ScanResult scan = graph.scan()) {
+            ClassInfoList list = scan.getClassesImplementing(Integration.class);
+            list.stream()
+                    .map(info -> info.loadClass(Integration.class))
+                    .map(type -> {
+                        Dependencies dependencies = type.getAnnotation(Dependencies.class);
+                        if(dependencies == null) {
+                            return null;
+                        }
+
+                        for (Dependency dependency : dependencies.value()) {
+                            String id = dependency.value();
+                            if(!platform.plugin(id).isPresent() && !dependency.optional()) {
+                                return null;
+                            }
+                        }
+
+                        try {
+                            return type.getConstructor().newInstance();
+                        }
+                        catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .forEach(integration -> {
+                        integration.subscribe(this.logger(), Impactor.instance().events());
+                    });
+        } catch (Exception e) {
+            ExceptionPrinter.print(this.logger(), e);
+        }
     }
 }

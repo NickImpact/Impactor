@@ -27,37 +27,25 @@ package net.impactdev.impactor.fabric;
 
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
-import eu.pb4.placeholders.api.PlaceholderContext;
-import eu.pb4.placeholders.api.Placeholders;
 import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandSource;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.api.scheduler.AbstractJavaScheduler;
-import net.impactdev.impactor.api.text.events.RegisterPlaceholdersEvent;
-import net.impactdev.impactor.api.text.placeholders.PlaceholderArguments;
 import net.impactdev.impactor.core.commands.ImpactorCommandRegistry;
 import net.impactdev.impactor.core.commands.parsers.CurrencyParser;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
-import net.impactdev.impactor.core.utility.future.Futures;
 import net.impactdev.impactor.fabric.commands.BrigadierMapper;
 import net.impactdev.impactor.fabric.commands.FabricCommandManager;
 import net.impactdev.impactor.fabric.commands.FabricCommandModule;
-import net.impactdev.impactor.fabric.platform.FabricPlatform;
+import net.impactdev.impactor.fabric.integrations.PlaceholderAPIIntegration;
 import net.impactdev.impactor.fabric.platform.FabricPlatformModule;
 import net.impactdev.impactor.fabric.scheduler.FabricSchedulerModule;
 import net.impactdev.impactor.fabric.ui.FabricUIModule;
 import net.impactdev.impactor.minecraft.plugin.GameImpactorPlugin;
-import net.impactdev.impactor.minecraft.text.AdventureTranslator;
 import net.kyori.adventure.key.Key;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 public final class FabricImpactorPlugin extends GameImpactorPlugin implements ImpactorPlugin {
@@ -69,31 +57,6 @@ public final class FabricImpactorPlugin extends GameImpactorPlugin implements Im
     @Override
     public void construct() {
         super.construct();
-        Impactor.instance().events().subscribe(RegisterPlaceholdersEvent.class, event -> {
-            Placeholders.getPlaceholders().forEach((location, handler) -> {
-                Key key = Key.key(location.toString());
-                event.register(key, (viewer, context) -> {
-                    FabricPlatform platform = (FabricPlatform) Impactor.instance().platform();
-                    MinecraftServer server = platform.server();
-                    ServerPlayer player = context.request(PlatformPlayer.class)
-                            .map(PlatformSource::uuid)
-                            .or(() -> Optional.ofNullable(viewer).map(PlatformSource::uuid))
-                            .map(p -> server.getPlayerList().getPlayer(p))
-                            .orElse(null);
-
-                    PlaceholderArguments arguments = context.require(PlaceholderArguments.class);
-
-                    PlaceholderContext ctx;
-                    if(player != null) {
-                        ctx = PlaceholderContext.of(player);
-                    } else {
-                        ctx = PlaceholderContext.of(server);
-                    }
-
-                    return AdventureTranslator.fromNative(handler.onPlaceholderRequest(ctx, arguments.popOrDefault()).text());
-                });
-            });
-        });
     }
 
     @Override
@@ -128,17 +91,5 @@ public final class FabricImpactorPlugin extends GameImpactorPlugin implements Im
         parent.add(FabricCommandModule.class);
 
         return parent;
-    }
-
-    @Override
-    public void shutdown() {
-        this.logger().info("Shutting down Impactor scheduler");
-        AbstractJavaScheduler scheduler = (AbstractJavaScheduler) Impactor.instance().scheduler();
-        scheduler.shutdownExecutor();
-        scheduler.shutdownScheduler();
-
-        Futures.shutdown();
-
-        this.logger().info("Scheduler shutdown successfully!");
     }
 }

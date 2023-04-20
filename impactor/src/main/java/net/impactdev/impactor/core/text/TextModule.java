@@ -35,6 +35,8 @@ import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.text.placeholders.ImpactorPlaceholderService;
 import net.impactdev.impactor.core.text.placeholders.ImpactorRegisterPlaceholdersEvent;
+import net.impactdev.impactor.core.utility.events.EventPublisher;
+import net.kyori.event.PostResult;
 
 public final class TextModule implements ImpactorModule {
     @Override
@@ -53,6 +55,7 @@ public final class TextModule implements ImpactorModule {
         PlaceholderService service = api.services().provide(PlaceholderService.class);
 
         BaseImpactorPlugin.instance().logger().info("Firing placeholder registration event");
-        api.events().post(new ImpactorRegisterPlaceholdersEvent(service));
+
+        EventPublisher.post(new ImpactorRegisterPlaceholdersEvent(service));
     }
 }

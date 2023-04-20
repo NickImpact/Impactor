@@ -93,10 +93,4 @@ public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorP
         return parent;
     }
 
-    @Override
-    public void shutdown() {
-        AbstractJavaScheduler scheduler = (AbstractJavaScheduler) Impactor.instance().scheduler();
-        scheduler.shutdownExecutor();
-    }
-
 }
