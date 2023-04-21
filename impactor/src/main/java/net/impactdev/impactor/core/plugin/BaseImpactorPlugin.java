@@ -208,7 +208,10 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
      * This problem affects sponge and forge only (SpongeForge, SpongeVanilla, Forge).
      */
     private void initializeModules(Impactor service) {
-        ClassGraph graph = new ClassGraph().verbose().acceptPackages("net.impactdev.impactor");
+        ClassGraph graph = new ClassGraph()
+                .acceptPackages("net.impactdev.impactor")
+                .overrideClassLoaders(this.getClass().getClassLoader());
+        
         try (ScanResult scan = graph.scan()) {
             ClassInfoList list = scan.getClassesImplementing(ImpactorModule.class);
             this.bootstrapper.logger().info("Scan complete, found " + list.size() + " modules, now loading...");
@@ -242,7 +245,10 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
     private void integrate() {
         PlatformInfo platform = Impactor.instance().platform().info();
 
-        ClassGraph graph = new ClassGraph().acceptPackages("net.impactdev.impactor");
+        ClassGraph graph = new ClassGraph()
+                .acceptPackages("net.impactdev.impactor")
+                .overrideClassLoaders(this.getClass().getClassLoader());
+
         try (ScanResult scan = graph.scan()) {
             ClassInfoList list = scan.getClassesImplementing(Integration.class);
             list.stream()
