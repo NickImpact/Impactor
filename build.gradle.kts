@@ -7,3 +7,8 @@ plugins {
 
 group = "net.impactdev.impactor"
 version = properties["plugin"]!!
+
+val isSnapshot = project.property("snapshot")?.equals("true") ?: false
+if (isSnapshot) {
+    version = "$version-SNAPSHOT"
+}

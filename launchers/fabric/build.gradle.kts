@@ -81,3 +81,23 @@ tasks {
         ).forEach { relocate(it, "$prefix.$it") }
     }
 }
+
+publishing {
+    publications {
+        create<MavenPublication>(project.name) {
+            from(components["java"])
+
+            groupId = "net.impactdev.impactor.launchers"
+            artifactId = "fabric"
+
+            val plugin = rootProject.property("plugin").toString()
+            val minecraft = rootProject.property("minecraft").toString()
+            val snapshot = rootProject.property("snapshot") == "true"
+
+            version = "${plugin}+${minecraft}"
+            if(snapshot) {
+                version += "-SNAPSHOT"
+            }
+        }
+    }
+}

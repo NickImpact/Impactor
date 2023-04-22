@@ -69,3 +69,21 @@ license {
     exclude("**/datasize/DataSizeUtils.java")
     exclude("**/datasize/DataUnit.java")
 }
+
+publishing {
+    publications {
+        create<MavenPublication>(project.name) {
+            from(components["java"])
+
+            groupId = "net.impactdev.impactor"
+            artifactId = "common"
+
+            val snapshot = rootProject.property("snapshot") == "true"
+
+            version = rootProject.property("plugin").toString()
+            if(snapshot) {
+                version += "-SNAPSHOT"
+            }
+        }
+    }
+}

@@ -108,8 +108,8 @@ public class ImpactorChestLayout extends ImpactorLayout implements ChestLayout {
         @Override
         public ChestLayoutBuilder center(Icon icon) {
             if(this.rows % 2 == 0) {
-                this.slot(icon, (this.rows * 9) / 2 - 4);
-                this.slot(icon, (this.rows * 9) / 2 + 5);
+                this.slot(icon, (this.rows * 9) / 2 - 5);
+                this.slot(icon, (this.rows * 9) / 2 + 4);
             } else {
                 this.slot(icon, (this.rows * 9) / 2);
             }

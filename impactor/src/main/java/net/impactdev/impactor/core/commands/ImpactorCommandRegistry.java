@@ -39,12 +39,14 @@ import net.impactdev.impactor.api.commands.ImpactorCommandManager;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
+import net.impactdev.impactor.core.commands.events.RegisterCommandsEvent;
 import net.impactdev.impactor.core.commands.parsers.CurrencyParser;
 import net.impactdev.impactor.core.commands.economy.EconomyCommands;
 import net.impactdev.impactor.core.commands.parsers.LocaleParser;
 import net.impactdev.impactor.core.commands.parsers.PlatformSourceParser;
 import net.impactdev.impactor.core.commands.translations.TranslationCommands;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.core.utility.events.EventPublisher;
 
 import java.util.List;
 import java.util.Locale;
@@ -77,6 +79,8 @@ public final class ImpactorCommandRegistry {
                 ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
             }
         });
+
+        EventPublisher.post(new RegisterCommandsEvent(parser));
     }
 
     public void registerArgumentParsers() {

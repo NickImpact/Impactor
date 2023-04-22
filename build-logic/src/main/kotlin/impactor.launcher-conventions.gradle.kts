@@ -5,8 +5,6 @@ plugins {
 }
 
 tasks {
-    val minecraft = rootProject.property("minecraft")
-
     val remapProductionJar by registering(RemapJarTask::class) {
         listOf(shadowJar, remapJar).forEach {
             dependsOn(it)
@@ -16,7 +14,7 @@ tasks {
         inputFile.set(shadowJar.flatMap { it.archiveFile })
 
         archiveBaseName.set("Impactor-${project.name.capitalize()}")
-        archiveVersion.set("${minecraft}-${rootProject.version}")
+        archiveVersion.set(writeVersion())
     }
 
 }
@@ -27,4 +25,18 @@ tasks.withType<PublishToMavenRepository> {
 
 tasks.withType<GenerateModuleMetadata> {
     dependsOn(tasks["remapProductionJar"])
+}
+
+fun writeVersion(): String
+{
+    val plugin = rootProject.property("plugin")
+    val minecraft = rootProject.property("minecraft")
+    val snapshot = rootProject.property("snapshot") == "true"
+
+    var version = "$plugin+$minecraft"
+    if(snapshot) {
+        version = "$version-SNAPSHOT"
+    }
+
+    return version
 }
