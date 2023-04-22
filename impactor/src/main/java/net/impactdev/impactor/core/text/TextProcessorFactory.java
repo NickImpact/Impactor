@@ -30,12 +30,13 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.core.text.processors.LegacyTextProcessor;
 import net.impactdev.impactor.core.text.processors.MiniMessageProcessor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.concurrent.TimeUnit;
 
 public class TextProcessorFactory implements TextProcessor.Factory {
 
-    private final MiniMessageProcessor mini = new MiniMessageProcessor();
+    private final MiniMessageProcessor mini = new MiniMessageProcessor(MiniMessage.miniMessage());
     private final LoadingCache<Character, LegacyTextProcessor> legacy = Caffeine.newBuilder()
             .expireAfterAccess(15, TimeUnit.MINUTES)
             .build(LegacyTextProcessor::new);
@@ -43,6 +44,11 @@ public class TextProcessorFactory implements TextProcessor.Factory {
     @Override
     public TextProcessor mini() {
         return this.mini;
+    }
+
+    @Override
+    public TextProcessor mini(MiniMessage delegate) {
+        return new MiniMessageProcessor(delegate);
     }
 
     @Override

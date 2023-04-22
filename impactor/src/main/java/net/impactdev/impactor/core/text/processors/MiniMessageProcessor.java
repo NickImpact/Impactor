@@ -52,7 +52,11 @@ import java.util.function.Supplier;
 public final class MiniMessageProcessor implements TextProcessor {
 
     private final Supplier<PlaceholderService> service = Suppliers.memoize(() -> Impactor.instance().services().provide(PlaceholderService.class));
-    private final MiniMessage mini = MiniMessage.miniMessage();
+    private final MiniMessage mini;
+
+    public MiniMessageProcessor(MiniMessage service) {
+        this.mini = service;
+    }
 
     @Override
     public @NotNull Component parse(@Nullable PlatformSource viewer, String raw, Context context) {

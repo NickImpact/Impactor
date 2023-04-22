@@ -26,6 +26,7 @@
 package net.impactdev.impactor.core.text.placeholders.provided;
 
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
@@ -119,7 +120,7 @@ public final class ImpactorPlaceholders {
     public static final ImpactorPlaceholder ECONOMY_CURRENCY = new ImpactorPlaceholder(
             impactor("currency"),
             // TODO - Argument support for singular or plural
-            (viewer, ctx) -> ctx.require(Currency.class).plural()
+            (viewer, ctx) -> ctx.request(Currency.class).orElse(EconomyService.instance().currencies().primary()).plural()
     );
     public static final ImpactorPlaceholder ECONOMY_TRANSACTION = new ImpactorPlaceholder(
             impactor("economy_transaction"),

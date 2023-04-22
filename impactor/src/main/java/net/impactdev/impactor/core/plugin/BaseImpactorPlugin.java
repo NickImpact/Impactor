@@ -211,7 +211,7 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         ClassGraph graph = new ClassGraph()
                 .acceptPackages("net.impactdev.impactor")
                 .overrideClassLoaders(this.getClass().getClassLoader());
-        
+
         try (ScanResult scan = graph.scan()) {
             ClassInfoList list = scan.getClassesImplementing(ImpactorModule.class);
             this.bootstrapper.logger().info("Scan complete, found " + list.size() + " modules, now loading...");
