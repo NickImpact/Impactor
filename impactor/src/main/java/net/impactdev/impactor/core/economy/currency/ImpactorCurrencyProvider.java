@@ -47,10 +47,11 @@ public class ImpactorCurrencyProvider implements CurrencyProvider {
 
     public ImpactorCurrencyProvider(List<Currency> currencies) {
         this.primary = currencies.stream()
-                .peek(currency -> this.currencies.put(currency.key(), currency))
                 .filter(Currency::primary)
                 .findFirst()
                 .orElse(currencies.get(0));
+
+        currencies.forEach(currency -> this.currencies.put(currency.key(), currency));
     }
 
     @Override
