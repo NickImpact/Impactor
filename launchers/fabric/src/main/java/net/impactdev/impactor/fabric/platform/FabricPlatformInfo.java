@@ -80,7 +80,7 @@ public final class FabricPlatformInfo extends ImpactorPlatformInfo {
             printer.tr(component.name(), component.version());
         }
         printer.hr('-');
-        
+
         printer.newline().add("Mods: ");
         printer.table("Mod", 40, "Version", "Parent");
         List<ModContainer> mods = FabricLoader.getInstance().getAllMods()

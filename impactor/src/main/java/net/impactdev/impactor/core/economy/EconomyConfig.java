@@ -34,6 +34,7 @@ import net.kyori.adventure.key.Key;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.function.Function;
 
 import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.booleanKey;
 import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.doubleKey;
@@ -65,19 +66,21 @@ public final class EconomyConfig {
                     .add("currencies")
                     .add(option);
 
+            Function<String, String> modifier = key -> joiner + "." + key;
+
             Currency.CurrencyBuilder builder = Currency.builder()
-                    .key(Key.key(adapter.getString(joiner.add("key").toString(), "impactor:dollars")))
-                    .name(text(adapter.getString(joiner.add("name").toString(), "Dollar")))
-                    .plural(text(adapter.getString(joiner.add("plural").toString(), "Dollars")))
-                    .symbol(text(adapter.getString(joiner.add("symbol").add("character").toString(), "$")))
+                    .key(Key.key(option))
+                    .name(text(adapter.getString(modifier.apply("singular"), "Dollar")))
+                    .plural(text(adapter.getString(modifier.apply("plural"), "Dollars")))
+                    .symbol(text(adapter.getString(modifier.apply("symbol.character"), "$")))
                     .formatting(Currency.SymbolFormatting.fromIdentifier(adapter.getString(
-                            joiner.add("symbol").add("placement").toString(),
+                            modifier.apply("symbol.placement"),
                             Currency.SymbolFormatting.BEFORE.name().toLowerCase()
                     )))
-                    .decimals(adapter.getInteger(joiner.add("decimals").toString(), 2))
-                    .starting(BigDecimal.valueOf(adapter.getDouble(joiner.add("default-balance").toString(), 500)));
+                    .decimals(adapter.getInteger(modifier.apply("decimals"), 2))
+                    .starting(BigDecimal.valueOf(adapter.getDouble(modifier.apply("default-balance"), 500)));
 
-            if(adapter.getBoolean("primary", false)) {
+            if(adapter.getBoolean(modifier.apply("primary"), false)) {
                 builder.primary();
             }
 
