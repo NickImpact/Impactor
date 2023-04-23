@@ -36,6 +36,7 @@ import net.impactdev.impactor.api.platform.PlatformType;
 import net.impactdev.impactor.api.platform.plugins.PluginMetadata;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.platform.ImpactorPlatformInfo;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -79,15 +80,16 @@ public final class FabricPlatformInfo extends ImpactorPlatformInfo {
             printer.tr(component.name(), component.version());
         }
         printer.hr('-');
-
+        
         printer.newline().add("Mods: ");
-        printer.table("Mod", "Version");
+        printer.table("Mod", 40, "Version", "Parent");
         List<ModContainer> mods = FabricLoader.getInstance().getAllMods()
                 .stream()
                 .filter(info -> !this.exclusions.contains(info.getMetadata().getId()))
+                .filter(info -> info.getContainingMod().isEmpty())
                 .collect(Collectors.toList());
         for(ModContainer info : mods) {
-            printer.tr(info.getMetadata().getName(), info.getMetadata().getVersion().getFriendlyString());
+            this.printModContainer(info, printer);
         }
     }
 
@@ -104,5 +106,14 @@ public final class FabricPlatformInfo extends ImpactorPlatformInfo {
                 .version(metadata.getVersion().getFriendlyString())
                 .description(metadata.getDescription())
                 .build();
+    }
+
+    private void printModContainer(ModContainer target, PrettyPrinter printer) {
+        @Nullable ModContainer parent = target.getContainingMod().orElse(null);
+        printer.tr(target.getMetadata().getName(), target.getMetadata().getVersion().getFriendlyString(), parent != null ? parent.getMetadata().getName() : "");
+
+        for (ModContainer child : target.getContainedMods()) {
+            this.printModContainer(child, printer);
+        }
     }
 }

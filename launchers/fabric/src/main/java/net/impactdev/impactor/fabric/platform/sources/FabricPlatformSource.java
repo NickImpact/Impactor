@@ -25,13 +25,26 @@
 
 package net.impactdev.impactor.fabric.platform.sources;
 
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.sources.SourceType;
 import net.impactdev.impactor.core.platform.sources.ImpactorPlatformSource;
+import net.impactdev.impactor.fabric.platform.FabricPlatform;
+import net.impactdev.impactor.minecraft.text.AdventureTranslator;
+import net.kyori.adventure.audience.MessageType;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
 public final class FabricPlatformSource extends ImpactorPlatformSource {
     public FabricPlatformSource(UUID uuid, SourceType type) {
         super(uuid, type);
+    }
+
+    @Override
+    public void sendMessage(@NotNull Identity source, @NotNull Component message, @NotNull MessageType type) {
+        FabricPlatform platform = (FabricPlatform) Impactor.instance().platform();
+        platform.server().sendSystemMessage(AdventureTranslator.toNative(message));
     }
 }
