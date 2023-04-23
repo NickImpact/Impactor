@@ -44,7 +44,11 @@ import java.util.stream.Collectors;
 
 public final class FabricPlatformInfo extends ImpactorPlatformInfo {
 
-    private final List<String> exclusions = Lists.newArrayList("minecraft", "fabric");
+    private final List<String> exclusions = Lists.newArrayList(
+            "minecraft",
+            "fabricloader",
+            "java"
+    );
 
     FabricPlatformInfo() {
         super(PlatformType.FABRIC);
@@ -70,17 +74,20 @@ public final class FabricPlatformInfo extends ImpactorPlatformInfo {
     @Override
     protected void printComponents(PrettyPrinter printer) {
         printer.add("Components:");
+        printer.table("Name", "Version");
         for(PlatformComponent component : this.components()) {
-            printer.add(component);
+            printer.tr(component.name(), component.version());
         }
+        printer.hr('-');
 
-        printer.hr('-').add("Mods: ");
+        printer.newline().add("Mods: ");
+        printer.table("Mod", "Version");
         List<ModContainer> mods = FabricLoader.getInstance().getAllMods()
                 .stream()
                 .filter(info -> !this.exclusions.contains(info.getMetadata().getId()))
                 .collect(Collectors.toList());
         for(ModContainer info : mods) {
-            printer.add("%s - %s", info.getMetadata().getName(), info.getMetadata().getVersion().getFriendlyString());
+            printer.tr(info.getMetadata().getName(), info.getMetadata().getVersion().getFriendlyString());
         }
     }
 

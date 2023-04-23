@@ -32,7 +32,7 @@ import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 public final class FabricComponent implements PlatformComponent {
     @Override
     public String name() {
-        return "Fabric";
+        return "Fabric Loader";
     }
 
     @Override

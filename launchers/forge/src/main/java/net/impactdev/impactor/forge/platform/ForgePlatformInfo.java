@@ -54,17 +54,20 @@ public class ForgePlatformInfo extends ImpactorPlatformInfo {
     @Override
     protected void printComponents(PrettyPrinter printer) {
         printer.add("Components:");
+        printer.table("Name", "Version");
         for(PlatformComponent component : this.components()) {
-            printer.add(component);
+            printer.tr(component.name(), component.version());
         }
+        printer.hr('-');
 
-        printer.hr('-').add("Mods: ");
+        printer.newline().add("Mods: ");
+        printer.table("Mod", "Version");
         List<IModInfo> mods = ModList.get().getMods()
                 .stream()
                 .filter(info -> !this.exclusions.contains(info.getModId()))
                 .toList();
         for(IModInfo info : mods) {
-            printer.add("%s - %s", info.getDisplayName(), info.getVersion());
+            printer.tr(info.getDisplayName(), info.getVersion());
         }
     }
 

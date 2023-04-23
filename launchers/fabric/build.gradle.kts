@@ -53,10 +53,10 @@ dependencies {
 
 tasks {
     processResources {
-        inputs.property("version", rootProject.version)
+        inputs.property("version", writeVersion())
 
         filesMatching("fabric.mod.json") {
-            expand("version" to rootProject.version)
+            expand("version" to writeVersion())
         }
     }
 
@@ -100,4 +100,18 @@ publishing {
             }
         }
     }
+}
+
+fun writeVersion(): String
+{
+    val plugin = rootProject.property("plugin")
+    val minecraft = rootProject.property("minecraft")
+    val snapshot = rootProject.property("snapshot") == "true"
+
+    var version = "$plugin+$minecraft"
+    if(snapshot) {
+        version = "$version-SNAPSHOT"
+    }
+
+    return version
 }

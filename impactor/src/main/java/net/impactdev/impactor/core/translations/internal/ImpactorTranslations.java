@@ -25,13 +25,11 @@
 
 package net.impactdev.impactor.core.translations.internal;
 
-import com.google.common.collect.Maps;
 import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.api.translations.TranslationManager;
 import net.impactdev.impactor.api.translations.TranslationProvider;
 import net.impactdev.impactor.api.translations.repository.TranslationEndpoint;
 import net.impactdev.impactor.api.translations.repository.TranslationRepository;
-import net.impactdev.impactor.api.utility.Time;
 import net.impactdev.impactor.api.utility.collections.mappings.LoadingMap;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.translations.TranslationsModule;
@@ -39,9 +37,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public interface ImpactorTranslations {
 
@@ -82,6 +78,8 @@ public interface ImpactorTranslations {
     TranslationProvider<Component> TRANSLATIONS_INSTALLING_LANGUAGE = create("translations.installing-language");
     TranslationProvider<Component> TRANSLATIONS_INSTALL_COMPLETE = create("translations.install-complete");
     TranslationProvider<Component> TRANSLATIONS_INSTALL_FAILED = create("translations.install-failed");
+
+    TranslationProvider<Component> PLATFORM_INFO_GENERATED = create("platform.info.notify-generated");
 
     @SuppressWarnings("unchecked")
     static <T> TranslationProvider<T> create(final @NotNull String key) {

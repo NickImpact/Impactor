@@ -15,5 +15,7 @@
     "translations.info.progress": "<gray>Progress: <impactor:language:progress>",
     "translations.info.contributor.header": "<gray>Contributors:",
     "translations.info.contributor.name": "<yellow>* <impactor:language:contributor>",
-    "translations.info.invalid-locale": "<red>Invalid locale specified!"
+    "translations.info.invalid-locale": "<red>Invalid locale specified!",
+
+    "platform.info.notify-generated": "<gray>Generated platform information, see the dumps directory!"
 }
