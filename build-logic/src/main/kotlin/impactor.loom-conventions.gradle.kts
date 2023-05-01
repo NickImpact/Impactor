@@ -57,7 +57,8 @@ tasks {
                 "org.spongepowered:configurate-gson:.*",
                 "org.spongepowered:configurate-hocon:.*",
                 "org.spongepowered:configurate-yaml:.*",
-                "org.spongepowered:math:.*"
+                "org.spongepowered:math:.*",
+                "org.jetbrains.kotlin:kotlin-stdlib:1.7.10"
             ).forEach { include(dependency(it)) }
         }
 
@@ -76,7 +77,8 @@ tasks {
             "okhttp3",
             "okio",
             "org.spongepowered.configurate",
-            "org.spongepowered.math"
+            "org.spongepowered.math",
+            "kotlin"
         ).forEach { relocate(it, "$prefix.$it") }
     }
 
