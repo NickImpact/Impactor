@@ -27,6 +27,7 @@ package net.impactdev.impactor.fabric.platform.sources;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.mojang.authlib.GameProfile;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.platform.sources.SourceType;
@@ -35,8 +36,10 @@ import net.impactdev.impactor.fabric.FabricImpactorBootstrap;
 import net.impactdev.impactor.minecraft.platform.metadata.GameMetadataKeys;
 import net.kyori.adventure.key.Key;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -45,6 +48,7 @@ import net.minecraft.world.phys.Vec3;
 import org.spongepowered.math.vector.Vector2d;
 import org.spongepowered.math.vector.Vector3d;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class FabricPlatformFactory implements PlatformSource.Factory, PlatformPlayer.Factory {
@@ -60,15 +64,20 @@ public class FabricPlatformFactory implements PlatformSource.Factory, PlatformPl
     }
 
     @Override
-    public PlatformSource entity(UUID uuid) {
-        return this.cache.get(uuid, id -> {
-            PlayerList players = FabricImpactorBootstrap.instance().server().get().getPlayerList();
-            ServerPlayer player = players.getPlayer(id);
-            if(player != null) {
-                PlatformPlayer source = new FabricPlatformPlayer(id);
+    public PlatformSource fromID(UUID uuid) {
+        if(uuid.equals(PlatformSource.SERVER_UUID)) {
+            return this.server();
+        }
 
-                this.cache.put(id, source);
-                return source;
+        return this.cache.get(uuid, id -> {
+            MinecraftServer server = FabricImpactorBootstrap.instance().server().get();
+            PlayerList players = server.getPlayerList();
+            ServerPlayer player = players.getPlayer(id);
+            GameProfileCache cache = server.getProfileCache();
+            Optional<GameProfile> profile = cache.get(uuid);
+
+            if(player != null || profile.isPresent()) {
+                return new FabricPlatformPlayer(id);
             }
 
             for(ServerLevel level : FabricImpactorBootstrap.instance().server().get().getAllLevels()) {
@@ -89,7 +98,6 @@ public class FabricPlatformFactory implements PlatformSource.Factory, PlatformPl
                         return new Vector2d(vec2.x, vec2.y);
                     });
 
-                    this.cache.put(id, source);
                     return source;
                 }
             }

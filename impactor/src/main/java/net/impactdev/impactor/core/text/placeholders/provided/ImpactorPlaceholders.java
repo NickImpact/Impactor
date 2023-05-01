@@ -29,19 +29,14 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
-import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.api.text.placeholders.PlaceholderArguments;
-import net.impactdev.impactor.api.translations.TranslationManager;
-import net.impactdev.impactor.api.translations.TranslationProvider;
 import net.impactdev.impactor.api.translations.metadata.LanguageInfo;
 import net.impactdev.impactor.core.economy.context.TransactionContext;
 import net.impactdev.impactor.core.economy.context.TransferTransactionContext;
-import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 
@@ -108,7 +103,7 @@ public final class ImpactorPlaceholders {
                         // TODO - Argument support for short or long
                         return account.currency().format(account.balance());
                     case "name":
-                        PlatformSource source = PlatformSource.factory().entity(account.owner());
+                        PlatformSource source = PlatformSource.factory().fromID(account.owner());
                         return source.name();
                     case "uuid":
                         return text(account.owner().toString());
@@ -121,6 +116,22 @@ public final class ImpactorPlaceholders {
             impactor("currency"),
             // TODO - Argument support for singular or plural
             (viewer, ctx) -> ctx.request(Currency.class).orElse(EconomyService.instance().currencies().primary()).plural()
+    );
+    public static final ImpactorPlaceholder ECONOMY_BALTOP = new ImpactorPlaceholder(
+            impactor("baltop"),
+            (viewer, ctx) -> {
+                PlaceholderArguments arguments = ctx.require(PlaceholderArguments.class);
+                if(!arguments.hasNext()) {
+                    return empty();
+                }
+
+                switch (arguments.pop()) {
+                    case "ranking":
+                        return text(ctx.require(Integer.class));
+                }
+
+                return empty();
+            }
     );
     public static final ImpactorPlaceholder ECONOMY_TRANSACTION = new ImpactorPlaceholder(
             impactor("economy_transaction"),

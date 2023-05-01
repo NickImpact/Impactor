@@ -26,6 +26,7 @@
 package net.impactdev.impactor.minecraft.platform.sources;
 
 import com.google.common.collect.Lists;
+import com.mojang.authlib.GameProfile;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.extensions.BookStack;
@@ -65,6 +66,7 @@ import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -116,12 +118,21 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
 
     protected abstract Optional<ServerPlayer> asMinecraftPlayer();
 
+    private Optional<GameProfile> profile() {
+        GameProfileCache cache = ((GamePlatform) Impactor.instance().platform()).server().getProfileCache();
+        return cache.get(this.uuid());
+    }
+
     @Override
     public Component name() {
         return this.asMinecraftPlayer()
                 .map(Player::getName)
                 .map(AdventureTranslator::fromNative)
-                .orElse(Component.text("Unknown"));
+                .orElseGet(() -> this.profile()
+                        .map(GameProfile::getName)
+                        .map(Component::text)
+                        .orElse(Component.text("Unknown"))
+                );
     }
 
     @Override

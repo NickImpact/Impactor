@@ -60,7 +60,7 @@ public class ForgePlatformFactory implements PlatformSource.Factory, PlatformPla
     }
 
     @Override
-    public PlatformSource entity(UUID uuid) {
+    public PlatformSource fromID(UUID uuid) {
         return this.cache.get(uuid, id -> {
             PlayerList players = ServerLifecycleHooks.getCurrentServer().getPlayerList();
             ServerPlayer player = players.getPlayer(id);

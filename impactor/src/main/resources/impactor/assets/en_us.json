@@ -4,6 +4,10 @@
     "economy.transactions.transfer.successful": "<hover:show_text:'<gray>Transaction Type: <yellow>TRANSFER<newline><gray>Source: <green><impactor:economy_transaction:source:before> <gray>--> <green><impactor:economy_transaction:source:after><newline><gray>Recipient: <green><impactor:economy_transaction:recipient:before> <gray>--> <green><impactor:economy_transaction:recipient:after>'><gray>Transaction completed successfully! Hover for transaction info!",
     "economy.transactions.failed": "<red>The transaction failed with the given status: <yellow><impactor:economy_transaction:reason>",
     "economy.transactions.cant-pay-self": "<red>You are unable to pay yourself!",
+    "economy.baltop.calculating": "<gray>Calculating the current top balances...",
+    "economy.baltop.header": "<st><gradient:#32a852:#326da8>====================</gradient><reset> <yellow><impactor:currency> <st><gradient:#326da8:#32a852>=====================",
+    "economy.baltop.entry": "<yellow><impactor:baltop:ranking>) <aqua><impactor:account:name><gray>: <green><impactor:account:balance>",
+    "economy.baltop.footer": "<st><gradient:#32a852:#326da8>=========================</gradient><gradient:#326da8:#32a852>==========================",
 
     "translations.searching": "<gray>Checking available languages...",
     "translations.installing": "<gray>Attempting to install translations now...",

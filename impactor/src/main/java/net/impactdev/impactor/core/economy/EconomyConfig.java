@@ -38,6 +38,7 @@ import java.util.function.Function;
 
 import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.booleanKey;
 import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.doubleKey;
+import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.intKey;
 import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.key;
 import static net.kyori.adventure.text.Component.text;
 
@@ -57,6 +58,8 @@ public final class EconomyConfig {
         return BigDecimal.valueOf(value);
     });
     public static final ConfigKey<Boolean> ALLOW_TRANSFER_CROSS_CURRENCY = booleanKey("restrictions.allow-cross-currency-transfers", false);
+
+    public static final ConfigKey<Integer> MAX_BALTOP_ENTRIES = intKey("baltop.max-entries", 10);
 
     @SuppressWarnings("PatternValidation")
     public static final ConfigKey<List<Currency>> CURRENCIES = key(adapter -> {

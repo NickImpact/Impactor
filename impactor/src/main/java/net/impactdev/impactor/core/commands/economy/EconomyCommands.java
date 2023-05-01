@@ -29,9 +29,12 @@ import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandDescription;
 import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.CommandPermission;
+import cloud.commandframework.annotations.Flag;
+import cloud.commandframework.annotations.ProxiedBy;
 import cloud.commandframework.annotations.processing.CommandContainer;
 import com.google.common.base.Preconditions;
 import net.impactdev.impactor.api.commands.CommandSource;
+import net.impactdev.impactor.api.configuration.Config;
 import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
@@ -40,6 +43,8 @@ import net.impactdev.impactor.api.economy.transactions.EconomyTransferTransactio
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.utility.Context;
+import net.impactdev.impactor.core.economy.EconomyConfig;
+import net.impactdev.impactor.core.economy.ImpactorEconomyService;
 import net.impactdev.impactor.core.economy.context.TransactionContext;
 import net.impactdev.impactor.core.economy.context.TransferTransactionContext;
 import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
@@ -47,12 +52,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings({"DuplicatedCode", "unused"})
 @CommandContainer
 @CommandPermission("impactor.commands.economy.base")
 public final class EconomyCommands {
 
+    @ProxiedBy("balance")
     @CommandMethod("economy|eco balance [currency] [target]")
     @CommandPermission("impactor.commands.economy.balance")
     @CommandDescription("Fetches the balance of the source or identified target")
@@ -69,6 +77,7 @@ public final class EconomyCommands {
         ImpactorTranslations.ECONOMY_BALANCE.send(source, context);
     }
 
+    @ProxiedBy("withdraw")
     @CommandMethod("economy|eco withdraw <amount> [currency] [target]")
     @CommandPermission("impactor.commands.economy.withdraw")
     public void withdraw(
@@ -98,6 +107,7 @@ public final class EconomyCommands {
         ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
     }
 
+    @ProxiedBy("deposit")
     @CommandMethod("economy|eco deposit <amount> [currency] [target]")
     @CommandPermission("impactor.commands.economy.deposit")
     public void deposit(
@@ -141,7 +151,7 @@ public final class EconomyCommands {
         Account account = service.account(c, focus.uuid()).join();
         BigDecimal before = account.balance();
 
-        EconomyTransaction transaction = account.deposit(new BigDecimal(amount));
+        EconomyTransaction transaction = account.set(new BigDecimal(amount));
         Context context = Context.empty();
         context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.SET, before, account.balance(), transaction.result()));
         context.append(Currency.class, c);
@@ -182,6 +192,7 @@ public final class EconomyCommands {
         ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
     }
 
+    @ProxiedBy("pay")
     @CommandMethod("economy|eco pay <amount> <target> [currency] [source]")
     @CommandPermission("impactor.commands.economy.pay")
     public void transfer(
@@ -225,5 +236,39 @@ public final class EconomyCommands {
         //     Source: Before --> After
         //     Recipient: Before --> After
         ImpactorTranslations.ECONOMY_TRANSFER.send(source, context);
+    }
+
+    @ProxiedBy("baltop")
+    @CommandMethod("economy|eco baltop")
+    @CommandPermission("impactor.commands.economy.baltop")
+    public void baltop(final CommandSource source, @Nullable @Flag("currency") Currency currency, @Flag("extended") boolean nonPlayers) {
+        EconomyService service = EconomyService.instance();
+        Currency target = currency != null ? currency : service.currencies().primary();
+
+        AtomicInteger max = new AtomicInteger(10);
+        if(service instanceof ImpactorEconomyService) {
+            Config config = ((ImpactorEconomyService) service).config();
+            max.set(config.get(EconomyConfig.MAX_BALTOP_ENTRIES));
+        }
+
+        ImpactorTranslations.ECONOMY_BALTOP_CALCULATING.send(source, Context.empty());
+        service.accounts(target).thenAccept(accounts -> {
+            Context context = Context.empty().append(Currency.class, target);
+            ImpactorTranslations.ECONOMY_BALTOP_HEADER.send(source, context);
+
+            AtomicInteger ranking = new AtomicInteger(1);
+            accounts.stream()
+                    .sorted(Comparator.comparing(Account::balance).reversed())
+                    .filter(account -> !account.virtual() || nonPlayers)
+                    .limit(max.get())
+                    .forEach(account -> {
+                        Context relative = Context.empty().with(context)
+                                .append(Account.class, account)
+                                .append(Integer.class, ranking.getAndIncrement());
+                        ImpactorTranslations.ECONOMY_BALTOP_ENTRY.send(source, relative);
+                    });
+
+            ImpactorTranslations.ECONOMY_BALTOP_FOOTER.send(source, context);
+        });
     }
 }
