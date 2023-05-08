@@ -48,6 +48,7 @@ import net.impactdev.impactor.core.economy.ImpactorEconomyService;
 import net.impactdev.impactor.core.economy.context.TransactionContext;
 import net.impactdev.impactor.core.economy.context.TransferTransactionContext;
 import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
+import net.kyori.adventure.util.TriState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -206,9 +207,22 @@ public final class EconomyCommands {
         Currency c = currency != null ? currency : service.currencies().primary();
         PlatformSource focus = from != null ? from : source.source();
 
+        Context context = Context.empty();
+        context.append(Currency.class, c);
         if(target == focus) {
-            ImpactorTranslations.ECONOMY_CANT_PAY_SELF.send(source, Context.empty());
+            ImpactorTranslations.ECONOMY_CANT_PAY_SELF.send(source, context);
             return;
+        }
+
+        if(c.transferable() == TriState.FALSE) {
+            ImpactorTranslations.ECONOMY_TRANSFER_NOT_ALLOWED.send(source, context);
+            return;
+        } else {
+            Config config = ((ImpactorEconomyService) service).config();
+            if(c.transferable() == TriState.NOT_SET && !config.get(EconomyConfig.ALLOW_TRANSFER_ON_NOT_SET)) {
+                ImpactorTranslations.ECONOMY_TRANSFER_NOT_ALLOWED.send(source, context);
+                return;
+            }
         }
 
         Account sa = service.account(c, focus.uuid()).join();
@@ -218,8 +232,6 @@ public final class EconomyCommands {
         BigDecimal tb = ta.balance();
 
         EconomyTransferTransaction transaction = sa.transfer(ta, new BigDecimal(amount));
-        Context context = Context.empty();
-        context.append(Currency.class, c);
         context.append(TransferTransactionContext.class, new TransferTransactionContext(
                 new TransactionContext(EconomyTransactionType.WITHDRAW, sb, sa.balance(), transaction.result()),
                 new TransactionContext(EconomyTransactionType.DEPOSIT, tb, ta.balance(), transaction.result()),

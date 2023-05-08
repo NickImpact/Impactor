@@ -68,6 +68,7 @@ public interface ImpactorTranslations {
     TranslationProvider<Component> ECONOMY_BALTOP_HEADER = create("economy.baltop.header");
     TranslationProvider<Component> ECONOMY_BALTOP_ENTRY = create("economy.baltop.entry");
     TranslationProvider<Component> ECONOMY_BALTOP_FOOTER = create("economy.baltop.footer");
+    TranslationProvider<Component> ECONOMY_TRANSFER_NOT_ALLOWED = create("economy.transactions.transfer.not-allowed");
 
     // Translations
     TranslationProvider<Component> TRANSLATIONS_SEARCHING = create("translations.searching");

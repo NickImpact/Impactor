@@ -58,7 +58,7 @@ public final class EconomyConfig {
         return BigDecimal.valueOf(value);
     });
     public static final ConfigKey<Boolean> ALLOW_TRANSFER_CROSS_CURRENCY = booleanKey("restrictions.allow-cross-currency-transfers", false);
-
+    public static final ConfigKey<Boolean> ALLOW_TRANSFER_ON_NOT_SET = booleanKey("allow-transfer-for-not-set", false);
     public static final ConfigKey<Integer> MAX_BALTOP_ENTRIES = intKey("baltop.max-entries", 10);
 
     @SuppressWarnings("PatternValidation")
@@ -85,6 +85,11 @@ public final class EconomyConfig {
 
             if(adapter.getBoolean(modifier.apply("primary"), false)) {
                 builder.primary();
+            }
+
+            boolean transferSet = adapter.getKeys(joiner.toString(), Lists.newArrayList()).contains("transferable");
+            if(transferSet) {
+                builder.transferable(adapter.getBoolean(modifier.apply("transferable"), false));
             }
 
             results.add(builder.build());

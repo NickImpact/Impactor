@@ -28,6 +28,8 @@ package net.impactdev.impactor.core.economy.currency;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.util.TriState;
+import net.luckperms.api.util.Tristate;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -116,6 +118,11 @@ public class ImpactorCurrency implements Currency {
         return this.primary;
     }
 
+    @Override
+    public TriState transferable() {
+        return null;
+    }
+
     public static class ImpactorCurrencyBuilder implements CurrencyBuilder {
 
         private Key key;
@@ -127,6 +134,7 @@ public class ImpactorCurrency implements Currency {
         private BigDecimal starting;
         private int decimals;
         private boolean primary;
+        private TriState transferable = TriState.NOT_SET;
 
         @Override
         public CurrencyBuilder key(@NotNull Key key) {
@@ -173,6 +181,11 @@ public class ImpactorCurrency implements Currency {
         @Override
         public CurrencyBuilder primary() {
             this.primary = true;
+            return this;
+        }
+
+        public CurrencyBuilder transferable(final boolean state) {
+            this.transferable = TriState.byBoolean(state);
             return this;
         }
 
