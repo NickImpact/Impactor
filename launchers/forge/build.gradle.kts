@@ -32,7 +32,7 @@ loom {
 dependencies {
     forge("net.minecraftforge:forge:${rootProject.property("minecraft")}-${rootProject.property("forge")}")
 
-    implementation(project(":minecraft"))
+    implementation(project(":minecraft:impl"))
     modImplementation("ca.landonjw.gooeylibs:forge:3.0.0-1.19.2-SNAPSHOT@jar")
 
     include("io.leangen.geantyref:geantyref:1.3.13")

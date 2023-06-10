@@ -20,7 +20,8 @@ tasks {
             include(project(":api:translations"))
             include(project(":api:ui"))
             include(project(":impactor"))
-            include(project(":minecraft"))
+            include(project(":minecraft:api"))
+            include(project(":minecraft:impl"))
 
             include(dependency("net.impactdev:json:.*"))
             include(dependency("net.impactdev.impactor.api:commands:.*"))

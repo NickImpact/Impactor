@@ -1,7 +1,7 @@
 plugins {
     id("impactor.base-conventions")
     id("impactor.publishing-conventions")
-    id("org.spongepowered.gradle.vanilla") version("0.2.1-SNAPSHOT")
+    id("org.spongepowered.gradle.vanilla")
 }
 
 repositories {
@@ -20,11 +20,10 @@ java {
 }
 
 dependencies {
-    api(project(":impactor"))
     api(project(":api:items"))
     api(project(":api:ui"))
 
-    api(project(":minecraft:api"))
+    api(project(":impactor"))
 }
 
 publishing {
@@ -32,8 +31,8 @@ publishing {
         create<MavenPublication>(project.name) {
             from(components["java"])
 
-            groupId = "net.impactdev.impactor.integration"
-            artifactId = "minecraft"
+            groupId = "net.impactdev.impactor.minecraft"
+            artifactId = "api"
 
             val plugin = rootProject.property("plugin").toString()
             val minecraft = rootProject.property("minecraft").toString()

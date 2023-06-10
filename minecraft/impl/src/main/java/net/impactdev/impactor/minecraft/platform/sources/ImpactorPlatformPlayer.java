@@ -35,7 +35,8 @@ import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.sources.SourceType;
 import net.impactdev.impactor.api.platform.sources.metadata.MetadataKeys;
 import net.impactdev.impactor.core.platform.sources.ImpactorPlatformSource;
-import net.impactdev.impactor.minecraft.items.stacks.ItemStackTranslator;
+import net.impactdev.impactor.minecraft.api.items.ItemStackTranslator;
+import net.impactdev.impactor.minecraft.items.stacks.ImpactorItemStackTranslator;
 import net.impactdev.impactor.minecraft.items.transactions.ImpactorItemTransaction;
 import net.impactdev.impactor.minecraft.platform.GamePlatform;
 import net.impactdev.impactor.minecraft.text.AdventureTranslator;
@@ -52,7 +53,6 @@ import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.TitlePart;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.minecraft.core.Registry;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.network.protocol.game.ClientboundCustomSoundPacket;
 import net.minecraft.network.protocol.game.ClientboundOpenBookPacket;
@@ -77,10 +77,8 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector2d;
 import org.spongepowered.math.vector.Vector3d;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 
 public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource implements PlatformPlayer {
@@ -139,7 +137,9 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
     public ItemTransaction offer(ImpactorItemStack stack) {
         return this.asMinecraftPlayer()
                 .map(player -> {
-                    ItemStack minecraft = ItemStackTranslator.translate(stack);
+                    ItemStack minecraft = Impactor.instance().services()
+                            .provide(ItemStackTranslator.class)
+                            .translate(stack);
 
                     boolean result = player.addItem(minecraft);
                     return new ImpactorItemTransaction(
@@ -170,7 +170,9 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
                     .author(LegacyComponentSerializer.legacyAmpersand().serialize(GlobalTranslator.render(book.author(), this.locale())))
                     .pages(Lists.transform(book.pages(), page -> GlobalTranslator.render(page, this.locale())))
                     .build();
-            final ItemStack vanilla = ItemStackTranslator.translate(item);
+
+            final ItemStackTranslator translator = Impactor.instance().services().provide(ItemStackTranslator.class);
+            final ItemStack vanilla = translator.translate(item);
 
             connection.send(new ClientboundContainerSetSlotPacket(0, target.containerMenu.getStateId(), slot, vanilla));
             connection.send(new ClientboundOpenBookPacket(InteractionHand.MAIN_HAND));

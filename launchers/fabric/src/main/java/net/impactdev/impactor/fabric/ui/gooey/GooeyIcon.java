@@ -27,17 +27,19 @@ package net.impactdev.impactor.fabric.ui.gooey;
 
 import ca.landonjw.gooeylibs2.api.button.ButtonClick;
 import ca.landonjw.gooeylibs2.api.button.GooeyButton;
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.utility.Context;
-import net.impactdev.impactor.minecraft.items.stacks.ItemStackTranslator;
+import net.impactdev.impactor.minecraft.api.items.ItemStackTranslator;
+import net.impactdev.impactor.minecraft.items.stacks.ImpactorItemStackTranslator;
 import org.jetbrains.annotations.NotNull;
 
 public final class GooeyIcon extends GooeyButton {
 
     public GooeyIcon(@NotNull Icon icon) {
-        super(ItemStackTranslator.translate(icon.display().get()), action -> {
+        super(Impactor.instance().services().provide(ItemStackTranslator.class).translate(icon.display().get()), action -> {
             Context context = Context.empty();
             context.with(icon.context())
                     .append(ImpactorItemStack.class, icon.display().get())

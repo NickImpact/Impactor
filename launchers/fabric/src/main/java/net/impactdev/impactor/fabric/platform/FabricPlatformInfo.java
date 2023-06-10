@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
+import net.fabricmc.loader.impl.discovery.ModCandidate;
 import net.impactdev.impactor.fabric.platform.components.FabricComponent;
 import net.impactdev.impactor.fabric.platform.components.FabricMinecraftComponent;
 import net.impactdev.impactor.api.platform.PlatformComponent;
@@ -38,6 +39,9 @@ import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.platform.ImpactorPlatformInfo;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -81,16 +85,14 @@ public final class FabricPlatformInfo extends ImpactorPlatformInfo {
         }
         printer.hr('-');
 
-        printer.newline().add("Mods: ");
-        printer.table("Mod", 40, "Version", "Parent");
         List<ModContainer> mods = FabricLoader.getInstance().getAllMods()
                 .stream()
                 .filter(info -> !this.exclusions.contains(info.getMetadata().getId()))
                 .filter(info -> info.getContainingMod().isEmpty())
                 .collect(Collectors.toList());
-        for(ModContainer info : mods) {
-            this.printModContainer(info, printer);
-        }
+        printer.newline().add("Mods (%d)", (Object) mods.size());
+        mods.forEach(mod -> this.printModContainer(mod, printer, 0, false));
+
     }
 
     @Override
@@ -108,12 +110,29 @@ public final class FabricPlatformInfo extends ImpactorPlatformInfo {
                 .build();
     }
 
-    private void printModContainer(ModContainer target, PrettyPrinter printer) {
-        @Nullable ModContainer parent = target.getContainingMod().orElse(null);
-        printer.tr(target.getMetadata().getName(), target.getMetadata().getVersion().getFriendlyString(), parent != null ? parent.getMetadata().getName() : "");
+    private void printModContainer(ModContainer target, PrettyPrinter printer, int level, boolean last) {
+        StringBuilder builder = new StringBuilder();
+        for(int depth = 0; depth < level; depth++) {
+            builder.append(depth == 0 ? "\t" : "   | ");
+        }
 
-        for (ModContainer child : target.getContainedMods()) {
-            this.printModContainer(child, printer);
+        builder.append(level == 0 ? "\t" : "  ");
+        builder.append(level == 0 ? "-" : last ? " \\--" : " |--");
+        builder.append(' ').append(target.getMetadata().getId()).append(' ');
+        builder.append(target.getMetadata().getVersion().getFriendlyString());
+
+        printer.add(builder.toString());
+
+        List<ModContainer> nestedMods = new ArrayList<>(target.getContainedMods());
+        nestedMods.sort(Comparator.comparing(nestedMod -> nestedMod.getMetadata().getId()));
+
+        if(!nestedMods.isEmpty()) {
+            Iterator<ModContainer> iterator = nestedMods.iterator();
+            while(iterator.hasNext()) {
+                ModContainer next = iterator.next();
+
+                this.printModContainer(next, printer, level + 1, !iterator.hasNext());
+            }
         }
     }
 }

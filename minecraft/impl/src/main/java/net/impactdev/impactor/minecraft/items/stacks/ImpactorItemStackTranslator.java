@@ -28,6 +28,8 @@ package net.impactdev.impactor.minecraft.items.stacks;
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.properties.MetaFlag;
 import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
+import net.impactdev.impactor.api.services.Service;
+import net.impactdev.impactor.minecraft.api.items.ItemStackTranslator;
 import net.impactdev.impactor.minecraft.items.ImpactorItemType;
 import net.impactdev.impactor.minecraft.utility.ResourceKeyTranslator;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -56,9 +58,14 @@ import net.minecraft.world.level.ItemLike;
 
 import java.util.function.Function;
 
-public final class ItemStackTranslator {
+public final class ImpactorItemStackTranslator implements ItemStackTranslator {
 
-    public static ItemStack translate(ImpactorItemStack stack) {
+    @Override
+    public String name() {
+        return "ItemStack Translator";
+    }
+
+    public ItemStack translate(ImpactorItemStack stack) {
         ItemLike like = ((ImpactorItemType)stack.type()).minecraft().orElse(null);
         ItemStack result = new ItemStack(like);
         result.setCount(stack.quantity());
@@ -93,11 +100,11 @@ public final class ItemStackTranslator {
         return result;
     }
 
-    private static void translateNBT(CompoundTag minecraft, CompoundBinaryTag impactor) {
+    private void translateNBT(CompoundTag minecraft, CompoundBinaryTag impactor) {
         translateCompound(minecraft, impactor);
     }
 
-    private static CompoundTag translateCompound(CompoundTag source, CompoundBinaryTag compound) {
+    private CompoundTag translateCompound(CompoundTag source, CompoundBinaryTag compound) {
         compound.forEach(entry -> {
             String key = entry.getKey();
             BinaryTag tag = entry.getValue();
@@ -132,7 +139,7 @@ public final class ItemStackTranslator {
         return source;
     }
 
-    private static ListTag translateList(ListBinaryTag list) {
+    private ListTag translateList(ListBinaryTag list) {
         ListTag minecraft = new ListTag();
         list.forEach(tag -> {
             if(tag.type().equals(BinaryTagTypes.COMPOUND)) {
@@ -166,12 +173,13 @@ public final class ItemStackTranslator {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends BinaryTag> T as(BinaryTagType<T> type, BinaryTag tag) {
+    private <T extends BinaryTag> T as(BinaryTagType<T> type, BinaryTag tag) {
         return (T) tag;
     }
 
-    private static <M extends Tag, T> M asMinecraft(T value, Function<T, M> translator) {
+    private <M extends Tag, T> M asMinecraft(T value, Function<T, M> translator) {
         return translator.apply(value);
     }
+
 
 }

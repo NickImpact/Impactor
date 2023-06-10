@@ -175,7 +175,7 @@ public class BasicEconomyTest {
 
         List<Account> sorted = accounts.stream()
                 .sorted(Comparator.<Account, BigDecimal>comparing(account -> account.balanceAsync().join()).reversed())
-                .toList();
+                .collect(Collectors.toList());
 
         assertEquals(BigDecimal.valueOf(1000.0), sorted.get(0).balanceAsync().join());
     }

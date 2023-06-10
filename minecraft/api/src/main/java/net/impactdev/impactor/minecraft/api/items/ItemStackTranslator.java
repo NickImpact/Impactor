@@ -23,34 +23,14 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.plugin;
+package net.impactdev.impactor.minecraft.api.items;
 
-import com.google.common.collect.Sets;
-import net.impactdev.impactor.core.modules.ImpactorModule;
-import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
-import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
-import net.impactdev.impactor.minecraft.items.ItemsModule;
-import net.impactdev.impactor.minecraft.ui.UIModule;
+import net.impactdev.impactor.api.items.ImpactorItemStack;
+import net.impactdev.impactor.api.services.Service;
+import net.minecraft.world.item.ItemStack;
 
-import java.util.Set;
+public interface ItemStackTranslator extends Service {
 
-public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
+    ItemStack translate(ImpactorItemStack stack);
 
-    public GameImpactorPlugin(ImpactorBootstrapper bootstrapper) {
-        super(bootstrapper);
-    }
-
-    @Override
-    protected Set<Class<? extends ImpactorModule>> modules() {
-        return Sets.newHashSet(
-                ItemsModule.class,
-                UIModule.class
-//                CommandsModule.class
-        );
-    }
-
-    @Override
-    public void construct() {
-        super.construct();
-    }
 }

@@ -34,6 +34,8 @@ import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.core.modules.ImpactorModule;
+import net.impactdev.impactor.minecraft.api.items.ItemStackTranslator;
+import net.impactdev.impactor.minecraft.items.stacks.ImpactorItemStackTranslator;
 import net.impactdev.impactor.minecraft.items.stacks.builders.ImpactorBasicStackBuilder;
 import net.impactdev.impactor.minecraft.items.stacks.builders.ImpactorBookStackBuilder;
 import net.impactdev.impactor.minecraft.items.stacks.builders.ImpactorSkullStackBuilder;
@@ -57,7 +59,7 @@ public class ItemsModule implements ImpactorModule {
 
     @Override
     public void services(ServiceProvider provider) {
-
+        provider.register(ItemStackTranslator.class, new ImpactorItemStackTranslator());
     }
 
 }

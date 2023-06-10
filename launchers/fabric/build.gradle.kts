@@ -26,7 +26,7 @@ dependencies {
         "fabric-networking-api-v1"
     ).forEach { modImplementation(fabricApi.module(it, rootProject.property("fabric-api").toString())) }
 
-    implementation(project(":minecraft"))
+    implementation(project(":minecraft:impl"))
     modImplementation("ca.landonjw.gooeylibs:fabric:3.0.0-1.19.2-SNAPSHOT@jar")
 
     modImplementation("net.impactdev.impactor.commands:fabric:5.0.0+1.19.2-SNAPSHOT") {
