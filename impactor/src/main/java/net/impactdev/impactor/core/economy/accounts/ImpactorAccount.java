@@ -49,6 +49,8 @@ import net.impactdev.impactor.core.economy.transactions.ImpactorEconomyTransacti
 import net.impactdev.impactor.core.economy.transactions.ImpactorEconomyTransferTransaction;
 import net.impactdev.impactor.core.economy.transactions.composers.BaseTransactionComposer;
 import net.impactdev.impactor.core.economy.transactions.composers.TransferTransactionComposer;
+import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.core.utility.future.Futures;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.event.PostResult;
@@ -58,6 +60,8 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
@@ -103,20 +107,20 @@ public final class ImpactorAccount implements Account {
     }
 
     @Override
-    public @NotNull BigDecimal balance() {
-        return this.balance;
+    public @NotNull CompletableFuture<BigDecimal> balanceAsync() {
+        return Futures.timed(() -> this.balance, 5, TimeUnit.SECONDS);
     }
 
     @Override
-    public @NotNull EconomyTransaction set(BigDecimal amount) {
+    public @NotNull CompletableFuture<@NotNull EconomyTransaction> setAsync(BigDecimal amount) {
         return EconomyTransaction.compose()
-                .account(this)
-                .type(EconomyTransactionType.SET)
-                .amount(amount)
-                .build();
+                        .account(this)
+                        .type(EconomyTransactionType.SET)
+                        .amount(amount)
+                        .send();
     }
 
-    public @NotNull EconomyTransaction set(BaseTransactionComposer composer) {
+    public @NotNull CompletableFuture<@NotNull EconomyTransaction> set(BaseTransactionComposer composer) {
         final BigDecimal amount = composer.amount();
         return this.enact(amount, EconomyTransactionType.SET, () -> {
                 ImpactorEconomyTransaction.TransactionBuilder builder = ImpactorEconomyTransaction.builder()
@@ -151,15 +155,15 @@ public final class ImpactorAccount implements Account {
     }
 
     @Override
-    public @NotNull EconomyTransaction withdraw(BigDecimal amount) {
+    public @NotNull CompletableFuture<@NotNull EconomyTransaction> withdrawAsync(BigDecimal amount) {
         return EconomyTransaction.compose()
                 .account(this)
                 .type(EconomyTransactionType.WITHDRAW)
                 .amount(amount)
-                .build();
+                .send();
     }
 
-    public @NotNull EconomyTransaction withdraw(BaseTransactionComposer composer) {
+    public @NotNull CompletableFuture<EconomyTransaction> withdraw(BaseTransactionComposer composer) {
         final BigDecimal amount = composer.amount();
         return this.enact(amount, EconomyTransactionType.WITHDRAW, () -> {
                     ImpactorEconomyTransaction.TransactionBuilder builder = ImpactorEconomyTransaction.builder()
@@ -199,15 +203,15 @@ public final class ImpactorAccount implements Account {
     }
 
     @Override
-    public @NotNull EconomyTransaction deposit(BigDecimal amount) {
+    public @NotNull CompletableFuture<@NotNull EconomyTransaction> depositAsync(BigDecimal amount) {
         return EconomyTransaction.compose()
                 .account(this)
                 .type(EconomyTransactionType.DEPOSIT)
                 .amount(amount)
-                .build();
+                .send();
     }
 
-    public @NotNull EconomyTransaction deposit(BaseTransactionComposer composer) {
+    public @NotNull CompletableFuture<EconomyTransaction> deposit(BaseTransactionComposer composer) {
         final BigDecimal amount = composer.amount();
         return this.enact(amount, EconomyTransactionType.DEPOSIT, () -> {
                     ImpactorEconomyTransaction.TransactionBuilder builder = ImpactorEconomyTransaction.builder()
@@ -243,15 +247,15 @@ public final class ImpactorAccount implements Account {
     }
 
     @Override
-    public @NotNull EconomyTransferTransaction transfer(Account to, BigDecimal amount) {
+    public @NotNull CompletableFuture<@NotNull EconomyTransferTransaction> transferAsync(Account to, BigDecimal amount) {
         return EconomyTransferTransaction.compose()
                 .from(this)
                 .to(to)
                 .amount(amount)
-                .build();
+                .send();
     }
 
-    public @NotNull EconomyTransferTransaction transfer(TransferTransactionComposer composer) {
+    public @NotNull CompletableFuture<EconomyTransferTransaction> transfer(TransferTransactionComposer composer) {
         final BigDecimal amount = composer.amount();
         final Account to = composer.target();
 
@@ -281,7 +285,7 @@ public final class ImpactorAccount implements Account {
                     }
 
                     BigDecimal withdraw = this.balance.subtract(amount);
-                    BigDecimal deposit = to.balance().add(amount);
+                    BigDecimal deposit = to.balanceAsync().join().add(amount);
                     if(this.restriction(EconomyConfig.APPLY_RESTRICTIONS).orElse(false)) {
                         Optional<BigDecimal> minimum = this.restriction(EconomyConfig.MIN_BALANCE);
                         Optional<BigDecimal> maximum = this.restriction(EconomyConfig.MAX_BALANCE);
@@ -303,7 +307,7 @@ public final class ImpactorAccount implements Account {
                     }
 
                     this.balance = this.balance.subtract(amount);
-                    ((ImpactorAccount) to).quietSet(to.balance().add(amount));
+                    ((ImpactorAccount) to).quietSet(to.balanceAsync().join().add(amount));
 
                     this.save();
                     ((ImpactorAccount) to).save();
@@ -324,22 +328,23 @@ public final class ImpactorAccount implements Account {
     }
 
     @Override
-    public @NotNull EconomyTransaction reset() {
+    public @NotNull CompletableFuture<@NotNull EconomyTransaction> resetAsync() {
         return EconomyTransaction.compose()
                 .account(this)
                 .type(EconomyTransactionType.RESET)
-                .build();
+                .send();
     }
 
-    public @NotNull EconomyTransaction reset(BaseTransactionComposer composer) {
+    public @NotNull CompletableFuture<EconomyTransaction> reset(BaseTransactionComposer composer) {
+        final BigDecimal amount = composer.amount();
         return this.enact(this.currency.defaultAccountBalance(), EconomyTransactionType.RESET, () -> {
                     ImpactorEconomyTransaction.TransactionBuilder builder = ImpactorEconomyTransaction.builder()
                             .account(this)
                             .currency(this.currency)
-                            .amount(this.currency.defaultAccountBalance())
+                            .amount(amount)
                             .type(EconomyTransactionType.DEPOSIT);
 
-                    EconomyTransactionEvent.Pre pre = this.createAndFirePre(this.currency.defaultAccountBalance(), EconomyTransactionType.RESET);
+                    EconomyTransactionEvent.Pre pre = this.createAndFirePre(amount, EconomyTransactionType.RESET);
                     if(pre.cancelled()) {
                         return builder.result(EconomyResultType.CANCELLED).build();
                     }
@@ -370,39 +375,43 @@ public final class ImpactorAccount implements Account {
         result.raise();
     }
 
-    private <T> T enact(BigDecimal amount, EconomyTransactionType type, TransactionProcessor<T> processor, Supplier<T> fallback) {
-        try {
-            return processor.process();
-        } catch (PostResult.CompositeException exception) {
-            PrettyPrinter printer = new PrettyPrinter(80);
-            printer.title("Economy Transaction - Subscriber Exceptions")
-                    .consume(p -> {
-                        int tracked = exception.result().exceptions().size();
-                        if(tracked > 1) {
-                            p.add("A set of exceptions were encountered while trying to process a");
-                            p.add("transaction. Details regarding the problem will now be displayed below...");
-                        } else {
-                            p.add("An exception encountered while trying to process a transaction. Details");
-                            p.add("regarding the problem will now be displayed below...");
-                        }
-                    })
-                    .hr('-')
-                    .add("Transaction Type: " + type.name())
-                    .add("Currency: " + PlainTextComponentSerializer.plainText().serialize(this.currency.plural()))
-                    .add("Account: " + this.owner.toString())
-                    .add("Amount: " + PlainTextComponentSerializer.plainText().serialize(this.currency.format(amount)))
-                    .consume(p -> {
-                        p.newline();
-                        AtomicInteger index = new AtomicInteger(1);
-                        exception.result().exceptions()
-                                .forEach((subscriber, error) -> {
-                                    p.add("%d: %s", index.getAndIncrement(), subscriber);
-                                    p.add(error, 2);
-                                });
-                        p.newline();
-                    });
-            return fallback.get();
-        }
+    private <T> CompletableFuture<T> enact(BigDecimal amount, EconomyTransactionType type, TransactionProcessor<T> processor, Supplier<T> fallback) {
+        return Futures.timed(() -> {
+            try {
+                return processor.process();
+            } catch (PostResult.CompositeException exception) {
+                PrettyPrinter printer = new PrettyPrinter(80);
+                printer.title("Economy Transaction - Subscriber Exceptions")
+                        .consume(p -> {
+                            int tracked = exception.result().exceptions().size();
+                            if(tracked > 1) {
+                                p.add("A set of exceptions were encountered while trying to process a");
+                                p.add("transaction. Details regarding the problem will now be displayed below...");
+                            } else {
+                                p.add("An exception encountered while trying to process a transaction. Details");
+                                p.add("regarding the problem will now be displayed below...");
+                            }
+                        })
+                        .hr('-')
+                        .add("Transaction Type: " + type.name())
+                        .add("Currency: " + PlainTextComponentSerializer.plainText().serialize(this.currency.plural()))
+                        .add("Account: " + this.owner.toString())
+                        .add("Amount: " + PlainTextComponentSerializer.plainText().serialize(this.currency.format(amount)))
+                        .consume(p -> {
+                            p.newline();
+                            AtomicInteger index = new AtomicInteger(1);
+                            exception.result().exceptions()
+                                    .forEach((subscriber, error) -> {
+                                        p.add("%d: %s", index.getAndIncrement(), subscriber);
+                                        p.add(error, 2);
+                                    });
+                            p.newline();
+                        });
+
+                Impactor.instance().scheduler().sync().execute(() -> printer.log(BaseImpactorPlugin.instance().logger(), PrettyPrinter.Level.ERROR));
+                return fallback.get();
+            }
+        }, 5, TimeUnit.SECONDS);
     }
 
     private <T> Optional<T> restriction(ConfigKey<T> key) {

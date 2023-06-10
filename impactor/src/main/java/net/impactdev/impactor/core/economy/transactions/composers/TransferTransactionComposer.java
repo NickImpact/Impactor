@@ -32,11 +32,13 @@ import net.impactdev.impactor.api.economy.transactions.composer.TransferComposer
 import net.impactdev.impactor.api.economy.transactions.details.EconomyResultType;
 import net.impactdev.impactor.core.economy.accounts.ImpactorAccount;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public final class TransferTransactionComposer implements TransferComposer {
 
@@ -83,7 +85,7 @@ public final class TransferTransactionComposer implements TransferComposer {
     }
 
     @Override
-    public EconomyTransferTransaction build() {
+    public @NotNull CompletableFuture<@NotNull EconomyTransferTransaction> send() {
         Preconditions.checkNotNull(this.from, "from");
         Preconditions.checkNotNull(this.to, "to");
         Preconditions.checkNotNull(this.amount, "amount");

@@ -48,6 +48,7 @@ public class ImpactorCurrency implements Currency {
     private final int decimals;
     private final SymbolFormatting formatting;
     private final boolean primary;
+    private final TriState transferable;
 
     private final String pattern;
 
@@ -60,6 +61,7 @@ public class ImpactorCurrency implements Currency {
         this.decimals = builder.decimals;
         this.formatting = builder.formatting;
         this.primary = builder.primary;
+        this.transferable = builder.transferable;
 
         this.pattern = "%." + this.decimals + "f";
     }
@@ -120,7 +122,7 @@ public class ImpactorCurrency implements Currency {
 
     @Override
     public TriState transferable() {
-        return null;
+        return this.transferable;
     }
 
     public static class ImpactorCurrencyBuilder implements CurrencyBuilder {

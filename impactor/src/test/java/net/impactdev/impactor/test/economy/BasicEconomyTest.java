@@ -104,7 +104,7 @@ public class BasicEconomyTest {
         Currency currency = service.currencies().primary();
         Account account = service.account(currency, target).join();
 
-        assertEquals(currency.defaultAccountBalance(), balance = account.balance());
+        assertEquals(currency.defaultAccountBalance(), balance = account.balanceAsync().join());
         assertTrue(Files.exists(Paths.get("config")
                 .resolve("impactor")
                 .resolve("economy")
@@ -131,16 +131,16 @@ public class BasicEconomyTest {
         Currency currency = service.currencies().primary();
         Account account = service.account(currency, target).join();
 
-        assertEquals(balance, account.balance());
+        assertEquals(balance, account.balanceAsync().join());
         BigDecimal adjustment = BigDecimal.valueOf(250);
-        EconomyTransaction transaction = account.deposit(adjustment);
+        EconomyTransaction transaction = account.depositAsync(adjustment).join();
 
         assertEquals(EconomyResultType.SUCCESS, transaction.result());
         assertEquals(EconomyTransactionType.DEPOSIT, transaction.type());
-        assertEquals(balance.add(adjustment), balance = account.balance());
+        assertEquals(balance.add(adjustment), balance = account.balanceAsync().join());
 
         account = service.account(currency, target).join();
-        assertEquals(balance, account.balance());
+        assertEquals(balance, account.balanceAsync().join());
     }
 
     @Test
@@ -167,17 +167,17 @@ public class BasicEconomyTest {
         BigDecimal adjustment = BigDecimal.ZERO;
         Collection<Account> accounts = service.accounts(currency).join();
         for(Account account : accounts) {
-            account.reset();
+            account.resetAsync().join();
 
-            account.deposit(adjustment);
+            account.depositAsync(adjustment).join();
             adjustment = adjustment.add(BigDecimal.valueOf(250));
         }
 
         List<Account> sorted = accounts.stream()
-                .sorted(Comparator.comparing(Account::balance).reversed())
-                .collect(Collectors.toList());
+                .sorted(Comparator.<Account, BigDecimal>comparing(account -> account.balanceAsync().join()).reversed())
+                .toList();
 
-        assertEquals(BigDecimal.valueOf(1000.0), sorted.get(0).balance());
+        assertEquals(BigDecimal.valueOf(1000.0), sorted.get(0).balanceAsync().join());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class BasicEconomyTest {
         Currency currency = service.currencies().primary();
         Account account = service.account(currency, target).join();
 
-        account.withdraw(new BigDecimal(300));
+        account.withdrawAsync(new BigDecimal(300)).join();
         assertTrue(flag.get());
     }
 
@@ -231,7 +231,7 @@ public class BasicEconomyTest {
         Currency currency = service.currencies().primary();
 
         Account account = service.account(currency, target).join();
-        EconomyTransaction set = account.set(BigDecimal.ONE);
+        EconomyTransaction set = account.setAsync(BigDecimal.ONE).join();
         assertTrue(set.successful());
         BigDecimal amount = new BigDecimal("1.00");
 
@@ -242,10 +242,11 @@ public class BasicEconomyTest {
                 .message(EconomyResultType.SUCCESS, Component.text("Transaction succeeded!"))
                 .message(EconomyResultType.NOT_ENOUGH_FUNDS, Component.text("Account did not have enough funds..."))
                 .message(EconomyResultType.FAILED, Component.text("A failure occurred while processing this transaction"))
-                .build();
+                .send()
+                .join();
 
         assertTrue(transaction.successful());
-        assertEquals(0, account.balance().intValue());
+        assertEquals(0, account.balanceAsync().join().intValue());
 
         AtomicReference<Component> message = new AtomicReference<>(Component.empty());
         Audience audience = new Audience() {
@@ -264,7 +265,8 @@ public class BasicEconomyTest {
                 .to(account)
                 .amount(new BigDecimal(250))
                 .message(EconomyResultType.SUCCESS, Component.text("Transaction completed!"))
-                .build();
+                .send()
+                .join();
 
         transfer.inform(audience);
         assertEquals("Transaction completed!", PlainTextComponentSerializer.plainText().serialize(message.get()));
@@ -284,7 +286,8 @@ public class BasicEconomyTest {
                 .to(b)
                 .amount(BigDecimal.TEN)
                 .message(EconomyResultType.INVALID, Component.text("Mismatched currencies..."))
-                .build();
+                .send()
+                .join();
 
         failure.inform(audience);
         assertEquals("Mismatched currencies...", PlainTextComponentSerializer.plainText().serialize(message.get()));

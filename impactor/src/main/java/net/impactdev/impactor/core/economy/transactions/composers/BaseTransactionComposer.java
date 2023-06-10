@@ -39,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public final class BaseTransactionComposer implements TransactionComposer {
 
@@ -80,7 +81,7 @@ public final class BaseTransactionComposer implements TransactionComposer {
     }
 
     @Override
-    public EconomyTransaction build() {
+    public @NotNull CompletableFuture<@NotNull EconomyTransaction> send() {
         Preconditions.checkNotNull(this.account, "account");
         Preconditions.checkNotNull(this.type, "type");
 
@@ -95,7 +96,7 @@ public final class BaseTransactionComposer implements TransactionComposer {
     @FunctionalInterface
     private interface Executor {
 
-        EconomyTransaction transact(ImpactorAccount account, BaseTransactionComposer composer);
+        CompletableFuture<EconomyTransaction> transact(ImpactorAccount account, BaseTransactionComposer composer);
 
     }
 
@@ -119,7 +120,7 @@ public final class BaseTransactionComposer implements TransactionComposer {
                     .orElseThrow(() -> new IllegalArgumentException("No valid executor registered"));
         }
 
-        public EconomyTransaction transact(ImpactorAccount account, BaseTransactionComposer composer) {
+        public CompletableFuture<EconomyTransaction> transact(ImpactorAccount account, BaseTransactionComposer composer) {
             return this.executor.transact(account, composer);
         }
     }

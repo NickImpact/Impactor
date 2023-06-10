@@ -92,11 +92,11 @@ public final class EconomyCommands {
         PlatformSource focus = target != null ? target : source.source();
 
         Account account = service.account(c, focus.uuid()).join();
-        BigDecimal before = account.balance();
+        BigDecimal before = account.balanceAsync().join();
 
-        EconomyTransaction transaction = account.withdraw(new BigDecimal(amount));
+        EconomyTransaction transaction = account.withdrawAsync(new BigDecimal(amount)).join();
         Context context = Context.empty();
-        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.WITHDRAW, before, account.balance(), transaction.result()));
+        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.WITHDRAW, before, account.balanceAsync().join(), transaction.result()));
         context.append(Currency.class, c);
         context.append(Account.class, account);
 
@@ -122,11 +122,11 @@ public final class EconomyCommands {
         PlatformSource focus = target != null ? target : source.source();
 
         Account account = service.account(c, focus.uuid()).join();
-        BigDecimal before = account.balance();
+        BigDecimal before = account.balanceAsync().join();
 
-        EconomyTransaction transaction = account.deposit(new BigDecimal(amount));
+        EconomyTransaction transaction = account.depositAsync(new BigDecimal(amount)).join();
         Context context = Context.empty();
-        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.DEPOSIT, before, account.balance(), transaction.result()));
+        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.DEPOSIT, before, account.balanceAsync().join(), transaction.result()));
         context.append(Currency.class, c);
         context.append(Account.class, account);
 
@@ -150,11 +150,11 @@ public final class EconomyCommands {
         PlatformSource focus = target != null ? target : source.source();
 
         Account account = service.account(c, focus.uuid()).join();
-        BigDecimal before = account.balance();
+        BigDecimal before = account.balanceAsync().join();
 
-        EconomyTransaction transaction = account.set(new BigDecimal(amount));
+        EconomyTransaction transaction = account.setAsync(new BigDecimal(amount)).join();
         Context context = Context.empty();
-        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.SET, before, account.balance(), transaction.result()));
+        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.SET, before, account.balanceAsync().join(), transaction.result()));
         context.append(Currency.class, c);
         context.append(Account.class, account);
 
@@ -177,11 +177,11 @@ public final class EconomyCommands {
         PlatformSource focus = target != null ? target : source.source();
 
         Account account = service.account(c, focus.uuid()).join();
-        BigDecimal before = account.balance();
+        BigDecimal before = account.balanceAsync().join();
 
-        EconomyTransaction transaction = account.reset();
+        EconomyTransaction transaction = account.resetAsync().join();
         Context context = Context.empty();
-        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.RESET, before, account.balance(), transaction.result()));
+        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.RESET, before, account.balanceAsync().join(), transaction.result()));
         context.append(Currency.class, c);
         context.append(Account.class, account);
 
@@ -228,13 +228,13 @@ public final class EconomyCommands {
         Account sa = service.account(c, focus.uuid()).join();
         Account ta = service.account(c, target.uuid()).join();
 
-        BigDecimal sb = sa.balance();
-        BigDecimal tb = ta.balance();
+        BigDecimal sb = sa.balanceAsync().join();
+        BigDecimal tb = ta.balanceAsync().join();
 
-        EconomyTransferTransaction transaction = sa.transfer(ta, new BigDecimal(amount));
+        EconomyTransferTransaction transaction = sa.transferAsync(ta, new BigDecimal(amount)).join();
         context.append(TransferTransactionContext.class, new TransferTransactionContext(
-                new TransactionContext(EconomyTransactionType.WITHDRAW, sb, sa.balance(), transaction.result()),
-                new TransactionContext(EconomyTransactionType.DEPOSIT, tb, ta.balance(), transaction.result()),
+                new TransactionContext(EconomyTransactionType.WITHDRAW, sb, sa.balanceAsync().join(), transaction.result()),
+                new TransactionContext(EconomyTransactionType.DEPOSIT, tb, ta.balanceAsync().join(), transaction.result()),
                 transaction.result()
         ));
 
@@ -270,7 +270,7 @@ public final class EconomyCommands {
 
             AtomicInteger ranking = new AtomicInteger(1);
             accounts.stream()
-                    .sorted(Comparator.comparing(Account::balance).reversed())
+                    .sorted(Comparator.<Account, BigDecimal>comparing(account -> account.balanceAsync().join()).reversed())
                     .filter(account -> !account.virtual() || nonPlayers)
                     .limit(max.get())
                     .forEach(account -> {
