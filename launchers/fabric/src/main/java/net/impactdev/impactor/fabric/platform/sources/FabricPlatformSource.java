@@ -29,7 +29,7 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.sources.SourceType;
 import net.impactdev.impactor.core.platform.sources.ImpactorPlatformSource;
 import net.impactdev.impactor.fabric.platform.FabricPlatform;
-import net.impactdev.impactor.minecraft.text.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;

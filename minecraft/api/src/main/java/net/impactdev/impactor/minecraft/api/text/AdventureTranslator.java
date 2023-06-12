@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.text;
+package net.impactdev.impactor.minecraft.api.text;
 
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;

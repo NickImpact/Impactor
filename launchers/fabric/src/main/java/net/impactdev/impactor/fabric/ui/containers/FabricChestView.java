@@ -32,7 +32,7 @@ import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.fabric.ui.gooey.GooeyIcon;
 import net.impactdev.impactor.fabric.ui.gooey.GooeyPageOpenCloser;
-import net.impactdev.impactor.minecraft.text.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
 import net.impactdev.impactor.minecraft.ui.containers.views.chests.ImpactorChestView;
 import org.jetbrains.annotations.Nullable;
 

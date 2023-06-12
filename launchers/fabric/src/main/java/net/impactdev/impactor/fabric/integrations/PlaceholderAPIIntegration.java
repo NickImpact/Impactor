@@ -38,7 +38,7 @@ import net.impactdev.impactor.core.integrations.Dependencies;
 import net.impactdev.impactor.core.integrations.Dependency;
 import net.impactdev.impactor.core.integrations.Integration;
 import net.impactdev.impactor.fabric.platform.FabricPlatform;
-import net.impactdev.impactor.minecraft.text.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
 import net.kyori.adventure.key.Key;
 import net.kyori.event.EventBus;
 import net.minecraft.server.MinecraftServer;
