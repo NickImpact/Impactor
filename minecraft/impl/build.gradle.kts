@@ -21,6 +21,7 @@ java {
 
 dependencies {
     api(project(":minecraft:api"))
+    api(project(":impactor"))
 }
 
 publishing {

@@ -22,8 +22,6 @@ java {
 dependencies {
     api(project(":api:items"))
     api(project(":api:ui"))
-
-    api(project(":impactor"))
 }
 
 publishing {
