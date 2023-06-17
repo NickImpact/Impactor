@@ -9,6 +9,7 @@
     "economy.baltop.header": "<st><gradient:#32a852:#326da8>====================</gradient><reset> <yellow><impactor:currency> <st><gradient:#326da8:#32a852>=====================",
     "economy.baltop.entry": "<yellow><impactor:baltop:ranking>) <aqua><impactor:account:name><gray>: <green><impactor:account:balance>",
     "economy.baltop.footer": "<st><gradient:#32a852:#326da8>=========================</gradient><gradient:#326da8:#32a852>==========================",
+    "economy.payments.receive": "<yellow><impactor:name> <gray>has paid you <green><impactor:payment:amount><gray>!",
 
     "translations.searching": "<gray>Checking available languages...",
     "translations.installing": "<gray>Attempting to install translations now...",

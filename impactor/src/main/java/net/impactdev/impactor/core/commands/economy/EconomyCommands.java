@@ -33,6 +33,7 @@ import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.annotations.ProxiedBy;
 import cloud.commandframework.annotations.processing.CommandContainer;
 import com.google.common.base.Preconditions;
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.configuration.Config;
 import net.impactdev.impactor.api.economy.EconomyService;
@@ -41,6 +42,7 @@ import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransferTransaction;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.utility.Context;
 import net.impactdev.impactor.core.economy.EconomyConfig;
@@ -243,11 +245,10 @@ public final class EconomyCommands {
             return;
         }
 
-        // Hover:
-        //   Transaction Type: TRANSFER
-        //     Source: Before --> After
-        //     Recipient: Before --> After
         ImpactorTranslations.ECONOMY_TRANSFER.send(source, context);
+
+        context.append(CommandSource.class, source);
+        ImpactorTranslations.ECONOMY_RECEIVE_PAYMENT.send(target, context);
     }
 
     @ProxiedBy("baltop")
