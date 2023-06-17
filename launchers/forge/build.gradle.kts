@@ -33,11 +33,11 @@ dependencies {
     forge("net.minecraftforge:forge:${rootProject.property("minecraft")}-${rootProject.property("forge")}")
 
     implementation(project(":minecraft:impl"))
-    modImplementation("ca.landonjw.gooeylibs:forge:3.0.0-1.19.2-SNAPSHOT@jar")
+    modImplementation("ca.landonjw.gooeylibs:forge:3.0.0-1.20.1-SNAPSHOT@jar")
 
     include("io.leangen.geantyref:geantyref:1.3.13")
 
-    modImplementation("net.impactdev.impactor.commands:forge:5.0.0+1.19.2-SNAPSHOT") {
+    modImplementation("net.impactdev.impactor.commands:forge:5.1.1+1.19.4-SNAPSHOT") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")
