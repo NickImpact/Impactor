@@ -44,4 +44,8 @@ public class ResourceKeyTranslator {
         return asResourceLocation(key);
     }
 
+    public static @NotNull Key toAdventure(@NotNull ResourceLocation location) {
+        return Key.key(location.getNamespace(), location.getPath());
+    }
+
 }

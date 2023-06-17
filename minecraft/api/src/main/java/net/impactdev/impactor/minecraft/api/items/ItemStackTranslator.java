@@ -33,4 +33,6 @@ public interface ItemStackTranslator extends Service {
 
     ItemStack translate(ImpactorItemStack stack);
 
+    ImpactorItemStack from(ItemStack stack);
+
 }

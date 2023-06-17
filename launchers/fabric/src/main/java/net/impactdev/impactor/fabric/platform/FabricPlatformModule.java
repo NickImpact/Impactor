@@ -29,8 +29,6 @@ import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerService;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
-import net.impactdev.impactor.core.commands.events.RegisterCommandsEvent;
-import net.impactdev.impactor.core.platform.commands.PlatformCommands;
 import net.impactdev.impactor.fabric.platform.performance.FabricPerformanceMonitorFactory;
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
@@ -61,8 +59,4 @@ public final class FabricPlatformModule implements ImpactorModule {
         provider.register(PlatformPlayerService.class, new FabricPlatformPlayerService());
     }
 
-    @Override
-    public void subscribe(EventBus<ImpactorEvent> bus) {
-        bus.subscribe(RegisterCommandsEvent.class, event -> event.register(PlatformCommands.class));
-    }
 }

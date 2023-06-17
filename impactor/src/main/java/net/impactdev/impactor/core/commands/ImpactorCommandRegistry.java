@@ -26,12 +26,17 @@
 package net.impactdev.impactor.core.commands;
 
 import cloud.commandframework.annotations.AnnotationParser;
+import cloud.commandframework.annotations.processing.CommandContainer;
 import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import com.google.common.collect.Lists;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
 import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandSource;
@@ -45,12 +50,15 @@ import net.impactdev.impactor.core.commands.economy.EconomyCommands;
 import net.impactdev.impactor.core.commands.parsers.LocaleParser;
 import net.impactdev.impactor.core.commands.parsers.PlatformSourceParser;
 import net.impactdev.impactor.core.commands.translations.TranslationCommands;
+import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.utility.events.EventPublisher;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class ImpactorCommandRegistry {
 
@@ -66,10 +74,7 @@ public final class ImpactorCommandRegistry {
     public void registerAllCommands() {
         AnnotationParser<CommandSource> parser = this.createParser();
 
-        List<Class<?>> containers = Lists.newArrayList(
-                EconomyCommands.class,
-                TranslationCommands.class
-        );
+        List<Class<?>> containers = this.collectCommandContainers(Impactor.instance());
 
         containers.forEach(container -> {
             try {
@@ -118,6 +123,24 @@ public final class ImpactorCommandRegistry {
                     return meta.build();
                 }
         );
+    }
+
+    private List<Class<?>> collectCommandContainers(Impactor service) {
+        ClassGraph graph = new ClassGraph()
+                .acceptPackages("net.impactdev.impactor")
+                .enableClassInfo()
+                .enableAnnotationInfo()
+                .overrideClassLoaders(this.getClass().getClassLoader());
+
+        try (ScanResult scan = graph.scan()) {
+            ClassInfoList list = scan.getClassesWithAnnotation(CommandContainer.class);
+            return list.stream()
+                    .map(ClassInfo::loadClass)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
     }
 
 }

@@ -62,9 +62,4 @@ public class ForgePlatformModule implements ImpactorModule {
         provider.register(PlatformPlayerService.class, new ForgePlatformPlayerService());
     }
 
-    @Override
-    public void subscribe(EventBus<ImpactorEvent> bus) {
-        bus.subscribe(RegisterCommandsEvent.class, event -> event.register(PlatformCommands.class));
-    }
-
 }
