@@ -51,9 +51,10 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.TitlePart;
 import net.kyori.adventure.translation.GlobalTranslator;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
-import net.minecraft.network.protocol.game.ClientboundCustomSoundPacket;
 import net.minecraft.network.protocol.game.ClientboundOpenBookPacket;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
@@ -229,28 +230,31 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
     @Override
     public void playSound(@NotNull Sound sound, double x, double y, double z) {
         this.asMinecraftPlayer().ifPresent(target -> {
-            final Optional<SoundEvent> event = Registry.SOUND_EVENT.getOptional(ResourceKeyTranslator.asResourceLocation(sound.name()));
-            if(event.isPresent()) {
-                target.connection.send(new ClientboundSoundPacket(event.get(), AdventureTranslator.asVanilla(sound.source()), x, y, z, sound.volume(), sound.pitch(), RandomProvider.nextLong()));
-            } else {
-                target.connection.send(new ClientboundCustomSoundPacket(
-                        ResourceKeyTranslator.asResourceLocation(sound.name()),
-                        AdventureTranslator.asVanilla(sound.source()),
-                        new net.minecraft.world.phys.Vec3(x, y, z),
-                        sound.volume(),
-                        sound.pitch(),
-                        RandomProvider.nextLong()
-                ));
-            }
+            final Optional<Holder.Reference<SoundEvent>> reference = BuiltInRegistries.SOUND_EVENT.holders()
+                    .filter(event -> event.is(ResourceKeyTranslator.asResourceLocation(sound.name())))
+                    .findFirst();
+
+            reference.ifPresent(soundEventReference -> target.connection.send(new ClientboundSoundPacket(
+                    soundEventReference,
+                    AdventureTranslator.asVanilla(sound.source()),
+                    x,
+                    y,
+                    z,
+                    sound.volume(),
+                    sound.pitch(),
+                    RandomProvider.nextLong()
+            )));
         });
     }
 
     @Override
     public void playSound(@NotNull Sound sound, Sound.@NotNull Emitter emitter) {
         this.asMinecraftPlayer().ifPresent(target -> {
-            final Optional<SoundEvent> event = Registry.SOUND_EVENT.getOptional(ResourceKeyTranslator.asResourceLocation(
-                    Objects.requireNonNull(sound, "sound").name()));
-            if(event.isPresent()) {
+            final Optional<Holder.Reference<SoundEvent>> reference = BuiltInRegistries.SOUND_EVENT.holders()
+                    .filter(event -> event.is(ResourceKeyTranslator.asResourceLocation(sound.name())))
+                    .findFirst();
+
+            if(reference.isPresent()) {
                 final Entity tracked;
                 if(emitter == Sound.Emitter.self()) {
                     tracked = target;
@@ -263,7 +267,7 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
                 }
 
                 target.connection.send(new ClientboundSoundEntityPacket(
-                        event.get(),
+                        reference.get(),
                         AdventureTranslator.asVanilla(sound.source()),
                         tracked,
                         sound.volume(),
