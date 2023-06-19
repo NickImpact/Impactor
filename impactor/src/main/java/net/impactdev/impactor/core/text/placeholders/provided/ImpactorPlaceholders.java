@@ -40,6 +40,7 @@ import net.kyori.adventure.key.Key;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Optional;
 
@@ -186,6 +187,14 @@ public final class ImpactorPlaceholders {
                 }
 
                 return empty();
+            }
+    );
+    public static final ImpactorPlaceholder PAYMENT = new ImpactorPlaceholder(
+            impactor("payment"),
+            (viewer, ctx) -> {
+                Currency currency = ctx.require(Currency.class);
+                BigDecimal amount = ctx.require(BigDecimal.class);
+                return currency.format(amount);
             }
     );
     public static final ImpactorPlaceholder LANGUAGE = new ImpactorPlaceholder(

@@ -87,11 +87,7 @@ public final class EconomyConfig {
                 builder.primary();
             }
 
-            boolean transferSet = adapter.getKeys(joiner.toString(), Lists.newArrayList()).contains("transferable");
-            if(transferSet) {
-                builder.transferable(adapter.getBoolean(modifier.apply("transferable"), true));
-            }
-
+            builder.transferable(adapter.getBoolean(modifier.apply("transferable"), true));
             results.add(builder.build());
         }
 
