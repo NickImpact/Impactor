@@ -232,8 +232,9 @@ public final class EconomyCommands {
 
         BigDecimal sb = sa.balanceAsync().join();
         BigDecimal tb = ta.balanceAsync().join();
+        BigDecimal total = new BigDecimal(amount);
 
-        EconomyTransferTransaction transaction = sa.transferAsync(ta, new BigDecimal(amount)).join();
+        EconomyTransferTransaction transaction = sa.transferAsync(ta, total).join();
         context.append(TransferTransactionContext.class, new TransferTransactionContext(
                 new TransactionContext(EconomyTransactionType.WITHDRAW, sb, sa.balanceAsync().join(), transaction.result()),
                 new TransactionContext(EconomyTransactionType.DEPOSIT, tb, ta.balanceAsync().join(), transaction.result()),
@@ -247,7 +248,8 @@ public final class EconomyCommands {
 
         ImpactorTranslations.ECONOMY_TRANSFER.send(source, context);
 
-        context.append(CommandSource.class, source);
+        context.append(PlatformSource.class, source.source());
+        context.append(BigDecimal.class, total);
         ImpactorTranslations.ECONOMY_RECEIVE_PAYMENT.send(target, context);
     }
 
