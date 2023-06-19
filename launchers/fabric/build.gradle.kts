@@ -27,9 +27,9 @@ dependencies {
     ).forEach { modImplementation(fabricApi.module(it, rootProject.property("fabric-api").toString())) }
 
     implementation(project(":minecraft:impl"))
-    modImplementation("ca.landonjw.gooeylibs:fabric:3.0.0-1.19.2-SNAPSHOT@jar")
+    modImplementation("ca.landonjw.gooeylibs:fabric:3.0.0-1.19.4-SNAPSHOT@jar")
 
-    modImplementation("net.impactdev.impactor.commands:fabric:5.0.0+1.19.2-SNAPSHOT") {
+    modImplementation("net.impactdev.impactor.commands:fabric:5.1.1+1.19.4-SNAPSHOT") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")
