@@ -102,8 +102,7 @@ publishing {
     }
 }
 
-fun writeVersion(): String
-{
+fun writeVersion(): String {
     val plugin = rootProject.property("plugin")
     val minecraft = rootProject.property("minecraft")
     val snapshot = rootProject.property("snapshot") == "true"

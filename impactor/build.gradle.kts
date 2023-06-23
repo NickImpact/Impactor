@@ -42,6 +42,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
 //    implementation("com.squareup.okio:okio:3.3.0")
 
+    testImplementation("net.kyori:adventure-text-serializer-ansi:4.14.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
     testImplementation("org.mockito:mockito-core:4.7.0")
