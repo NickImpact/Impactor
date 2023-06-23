@@ -27,12 +27,16 @@ package net.impactdev.impactor.core.text;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.logging.PluginLogger;
+import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.text.TextProcessor;
+import net.impactdev.impactor.api.text.pagination.PaginatedText;
 import net.impactdev.impactor.api.text.placeholders.PlaceholderService;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.core.text.pagination.ImpactorPaginatedText;
+import net.impactdev.impactor.core.text.pagination.PaginationService;
 import net.impactdev.impactor.core.text.placeholders.ImpactorPlaceholderService;
 import net.impactdev.impactor.core.text.placeholders.ImpactorRegisterPlaceholdersEvent;
 import net.impactdev.impactor.core.utility.events.EventPublisher;
@@ -47,6 +51,12 @@ public final class TextModule implements ImpactorModule {
     @Override
     public void services(ServiceProvider provider) {
         provider.register(PlaceholderService.class, new ImpactorPlaceholderService());
+        provider.register(PaginationService.class, new PaginationService());
+    }
+
+    @Override
+    public void builders(BuilderProvider provider) {
+        provider.register(PaginatedText.PaginatedTextBuilder.class, ImpactorPaginatedText.ImpactorPaginationBuilder::new);
     }
 
     @Override
