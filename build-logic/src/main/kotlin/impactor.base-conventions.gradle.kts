@@ -1,3 +1,5 @@
+import java.io.ByteArrayOutputStream
+
 plugins {
     `java-library`
     id("org.cadixdev.licenser")
@@ -43,5 +45,24 @@ license {
         this.set("name", "Impactor")
         this.set("url", "https://github.com/NickImpact/Impactor/")
         this.set("year", 2022)
+    }
+}
+
+blossom {
+    replaceToken("@version@", project.version)
+    replaceToken("@githash@", getLatestGitCommitHash(project))
+}
+
+fun getLatestGitCommitHash(project: Project) : String {
+    return try {
+        val byteOut = ByteArrayOutputStream()
+        project.exec {
+            this.commandLine = "git rev-parse --short HEAD".split(" ")
+            this.standardOutput = byteOut
+        }
+
+        byteOut.toString("UTF-8").trim()
+    } catch (ex: Exception) {
+        "Unknown"
     }
 }

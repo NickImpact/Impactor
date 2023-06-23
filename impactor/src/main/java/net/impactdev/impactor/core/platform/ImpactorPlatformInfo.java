@@ -37,6 +37,8 @@ import java.util.Set;
 
 public abstract class ImpactorPlatformInfo implements PlatformInfo {
 
+    public static final String GIT_HASH = "@githash@";
+
     private final PlatformType type;
     private final Set<PlatformComponent> components;
 

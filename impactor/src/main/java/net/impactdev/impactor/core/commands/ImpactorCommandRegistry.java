@@ -45,19 +45,17 @@ import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.commands.events.RegisterCommandsEvent;
+import net.impactdev.impactor.core.commands.parsers.ActivePaginationParser;
 import net.impactdev.impactor.core.commands.parsers.CurrencyParser;
-import net.impactdev.impactor.core.commands.economy.EconomyCommands;
 import net.impactdev.impactor.core.commands.parsers.LocaleParser;
 import net.impactdev.impactor.core.commands.parsers.PlatformSourceParser;
-import net.impactdev.impactor.core.commands.translations.TranslationCommands;
-import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.core.text.pagination.ActivePagination;
 import net.impactdev.impactor.core.utility.events.EventPublisher;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class ImpactorCommandRegistry {
@@ -102,6 +100,11 @@ public final class ImpactorCommandRegistry {
         this.manager.delegate().parserRegistry().registerParserSupplier(
                 TypeToken.get(Locale.class),
                 options -> new LocaleParser()
+        );
+
+        this.manager.delegate().parserRegistry().registerParserSupplier(
+                TypeToken.get(ActivePagination.class),
+                options -> new ActivePaginationParser()
         );
     }
 
