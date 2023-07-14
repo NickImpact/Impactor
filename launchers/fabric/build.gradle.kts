@@ -61,7 +61,7 @@ tasks {
     }
 
     shadowJar {
-        val mapped = "loom_mappings_1_19_2_layered_hash_40359_v2"
+        val mapped = "loom_mappings_1_20_1_layered_hash_40359_v2"
         dependencies {
             include(dependency("net.impactdev.impactor.commands:common:.*"))
             include(dependency("$mapped.net.impactdev.impactor.commands:fabric:.*"))
