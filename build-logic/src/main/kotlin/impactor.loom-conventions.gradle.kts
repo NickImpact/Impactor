@@ -25,14 +25,14 @@ dependencies {
     listOf(
         "net.kyori:examination-api:1.3.0",
         "net.kyori:examination-string:1.3.0",
-        "net.kyori:adventure-api:4.13.0",
-        "net.kyori:adventure-key:4.13.0",
-        "net.kyori:adventure-nbt:4.13.0",
-        "net.kyori:adventure-text-serializer-plain:4.13.0",
-        "net.kyori:adventure-text-serializer-legacy:4.13.0",
-        "net.kyori:adventure-text-serializer-gson:4.13.0",
-        "net.kyori:adventure-text-minimessage:4.13.0",
-        "net.kyori:adventure-text-logger-slf4j:4.13.0",
+        "net.kyori:adventure-api:4.14.0",
+        "net.kyori:adventure-key:4.14.0",
+        "net.kyori:adventure-nbt:4.14.0",
+        "net.kyori:adventure-text-serializer-plain:4.14.0",
+        "net.kyori:adventure-text-serializer-legacy:4.14.0",
+        "net.kyori:adventure-text-serializer-gson:4.14.0",
+        "net.kyori:adventure-text-minimessage:4.14.0",
+        "net.kyori:adventure-text-logger-slf4j:4.14.0",
         "net.kyori:event-api:5.0.0-SNAPSHOT",
     ).forEach { include(it) }
 }
