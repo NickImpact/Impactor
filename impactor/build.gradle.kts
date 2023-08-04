@@ -46,6 +46,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
     testImplementation("org.mockito:mockito-core:4.7.0")
+    testRuntimeOnly("org.apache.logging.log4j:log4j-core:2.19.0")
 }
 
 tasks.withType(Test::class) {

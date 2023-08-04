@@ -54,9 +54,7 @@ import net.impactdev.impactor.core.economy.EconomyModule;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.text.TextModule;
 import net.impactdev.impactor.core.translations.TranslationsModule;
-import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
 import net.impactdev.impactor.core.utility.future.Futures;
-import org.apache.commons.lang3.ThreadUtils;
 
 import java.io.InputStream;
 import java.nio.file.Path;

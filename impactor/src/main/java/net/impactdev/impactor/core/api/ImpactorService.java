@@ -27,6 +27,7 @@ package net.impactdev.impactor.core.api;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.events.ImpactorEvent;
+import net.impactdev.impactor.api.events.ImpactorEventBus;
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
@@ -42,7 +43,7 @@ public class ImpactorService implements Impactor {
     private final FactoryProvider factories = new FactoryProviderImplementation();
     private final BuilderProvider builders = new BuilderProviderImplementation();
     private final ServiceProvider services = new ServiceProviderImplementation();
-    private final EventBus<ImpactorEvent> bus = EventBus.create(ImpactorEvent.class);
+    private final EventBus<ImpactorEvent> bus = ImpactorEventBus.bus();
 
     @Override
     public Platform platform() {
