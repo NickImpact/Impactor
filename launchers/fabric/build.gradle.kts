@@ -44,7 +44,7 @@ dependencies {
         libs.cloudFabric
     ).forEach { include(it) }
 
-    modImplementation("eu.pb4:placeholder-api:2.0.0-pre.1+1.19.2")
+    modCompileOnly("eu.pb4:placeholder-api:2.0.0-pre.1+1.19.2")
     include("io.leangen.geantyref:geantyref:1.3.13")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
