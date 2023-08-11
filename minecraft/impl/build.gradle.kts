@@ -1,16 +1,12 @@
 plugins {
     id("impactor.base-conventions")
+    id("impactor.loom-conventions")
     id("impactor.publishing-conventions")
-    id("org.spongepowered.gradle.vanilla")
 }
 
 repositories {
     mavenCentral()
     maven("https://oss.sonatype.org/content/repositories/snapshots")
-}
-
-minecraft {
-    version("${rootProject.property("minecraft")}")
 }
 
 java {
@@ -20,8 +16,16 @@ java {
 }
 
 dependencies {
-    api(project(":minecraft:api"))
+    api(project(":api:scoreboard"))
     api(project(":impactor"))
+    api(project(":minecraft:api"))
+
+    implementation("org.spongepowered:mixin:0.8.5")
+    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
+
+    testImplementation("net.kyori:adventure-text-serializer-ansi:4.14.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
 }
 
 publishing {
@@ -42,4 +46,8 @@ publishing {
             }
         }
     }
+}
+
+tasks.withType(Test::class) {
+    useJUnitPlatform()
 }

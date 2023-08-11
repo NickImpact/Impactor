@@ -113,7 +113,7 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
         );
     }
 
-    protected abstract Optional<ServerPlayer> asMinecraftPlayer();
+    public abstract Optional<ServerPlayer> asMinecraftPlayer();
 
     private Optional<GameProfile> profile() {
         GameProfileCache cache = ((GamePlatform) Impactor.instance().platform()).server().getProfileCache();
