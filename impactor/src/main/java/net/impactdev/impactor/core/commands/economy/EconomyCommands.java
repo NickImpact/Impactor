@@ -44,6 +44,7 @@ import net.impactdev.impactor.api.economy.transactions.EconomyTransferTransactio
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
+import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.impactdev.impactor.api.utility.Context;
 import net.impactdev.impactor.core.economy.EconomyConfig;
 import net.impactdev.impactor.core.economy.ImpactorEconomyService;
@@ -211,9 +212,17 @@ public final class EconomyCommands {
 
         Context context = Context.empty();
         context.append(Currency.class, c);
-        if(target == focus) {
+        if(target.equals(focus)) {
             ImpactorTranslations.ECONOMY_CANT_PAY_SELF.send(source, context);
             return;
+        }
+
+        if(from != null) {
+            PermissionsService permissions = Impactor.instance().services().provide(PermissionsService.class);
+            if(!permissions.hasPermission(source.source(), "impactor.commands.economy.pay.other")) {
+                ImpactorTranslations.NO_PERMISSION.send(source, context);
+                return;
+            }
         }
 
         if(c.transferable() == TriState.FALSE) {
@@ -247,10 +256,12 @@ public final class EconomyCommands {
         }
 
         ImpactorTranslations.ECONOMY_TRANSFER.send(source, context);
+        if(!target.equals(focus)) {
+            context.append(PlatformSource.class, source.source());
+            context.append(BigDecimal.class, total);
 
-        context.append(PlatformSource.class, source.source());
-        context.append(BigDecimal.class, total);
-        ImpactorTranslations.ECONOMY_RECEIVE_PAYMENT.send(target, context);
+            ImpactorTranslations.ECONOMY_RECEIVE_PAYMENT.send(target, context);
+        }
     }
 
     @ProxiedBy("baltop")
