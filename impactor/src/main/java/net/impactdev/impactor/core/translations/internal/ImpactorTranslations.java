@@ -58,6 +58,9 @@ public interface ImpactorTranslations {
 
     LoadingMap<String, TranslationProvider<?>> REGISTERED = LoadingMap.of(key -> TranslationProvider.create(MANAGER, key));
 
+    // Generic
+    TranslationProvider<Component> NO_PERMISSION = create("permissions.lacking");
+
     // Economy
     TranslationProvider<Component> ECONOMY_BALANCE = create("economy.account.balance");
     TranslationProvider<Component> ECONOMY_TRANSFER = create("economy.transactions.transfer.successful");
