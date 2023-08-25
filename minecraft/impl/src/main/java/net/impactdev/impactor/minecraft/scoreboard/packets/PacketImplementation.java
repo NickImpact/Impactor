@@ -6,12 +6,11 @@ import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
 import net.impactdev.impactor.scoreboards.Scoreboard;
 import net.impactdev.impactor.scoreboards.ScoreboardImplementation;
 import net.impactdev.impactor.scoreboards.lines.ScoreboardLine;
-import net.impactdev.impactor.scoreboards.objectives.ScoreboardObjective;
+import net.impactdev.impactor.scoreboards.objectives.Objective;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket;
 import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket;
 import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket;
-import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Team;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
@@ -19,7 +18,7 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 public final class PacketImplementation implements ScoreboardImplementation {
 
     @Override
-    public void objective(PlatformPlayer viewer, ScoreboardObjective objective) {
+    public void objective(PlatformPlayer viewer, Objective objective) {
         ClientboundSetObjectivePacket packet = new ClientboundSetObjectivePacket(
                 this.createObjective(viewer, objective),
                 0
@@ -31,9 +30,10 @@ public final class PacketImplementation implements ScoreboardImplementation {
     }
 
     @Override
+    @SuppressWarnings("DataFlowIssue")
     public void line(PlatformPlayer viewer, ScoreboardLine line) {
         PlayerTeam team = new PlayerTeam(null, viewer.uuid().toString());
-        team.setDisplayName(AdventureTranslator.toNative(line.text()));
+        team.setDisplayName(AdventureTranslator.toNative(line.resolver().resolve(line)));
         team.setColor(ChatFormatting.WHITE);
 
         team.setNameTagVisibility(Team.Visibility.ALWAYS);
@@ -49,7 +49,7 @@ public final class PacketImplementation implements ScoreboardImplementation {
     @Override
     public void show(PlatformPlayer viewer, Scoreboard scoreboard) {
         ((ImpactorPlatformPlayer) viewer).asMinecraftPlayer().ifPresent(player -> {
-            Objective objective = this.createObjective(viewer, scoreboard.objective());
+            net.minecraft.world.scores.Objective objective = this.createObjective(viewer, scoreboard.objective());
             ClientboundSetObjectivePacket create = new ClientboundSetObjectivePacket(
                     objective,
                     0
@@ -68,7 +68,7 @@ public final class PacketImplementation implements ScoreboardImplementation {
     @Override
     public void hide(PlatformPlayer viewer, Scoreboard scoreboard) {
         ((ImpactorPlatformPlayer) viewer).asMinecraftPlayer().ifPresent(player -> {
-            Objective objective = this.createObjective(viewer, scoreboard.objective());
+            net.minecraft.world.scores.Objective objective = this.createObjective(viewer, scoreboard.objective());
             ClientboundSetObjectivePacket remove = new ClientboundSetObjectivePacket(objective, 1);
 
             player.connection.send(remove);
@@ -81,12 +81,12 @@ public final class PacketImplementation implements ScoreboardImplementation {
     }
 
     @SuppressWarnings("DataFlowIssue")
-    private Objective createObjective(PlatformPlayer viewer, ScoreboardObjective objective) {
-        return new Objective(
+    private net.minecraft.world.scores.Objective createObjective(PlatformPlayer viewer, Objective objective) {
+        return new net.minecraft.world.scores.Objective(
                 null,
                 viewer.uuid().toString(),
                 ObjectiveCriteria.DUMMY,
-                AdventureTranslator.toNative(objective.text().asComponent()),
+                AdventureTranslator.toNative(objective.resolver().resolve(objective)),
                 ObjectiveCriteria.RenderType.INTEGER
         );
     }
