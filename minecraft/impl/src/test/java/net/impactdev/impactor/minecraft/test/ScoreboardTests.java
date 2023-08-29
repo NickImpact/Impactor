@@ -1,6 +1,5 @@
 package net.impactdev.impactor.minecraft.test;
 
-import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.scoreboards.Scoreboard;
 import net.impactdev.impactor.scoreboards.ScoreboardImplementation;
 import net.impactdev.impactor.api.text.transforming.transformers.FadeTransformer;
@@ -21,12 +20,13 @@ public final class ScoreboardTests {
                 .build();
 
         Objective objective = Objective.scheduled(
-                test::asComponent,
-                builder -> builder.interval(20, TimeUnit.MILLISECONDS).async().build()
+                builder -> builder.text(test::asComponent)
+                        .interval(20, TimeUnit.MILLISECONDS)
+                        .async()
+                        .build()
         );
 
         Scoreboard scoreboard = Scoreboard.builder()
-                .processor(TextProcessor.mini())
                 .implementation(ScoreboardImplementation.packets())
                 .objective(objective)
                 .build();

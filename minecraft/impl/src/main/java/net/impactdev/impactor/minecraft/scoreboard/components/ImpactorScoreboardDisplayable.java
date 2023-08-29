@@ -4,10 +4,12 @@ import net.impactdev.impactor.scoreboards.ScoreboardDisplayable;
 import net.impactdev.impactor.scoreboards.updaters.ComponentResolver;
 import net.kyori.adventure.text.Component;
 
+import java.util.function.Supplier;
+
 abstract class ImpactorScoreboardDisplayable implements ScoreboardDisplayable {
 
     @Override
-    public Component text() {
+    public Supplier<Component> provider() {
         return null;
     }
 

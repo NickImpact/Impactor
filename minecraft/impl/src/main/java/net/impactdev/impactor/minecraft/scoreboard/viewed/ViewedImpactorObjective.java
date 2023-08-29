@@ -6,18 +6,24 @@ import net.kyori.adventure.text.Component;
 
 public class ViewedImpactorObjective implements ViewedObjective {
 
+    private final Objective delegate;
+
+    private ViewedImpactorObjective(Objective delegate) {
+        this.delegate = delegate;
+    }
+
     public static ViewedImpactorObjective create(Objective objective) {
-        return new ViewedImpactorObjective();
+        return new ViewedImpactorObjective(objective);
     }
 
     @Override
     public Objective delegate() {
-        return null;
+        return this.delegate;
     }
 
     @Override
     public Component text() {
-        return null;
+        return this.delegate.resolver().resolve(this.delegate);
     }
 
 }

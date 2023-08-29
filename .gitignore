@@ -29,3 +29,5 @@ run
 
 */build
 
+/impactor/config/impactor/translations/*.conf
+/impactor/config/impactor/*.conf

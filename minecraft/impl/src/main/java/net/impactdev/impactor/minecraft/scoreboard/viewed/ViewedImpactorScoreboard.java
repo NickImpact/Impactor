@@ -5,6 +5,7 @@ import net.impactdev.impactor.scoreboards.Scoreboard;
 import net.impactdev.impactor.scoreboards.viewed.ViewedLine;
 import net.impactdev.impactor.scoreboards.viewed.ViewedObjective;
 import net.impactdev.impactor.scoreboards.viewed.ViewedScoreboard;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,6 +64,15 @@ public final class ViewedImpactorScoreboard implements ViewedScoreboard {
         this.hide();
         this.objective.delegate().resolver().shutdown();
         this.lines.forEach(line -> line.delegate().resolver().shutdown());
+    }
+
+    public static final class ViewedScoreboardFactory implements Factory {
+
+        @Override
+        public ViewedScoreboard create(@NotNull Scoreboard parent, @NotNull PlatformPlayer viewer) {
+            return new ViewedImpactorScoreboard(parent, viewer);
+        }
+
     }
 
 }

@@ -6,17 +6,24 @@ import net.kyori.adventure.text.Component;
 
 public class ViewedImpactorScoreboardLine implements ViewedLine {
 
+    private final ScoreboardLine delegate;
+
+    private ViewedImpactorScoreboardLine(ScoreboardLine delegate) {
+        this.delegate = delegate;
+    }
+
     public static ViewedImpactorScoreboardLine create(ScoreboardLine line) {
-        return new ViewedImpactorScoreboardLine();
+        return new ViewedImpactorScoreboardLine(line);
     }
 
     @Override
     public ScoreboardLine delegate() {
-        return null;
+        return this.delegate;
     }
 
     @Override
     public Component text() {
-        return null;
+        return this.delegate.resolver().resolve(this.delegate);
     }
+
 }
