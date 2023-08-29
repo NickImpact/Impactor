@@ -32,7 +32,7 @@ versions:
   mockk: 1.12.1
 
   # Cloud
-  cloud: 1.7.1
+  cloud: 1.9.0-SNAPSHOT
 
 dependencies:
 
