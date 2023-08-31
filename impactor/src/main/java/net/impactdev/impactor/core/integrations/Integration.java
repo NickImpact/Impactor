@@ -25,7 +25,6 @@
 
 package net.impactdev.impactor.core.integrations;
 
-
 import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.logging.PluginLogger;
 import net.kyori.event.EventBus;

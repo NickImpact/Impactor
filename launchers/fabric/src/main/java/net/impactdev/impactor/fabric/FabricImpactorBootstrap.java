@@ -65,6 +65,7 @@ public final class FabricImpactorBootstrap extends ImpactorBootstrapper implemen
     private void onServerStarting(MinecraftServer server) {
         this.server = server;
         this.setup();
+        this.plugin.starting();
     }
 
     public Optional<MinecraftServer> server() {

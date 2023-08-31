@@ -33,6 +33,8 @@ import io.github.classgraph.ScanResult;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.PlatformInfo;
 import net.impactdev.impactor.api.scheduler.AbstractJavaScheduler;
+import net.impactdev.impactor.api.scheduler.v2.Scheduler;
+import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.core.commands.ImpactorCommandRegistry;
 import net.impactdev.impactor.core.configuration.ConfigModule;
 import net.impactdev.impactor.core.configuration.ImpactorConfig;
@@ -52,6 +54,8 @@ import net.impactdev.impactor.core.permissions.LuckPermsPermissionsService;
 import net.impactdev.impactor.core.permissions.NoOpPermissionsService;
 import net.impactdev.impactor.core.economy.EconomyModule;
 import net.impactdev.impactor.core.modules.ImpactorModule;
+import net.impactdev.impactor.core.scheduler.AsyncScheduler;
+import net.impactdev.impactor.core.scheduler.SchedulerModule;
 import net.impactdev.impactor.core.text.TextModule;
 import net.impactdev.impactor.core.translations.TranslationsModule;
 import net.impactdev.impactor.core.utility.future.Futures;
@@ -119,6 +123,7 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         Set<Class<? extends ImpactorModule>> modules = new LinkedHashSet<>(Lists.newArrayList(
                 ConfigModule.class,
                 EconomyModule.class,
+                SchedulerModule.class,
                 TextModule.class,
                 TranslationsModule.class
         ));
@@ -152,6 +157,8 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         registry.registerAllCommands();
         this.registerCommandMappings(registry);
 
+        this.setupSchedulers();
+
         this.logger().info("Setting up plugin integrations...");
         this.integrate();
     }
@@ -173,28 +180,30 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
     }
 
     @Override
-    public void starting() {
-
-    }
+    public void starting() {}
 
     @Override
-    public void started() {
-
-    }
+    public void started() {}
 
     @Override
     public void shutdown() {
-        this.logger().info("Shutting down Impactor scheduler");
+        this.logger().info("Shutting down schedulers...");
         AbstractJavaScheduler scheduler = (AbstractJavaScheduler) Impactor.instance().scheduler();
         scheduler.shutdownExecutor();
         scheduler.shutdownScheduler();
 
+        Schedulers.shutdown(this.logger());
         Futures.shutdown();
 
-        this.logger().info("Scheduler shutdown successfully!");
+        this.logger().info("Schedulers shutdown successfully!");
     }
 
     protected abstract Set<Class<? extends ImpactorModule>> modules();
+
+    protected void setupSchedulers() {
+        this.logger().info("Setting up schedulers...");
+        Schedulers.register(Scheduler.ASYNCHRONOUS, new AsyncScheduler());
+    }
 
     /**
      * For 1.16.5, this code works perfectly in a non-forge environment. However, with forge, there's
