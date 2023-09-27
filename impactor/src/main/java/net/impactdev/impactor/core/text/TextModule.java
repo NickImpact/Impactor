@@ -33,16 +33,13 @@ import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.api.text.pagination.PaginatedText;
 import net.impactdev.impactor.api.text.placeholders.PlaceholderService;
-import net.impactdev.impactor.api.text.transforming.TransformableText;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.text.pagination.ImpactorPaginatedText;
 import net.impactdev.impactor.core.text.pagination.PaginationService;
 import net.impactdev.impactor.core.text.placeholders.ImpactorPlaceholderService;
 import net.impactdev.impactor.core.text.placeholders.ImpactorRegisterPlaceholdersEvent;
-import net.impactdev.impactor.core.text.transforming.TransformableTextImpl;
 import net.impactdev.impactor.core.utility.events.EventPublisher;
-import net.kyori.event.PostResult;
 
 public final class TextModule implements ImpactorModule {
     @Override
@@ -59,7 +56,6 @@ public final class TextModule implements ImpactorModule {
     @Override
     public void builders(BuilderProvider provider) {
         provider.register(PaginatedText.PaginatedTextBuilder.class, ImpactorPaginatedText.ImpactorPaginationBuilder::new);
-        provider.register(TransformableText.TransformableTextBuilder.class, TransformableTextImpl.TransformableTextImplBuilder::new);
     }
 
     @Override

@@ -25,36 +25,37 @@
 
 package net.impactdev.impactor.minecraft.test;
 
-import net.impactdev.impactor.scoreboards.Scoreboard;
-import net.impactdev.impactor.scoreboards.ScoreboardImplementation;
-import net.impactdev.impactor.api.text.transforming.transformers.FadeTransformer;
-import net.impactdev.impactor.scoreboards.objectives.Objective;
-import net.impactdev.impactor.api.text.transforming.TransformableText;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.sources.PlatformSource;
+import net.impactdev.impactor.api.scheduler.Ticks;
+import net.impactdev.impactor.api.scheduler.v2.Scheduler;
+import net.impactdev.impactor.api.scheduler.v2.Schedulers;
+import net.impactdev.impactor.api.scoreboards.Scoreboard;
+import net.impactdev.impactor.api.scoreboards.ScoreboardImplementation;
+import net.impactdev.impactor.api.text.transformers.FadeTransformer;
+import net.impactdev.impactor.api.scoreboards.objectives.Objective;
+import net.impactdev.impactor.api.scoreboards.relative.PlayerScoreboard;
 import net.kyori.adventure.text.Component;
 import org.junit.jupiter.api.Test;
-
-import java.util.concurrent.TimeUnit;
 
 public final class ScoreboardTests {
 
     @Test
     public void create() {
-//        TransformableText test = TransformableText.builder()
-//                .supplier(() -> Component.text("Impactor Server Diagnostics"))
-//                .transformer(FadeTransformer.create(90, 3, 0))
-//                .build();
-//
-//        Objective objective = Objective.scheduled(
-//                builder -> builder.text(test::asComponent)
-//                        .interval(20, TimeUnit.MILLISECONDS)
-//                        .async()
-//                        .build()
-//        );
-//
-//        Scoreboard scoreboard = Scoreboard.builder()
-//                .implementation(ScoreboardImplementation.packets())
-//                .objective(objective)
-//                .build();
+        Objective objective = Objective.scheduled(builder -> builder
+                .provider((displayable, viewer) -> Component.text("Impactor Server Diagnostics"))
+                .transformer(FadeTransformer.create(90, 3, 0))
+                .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
+                .task((scheduler, displayable) -> scheduler.repeating(displayable::update, Ticks.single()))
+                .build()
+        );
+
+        Scoreboard scoreboard = Scoreboard.builder()
+                .implementation(ScoreboardImplementation.packets())
+                .objective(objective)
+                .build();
+
+        PlayerScoreboard viewed = scoreboard.createFor(PlatformPlayer.getOrCreate(PlatformSource.SERVER_UUID));
     }
 
 }

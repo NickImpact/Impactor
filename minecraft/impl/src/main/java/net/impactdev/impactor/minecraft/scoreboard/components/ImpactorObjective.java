@@ -25,10 +25,14 @@
 
 package net.impactdev.impactor.minecraft.scoreboard.components;
 
-import net.impactdev.impactor.scoreboards.objectives.Objective;
-import net.impactdev.impactor.scoreboards.updaters.ComponentResolver;
-import net.kyori.adventure.text.Component;
+import net.impactdev.impactor.api.scoreboards.objectives.Objective;
+import net.impactdev.impactor.api.scoreboards.updaters.ComponentProvider;
+import net.impactdev.impactor.api.scoreboards.updaters.ResolverConfiguration;
 
-import java.util.function.Supplier;
+public final class ImpactorObjective extends ImpactorScoreboardDisplayable implements Objective {
 
-public final class ImpactorObjective extends ImpactorScoreboardDisplayable implements Objective {}
+    public ImpactorObjective(ComponentProvider provider, ResolverConfiguration resolver) {
+        super(provider, resolver);
+    }
+
+}

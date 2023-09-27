@@ -29,6 +29,7 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.scheduler.SchedulerTask;
 import net.impactdev.impactor.api.scheduler.Ticks;
 import net.impactdev.impactor.api.scheduler.v2.Scheduler;
+import net.impactdev.impactor.api.scheduler.v2.Task;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.kyori.adventure.key.Key;
@@ -44,6 +45,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -84,8 +86,8 @@ public class AsyncScheduler implements Scheduler {
     }
 
     @Override
-    public SchedulerTask delayed(@NotNull Runnable action, @NotNull Ticks ticks) {
-        return this.delayed(action, ticks.ticks() / 20, TimeUnit.SECONDS);
+    public SchedulerTask delayed(@NotNull Consumer<Task> action, @NotNull Ticks ticks) {
+        return this.delayed(() -> action.accept(null), ticks.ticks() / 20, TimeUnit.SECONDS);
     }
 
     @Override

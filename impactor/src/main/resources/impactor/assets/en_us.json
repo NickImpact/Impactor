@@ -23,5 +23,6 @@
     "translations.info.contributor.name": "<yellow>* <impactor:language:contributor>",
     "translations.info.invalid-locale": "<red>Invalid locale specified!",
 
-    "platform.info.notify-generated": "<gray>Generated platform information, see the dumps directory!"
+    "platform.info.notify-generated": "<gray>Generated platform information, see the dumps directory!",
+    "click-callback.invalid": "<red>No callback with that ID could be found! You may have used it too many times or it has expired..."
 }

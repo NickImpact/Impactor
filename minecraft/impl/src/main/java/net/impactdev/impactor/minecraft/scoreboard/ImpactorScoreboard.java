@@ -25,10 +25,10 @@
 
 package net.impactdev.impactor.minecraft.scoreboard;
 
-import net.impactdev.impactor.scoreboards.Scoreboard;
-import net.impactdev.impactor.scoreboards.ScoreboardImplementation;
-import net.impactdev.impactor.scoreboards.lines.ScoreboardLine;
-import net.impactdev.impactor.scoreboards.objectives.Objective;
+import net.impactdev.impactor.api.scoreboards.Scoreboard;
+import net.impactdev.impactor.api.scoreboards.ScoreboardImplementation;
+import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -23,15 +23,17 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.scoreboard.packets;
+package net.impactdev.impactor.minecraft.scoreboard.implementations;
 
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.scoreboards.relative.RelativeScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.relative.RelativeObjective;
+import net.impactdev.impactor.api.scoreboards.relative.PlayerScoreboard;
 import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
 import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
-import net.impactdev.impactor.scoreboards.Scoreboard;
-import net.impactdev.impactor.scoreboards.ScoreboardImplementation;
-import net.impactdev.impactor.scoreboards.lines.ScoreboardLine;
-import net.impactdev.impactor.scoreboards.objectives.Objective;
+import net.impactdev.impactor.api.scoreboards.ScoreboardImplementation;
+import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket;
 import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket;
@@ -43,7 +45,7 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 public final class PacketImplementation implements ScoreboardImplementation {
 
     @Override
-    public void objective(PlatformPlayer viewer, Objective objective) {
+    public void objective(RelativeObjective objective) {
         ClientboundSetObjectivePacket packet = new ClientboundSetObjectivePacket(
                 this.createObjective(viewer, objective),
                 0
@@ -56,7 +58,7 @@ public final class PacketImplementation implements ScoreboardImplementation {
 
     @Override
     @SuppressWarnings("DataFlowIssue")
-    public void line(PlatformPlayer viewer, ScoreboardLine line) {
+    public void line(RelativeScoreboardLine line) {
         PlayerTeam team = new PlayerTeam(null, viewer.uuid().toString());
         team.setDisplayName(AdventureTranslator.toNative(line.resolver().resolve()));
         team.setColor(ChatFormatting.WHITE);
@@ -72,7 +74,7 @@ public final class PacketImplementation implements ScoreboardImplementation {
     }
 
     @Override
-    public void show(PlatformPlayer viewer, Scoreboard scoreboard) {
+    public void show(PlayerScoreboard scoreboard) {
         ((ImpactorPlatformPlayer) viewer).asMinecraftPlayer().ifPresent(player -> {
             net.minecraft.world.scores.Objective objective = this.createObjective(viewer, scoreboard.objective());
             ClientboundSetObjectivePacket create = new ClientboundSetObjectivePacket(
@@ -91,7 +93,7 @@ public final class PacketImplementation implements ScoreboardImplementation {
     }
 
     @Override
-    public void hide(PlatformPlayer viewer, Scoreboard scoreboard) {
+    public void hide(PlayerScoreboard scoreboard) {
         ((ImpactorPlatformPlayer) viewer).asMinecraftPlayer().ifPresent(player -> {
             net.minecraft.world.scores.Objective objective = this.createObjective(viewer, scoreboard.objective());
             ClientboundSetObjectivePacket remove = new ClientboundSetObjectivePacket(objective, 1);

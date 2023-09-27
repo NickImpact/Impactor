@@ -19,6 +19,7 @@ plugins {
 
 rootProject.name = "Impactor"
 
+//include("api:animations")
 include("api:core")
 include("api:config")
 include("api:economy")

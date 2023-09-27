@@ -25,11 +25,12 @@
 
 package net.impactdev.impactor.minecraft.scoreboard.viewed;
 
-import net.impactdev.impactor.scoreboards.objectives.Objective;
-import net.impactdev.impactor.scoreboards.viewed.ViewedObjective;
+import net.impactdev.impactor.api.scoreboards.objectives.Objective;
+import net.impactdev.impactor.api.scoreboards.updaters.ComponentResolver;
+import net.impactdev.impactor.api.scoreboards.relative.RelativeObjective;
 import net.kyori.adventure.text.Component;
 
-public class ViewedImpactorObjective implements ViewedObjective {
+public class ViewedImpactorObjective implements RelativeObjective {
 
     private final Objective delegate;
 
@@ -47,9 +48,18 @@ public class ViewedImpactorObjective implements ViewedObjective {
     }
 
     @Override
+    public ComponentResolver resolver() {
+        return null;
+    }
+
+    @Override
     public Component text() {
 //        return this.delegate.resolver().resolve(this.delegate);
         return Component.empty();
     }
 
+    @Override
+    public void update() {
+
+    }
 }

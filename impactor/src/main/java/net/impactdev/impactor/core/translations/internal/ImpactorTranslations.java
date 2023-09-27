@@ -87,6 +87,8 @@ public interface ImpactorTranslations {
 
     TranslationProvider<Component> PLATFORM_INFO_GENERATED = create("platform.info.notify-generated");
 
+    TranslationProvider<Component> INVALID_CLICK_CALLBACK = create("click-callback.invalid");
+
     @SuppressWarnings("unchecked")
     static <T> TranslationProvider<T> create(final @NotNull String key) {
         return (TranslationProvider<T>) REGISTERED.get(key);

@@ -27,7 +27,7 @@ package net.impactdev.impactor.test.text;
 
 import net.impactdev.impactor.api.text.components.ProgressBarComponent;
 import net.impactdev.impactor.api.text.transforming.TransformableText;
-import net.impactdev.impactor.api.text.transforming.transformers.FadeTransformer;
+import net.impactdev.impactor.api.text.transformers.FadeTransformer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;

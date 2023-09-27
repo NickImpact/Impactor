@@ -26,22 +26,22 @@
 package net.impactdev.impactor.minecraft.scoreboard.viewed;
 
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.scoreboards.Scoreboard;
-import net.impactdev.impactor.scoreboards.viewed.ViewedLine;
-import net.impactdev.impactor.scoreboards.viewed.ViewedObjective;
-import net.impactdev.impactor.scoreboards.viewed.ViewedScoreboard;
+import net.impactdev.impactor.api.scoreboards.Scoreboard;
+import net.impactdev.impactor.api.scoreboards.relative.RelativeScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.relative.RelativeObjective;
+import net.impactdev.impactor.api.scoreboards.relative.PlayerScoreboard;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class ViewedImpactorScoreboard implements ViewedScoreboard {
+public final class ViewedImpactorScoreboard implements PlayerScoreboard {
 
     private final PlatformPlayer viewer;
 
     private final Scoreboard delegate;
-    private final ViewedObjective objective;
-    private final List<ViewedLine> lines;
+    private final RelativeObjective objective;
+    private final List<RelativeScoreboardLine> lines;
 
     public ViewedImpactorScoreboard(Scoreboard delegate, PlatformPlayer viewer) {
         this.viewer = viewer;
@@ -55,7 +55,7 @@ public final class ViewedImpactorScoreboard implements ViewedScoreboard {
     }
 
     @Override
-    public Scoreboard delegate() {
+    public Scoreboard configuration() {
         return this.delegate;
     }
 
@@ -65,36 +65,36 @@ public final class ViewedImpactorScoreboard implements ViewedScoreboard {
     }
 
     @Override
-    public ViewedObjective objective() {
+    public RelativeObjective objective() {
         return this.objective;
     }
 
     @Override
-    public List<ViewedLine> lines() {
+    public List<RelativeScoreboardLine> lines() {
         return this.lines;
     }
 
     @Override
     public void open() {
-        this.delegate.implementation().show(this.viewer(), this.delegate());
+        this.delegate.implementation().show(this.viewer(), this.configuration());
     }
 
     @Override
     public void hide() {
-        this.delegate.implementation().hide(this.viewer(), this.delegate());
+        this.delegate.implementation().hide(this.viewer(), this.configuration());
     }
 
     @Override
     public void destroy() {
         this.hide();
-        this.objective.delegate().resolver().shutdown();
-        this.lines.forEach(line -> line.delegate().resolver().shutdown());
+        this.objective.resolver().shutdown();
+        this.lines.forEach(line -> line.resolver().shutdown());
     }
 
     public static final class ViewedScoreboardFactory implements Factory {
 
         @Override
-        public ViewedScoreboard create(@NotNull Scoreboard parent, @NotNull PlatformPlayer viewer) {
+        public PlayerScoreboard create(@NotNull Scoreboard parent, @NotNull PlatformPlayer viewer) {
             return new ViewedImpactorScoreboard(parent, viewer);
         }
 

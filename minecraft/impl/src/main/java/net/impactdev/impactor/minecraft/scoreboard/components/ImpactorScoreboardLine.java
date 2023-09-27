@@ -25,11 +25,17 @@
 
 package net.impactdev.impactor.minecraft.scoreboard.components;
 
-import net.impactdev.impactor.scoreboards.lines.ScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.updaters.ComponentProvider;
+import net.impactdev.impactor.api.scoreboards.updaters.ResolverConfiguration;
 
 public final class ImpactorScoreboardLine extends ImpactorScoreboardDisplayable implements ScoreboardLine {
 
     private int score;
+
+    public ImpactorScoreboardLine(ComponentProvider provider, ResolverConfiguration resolver) {
+        super(provider, resolver);
+    }
 
     @Override
     public int score() {
