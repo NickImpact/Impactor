@@ -37,14 +37,14 @@ dependencies {
 
     include("io.leangen.geantyref:geantyref:1.3.13")
 
-    modImplementation("net.impactdev.impactor.commands:forge:5.1.1+1.20.1-SNAPSHOT") {
-        exclude("net.impactdev.impactor.api", "config")
-        exclude("net.impactdev.impactor.api", "core")
-        exclude("net.impactdev.impactor.api", "items")
-        exclude("net.impactdev.impactor.api", "players")
-        exclude("net.impactdev.impactor.api", "plugins")
-        exclude("net.impactdev.impactor.api", "storage")
-    }
+//    modImplementation("net.impactdev.impactor.commands:forge:5.1.1+1.20.1-SNAPSHOT") {
+//        exclude("net.impactdev.impactor.api", "config")
+//        exclude("net.impactdev.impactor.api", "core")
+//        exclude("net.impactdev.impactor.api", "items")
+//        exclude("net.impactdev.impactor.api", "players")
+//        exclude("net.impactdev.impactor.api", "plugins")
+//        exclude("net.impactdev.impactor.api", "storage")
+//    }
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")

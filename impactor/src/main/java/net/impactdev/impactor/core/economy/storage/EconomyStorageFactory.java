@@ -30,13 +30,13 @@ import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.api.storage.connection.configurate.loaders.HoconLoader;
 import net.impactdev.impactor.api.storage.connection.configurate.loaders.JsonLoader;
 import net.impactdev.impactor.api.storage.connection.configurate.loaders.YamlLoader;
-import net.impactdev.impactor.core.economy.storage.implementations.ConfigurateProvider;
+import net.impactdev.impactor.core.economy.storage.implementations.EconomyConfigurateProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-public final class StorageFactory {
+public final class EconomyStorageFactory {
 
     public static EconomyStorage instance(ImpactorPlugin plugin, @Nullable StorageType type, @NotNull StorageType fallback) {
         StorageType use = Optional.ofNullable(type).orElse(fallback);
@@ -47,11 +47,11 @@ public final class StorageFactory {
     private static EconomyStorageImplementation createNewImplementation(StorageType type) {
         switch (type) {
             case JSON:
-                return new ConfigurateProvider(new JsonLoader());
+                return new EconomyConfigurateProvider(new JsonLoader());
             case YAML:
-                return new ConfigurateProvider(new YamlLoader());
+                return new EconomyConfigurateProvider(new YamlLoader());
             case HOCON:
-                return new ConfigurateProvider(new HoconLoader());
+                return new EconomyConfigurateProvider(new HoconLoader());
         }
 
         throw new IllegalArgumentException("Unsupported storage type: " + type);

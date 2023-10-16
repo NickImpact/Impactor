@@ -12,6 +12,7 @@ dependencies {
     api(project(":api:core"))
     api(project(":api:config"))
     api(project(":api:economy"))
+    api(project(":api:mail"))
     api(project(":api:players"))
     api(project(":api:plugins"))
     api(project(":api:storage"))

@@ -35,7 +35,7 @@ import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.economy.currency.ImpactorCurrencyProvider;
 import net.impactdev.impactor.core.economy.storage.EconomyStorage;
-import net.impactdev.impactor.core.economy.storage.StorageFactory;
+import net.impactdev.impactor.core.economy.storage.EconomyStorageFactory;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 
 import java.util.List;
@@ -61,7 +61,7 @@ public final class ImpactorEconomyService implements EconomyService {
         }
 
         this.provider = new ImpactorCurrencyProvider(currencies);
-        this.storage = StorageFactory.instance(BaseImpactorPlugin.instance(), this.config.get(EconomyConfig.STORAGE_TYPE), StorageType.JSON);
+        this.storage = EconomyStorageFactory.instance(BaseImpactorPlugin.instance(), this.config.get(EconomyConfig.STORAGE_TYPE), StorageType.JSON);
 
         try {
             this.storage.init();
