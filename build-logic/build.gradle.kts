@@ -16,5 +16,6 @@ dependencies {
     implementation(libs.blossom)
     implementation(libs.shadow)
     implementation(libs.loom)
+    implementation(libs.minotaur)
     implementation(libs.architecturyPlugin)
 }

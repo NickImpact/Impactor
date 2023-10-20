@@ -102,15 +102,10 @@ publishing {
     }
 }
 
-fun writeVersion(): String {
-    val plugin = rootProject.property("plugin")
-    val minecraft = rootProject.property("minecraft")
-    val snapshot = rootProject.property("snapshot") == "true"
-
-    var version = "$plugin+$minecraft"
-    if(snapshot) {
-        version = "$version-SNAPSHOT"
+modrinth {
+    loaders.set(listOf("fabric"))
+    dependencies {
+        required.project("fabric-api")
+        optional.project("placeholder-api")
     }
-
-    return version
 }

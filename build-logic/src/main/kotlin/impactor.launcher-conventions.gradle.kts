@@ -2,6 +2,7 @@ import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
     id("impactor.loom-conventions")
+    id("com.modrinth.minotaur")
 }
 
 tasks {
@@ -27,16 +28,16 @@ tasks.withType<GenerateModuleMetadata> {
     dependsOn(tasks["remapProductionJar"])
 }
 
-fun writeVersion(): String
-{
-    val plugin = rootProject.property("plugin")
-    val minecraft = rootProject.property("minecraft")
+modrinth {
+    token.set(System.getenv("MODRINTH_GRADLE_TOKEN"))
+    projectId.set("Impactor")
+    versionNumber.set(writeVersion())
+
     val snapshot = rootProject.property("snapshot") == "true"
+    versionType.set(if(snapshot) "beta" else "release")
+    uploadFile.set(tasks.remapJar)
 
-    var version = "$plugin+$minecraft"
-    if(snapshot) {
-        version = "$version-SNAPSHOT"
-    }
+    gameVersions.set(listOf(rootProject.property("minecraft").toString()))
 
-    return version
+    // TODO - Changelog integration
 }
