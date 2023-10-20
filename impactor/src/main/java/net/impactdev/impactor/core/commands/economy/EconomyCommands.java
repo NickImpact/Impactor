@@ -57,6 +57,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings({"DuplicatedCode", "unused"})
@@ -94,21 +95,22 @@ public final class EconomyCommands {
         Currency c = currency != null ? currency : service.currencies().primary();
         PlatformSource focus = target != null ? target : source.source();
 
-        Account account = service.account(c, focus.uuid()).join();
-        BigDecimal before = account.balanceAsync().join();
+        service.account(c, focus.uuid()).thenAccept(account -> {
+            BigDecimal before = account.balance();
 
-        EconomyTransaction transaction = account.withdrawAsync(new BigDecimal(amount)).join();
-        Context context = Context.empty();
-        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.WITHDRAW, before, account.balanceAsync().join(), transaction.result()));
-        context.append(Currency.class, c);
-        context.append(Account.class, account);
+            EconomyTransaction transaction = account.withdraw(new BigDecimal(amount));
+            Context context = Context.empty();
+            context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.WITHDRAW, before, account.balance(), transaction.result()));
+            context.append(Currency.class, c);
+            context.append(Account.class, account);
 
-        if(!transaction.successful()) {
-            ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
-            return;
-        }
+            if(!transaction.successful()) {
+                ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
+            } else {
+                ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
+            }
+        });
 
-        ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
     }
 
     @ProxiedBy("deposit")
@@ -124,20 +126,21 @@ public final class EconomyCommands {
         Currency c = currency != null ? currency : service.currencies().primary();
         PlatformSource focus = target != null ? target : source.source();
 
-        Account account = service.account(c, focus.uuid()).join();
-        BigDecimal before = account.balanceAsync().join();
+        service.account(c, focus.uuid()).thenAccept(account -> {
+            BigDecimal before = account.balance();
 
-        EconomyTransaction transaction = account.depositAsync(new BigDecimal(amount)).join();
-        Context context = Context.empty();
-        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.DEPOSIT, before, account.balanceAsync().join(), transaction.result()));
-        context.append(Currency.class, c);
-        context.append(Account.class, account);
+            EconomyTransaction transaction = account.deposit(new BigDecimal(amount));
+            Context context = Context.empty();
+            context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.DEPOSIT, before, account.balance(), transaction.result()));
+            context.append(Currency.class, c);
+            context.append(Account.class, account);
 
-        if(!transaction.successful()) {
-            ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
-            return;
-        }
-        ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
+            if(!transaction.successful()) {
+                ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
+            } else {
+                ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
+            }
+        });
     }
 
     @CommandMethod("economy|eco set <amount> [currency] [target]")
@@ -152,20 +155,22 @@ public final class EconomyCommands {
         Currency c = currency != null ? currency : service.currencies().primary();
         PlatformSource focus = target != null ? target : source.source();
 
-        Account account = service.account(c, focus.uuid()).join();
-        BigDecimal before = account.balanceAsync().join();
+        service.account(c, focus.uuid()).thenAccept(account -> {
+            BigDecimal before = account.balance();
 
-        EconomyTransaction transaction = account.setAsync(new BigDecimal(amount)).join();
-        Context context = Context.empty();
-        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.SET, before, account.balanceAsync().join(), transaction.result()));
-        context.append(Currency.class, c);
-        context.append(Account.class, account);
+            EconomyTransaction transaction = account.set(new BigDecimal(amount));
+            Context context = Context.empty();
+            context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.SET, before, account.balance(), transaction.result()));
+            context.append(Currency.class, c);
+            context.append(Account.class, account);
 
-        if(!transaction.successful()) {
-            ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
-            return;
-        }
-        ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
+            if(!transaction.successful()) {
+                ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
+            } else {
+                ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
+            }
+        });
+
     }
 
     @CommandMethod("economy|eco reset [currency] [target]")
@@ -179,21 +184,21 @@ public final class EconomyCommands {
         Currency c = currency != null ? currency : service.currencies().primary();
         PlatformSource focus = target != null ? target : source.source();
 
-        Account account = service.account(c, focus.uuid()).join();
-        BigDecimal before = account.balanceAsync().join();
+        service.account(c, focus.uuid()).thenAccept(account -> {
+            BigDecimal before = account.balance();
 
-        EconomyTransaction transaction = account.resetAsync().join();
-        Context context = Context.empty();
-        context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.RESET, before, account.balanceAsync().join(), transaction.result()));
-        context.append(Currency.class, c);
-        context.append(Account.class, account);
+            EconomyTransaction transaction = account.reset();
+            Context context = Context.empty();
+            context.append(TransactionContext.class, new TransactionContext(EconomyTransactionType.RESET, before, account.balance(), transaction.result()));
+            context.append(Currency.class, c);
+            context.append(Account.class, account);
 
-        if(!transaction.successful()) {
-            ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
-            return;
-        }
-
-        ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
+            if(!transaction.successful()) {
+                ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
+            } else {
+                ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
+            }
+        });
     }
 
     @ProxiedBy("pay")
@@ -236,32 +241,33 @@ public final class EconomyCommands {
             }
         }
 
-        Account sa = service.account(c, focus.uuid()).join();
-        Account ta = service.account(c, target.uuid()).join();
+        service.account(c, focus.uuid()).thenAccept(s -> {
+            Account to = service.account(c, target.uuid()).join();
 
-        BigDecimal sb = sa.balanceAsync().join();
-        BigDecimal tb = ta.balanceAsync().join();
-        BigDecimal total = new BigDecimal(amount);
+            BigDecimal sb = s.balance();
+            BigDecimal tb = to.balance();
+            BigDecimal total = new BigDecimal(amount);
 
-        EconomyTransferTransaction transaction = sa.transferAsync(ta, total).join();
-        context.append(TransferTransactionContext.class, new TransferTransactionContext(
-                new TransactionContext(EconomyTransactionType.WITHDRAW, sb, sa.balanceAsync().join(), transaction.result()),
-                new TransactionContext(EconomyTransactionType.DEPOSIT, tb, ta.balanceAsync().join(), transaction.result()),
-                transaction.result()
-        ));
+            EconomyTransferTransaction transaction = s.transfer(to, total);
+            context.append(TransferTransactionContext.class, new TransferTransactionContext(
+                    new TransactionContext(EconomyTransactionType.WITHDRAW, sb, s.balance(), transaction.result()),
+                    new TransactionContext(EconomyTransactionType.DEPOSIT, tb, to.balance(), transaction.result()),
+                    transaction.result()
+            ));
 
-        if(!transaction.successful()) {
-            ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
-            return;
-        }
+            if(!transaction.successful()) {
+                ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
+                return;
+            }
 
-        ImpactorTranslations.ECONOMY_TRANSFER.send(source, context);
-        if(!target.equals(focus)) {
-            context.append(PlatformSource.class, source.source());
-            context.append(BigDecimal.class, total);
+            ImpactorTranslations.ECONOMY_TRANSFER.send(source, context);
+            if(!target.equals(focus)) {
+                context.append(PlatformSource.class, source.source());
+                context.append(BigDecimal.class, total);
 
-            ImpactorTranslations.ECONOMY_RECEIVE_PAYMENT.send(target, context);
-        }
+                ImpactorTranslations.ECONOMY_RECEIVE_PAYMENT.send(target, context);
+            }
+        });
     }
 
     @ProxiedBy("baltop")
@@ -284,7 +290,7 @@ public final class EconomyCommands {
 
             AtomicInteger ranking = new AtomicInteger(1);
             accounts.stream()
-                    .sorted(Comparator.<Account, BigDecimal>comparing(account -> account.balanceAsync().join()).reversed())
+                    .sorted(Comparator.<Account, BigDecimal>comparing(Account::balance).reversed())
                     .filter(account -> !account.virtual() || nonPlayers)
                     .limit(max.get())
                     .forEach(account -> {

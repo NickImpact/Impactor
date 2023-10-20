@@ -81,7 +81,7 @@ public final class BaseTransactionComposer implements TransactionComposer {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull EconomyTransaction> send() {
+    public EconomyTransaction build() {
         Preconditions.checkNotNull(this.account, "account");
         Preconditions.checkNotNull(this.type, "type");
 
@@ -96,7 +96,7 @@ public final class BaseTransactionComposer implements TransactionComposer {
     @FunctionalInterface
     private interface Executor {
 
-        CompletableFuture<EconomyTransaction> transact(ImpactorAccount account, BaseTransactionComposer composer);
+        EconomyTransaction transact(ImpactorAccount account, BaseTransactionComposer composer);
 
     }
 
@@ -120,7 +120,7 @@ public final class BaseTransactionComposer implements TransactionComposer {
                     .orElseThrow(() -> new IllegalArgumentException("No valid executor registered"));
         }
 
-        public CompletableFuture<EconomyTransaction> transact(ImpactorAccount account, BaseTransactionComposer composer) {
+        public EconomyTransaction transact(ImpactorAccount account, BaseTransactionComposer composer) {
             return this.executor.transact(account, composer);
         }
     }

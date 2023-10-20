@@ -26,24 +26,22 @@
 package net.impactdev.impactor.fabric;
 
 import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import io.leangen.geantyref.TypeToken;
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.core.commands.ImpactorCommandRegistry;
 import net.impactdev.impactor.core.commands.parsers.CurrencyParser;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
-import net.impactdev.impactor.fabric.commands.BrigadierMapper;
 import net.impactdev.impactor.fabric.commands.FabricCommandManager;
 import net.impactdev.impactor.fabric.commands.FabricCommandModule;
-import net.impactdev.impactor.fabric.integrations.PlaceholderAPIIntegration;
 import net.impactdev.impactor.fabric.platform.FabricPlatformModule;
 import net.impactdev.impactor.fabric.scheduler.FabricSchedulerModule;
 import net.impactdev.impactor.fabric.ui.FabricUIModule;
 import net.impactdev.impactor.minecraft.plugin.GameImpactorPlugin;
-import net.kyori.adventure.key.Key;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 
 import java.util.Objects;
 import java.util.Set;
@@ -62,8 +60,10 @@ public final class FabricImpactorPlugin extends GameImpactorPlugin implements Im
     @Override
     protected void registerCommandMappings(ImpactorCommandRegistry registry) {
         FabricCommandManager manager = (FabricCommandManager) registry.manager();
-        BrigadierMapper mapper = manager.mapper();
-        mapper.map(TypeToken.get(CurrencyParser.class), Key.key("minecraft:resource_location"), true);
+        manager.delegate().parserRegistry().registerParserSupplier(
+                TypeToken.get(CurrencyParser.class),
+                params -> new WrappedBrigadierParser<>(ResourceLocationArgument.id())
+        );
 
         MinecraftHelp<CommandSource> helper = new MinecraftHelp<>(
                 "/impactor help",

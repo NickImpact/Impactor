@@ -35,6 +35,8 @@ import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.economy.currency.Currency;
+import net.impactdev.impactor.core.commands.economy.EconomyCommands;
+import net.impactdev.impactor.core.commands.events.RegisterCommandsEvent;
 import net.impactdev.impactor.core.economy.currency.ImpactorCurrency;
 import net.impactdev.impactor.core.economy.registration.EconomyRegistrationProvider;
 import net.impactdev.impactor.core.economy.registration.ImpactorSuggestEconomyServiceEvent;

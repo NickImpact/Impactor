@@ -25,7 +25,6 @@ loom {
         }
 
         mixinConfig("mixins.impactor.forge.json")
-        mixinConfig("mixins.impactor.forge.commands.json")
     }
 }
 
@@ -62,6 +61,7 @@ tasks {
             include(dependency("cloud.commandframework:cloud-annotations:.*"))
             include(dependency("cloud.commandframework:cloud-brigadier:.*"))
             include(dependency("cloud.commandframework:cloud-services:.*"))
+            include(dependency("$mapped.cloud.commandframework:cloud-forge:.*"))
             include(dependency("cloud.commandframework:cloud-minecraft-extras:.*"))
 
             exclude("forge-client-extra.jar")

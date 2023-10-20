@@ -12,13 +12,19 @@ repositories {
     maven("https://maven.impactdev.net/repository/development/")
     maven("https://hub.spigotmc.org/nexus/content/groups/public/")
     maven("https://libraries.minecraft.net")
+    maven("https://oss.sonatype.org/content/repositories/snapshots") {
+        name = "Sonatype Snapshots"
+    }
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots") {
+        name = "Sonatype 01 Snapshots"
+    }
 }
 
 version = rootProject.version
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 

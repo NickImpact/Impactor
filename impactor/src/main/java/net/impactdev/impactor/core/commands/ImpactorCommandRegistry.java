@@ -71,18 +71,6 @@ public final class ImpactorCommandRegistry {
 
     public void registerAllCommands() {
         AnnotationParser<CommandSource> parser = this.createParser();
-
-        List<Class<?>> containers = this.collectCommandContainers(Impactor.instance());
-
-        containers.forEach(container -> {
-            try {
-                final Object instance = container.getConstructor().newInstance();
-                parser.parse(instance);
-            } catch (Exception e) {
-                ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
-            }
-        });
-
         EventPublisher.post(new RegisterCommandsEvent(parser));
     }
 

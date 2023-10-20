@@ -104,7 +104,7 @@ public class BasicEconomyTest {
         Currency currency = service.currencies().primary();
         Account account = service.account(currency, target).join();
 
-        assertEquals(currency.defaultAccountBalance(), balance = account.balanceAsync().join());
+        assertEquals(currency.defaultAccountBalance(), balance = account.balance());
         assertTrue(Files.exists(Paths.get("config")
                 .resolve("impactor")
                 .resolve("economy")
@@ -131,16 +131,16 @@ public class BasicEconomyTest {
         Currency currency = service.currencies().primary();
         Account account = service.account(currency, target).join();
 
-        assertEquals(balance, account.balanceAsync().join());
+        assertEquals(balance, account.balance());
         BigDecimal adjustment = BigDecimal.valueOf(250);
-        EconomyTransaction transaction = account.depositAsync(adjustment).join();
+        EconomyTransaction transaction = account.deposit(adjustment);
 
         assertEquals(EconomyResultType.SUCCESS, transaction.result());
         assertEquals(EconomyTransactionType.DEPOSIT, transaction.type());
-        assertEquals(balance.add(adjustment), balance = account.balanceAsync().join());
+        assertEquals(balance.add(adjustment), balance = account.balance());
 
         account = service.account(currency, target).join();
-        assertEquals(balance, account.balanceAsync().join());
+        assertEquals(balance, account.balance());
     }
 
     @Test
@@ -167,17 +167,17 @@ public class BasicEconomyTest {
         BigDecimal adjustment = BigDecimal.ZERO;
         Collection<Account> accounts = service.accounts(currency).join();
         for(Account account : accounts) {
-            account.resetAsync().join();
+            account.reset();
 
-            account.depositAsync(adjustment).join();
+            account.deposit(adjustment);
             adjustment = adjustment.add(BigDecimal.valueOf(250));
         }
 
         List<Account> sorted = accounts.stream()
-                .sorted(Comparator.<Account, BigDecimal>comparing(account -> account.balanceAsync().join()).reversed())
-                .collect(Collectors.toList());
+                .sorted(Comparator.<Account, BigDecimal>comparing(Account::balance).reversed())
+                .toList();
 
-        assertEquals(BigDecimal.valueOf(1000.0), sorted.get(0).balanceAsync().join());
+        assertEquals(BigDecimal.valueOf(1000.0), sorted.get(0).balance());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class BasicEconomyTest {
         Currency currency = service.currencies().primary();
         Account account = service.account(currency, target).join();
 
-        account.withdrawAsync(new BigDecimal(300)).join();
+        account.withdraw(new BigDecimal(300));
         assertTrue(flag.get());
     }
 
@@ -231,7 +231,7 @@ public class BasicEconomyTest {
         Currency currency = service.currencies().primary();
 
         Account account = service.account(currency, target).join();
-        EconomyTransaction set = account.setAsync(BigDecimal.ONE).join();
+        EconomyTransaction set = account.set(BigDecimal.ONE);
         assertTrue(set.successful());
         BigDecimal amount = new BigDecimal("1.00");
 
@@ -246,7 +246,7 @@ public class BasicEconomyTest {
                 .join();
 
         assertTrue(transaction.successful());
-        assertEquals(0, account.balanceAsync().join().intValue());
+        assertEquals(0, account.balance().intValue());
 
         AtomicReference<Component> message = new AtomicReference<>(Component.empty());
         Audience audience = new Audience() {

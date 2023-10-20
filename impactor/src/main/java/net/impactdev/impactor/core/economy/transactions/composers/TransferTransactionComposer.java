@@ -85,7 +85,7 @@ public final class TransferTransactionComposer implements TransferComposer {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull EconomyTransferTransaction> send() {
+    public @NotNull EconomyTransferTransaction build() {
         Preconditions.checkNotNull(this.from, "from");
         Preconditions.checkNotNull(this.to, "to");
         Preconditions.checkNotNull(this.amount, "amount");

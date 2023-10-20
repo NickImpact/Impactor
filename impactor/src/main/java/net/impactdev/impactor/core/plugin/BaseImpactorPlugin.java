@@ -33,6 +33,7 @@ import io.github.classgraph.ScanResult;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.PlatformInfo;
 import net.impactdev.impactor.api.scheduler.AbstractJavaScheduler;
+import net.impactdev.impactor.core.commands.CommandsModule;
 import net.impactdev.impactor.core.commands.ImpactorCommandRegistry;
 import net.impactdev.impactor.core.configuration.ConfigModule;
 import net.impactdev.impactor.core.configuration.ImpactorConfig;
@@ -118,6 +119,7 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         this.bootstrapper.logger().info("Registering modules...");
         Set<Class<? extends ImpactorModule>> modules = new LinkedHashSet<>(Lists.newArrayList(
                 ConfigModule.class,
+                CommandsModule.class,
                 EconomyModule.class,
                 TextModule.class,
                 TranslationsModule.class
