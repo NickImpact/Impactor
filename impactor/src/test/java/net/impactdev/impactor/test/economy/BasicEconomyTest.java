@@ -264,7 +264,7 @@ public class BasicEconomyTest {
                 .to(account)
                 .amount(new BigDecimal(250))
                 .message(EconomyResultType.SUCCESS, Component.text("Transaction completed!"))
-                .build()
+                .build();
 
         transfer.inform(audience);
         assertEquals("Transaction completed!", PlainTextComponentSerializer.plainText().serialize(message.get()));
