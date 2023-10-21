@@ -242,8 +242,7 @@ public class BasicEconomyTest {
                 .message(EconomyResultType.SUCCESS, Component.text("Transaction succeeded!"))
                 .message(EconomyResultType.NOT_ENOUGH_FUNDS, Component.text("Account did not have enough funds..."))
                 .message(EconomyResultType.FAILED, Component.text("A failure occurred while processing this transaction"))
-                .send()
-                .join();
+                .build();
 
         assertTrue(transaction.successful());
         assertEquals(0, account.balance().intValue());
@@ -265,8 +264,7 @@ public class BasicEconomyTest {
                 .to(account)
                 .amount(new BigDecimal(250))
                 .message(EconomyResultType.SUCCESS, Component.text("Transaction completed!"))
-                .send()
-                .join();
+                .build()
 
         transfer.inform(audience);
         assertEquals("Transaction completed!", PlainTextComponentSerializer.plainText().serialize(message.get()));

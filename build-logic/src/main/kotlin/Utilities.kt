@@ -11,7 +11,7 @@ fun Project.writeVersion(): String {
     if(snapshot) {
         version = "$version-SNAPSHOT"
     } else {
-        if(rc != -1) {
+        if(rc > 0) {
             version = "$version-RC$rc"
         }
     }
@@ -19,7 +19,7 @@ fun Project.writeVersion(): String {
     return version
 }
 
-fun Project.getLatestGitCommitHash() : String {
+fun Project.getLatestGitCommitHash(): String {
     return try {
         val byteOut = ByteArrayOutputStream()
         project.exec {
@@ -31,4 +31,17 @@ fun Project.getLatestGitCommitHash() : String {
     } catch (ex: Exception) {
         "Unknown"
     }
+}
+
+fun Project.isSnapshot(): Boolean {
+    return rootProject.property("snapshot") == "true"
+}
+
+fun Project.isReleaseCandidate(): Boolean {
+    val rc = Integer.parseInt(rootProject.property("release-candidate").toString())
+    return rc > 0
+}
+
+fun Project.isRelease(): Boolean {
+    return !this.isSnapshot() && !this.isReleaseCandidate()
 }

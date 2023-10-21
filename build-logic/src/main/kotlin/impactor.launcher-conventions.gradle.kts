@@ -33,11 +33,13 @@ modrinth {
     projectId.set("Impactor")
     versionNumber.set(writeVersion())
 
-    val snapshot = rootProject.property("snapshot") == "true"
-    versionType.set(if(snapshot) "beta" else "release")
+    versionType.set(if(!isRelease()) "beta" else "release")
     uploadFile.set(tasks.remapJar)
 
     gameVersions.set(listOf(rootProject.property("minecraft").toString()))
 
+    // https://github.com/modrinth/minotaur
     // TODO - Changelog integration
+    // TODO - Project Body Sync
+    debugMode.set(true)
 }

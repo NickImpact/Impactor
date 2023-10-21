@@ -41,6 +41,8 @@ import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransferTransaction;
+import net.impactdev.impactor.api.economy.transactions.composer.TransferComposer;
+import net.impactdev.impactor.api.economy.transactions.details.EconomyResultType;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
@@ -51,6 +53,7 @@ import net.impactdev.impactor.core.economy.ImpactorEconomyService;
 import net.impactdev.impactor.core.economy.context.TransactionContext;
 import net.impactdev.impactor.core.economy.context.TransferTransactionContext;
 import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.util.TriState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -248,20 +251,23 @@ public final class EconomyCommands {
             BigDecimal tb = to.balance();
             BigDecimal total = new BigDecimal(amount);
 
-            EconomyTransferTransaction transaction = s.transfer(to, total);
+            EconomyTransferTransaction transaction = EconomyTransferTransaction.compose()
+                    .to(to)
+                    .from(s)
+                    .amount(total)
+                    .message(EconomyResultType.INVALID, () -> ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.resolve(source.locale(), context))
+                    .message(EconomyResultType.FAILED, () -> ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.resolve(source.locale(), context))
+                    .message(EconomyResultType.SUCCESS, () -> ImpactorTranslations.ECONOMY_TRANSFER.resolve(source.locale(), context))
+                    .build();
+
             context.append(TransferTransactionContext.class, new TransferTransactionContext(
                     new TransactionContext(EconomyTransactionType.WITHDRAW, sb, s.balance(), transaction.result()),
                     new TransactionContext(EconomyTransactionType.DEPOSIT, tb, to.balance(), transaction.result()),
                     transaction.result()
             ));
 
-            if(!transaction.successful()) {
-                ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
-                return;
-            }
-
-            ImpactorTranslations.ECONOMY_TRANSFER.send(source, context);
-            if(!target.equals(focus)) {
+            transaction.inform(source);
+            if(!target.equals(focus) && transaction.successful()) {
                 context.append(PlatformSource.class, source.source());
                 context.append(BigDecimal.class, total);
 

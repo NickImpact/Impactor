@@ -40,19 +40,20 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public final class BaseTransactionComposer implements TransactionComposer {
 
     private Account account;
     private BigDecimal amount;
     private EconomyTransactionType type;
-    private final Map<EconomyResultType, Component> messages = Maps.newHashMap();
+    private final Map<EconomyResultType, Supplier<Component>> messages = Maps.newHashMap();
 
     public BigDecimal amount() {
         return this.amount;
     }
 
-    public Map<EconomyResultType, Component> messages() {
+    public Map<EconomyResultType, Supplier<Component>> messages() {
         return this.messages;
     }
 
@@ -75,7 +76,7 @@ public final class BaseTransactionComposer implements TransactionComposer {
     }
 
     @Override
-    public TransactionComposer message(@NotNull EconomyResultType type, @NotNull Component message) {
+    public TransactionComposer message(@NotNull EconomyResultType type, @NotNull Supplier<@NotNull Component> message) {
         this.messages.put(type, message);
         return this;
     }

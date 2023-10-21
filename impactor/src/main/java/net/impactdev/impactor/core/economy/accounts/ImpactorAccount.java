@@ -260,70 +260,74 @@ public final class ImpactorAccount implements Account {
         final Account to = composer.target();
 
         return this.enact(amount, EconomyTransactionType.TRANSFER, () -> {
-                    ImpactorEconomyTransferTransaction.TransactionBuilder builder = ImpactorEconomyTransferTransaction.builder()
-                            .currency(this.currency)
-                            .from(this)
-                            .to(to)
-                            .amount(amount);
-
-                    if(!this.currency.key().equals(to.currency().key())) {
-                        if(!this.restriction(EconomyConfig.ALLOW_TRANSFER_CROSS_CURRENCY).orElse(true)) {
-                            return this.complete(builder, EconomyResultType.INVALID, composer.messages());
-                        }
-                    }
-
-                    EconomyTransferTransactionEvent.Pre event = new ImpactorEconomyTransferTransactionEvent.Pre(
-                            this.currency,
-                            this,
-                            to,
-                            amount
-                    );
-
-                    this.postAndVerify(event);
-                    if(event.cancelled()) {
-                        return this.complete(builder, EconomyResultType.CANCELLED, composer.messages());
-                    }
-
-                    BigDecimal withdraw = this.balance.subtract(amount);
-                    BigDecimal deposit = to.balance().add(amount);
-                    if(this.restriction(EconomyConfig.APPLY_RESTRICTIONS).orElse(false)) {
-                        Optional<BigDecimal> minimum = this.restriction(EconomyConfig.MIN_BALANCE);
-                        Optional<BigDecimal> maximum = this.restriction(EconomyConfig.MAX_BALANCE);
-                        if(maximum.isPresent() && maximum.get().compareTo(deposit) < 0) {
-                            EconomyTransferTransactionEvent.Post post = new ImpactorEconomyTransferTransactionEvent.Post(
-                                    this.complete(builder, EconomyResultType.NO_REMAINING_SPACE, composer.messages())
-                            );
-                            this.postAndVerify(post);
-                            return post.transaction();
-                        }
-
-                        if(minimum.isPresent() && minimum.get().compareTo(withdraw) > 0) {
-                            EconomyTransferTransactionEvent.Post post = new ImpactorEconomyTransferTransactionEvent.Post(
-                                    this.complete(builder, EconomyResultType.NOT_ENOUGH_FUNDS, composer.messages())
-                            );
-                            this.postAndVerify(post);
-                            return post.transaction();
-                        }
-                    }
-
-                    this.balance = this.balance.subtract(amount);
-                    ((ImpactorAccount) to).quietSet(to.balance().add(amount));
-
-                    this.save();
-                    ((ImpactorAccount) to).save();
-
-                    EconomyTransferTransactionEvent.Post post = new ImpactorEconomyTransferTransactionEvent.Post(
-                            this.complete(builder, EconomyResultType.SUCCESS, composer.messages())
-                    );
-                    this.postAndVerify(post);
-                    return post.transaction();
-                }, () -> ImpactorEconomyTransferTransaction.builder()
+                ImpactorEconomyTransferTransaction.TransactionBuilder builder = ImpactorEconomyTransferTransaction.builder()
                         .currency(this.currency)
                         .from(this)
                         .to(to)
-                        .amount(amount)
-                        .result(EconomyResultType.FAILED)
-                        .build()
+                        .amount(amount);
+
+                if(!this.currency.key().equals(to.currency().key())) {
+                    if(!this.restriction(EconomyConfig.ALLOW_TRANSFER_CROSS_CURRENCY).orElse(true)) {
+                        return this.complete(builder, EconomyResultType.INVALID, composer.messages());
+                    }
+                }
+
+                if(composer.amount().doubleValue() < 1) {
+                    return this.complete(builder, EconomyResultType.FAILED, composer.messages());
+                }
+
+                EconomyTransferTransactionEvent.Pre event = new ImpactorEconomyTransferTransactionEvent.Pre(
+                        this.currency,
+                        this,
+                        to,
+                        amount
+                );
+
+                this.postAndVerify(event);
+                if(event.cancelled()) {
+                    return this.complete(builder, EconomyResultType.CANCELLED, composer.messages());
+                }
+
+                BigDecimal withdraw = this.balance.subtract(amount);
+                BigDecimal deposit = to.balance().add(amount);
+                if(this.restriction(EconomyConfig.APPLY_RESTRICTIONS).orElse(false)) {
+                    Optional<BigDecimal> minimum = this.restriction(EconomyConfig.MIN_BALANCE);
+                    Optional<BigDecimal> maximum = this.restriction(EconomyConfig.MAX_BALANCE);
+                    if(maximum.isPresent() && maximum.get().compareTo(deposit) < 0) {
+                        EconomyTransferTransactionEvent.Post post = new ImpactorEconomyTransferTransactionEvent.Post(
+                                this.complete(builder, EconomyResultType.NO_REMAINING_SPACE, composer.messages())
+                        );
+                        this.postAndVerify(post);
+                        return post.transaction();
+                    }
+
+                    if(minimum.isPresent() && minimum.get().compareTo(withdraw) > 0) {
+                        EconomyTransferTransactionEvent.Post post = new ImpactorEconomyTransferTransactionEvent.Post(
+                                this.complete(builder, EconomyResultType.NOT_ENOUGH_FUNDS, composer.messages())
+                        );
+                        this.postAndVerify(post);
+                        return post.transaction();
+                    }
+                }
+
+                this.balance = this.balance.subtract(amount);
+                ((ImpactorAccount) to).quietSet(to.balance().add(amount));
+
+                this.save();
+                ((ImpactorAccount) to).save();
+
+                EconomyTransferTransactionEvent.Post post = new ImpactorEconomyTransferTransactionEvent.Post(
+                        this.complete(builder, EconomyResultType.SUCCESS, composer.messages())
+                );
+                this.postAndVerify(post);
+                return post.transaction();
+            }, () -> ImpactorEconomyTransferTransaction.builder()
+                    .currency(this.currency)
+                    .from(this)
+                    .to(to)
+                    .amount(amount)
+                    .result(EconomyResultType.FAILED)
+                    .build()
         );
     }
 
@@ -422,12 +426,14 @@ public final class ImpactorAccount implements Account {
         return Optional.empty();
     }
 
-    private EconomyTransaction complete(ImpactorEconomyTransaction.TransactionBuilder builder, EconomyResultType type, Map<EconomyResultType, Component> messages) {
-        return builder.result(type).message(messages.getOrDefault(type, null)).build();
+    private EconomyTransaction complete(ImpactorEconomyTransaction.TransactionBuilder builder, EconomyResultType type, Map<EconomyResultType, Supplier<Component>> messages) {
+        Optional<Component> message = Optional.ofNullable(messages.getOrDefault(type, null)).map(Supplier::get);
+        return builder.result(type).message(message.orElse(null)).build();
     }
 
-    private EconomyTransferTransaction complete(ImpactorEconomyTransferTransaction.TransactionBuilder builder, EconomyResultType type, Map<EconomyResultType, Component> messages) {
-        return builder.result(type).message(messages.getOrDefault(type, null)).build();
+    private EconomyTransferTransaction complete(ImpactorEconomyTransferTransaction.TransactionBuilder builder, EconomyResultType type, Map<EconomyResultType, Supplier<Component>> messages) {
+        Optional<Component> message = Optional.ofNullable(messages.getOrDefault(type, null)).map(Supplier::get);
+        return builder.result(type).message(message.orElse(null)).build();
     }
 
     @FunctionalInterface
