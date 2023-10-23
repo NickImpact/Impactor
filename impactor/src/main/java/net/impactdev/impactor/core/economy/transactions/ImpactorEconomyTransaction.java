@@ -35,57 +35,24 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
+import java.util.function.Supplier;
 
-public final class ImpactorEconomyTransaction implements EconomyTransaction {
-
-    private final Account account;
-    private final Currency currency;
-    private final BigDecimal amount;
-    private final EconomyTransactionType type;
-    private final EconomyResultType result;
-    private final Component message;
-
-    public ImpactorEconomyTransaction(Account account, Currency currency, BigDecimal amount, EconomyTransactionType type, EconomyResultType result, Component message) {
-        this.account = account;
-        this.currency = currency;
-        this.amount = amount;
-        this.type = type;
-        this.result = result;
-        this.message = message;
-    }
+public record ImpactorEconomyTransaction(
+        Account account,
+        Currency currency,
+        BigDecimal amount,
+        EconomyTransactionType type,
+        EconomyResultType result,
+        Supplier<Component> message
+) implements EconomyTransaction {
 
     public static TransactionBuilder builder() {
         return new TransactionBuilder();
     }
 
     @Override
-    public @Nullable Component message() {
+    public @Nullable Supplier<Component> message() {
         return this.message;
-    }
-
-    @Override
-    public Account account() {
-        return account;
-    }
-
-    @Override
-    public Currency currency() {
-        return currency;
-    }
-
-    @Override
-    public BigDecimal amount() {
-        return amount;
-    }
-
-    @Override
-    public EconomyTransactionType type() {
-        return type;
-    }
-
-    @Override
-    public EconomyResultType result() {
-        return result;
     }
 
     public static class TransactionBuilder implements Builder<ImpactorEconomyTransaction> {
@@ -95,7 +62,7 @@ public final class ImpactorEconomyTransaction implements EconomyTransaction {
         private BigDecimal amount;
         private EconomyTransactionType type;
         private EconomyResultType result;
-        private Component message;
+        private Supplier<Component> message;
 
         public TransactionBuilder account(Account account) {
             this.account = account;
@@ -122,14 +89,19 @@ public final class ImpactorEconomyTransaction implements EconomyTransaction {
             return this;
         }
 
-        public TransactionBuilder message(Component message) {
+        public TransactionBuilder message(Supplier<Component> message) {
             this.message = message;
             return this;
         }
 
         @Override
         public ImpactorEconomyTransaction build() {
-            return new ImpactorEconomyTransaction(this.account, this.currency, this.amount, this.type, this.result, this.message);
+            return new ImpactorEconomyTransaction(this.account,
+                    this.currency,
+                    this.amount,
+                    this.type,
+                    this.result,
+                    this.message);
         }
     }
 }

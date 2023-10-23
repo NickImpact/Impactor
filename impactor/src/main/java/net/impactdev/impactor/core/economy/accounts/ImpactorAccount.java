@@ -427,13 +427,11 @@ public final class ImpactorAccount implements Account {
     }
 
     private EconomyTransaction complete(ImpactorEconomyTransaction.TransactionBuilder builder, EconomyResultType type, Map<EconomyResultType, Supplier<Component>> messages) {
-        Optional<Component> message = Optional.ofNullable(messages.getOrDefault(type, null)).map(Supplier::get);
-        return builder.result(type).message(message.orElse(null)).build();
+        return builder.result(type).message(messages.getOrDefault(type, null)).build();
     }
 
     private EconomyTransferTransaction complete(ImpactorEconomyTransferTransaction.TransactionBuilder builder, EconomyResultType type, Map<EconomyResultType, Supplier<Component>> messages) {
-        Optional<Component> message = Optional.ofNullable(messages.getOrDefault(type, null)).map(Supplier::get);
-        return builder.result(type).message(message.orElse(null)).build();
+        return builder.result(type).message(messages.getOrDefault(type, null)).build();
     }
 
     @FunctionalInterface

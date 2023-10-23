@@ -255,6 +255,7 @@ public final class EconomyCommands {
                     .to(to)
                     .from(s)
                     .amount(total)
+                    .message(EconomyResultType.NOT_ENOUGH_FUNDS, () -> ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.resolve(source.locale(), context))
                     .message(EconomyResultType.INVALID, () -> ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.resolve(source.locale(), context))
                     .message(EconomyResultType.FAILED, () -> ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.resolve(source.locale(), context))
                     .message(EconomyResultType.SUCCESS, () -> ImpactorTranslations.ECONOMY_TRANSFER.resolve(source.locale(), context))
