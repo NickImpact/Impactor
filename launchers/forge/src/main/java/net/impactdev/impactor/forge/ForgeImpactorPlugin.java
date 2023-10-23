@@ -25,25 +25,15 @@
 
 package net.impactdev.impactor.forge;
 
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
-import cloud.commandframework.minecraft.extras.MinecraftHelp;
-import io.leangen.geantyref.TypeToken;
-import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.core.commands.ImpactorCommandRegistry;
-import net.impactdev.impactor.core.commands.parsers.CurrencyParser;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
-import net.impactdev.impactor.forge.commands.ForgeCommandManager;
 import net.impactdev.impactor.forge.commands.ForgeCommandModule;
 import net.impactdev.impactor.forge.platform.ForgePlatformModule;
 import net.impactdev.impactor.forge.scheduler.ForgeSchedulerModule;
 import net.impactdev.impactor.forge.ui.ForgeUIModule;
 import net.impactdev.impactor.minecraft.plugin.GameImpactorPlugin;
-import net.minecraft.commands.arguments.ResourceLocationArgument;
 
-import java.util.Objects;
 import java.util.Set;
 
 public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorPlugin {
@@ -55,31 +45,6 @@ public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorP
     @Override
     public void construct() {
         super.construct();
-    }
-
-    @Override
-    protected void registerCommandMappings(ImpactorCommandRegistry registry) {
-        ForgeCommandManager manager = (ForgeCommandManager) registry.manager();
-        manager.delegate().parserRegistry().registerParserSupplier(
-                TypeToken.get(CurrencyParser.class),
-                params -> new WrappedBrigadierParser<>(ResourceLocationArgument.id())
-        );
-
-        MinecraftHelp<CommandSource> helper = new MinecraftHelp<>(
-                "/impactor help",
-                CommandSource::source,
-                registry.manager().delegate()
-        );
-
-        registry.manager().delegate().command(registry.manager()
-                .delegate()
-                .commandBuilder("impactor")
-                .literal("help")
-                .argument(StringArgument.optional("query", StringArgument.StringMode.GREEDY))
-                .handler(context -> {
-                    helper.queryCommands(Objects.requireNonNull(context.getOrDefault("query", "")), context.getSender());
-                })
-        );
     }
 
     @Override

@@ -170,18 +170,22 @@ public final class ImpactorPlaceholders {
                         case "source":
                             String st = arguments.pop();
                             switch (st) {
-                                case "before":
+                                case "before" -> {
                                     return currency.format(context.from().before());
-                                case "after":
+                                }
+                                case "after" -> {
                                     return currency.format(context.from().after());
+                                }
                             }
                         case "recipient":
                             String rt = arguments.pop();
                             switch (rt) {
-                                case "before":
+                                case "before" -> {
                                     return currency.format(context.to().before());
-                                case "after":
+                                }
+                                case "after" -> {
                                     return currency.format(context.to().after());
+                                }
                             }
                     }
                 }

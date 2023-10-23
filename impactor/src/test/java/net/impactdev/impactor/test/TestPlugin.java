@@ -43,11 +43,6 @@ public class TestPlugin extends BaseImpactorPlugin {
     }
 
     @Override
-    protected void registerCommandMappings(ImpactorCommandRegistry registry) {
-
-    }
-
-    @Override
     protected Set<Class<? extends ImpactorModule>> modules() {
         return Sets.newHashSet(
                 TestPlatform.TestPlatformModule.class,

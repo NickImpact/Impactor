@@ -152,13 +152,10 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         ImpactorCommandRegistry registry = new ImpactorCommandRegistry();
         registry.registerArgumentParsers();
         registry.registerAllCommands();
-        this.registerCommandMappings(registry);
 
         this.logger().info("Setting up plugin integrations...");
         this.integrate();
     }
-
-    protected abstract void registerCommandMappings(ImpactorCommandRegistry registry);
 
     public void setup() {
         this.bootstrapper.logger().info("Initializing modules...");
