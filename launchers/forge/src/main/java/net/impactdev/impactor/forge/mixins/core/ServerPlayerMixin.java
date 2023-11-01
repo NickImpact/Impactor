@@ -50,7 +50,7 @@ public abstract class ServerPlayerMixin implements LocaleProvider {
     }
 
     @Override
-    public Locale locale() {
+    public Locale impactor$locale() {
         return this.impactor$language;
     }
 }

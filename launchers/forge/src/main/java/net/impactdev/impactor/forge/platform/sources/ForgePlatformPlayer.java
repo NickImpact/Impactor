@@ -44,7 +44,7 @@ public final class ForgePlatformPlayer extends ImpactorPlatformPlayer {
     public Locale locale() {
         return this.asMinecraftPlayer()
                 .map(player -> (LocaleProvider) player)
-                .map(LocaleProvider::locale)
+                .map(LocaleProvider::impactor$locale)
                 .orElse(Locale.getDefault());
     }
 

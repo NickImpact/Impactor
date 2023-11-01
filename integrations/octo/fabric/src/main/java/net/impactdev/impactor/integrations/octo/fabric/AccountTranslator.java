@@ -23,35 +23,24 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform.sources;
+package net.impactdev.impactor.integrations.octo.fabric;
 
-import net.impactdev.impactor.core.translations.locale.LocaleProvider;
-import net.impactdev.impactor.fabric.FabricImpactorBootstrap;
-import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
-import net.minecraft.server.level.ServerPlayer;
+import com.epherical.octoecon.api.Currency;
+import com.epherical.octoecon.api.Economy;
+import com.epherical.octoecon.api.user.UniqueUser;
+import com.epherical.octoecon.api.user.User;
+import net.impactdev.impactor.api.economy.accounts.Account;
 
-import java.util.Locale;
-import java.util.Optional;
-import java.util.UUID;
+import java.math.BigDecimal;
 
-public class FabricPlatformPlayer extends ImpactorPlatformPlayer {
+public final class AccountTranslator {
 
-    public FabricPlatformPlayer(UUID uuid) {
-        super(uuid);
-    }
-
-    @Override
-    public Locale locale() {
-        return this.asMinecraftPlayer()
-                .map(player -> (LocaleProvider) player)
-                .map(LocaleProvider::impactor$locale)
-                .orElse(Locale.getDefault());
-    }
-
-    @Override
-    public Optional<ServerPlayer> asMinecraftPlayer() {
-        return Optional.ofNullable(FabricImpactorBootstrap.instance().server().get())
-                .map(server -> server.getPlayerList().getPlayer(this.uuid()));
+    public static Account impactor(Economy economy, Currency currency, UniqueUser user) {
+        return Account.builder()
+                .owner(user.getUserID())
+                .balance(BigDecimal.valueOf(user.getBalance(currency)))
+                .currency(CurrencyTranslator.impactor(economy, currency))
+                .build();
     }
 
 }

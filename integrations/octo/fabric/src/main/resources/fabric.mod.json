@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "impactor-octo",
+  "version": "${version}",
+  "name": "Impactor",
+  "authors": [
+    "NickImpact"
+  ],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.impactdev.impactor.integrations.octo.fabric.FabricOctoIntegration"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.14.9",
+    "minecraft": ">=1.20.1",
+    "java": ">=17",
+    "impactor": ">=${version}",
+    "octo-economy-api": ">=1.0.0"
+  }
+}

@@ -23,35 +23,14 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform.sources;
+package net.impactdev.impactor.integrations.octo.fabric.config;
 
-import net.impactdev.impactor.core.translations.locale.LocaleProvider;
-import net.impactdev.impactor.fabric.FabricImpactorBootstrap;
-import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
-import net.minecraft.server.level.ServerPlayer;
+import net.impactdev.impactor.api.configuration.key.ConfigKey;
 
-import java.util.Locale;
-import java.util.Optional;
-import java.util.UUID;
+import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.booleanKey;
 
-public class FabricPlatformPlayer extends ImpactorPlatformPlayer {
+public final class OctoConfig {
 
-    public FabricPlatformPlayer(UUID uuid) {
-        super(uuid);
-    }
-
-    @Override
-    public Locale locale() {
-        return this.asMinecraftPlayer()
-                .map(player -> (LocaleProvider) player)
-                .map(LocaleProvider::impactor$locale)
-                .orElse(Locale.getDefault());
-    }
-
-    @Override
-    public Optional<ServerPlayer> asMinecraftPlayer() {
-        return Optional.ofNullable(FabricImpactorBootstrap.instance().server().get())
-                .map(server -> server.getPlayerList().getPlayer(this.uuid()));
-    }
+    public static final ConfigKey<Boolean> USE_IMPACTOR = booleanKey("use-impactor", true);
 
 }
