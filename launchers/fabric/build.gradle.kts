@@ -23,13 +23,13 @@ dependencies {
     listOf(
         "fabric-lifecycle-events-v1",
         "fabric-command-api-v2",
-        "fabric-networking-api-v1"
+        "fabric-networking-api-v1",
     ).forEach { modImplementation(fabricApi.module(it, rootProject.property("fabric-api").toString())) }
 
     implementation(project(":minecraft:impl"))
-    modImplementation("ca.landonjw.gooeylibs:fabric:3.0.0-1.19.2-SNAPSHOT@jar")
+    modImplementation("ca.landonjw.gooeylibs:fabric:3.0.0-1.20.1-SNAPSHOT@jar")
 
-    modImplementation("net.impactdev.impactor.commands:fabric:5.0.0+1.19.2-SNAPSHOT") {
+    modImplementation("net.impactdev.impactor.commands:fabric:5.1.1+1.20.1-SNAPSHOT") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")
@@ -47,6 +47,7 @@ dependencies {
     modCompileOnly("eu.pb4:placeholder-api:2.0.0-pre.1+1.19.2")
     include("io.leangen.geantyref:geantyref:1.3.13")
 
+    modRuntimeOnly("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }
@@ -61,7 +62,7 @@ tasks {
     }
 
     shadowJar {
-        val mapped = "loom_mappings_1_19_2_layered_hash_40359_v2"
+        val mapped = "loom_mappings_1_20_1_layered_hash_40359_v2"
         dependencies {
             include(dependency("net.impactdev.impactor.commands:common:.*"))
             include(dependency("$mapped.net.impactdev.impactor.commands:fabric:.*"))
@@ -102,15 +103,16 @@ publishing {
     }
 }
 
-fun writeVersion(): String {
-    val plugin = rootProject.property("plugin")
-    val minecraft = rootProject.property("minecraft")
-    val snapshot = rootProject.property("snapshot") == "true"
-
-    var version = "$plugin+$minecraft"
-    if(snapshot) {
-        version = "$version-SNAPSHOT"
+modrinth {
+    loaders.set(listOf("fabric"))
+    dependencies {
+        required.project("fabric-api")
+        optional.project("placeholder-api")
     }
+}
 
-    return version
+configurations.all {
+    resolutionStrategy {
+        force("net.fabricmc:fabric-loader:${rootProject.property("fabric-loader")}")
+    }
 }

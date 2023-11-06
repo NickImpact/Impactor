@@ -31,10 +31,9 @@ import net.impactdev.impactor.api.scheduler.Ticks;
 import net.impactdev.impactor.api.scheduler.v2.Scheduler;
 import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.api.scoreboards.Scoreboard;
-import net.impactdev.impactor.api.scoreboards.ScoreboardImplementation;
-import net.impactdev.impactor.api.text.transformers.FadeTransformer;
+import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
-import net.impactdev.impactor.api.scoreboards.relative.PlayerScoreboard;
+import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.kyori.adventure.text.Component;
 import org.junit.jupiter.api.Test;
 
@@ -43,19 +42,19 @@ public final class ScoreboardTests {
     @Test
     public void create() {
         Objective objective = Objective.scheduled(builder -> builder
-                .provider((displayable, viewer) -> Component.text("Impactor Server Diagnostics"))
-                .transformer(FadeTransformer.create(90, 3, 0))
+                .provider(ctx -> Component.text("Impactor Server Diagnostics"))
+//                .transformer(FadeTransformer.create(90, 3, 0))
                 .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
                 .task((scheduler, displayable) -> scheduler.repeating(displayable::update, Ticks.single()))
                 .build()
         );
 
         Scoreboard scoreboard = Scoreboard.builder()
-                .implementation(ScoreboardImplementation.packets())
+                .implementation(ScoreboardRenderer.packets())
                 .objective(objective)
                 .build();
 
-        PlayerScoreboard viewed = scoreboard.createFor(PlatformPlayer.getOrCreate(PlatformSource.SERVER_UUID));
+        AssignedScoreboard viewed = scoreboard.createFor(PlatformPlayer.getOrCreate(PlatformSource.SERVER_UUID));
     }
 
 }

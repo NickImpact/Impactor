@@ -86,8 +86,8 @@ public class AsyncScheduler implements Scheduler {
     }
 
     @Override
-    public SchedulerTask delayed(@NotNull Consumer<Task> action, @NotNull Ticks ticks) {
-        return this.delayed(() -> action.accept(null), ticks.ticks() / 20, TimeUnit.SECONDS);
+    public SchedulerTask delayed(@NotNull Runnable action, @NotNull Ticks ticks) {
+        return this.delayed(action::run, ticks.ticks() / 20, TimeUnit.SECONDS);
     }
 
     @Override

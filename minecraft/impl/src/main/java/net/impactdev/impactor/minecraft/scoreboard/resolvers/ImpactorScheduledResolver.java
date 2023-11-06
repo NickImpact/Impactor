@@ -27,9 +27,9 @@ package net.impactdev.impactor.minecraft.scoreboard.resolvers;
 
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.scheduler.SchedulerTask;
-import net.impactdev.impactor.api.scoreboards.ConfigurableScoreboardComponent;
-import net.impactdev.impactor.api.scoreboards.updaters.scheduled.SchedulerConfiguration;
-import net.impactdev.impactor.api.scoreboards.updaters.scheduled.ScheduledResolver;
+import net.impactdev.impactor.api.scoreboards.resolvers.Updatable;
+import net.impactdev.impactor.api.scoreboards.resolvers.scheduled.SchedulerConfiguration;
+import net.impactdev.impactor.api.scoreboards.resolvers.scheduled.ScheduledResolver;
 import net.kyori.adventure.text.Component;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -40,7 +40,7 @@ public final class ImpactorScheduledResolver extends AbstractResolver implements
     private final AtomicReference<Component> component;
     private final SchedulerTask task;
 
-    private ImpactorScheduledResolver(SchedulerConfiguration configuration, ConfigurableScoreboardComponent.Viewable viewed) {
+    private ImpactorScheduledResolver(SchedulerConfiguration configuration, Updatable.Viewable viewed) {
         super(viewed);
         this.configuration = configuration;
         this.task = configuration.task().schedule(configuration.scheduler(), viewed);

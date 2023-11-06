@@ -26,7 +26,7 @@
 package net.impactdev.impactor.minecraft.scoreboard.resolvers;
 
 import net.impactdev.impactor.api.text.transformers.TextTransformer;
-import net.impactdev.impactor.api.scoreboards.updaters.listener.ListenerResolver;
+import net.impactdev.impactor.api.scoreboards.resolvers.updaters.listener.ListenerResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.event.EventSubscription;
 

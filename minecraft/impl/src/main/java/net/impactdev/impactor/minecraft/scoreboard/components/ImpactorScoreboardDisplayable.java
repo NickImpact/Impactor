@@ -25,11 +25,11 @@
 
 package net.impactdev.impactor.minecraft.scoreboard.components;
 
-import net.impactdev.impactor.api.scoreboards.ConfigurableScoreboardComponent;
-import net.impactdev.impactor.api.scoreboards.updaters.ComponentProvider;
-import net.impactdev.impactor.api.scoreboards.updaters.ResolverConfiguration;
+import net.impactdev.impactor.api.scoreboards.resolvers.Updatable;
+import net.impactdev.impactor.api.scoreboards.resolvers.updaters.ComponentProvider;
+import net.impactdev.impactor.api.scoreboards.resolvers.updaters.ResolverConfiguration;
 
-abstract class ImpactorScoreboardDisplayable implements ConfigurableScoreboardComponent {
+abstract class ImpactorScoreboardDisplayable implements Updatable {
 
     private final ComponentProvider provider;
     private final ResolverConfiguration resolver;

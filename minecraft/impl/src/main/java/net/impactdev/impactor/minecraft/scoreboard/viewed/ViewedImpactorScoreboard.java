@@ -27,15 +27,15 @@ package net.impactdev.impactor.minecraft.scoreboard.viewed;
 
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.scoreboards.Scoreboard;
-import net.impactdev.impactor.api.scoreboards.relative.RelativeScoreboardLine;
-import net.impactdev.impactor.api.scoreboards.relative.RelativeObjective;
-import net.impactdev.impactor.api.scoreboards.relative.PlayerScoreboard;
+import net.impactdev.impactor.api.scoreboards.players.RelativeScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.players.RelativeObjective;
+import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class ViewedImpactorScoreboard implements PlayerScoreboard {
+public final class ViewedImpactorScoreboard implements AssignedScoreboard {
 
     private final PlatformPlayer viewer;
 
@@ -94,7 +94,7 @@ public final class ViewedImpactorScoreboard implements PlayerScoreboard {
     public static final class ViewedScoreboardFactory implements Factory {
 
         @Override
-        public PlayerScoreboard create(@NotNull Scoreboard parent, @NotNull PlatformPlayer viewer) {
+        public AssignedScoreboard create(@NotNull Scoreboard parent, @NotNull PlatformPlayer viewer) {
             return new ViewedImpactorScoreboard(parent, viewer);
         }
 

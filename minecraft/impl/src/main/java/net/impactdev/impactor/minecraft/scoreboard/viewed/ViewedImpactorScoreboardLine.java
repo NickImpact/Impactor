@@ -25,9 +25,9 @@
 
 package net.impactdev.impactor.minecraft.scoreboard.viewed;
 
-import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
-import net.impactdev.impactor.api.scoreboards.updaters.ComponentResolver;
-import net.impactdev.impactor.api.scoreboards.relative.RelativeScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.resolvers.lines.ScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.resolvers.updaters.resolver.ComponentResolver;
+import net.impactdev.impactor.api.scoreboards.players.RelativeScoreboardLine;
 import net.kyori.adventure.text.Component;
 
 public class ViewedImpactorScoreboardLine implements RelativeScoreboardLine {

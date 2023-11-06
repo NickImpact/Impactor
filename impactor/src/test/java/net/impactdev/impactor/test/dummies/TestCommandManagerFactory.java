@@ -26,15 +26,19 @@
 package net.impactdev.impactor.test.dummies;
 
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.commands.ImpactorCommandManager;
+import net.impactdev.impactor.api.commands.brigadier.BrigadierMapper;
 import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.platform.plugins.PluginMetadata;
+import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class TestCommandManagerFactory implements ImpactorCommandManager.Factory {
@@ -61,6 +65,16 @@ public class TestCommandManagerFactory implements ImpactorCommandManager.Factory
                     @Override
                     public @NonNull CommandMeta createDefaultCommandMeta() {
                         return SimpleCommandMeta.empty();
+                    }
+                };
+            }
+
+            @Override
+            public BrigadierMapper mapper() {
+                return new BrigadierMapper() {
+                    @Override
+                    public <T extends ArgumentParser<CommandSource, ?>> void map(Key key, TypeToken<T> type, boolean useCloudSuggestions) {
+
                     }
                 };
             }

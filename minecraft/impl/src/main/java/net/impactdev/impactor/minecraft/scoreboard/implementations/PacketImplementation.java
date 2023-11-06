@@ -26,14 +26,14 @@
 package net.impactdev.impactor.minecraft.scoreboard.implementations;
 
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.scoreboards.relative.RelativeScoreboardLine;
-import net.impactdev.impactor.api.scoreboards.relative.RelativeObjective;
-import net.impactdev.impactor.api.scoreboards.relative.PlayerScoreboard;
+import net.impactdev.impactor.api.scoreboards.players.RelativeScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.players.RelativeObjective;
+import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
 import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
-import net.impactdev.impactor.api.scoreboards.ScoreboardImplementation;
-import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
-import net.impactdev.impactor.api.scoreboards.objectives.Objective;
+import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
+import net.impactdev.impactor.api.scoreboards.resolvers.lines.ScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.resolvers.objectives.Objective;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket;
 import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket;
@@ -42,7 +42,7 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Team;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 
-public final class PacketImplementation implements ScoreboardImplementation {
+public final class PacketImplementation implements ScoreboardRenderer {
 
     @Override
     public void objective(RelativeObjective objective) {
@@ -74,7 +74,7 @@ public final class PacketImplementation implements ScoreboardImplementation {
     }
 
     @Override
-    public void show(PlayerScoreboard scoreboard) {
+    public void show(AssignedScoreboard scoreboard) {
         ((ImpactorPlatformPlayer) viewer).asMinecraftPlayer().ifPresent(player -> {
             net.minecraft.world.scores.Objective objective = this.createObjective(viewer, scoreboard.objective());
             ClientboundSetObjectivePacket create = new ClientboundSetObjectivePacket(
@@ -93,7 +93,7 @@ public final class PacketImplementation implements ScoreboardImplementation {
     }
 
     @Override
-    public void hide(PlayerScoreboard scoreboard) {
+    public void hide(AssignedScoreboard scoreboard) {
         ((ImpactorPlatformPlayer) viewer).asMinecraftPlayer().ifPresent(player -> {
             net.minecraft.world.scores.Objective objective = this.createObjective(viewer, scoreboard.objective());
             ClientboundSetObjectivePacket remove = new ClientboundSetObjectivePacket(objective, 1);

@@ -23,44 +23,24 @@
  *
  */
 
-package net.impactdev.impactor.fabric.mixins.core;
+package net.impactdev.impactor.core.commands;
 
-import net.impactdev.impactor.api.platform.performance.MemoryWatcher;
-import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Mth;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import net.impactdev.impactor.api.events.ImpactorEvent;
+import net.impactdev.impactor.core.commands.economy.EconomyCommands;
+import net.impactdev.impactor.core.commands.events.RegisterCommandsEvent;
+import net.impactdev.impactor.core.commands.pagination.PaginationCommands;
+import net.impactdev.impactor.core.commands.translations.TranslationCommands;
+import net.impactdev.impactor.core.modules.ImpactorModule;
+import net.kyori.event.EventBus;
 
-@Mixin(MinecraftServer.class)
-public class MinecraftServerMixin implements PerformanceMonitor {
-
-    @Shadow
-    private float averageTickTime;
-    @Shadow @Final
-    public long[] tickTimes;
+public final class CommandsModule implements ImpactorModule {
 
     @Override
-    public double ticksPerSecond() {
-        return 1000 / Math.max(50, this.averageTickTime);
+    public void subscribe(EventBus<ImpactorEvent> bus) {
+        bus.subscribe(RegisterCommandsEvent.class, event -> {
+            event.register(EconomyCommands.class);
+            event.register(PaginationCommands.class);
+            event.register(TranslationCommands.class);
+        });
     }
-
-    @Override
-    public double averageTickDuration() {
-        int length = this.tickTimes.length;
-        long sum = 0;
-
-        for(long tick : this.tickTimes) {
-            sum += tick;
-        }
-
-        return (sum / (double) length) / 1000000;
-    }
-
-    @Override
-    public MemoryWatcher memory() {
-        return new MemoryWatcher();
-    }
-
 }

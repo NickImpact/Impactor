@@ -26,16 +26,16 @@
 package net.impactdev.impactor.minecraft.scoreboard;
 
 import net.impactdev.impactor.api.scoreboards.Scoreboard;
-import net.impactdev.impactor.api.scoreboards.ScoreboardImplementation;
-import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
-import net.impactdev.impactor.api.scoreboards.objectives.Objective;
+import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
+import net.impactdev.impactor.api.scoreboards.resolvers.lines.ScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.resolvers.objectives.Objective;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class ImpactorScoreboard implements Scoreboard {
 
-    private final ScoreboardImplementation implementation;
+    private final ScoreboardRenderer implementation;
     private final Objective objective;
     private final List<ScoreboardLine> lines;
 
@@ -46,7 +46,7 @@ public final class ImpactorScoreboard implements Scoreboard {
     }
 
     @Override
-    public ScoreboardImplementation implementation() {
+    public ScoreboardRenderer implementation() {
         return this.implementation;
     }
 
@@ -62,12 +62,12 @@ public final class ImpactorScoreboard implements Scoreboard {
 
     public static class ImpactorScoreboardBuilder implements ScoreboardBuilder {
 
-        private ScoreboardImplementation implementation;
+        private ScoreboardRenderer implementation;
         private Objective objective;
         private final List<ScoreboardLine> lines = new ArrayList<>();
 
         @Override
-        public ScoreboardBuilder implementation(ScoreboardImplementation implementation) {
+        public ScoreboardBuilder implementation(ScoreboardRenderer implementation) {
             this.implementation = implementation;
             return this;
         }

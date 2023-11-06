@@ -46,7 +46,14 @@ public class MinecraftServerMixin implements PerformanceMonitor {
 
     @Override
     public double averageTickDuration() {
-        return Mth.average(this.tickTimes) / 1000000;
+        int length = this.tickTimes.length;
+        long sum = 0;
+
+        for(long tick : this.tickTimes) {
+            sum += tick;
+        }
+
+        return (sum / (double) length) / 1000000;
     }
 
     @Override

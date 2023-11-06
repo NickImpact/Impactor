@@ -39,6 +39,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public final class TransferTransactionComposer implements TransferComposer {
 
@@ -46,7 +47,7 @@ public final class TransferTransactionComposer implements TransferComposer {
     private Account to;
 
     private BigDecimal amount;
-    private final Map<EconomyResultType, Component> messages = new HashMap<>();
+    private final Map<EconomyResultType, Supplier<Component>> messages = new HashMap<>();
 
     public Account target() {
         return this.to;
@@ -56,7 +57,7 @@ public final class TransferTransactionComposer implements TransferComposer {
         return this.amount;
     }
 
-    public Map<EconomyResultType, Component> messages() {
+    public Map<EconomyResultType, Supplier<Component>> messages() {
         return this.messages;
     }
 
@@ -79,13 +80,13 @@ public final class TransferTransactionComposer implements TransferComposer {
     }
 
     @Override
-    public TransferComposer message(@NotNull EconomyResultType type, @NotNull Component message) {
+    public TransferComposer message(@NotNull EconomyResultType type, @NotNull Supplier<@NotNull Component> message) {
         this.messages.put(type, message);
         return this;
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull EconomyTransferTransaction> send() {
+    public @NotNull EconomyTransferTransaction build() {
         Preconditions.checkNotNull(this.from, "from");
         Preconditions.checkNotNull(this.to, "to");
         Preconditions.checkNotNull(this.amount, "amount");

@@ -27,12 +27,11 @@ package net.impactdev.impactor.core.commands;
 
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.processing.CommandContainer;
-import cloud.commandframework.arguments.parser.ParserParameter;
-import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
+import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
-import com.google.common.collect.Lists;
+import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
@@ -41,9 +40,9 @@ import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.commands.ImpactorCommandManager;
+import net.impactdev.impactor.api.commands.brigadier.BrigadierMapper;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
-import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.commands.events.RegisterCommandsEvent;
 import net.impactdev.impactor.core.commands.parsers.ActivePaginationParser;
 import net.impactdev.impactor.core.commands.parsers.CurrencyParser;
@@ -52,10 +51,12 @@ import net.impactdev.impactor.core.commands.parsers.PlatformSourceParser;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.text.pagination.ActivePagination;
 import net.impactdev.impactor.core.utility.events.EventPublisher;
+import net.kyori.adventure.key.Key;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public final class ImpactorCommandRegistry {
@@ -71,19 +72,23 @@ public final class ImpactorCommandRegistry {
 
     public void registerAllCommands() {
         AnnotationParser<CommandSource> parser = this.createParser();
-
-        List<Class<?>> containers = this.collectCommandContainers(Impactor.instance());
-
-        containers.forEach(container -> {
-            try {
-                final Object instance = container.getConstructor().newInstance();
-                parser.parse(instance);
-            } catch (Exception e) {
-                ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
-            }
-        });
-
         EventPublisher.post(new RegisterCommandsEvent(parser));
+
+        MinecraftHelp<CommandSource> helper = new MinecraftHelp<>(
+                "/impactor help",
+                CommandSource::source,
+                this.manager().delegate()
+        );
+
+        this.manager().delegate().command(this.manager()
+                .delegate()
+                .commandBuilder("impactor")
+                .literal("help")
+                .argument(StringArgument.optional("query", StringArgument.StringMode.GREEDY))
+                .handler(context -> {
+                    helper.queryCommands(Objects.requireNonNull(context.getOrDefault("query", "")), context.getSender());
+                })
+        );
     }
 
     public void registerArgumentParsers() {
@@ -106,6 +111,9 @@ public final class ImpactorCommandRegistry {
                 TypeToken.get(ActivePagination.class),
                 options -> new ActivePaginationParser()
         );
+
+        BrigadierMapper mapper = this.manager().mapper();
+        mapper.map(Key.key("minecraft", "resource_location"), TypeToken.get(CurrencyParser.class));
     }
 
     private AnnotationParser<CommandSource> createParser() {

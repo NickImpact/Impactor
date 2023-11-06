@@ -53,6 +53,7 @@ import net.kyori.adventure.nbt.StringBinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.ByteTag;
 import net.minecraft.nbt.CompoundTag;
@@ -103,7 +104,7 @@ public final class ImpactorItemStackTranslator implements ItemStackTranslator {
         }
 
         for(Enchantment enchantment : stack.enchantments()) {
-            net.minecraft.world.item.enchantment.Enchantment target = Registry.ENCHANTMENT.get(ResourceKeyTranslator.asResourceLocation(enchantment.type()));
+            net.minecraft.world.item.enchantment.Enchantment target = BuiltInRegistries.ENCHANTMENT.get(ResourceKeyTranslator.asResourceLocation(enchantment.type()));
             result.enchant(target, enchantment.level());
         }
 
@@ -123,7 +124,7 @@ public final class ImpactorItemStackTranslator implements ItemStackTranslator {
 
     @Override
     public ImpactorItemStack from(ItemStack stack) {
-        Key key = ResourceKeyTranslator.toAdventure(Registry.ITEM.getKey(stack.getItem()));
+        Key key = ResourceKeyTranslator.toAdventure(BuiltInRegistries.ITEM.getKey(stack.getItem()));
         ItemType type = ItemType.from(key);
 
         CompoundTag nbt = stack.getOrCreateTag();

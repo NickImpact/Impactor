@@ -25,9 +25,9 @@
 
 package net.impactdev.impactor.minecraft.scoreboard.components;
 
-import net.impactdev.impactor.api.scoreboards.objectives.Objective;
-import net.impactdev.impactor.api.scoreboards.updaters.ComponentProvider;
-import net.impactdev.impactor.api.scoreboards.updaters.ResolverConfiguration;
+import net.impactdev.impactor.api.scoreboards.resolvers.objectives.Objective;
+import net.impactdev.impactor.api.scoreboards.resolvers.updaters.ComponentProvider;
+import net.impactdev.impactor.api.scoreboards.resolvers.updaters.ResolverConfiguration;
 
 public final class ImpactorObjective extends ImpactorScoreboardDisplayable implements Objective {
 

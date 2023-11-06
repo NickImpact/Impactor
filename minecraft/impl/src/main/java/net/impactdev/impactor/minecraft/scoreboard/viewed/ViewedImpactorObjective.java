@@ -25,9 +25,9 @@
 
 package net.impactdev.impactor.minecraft.scoreboard.viewed;
 
-import net.impactdev.impactor.api.scoreboards.objectives.Objective;
-import net.impactdev.impactor.api.scoreboards.updaters.ComponentResolver;
-import net.impactdev.impactor.api.scoreboards.relative.RelativeObjective;
+import net.impactdev.impactor.api.scoreboards.resolvers.objectives.Objective;
+import net.impactdev.impactor.api.scoreboards.resolvers.updaters.resolver.ComponentResolver;
+import net.impactdev.impactor.api.scoreboards.players.RelativeObjective;
 import net.kyori.adventure.text.Component;
 
 public class ViewedImpactorObjective implements RelativeObjective {

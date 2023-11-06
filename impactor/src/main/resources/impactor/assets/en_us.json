@@ -1,4 +1,6 @@
 {
+    "permissions.lacking": "<red>You don't have permission to perform that action...",
+
     "economy.account.balance": "<hover:show_text:'<gray>Currency: <yellow><impactor:currency><newline><gray>Account: <yellow><impactor:account:name> <gray>(<aqua><impactor:account:uuid><gray>)'><gray>Balance: <green><impactor:account:balance>",
     "economy.transactions.successful": "<hover:show_text:'<gray>Transaction Type: <yellow><impactor:economy_transaction:type><newline><gray>Before: <yellow><impactor:economy_transaction:before><newline><gray>After: <yellow><impactor:account:balance>'><gray>Transaction completed successfully! Hover for transaction info!",
     "economy.transactions.transfer.successful": "<hover:show_text:'<gray>Transaction Type: <yellow>TRANSFER<newline><gray>Source: <green><impactor:economy_transaction:source:before> <gray>--> <green><impactor:economy_transaction:source:after><newline><gray>Recipient: <green><impactor:economy_transaction:recipient:before> <gray>--> <green><impactor:economy_transaction:recipient:after>'><gray>Transaction completed successfully! Hover for transaction info!",

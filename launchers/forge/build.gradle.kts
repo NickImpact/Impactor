@@ -25,7 +25,6 @@ loom {
         }
 
         mixinConfig("mixins.impactor.forge.json")
-        mixinConfig("mixins.impactor.forge.commands.json")
     }
 }
 
@@ -33,11 +32,11 @@ dependencies {
     forge("net.minecraftforge:forge:${rootProject.property("minecraft")}-${rootProject.property("forge")}")
 
     implementation(project(":minecraft:impl"))
-    modImplementation("ca.landonjw.gooeylibs:forge:3.0.0-1.19.2-SNAPSHOT@jar")
+    modImplementation("ca.landonjw.gooeylibs:forge:3.0.0-1.20.1-SNAPSHOT@jar")
 
     include("io.leangen.geantyref:geantyref:1.3.13")
 
-    modImplementation("net.impactdev.impactor.commands:forge:5.0.0+1.19.2-SNAPSHOT") {
+    modImplementation("net.impactdev.impactor.commands:forge:5.1.1+1.20.1-SNAPSHOT") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")
@@ -52,7 +51,7 @@ dependencies {
 
 tasks {
     shadowJar {
-        val mapped = "loom_mappings_1_19_2_layered_hash_40359_v2_forge_1_19_2_43_1_47_forge"
+        val mapped = "loom_mappings_1_20_1_layered_hash_40359_v2_forge_1_20_1_47_0_3_forge"
         dependencies {
             include(dependency("$mapped.net.impactdev.impactor.commands:common:.*"))
             include(dependency("$mapped.net.impactdev.impactor.commands:forge:.*"))
@@ -62,6 +61,7 @@ tasks {
             include(dependency("cloud.commandframework:cloud-annotations:.*"))
             include(dependency("cloud.commandframework:cloud-brigadier:.*"))
             include(dependency("cloud.commandframework:cloud-services:.*"))
+            include(dependency("$mapped.cloud.commandframework:cloud-forge:.*"))
             include(dependency("cloud.commandframework:cloud-minecraft-extras:.*"))
 
             exclude("forge-client-extra.jar")
@@ -108,16 +108,6 @@ publishing {
     }
 }
 
-fun writeVersion(): String
-{
-    val plugin = rootProject.property("plugin")
-    val minecraft = rootProject.property("minecraft")
-    val snapshot = rootProject.property("snapshot") == "true"
-
-    var version = "$plugin+$minecraft"
-    if(snapshot) {
-        version = "$version-SNAPSHOT"
-    }
-
-    return version
+modrinth {
+    loaders.set(listOf("forge"))
 }

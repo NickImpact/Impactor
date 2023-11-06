@@ -12,6 +12,12 @@ repositories {
     maven("https://maven.impactdev.net/repository/development/")
     maven("https://hub.spigotmc.org/nexus/content/groups/public/")
     maven("https://libraries.minecraft.net")
+    maven("https://oss.sonatype.org/content/repositories/snapshots") {
+        name = "Sonatype Snapshots"
+    }
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots") {
+        name = "Sonatype 01 Snapshots"
+    }
 }
 
 version = rootProject.version
@@ -50,19 +56,5 @@ license {
 
 blossom {
     replaceToken("@version@", project.version)
-    replaceToken("@githash@", getLatestGitCommitHash(project))
-}
-
-fun getLatestGitCommitHash(project: Project) : String {
-    return try {
-        val byteOut = ByteArrayOutputStream()
-        project.exec {
-            this.commandLine = "git rev-parse --short HEAD".split(" ")
-            this.standardOutput = byteOut
-        }
-
-        byteOut.toString("UTF-8").trim()
-    } catch (ex: Exception) {
-        "Unknown"
-    }
+    replaceToken("@githash@", getLatestGitCommitHash())
 }

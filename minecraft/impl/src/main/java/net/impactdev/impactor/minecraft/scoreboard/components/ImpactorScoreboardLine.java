@@ -25,9 +25,9 @@
 
 package net.impactdev.impactor.minecraft.scoreboard.components;
 
-import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
-import net.impactdev.impactor.api.scoreboards.updaters.ComponentProvider;
-import net.impactdev.impactor.api.scoreboards.updaters.ResolverConfiguration;
+import net.impactdev.impactor.api.scoreboards.resolvers.lines.ScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.resolvers.updaters.ComponentProvider;
+import net.impactdev.impactor.api.scoreboards.resolvers.updaters.ResolverConfiguration;
 
 public final class ImpactorScoreboardLine extends ImpactorScoreboardDisplayable implements ScoreboardLine {
 

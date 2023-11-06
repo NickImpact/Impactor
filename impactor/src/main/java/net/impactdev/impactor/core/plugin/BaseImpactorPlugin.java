@@ -35,6 +35,7 @@ import net.impactdev.impactor.api.platform.PlatformInfo;
 import net.impactdev.impactor.api.scheduler.AbstractJavaScheduler;
 import net.impactdev.impactor.api.scheduler.v2.Scheduler;
 import net.impactdev.impactor.api.scheduler.v2.Schedulers;
+import net.impactdev.impactor.core.commands.CommandsModule;
 import net.impactdev.impactor.core.commands.ImpactorCommandRegistry;
 import net.impactdev.impactor.core.configuration.ConfigModule;
 import net.impactdev.impactor.core.configuration.ImpactorConfig;
@@ -122,6 +123,7 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         this.bootstrapper.logger().info("Registering modules...");
         Set<Class<? extends ImpactorModule>> modules = new LinkedHashSet<>(Lists.newArrayList(
                 ConfigModule.class,
+                CommandsModule.class,
                 EconomyModule.class,
                 SchedulerModule.class,
                 TextModule.class,
@@ -155,15 +157,12 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         ImpactorCommandRegistry registry = new ImpactorCommandRegistry();
         registry.registerArgumentParsers();
         registry.registerAllCommands();
-        this.registerCommandMappings(registry);
 
         this.setupSchedulers();
 
         this.logger().info("Setting up plugin integrations...");
         this.integrate();
     }
-
-    protected abstract void registerCommandMappings(ImpactorCommandRegistry registry);
 
     public void setup() {
         this.bootstrapper.logger().info("Initializing modules...");
