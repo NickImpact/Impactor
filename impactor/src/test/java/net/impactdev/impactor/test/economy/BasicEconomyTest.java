@@ -222,6 +222,13 @@ public class BasicEconomyTest {
 
         condensed = currency.format(amount, true, Locale.CANADA_FRENCH);
         assertEquals("$17,38", PlainTextComponentSerializer.plainText().serialize(condensed));
+
+        BigDecimal large = BigDecimal.valueOf(100_540_233);
+        condensed = currency.format(large, Locale.US);
+        assertEquals("$100,540,233.00", PlainTextComponentSerializer.plainText().serialize(condensed));
+
+        condensed = currency.format(large, Locale.ITALIAN);
+        assertEquals("$100.540.233,00", PlainTextComponentSerializer.plainText().serialize(condensed));
     }
 
     @Test

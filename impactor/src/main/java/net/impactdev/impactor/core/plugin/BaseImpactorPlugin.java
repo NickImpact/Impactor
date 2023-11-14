@@ -141,8 +141,10 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
 
         Platform platform = Impactor.instance().platform();
         if(platform.info().plugin("luckperms").isPresent()) {
+            this.logger().info("LuckPerms detected, initializing luckperms integration...");
             service.services().register(PermissionsService.class, new LuckPermsPermissionsService());
         } else {
+            this.logger().info("No particular permissions service located, all permissions are now allowed!");
             service.services().register(PermissionsService.class, new NoOpPermissionsService());
         }
 

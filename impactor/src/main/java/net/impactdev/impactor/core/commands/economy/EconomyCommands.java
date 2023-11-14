@@ -206,7 +206,7 @@ public final class EconomyCommands {
 
     @ProxiedBy("pay")
     @CommandMethod("economy|eco pay <amount> <target> [currency] [source]")
-    @CommandPermission("impactor.commands.economy.pay")
+    @CommandPermission("impactor.commands.economy.pay.base")
     public void transfer(
             final @NotNull CommandSource source,
             @Argument("amount") double amount,
@@ -220,15 +220,16 @@ public final class EconomyCommands {
 
         Context context = Context.empty();
         context.append(Currency.class, c);
-        if(target.equals(focus)) {
-            ImpactorTranslations.ECONOMY_CANT_PAY_SELF.send(source, context);
-            return;
-        }
 
         if(from != null) {
             PermissionsService permissions = Impactor.instance().services().provide(PermissionsService.class);
             if(!permissions.hasPermission(source.source(), "impactor.commands.economy.pay.other")) {
                 ImpactorTranslations.NO_PERMISSION.send(source, context);
+                return;
+            }
+        } else {
+            if(target.uuid().equals(source.uuid())) {
+                ImpactorTranslations.ECONOMY_CANT_PAY_SELF.send(source, context);
                 return;
             }
         }
