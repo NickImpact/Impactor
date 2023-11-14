@@ -35,3 +35,6 @@ include("minecraft:api")
 include("minecraft:impl")
 include("launchers:forge")
 include("launchers:fabric")
+
+// Integrations
+include("integrations:vault")

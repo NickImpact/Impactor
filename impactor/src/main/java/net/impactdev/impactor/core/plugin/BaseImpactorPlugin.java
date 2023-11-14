@@ -31,7 +31,6 @@ import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.platform.PlatformInfo;
 import net.impactdev.impactor.api.scheduler.AbstractJavaScheduler;
 import net.impactdev.impactor.core.commands.CommandsModule;
 import net.impactdev.impactor.core.commands.ImpactorCommandRegistry;
@@ -46,9 +45,6 @@ import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.api.APIRegister;
 import net.impactdev.impactor.core.api.ImpactorService;
-import net.impactdev.impactor.core.integrations.Dependencies;
-import net.impactdev.impactor.core.integrations.Dependency;
-import net.impactdev.impactor.core.integrations.Integration;
 import net.impactdev.impactor.core.permissions.LuckPermsPermissionsService;
 import net.impactdev.impactor.core.permissions.NoOpPermissionsService;
 import net.impactdev.impactor.core.economy.EconomyModule;
@@ -154,9 +150,6 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         ImpactorCommandRegistry registry = new ImpactorCommandRegistry();
         registry.registerArgumentParsers();
         registry.registerAllCommands();
-
-        this.logger().info("Setting up plugin integrations...");
-        this.integrate();
     }
 
     public void setup() {
@@ -239,45 +232,5 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         Path path = target.apply(Paths.get("impactor").resolve("assets"));
         return Optional.ofNullable(this.getClass().getClassLoader().getResourceAsStream(path.toString().replace("\\", "/")))
                 .orElseThrow(() -> new IllegalArgumentException("Target resource not located"));
-    }
-
-    private void integrate() {
-        PlatformInfo platform = Impactor.instance().platform().info();
-
-        ClassGraph graph = new ClassGraph()
-                .acceptPackages("net.impactdev.impactor")
-                .overrideClassLoaders(this.getClass().getClassLoader());
-
-        try (ScanResult scan = graph.scan()) {
-            ClassInfoList list = scan.getClassesImplementing(Integration.class);
-            list.stream()
-                    .map(info -> info.loadClass(Integration.class))
-                    .map(type -> {
-                        Dependencies dependencies = type.getAnnotation(Dependencies.class);
-                        if(dependencies == null) {
-                            return null;
-                        }
-
-                        for (Dependency dependency : dependencies.value()) {
-                            String id = dependency.value();
-                            if(!platform.plugin(id).isPresent() && !dependency.optional()) {
-                                return null;
-                            }
-                        }
-
-                        try {
-                            return type.getConstructor().newInstance();
-                        }
-                        catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .filter(Objects::nonNull)
-                    .forEach(integration -> {
-                        integration.subscribe(this.logger(), Impactor.instance().events());
-                    });
-        } catch (Exception e) {
-            ExceptionPrinter.print(this.logger(), e);
-        }
     }
 }

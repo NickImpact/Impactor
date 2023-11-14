@@ -23,17 +23,18 @@
  *
  */
 
-package net.impactdev.impactor.core.integrations;
+package net.impactdev.impactor.integrations.vault;
 
+import net.impactdev.impactor.api.configuration.key.ConfigKey;
 
-import net.impactdev.impactor.api.events.ImpactorEvent;
-import net.impactdev.impactor.api.logging.PluginLogger;
-import net.kyori.event.EventBus;
+import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.booleanKey;
+import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.stringKey;
 
-public interface Integration {
+public final class VaultConfig {
 
-    String name();
+    public static final ConfigKey<Boolean> USE_VAULT = booleanKey("use-vault", true);
+    public static final ConfigKey<String> VAULT_SYMBOL = stringKey("vault.symbol", "$");
+    public static final ConfigKey<Boolean> VAULT_SYMBOL_PREFIX = booleanKey("vault.symbol-is-prefix", true);
 
-    void subscribe(PluginLogger logger, EventBus<ImpactorEvent> bus);
 
 }
