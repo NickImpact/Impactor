@@ -66,7 +66,7 @@ public final class EconomyConfig {
         Map<String, String> props = ImmutableMap.copyOf(adapter.getStringMap("data.pool-settings.properties", ImmutableMap.of()));
         return new StorageCredentials(address, database, username, password, maxPoolSize, minIdle, maxLifetime, keepAliveTime, connectionTimeout, props);
     }));
-    public static final ConfigKey<String> SQL_TABLE_PREFIX = notReloadable(stringKey("table-prefix", "gts_"));
+    public static final ConfigKey<String> SQL_TABLE_PREFIX = notReloadable(stringKey("table-prefix", "economy_"));
 
 
     public static final ConfigKey<Boolean> APPLY_RESTRICTIONS = booleanKey("restrictions.enabled", true);
