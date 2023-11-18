@@ -78,13 +78,7 @@ publishing {
 
             groupId = "net.impactdev.impactor"
             artifactId = "common"
-
-            val snapshot = rootProject.property("snapshot") == "true"
-
-            version = rootProject.property("plugin").toString()
-            if(snapshot) {
-                version += "-SNAPSHOT"
-            }
+            version = writeVersion()
         }
     }
 }
