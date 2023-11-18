@@ -1,8 +1,6 @@
 name: Deploy
 
 on:
-  workflow_run:
-    workflows: [ "Validate" ]
   push:
     tags:
       - '[5-9]*' # We should only run this task when a tag is pushed, and the tag begins with the given regex
