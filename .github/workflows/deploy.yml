@@ -1,0 +1,36 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [ "Validate" ]
+  push:
+    tags:
+      - '[5-9]*' # We should only run this task when a tag is pushed, and the tag begins with the given regex
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-20.04
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+      - name: Build Artifacts
+        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+        with:
+          arguments: build
+      - name: Publish to Maven
+        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+        with:
+          arguments: publish
+      - name: Publish to Modrinth
+        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+        with:
+          arguments: modrinth
