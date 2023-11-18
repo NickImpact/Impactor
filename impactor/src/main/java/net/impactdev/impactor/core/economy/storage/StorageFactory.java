@@ -25,12 +25,19 @@
 
 package net.impactdev.impactor.core.economy.storage;
 
+import net.impactdev.impactor.api.configuration.Config;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.api.storage.connection.configurate.loaders.HoconLoader;
 import net.impactdev.impactor.api.storage.connection.configurate.loaders.JsonLoader;
 import net.impactdev.impactor.api.storage.connection.configurate.loaders.YamlLoader;
+import net.impactdev.impactor.api.storage.connection.sql.hikari.MySQLConnection;
+import net.impactdev.impactor.core.economy.EconomyConfig;
 import net.impactdev.impactor.core.economy.storage.implementations.ConfigurateProvider;
+import net.impactdev.impactor.core.economy.storage.implementations.SQLProvider;
+import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.core.storage.sql.MariaDbConnectionImpl;
+import net.impactdev.impactor.core.storage.sql.MySQLConnectionImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,6 +52,7 @@ public final class StorageFactory {
     }
 
     private static EconomyStorageImplementation createNewImplementation(StorageType type) {
+        Config config = BaseImpactorPlugin.instance().configuration();
         switch (type) {
             case JSON:
                 return new ConfigurateProvider(new JsonLoader());
@@ -52,6 +60,16 @@ public final class StorageFactory {
                 return new ConfigurateProvider(new YamlLoader());
             case HOCON:
                 return new ConfigurateProvider(new HoconLoader());
+            case MYSQL:
+                return new SQLProvider(
+                        new MySQLConnectionImpl(config.get(EconomyConfig.STORAGE_CREDENTIALS)),
+                        config.get(EconomyConfig.SQL_TABLE_PREFIX)
+                );
+            case MARIADB:
+                return new SQLProvider(
+                        new MariaDbConnectionImpl(config.get(EconomyConfig.STORAGE_CREDENTIALS)),
+                        config.get(EconomyConfig.SQL_TABLE_PREFIX)
+                );
         }
 
         throw new IllegalArgumentException("Unsupported storage type: " + type);

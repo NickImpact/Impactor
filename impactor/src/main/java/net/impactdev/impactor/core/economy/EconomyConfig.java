@@ -25,14 +25,17 @@
 
 package net.impactdev.impactor.core.economy;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.configuration.key.ConfigKey;
 import net.impactdev.impactor.api.economy.currency.Currency;
+import net.impactdev.impactor.api.storage.StorageCredentials;
 import net.impactdev.impactor.api.storage.StorageType;
 import net.kyori.adventure.key.Key;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
@@ -40,6 +43,8 @@ import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.bool
 import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.doubleKey;
 import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.intKey;
 import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.key;
+import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.notReloadable;
+import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.stringKey;
 import static net.kyori.adventure.text.Component.text;
 
 public final class EconomyConfig {
@@ -47,6 +52,22 @@ public final class EconomyConfig {
     public static final ConfigKey<StorageType> STORAGE_TYPE = key(adapter ->
             StorageType.parse(adapter.getString("storage-method", "json"))
     );
+    public static final ConfigKey<StorageCredentials> STORAGE_CREDENTIALS = notReloadable(key(adapter -> {
+        String address = adapter.getString("data.address", "localhost");
+        String database = adapter.getString("data.database", "minecraft");
+        String username = adapter.getString("data.username", "root");
+        String password = adapter.getString("data.password", "");
+
+        int maxPoolSize = adapter.getInteger("data.pool-settings.maximum-pool-size", 10);
+        int minIdle = adapter.getInteger("data.pool-settings.minimum-idle", maxPoolSize);
+        int maxLifetime = adapter.getInteger("data.pool-settings.maximum-lifetime", 1800000);
+        int connectionTimeout = adapter.getInteger("data.pool-settings.connection-timeout", 5000);
+        int keepAliveTime = adapter.getInteger("data.pool-settings.keep-alive", 0);
+        Map<String, String> props = ImmutableMap.copyOf(adapter.getStringMap("data.pool-settings.properties", ImmutableMap.of()));
+        return new StorageCredentials(address, database, username, password, maxPoolSize, minIdle, maxLifetime, keepAliveTime, connectionTimeout, props);
+    }));
+    public static final ConfigKey<String> SQL_TABLE_PREFIX = notReloadable(stringKey("table-prefix", "gts_"));
+
 
     public static final ConfigKey<Boolean> APPLY_RESTRICTIONS = booleanKey("restrictions.enabled", true);
     public static final ConfigKey<BigDecimal> MIN_BALANCE = key(adapter -> {
