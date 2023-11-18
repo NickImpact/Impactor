@@ -27,6 +27,7 @@ package net.impactdev.impactor.forge;
 
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.core.modules.ImpactorModule;
+import net.impactdev.impactor.core.modules.ModuleInitializer;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
 import net.impactdev.impactor.forge.commands.ForgeCommandModule;
 import net.impactdev.impactor.forge.platform.ForgePlatformModule;
@@ -48,14 +49,12 @@ public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorP
     }
 
     @Override
-    protected Set<Class<? extends ImpactorModule>> modules() {
-        Set<Class<? extends ImpactorModule>> parent = super.modules();
-        parent.add(ForgeSchedulerModule.class);
-        parent.add(ForgeUIModule.class);
-        parent.add(ForgePlatformModule.class);
-        parent.add(ForgeCommandModule.class);
-
-        return parent;
+    protected ModuleInitializer registerModules() {
+        return super.registerModules()
+                .with(ForgeSchedulerModule.class)
+                .with(ForgeUIModule.class)
+                .with(ForgePlatformModule.class)
+                .with(ForgeCommandModule.class);
     }
 
 }

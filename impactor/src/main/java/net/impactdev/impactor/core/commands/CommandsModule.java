@@ -31,6 +31,7 @@ import net.impactdev.impactor.core.commands.events.RegisterCommandsEvent;
 import net.impactdev.impactor.core.commands.pagination.PaginationCommands;
 import net.impactdev.impactor.core.commands.translations.TranslationCommands;
 import net.impactdev.impactor.core.modules.ImpactorModule;
+import net.impactdev.impactor.core.platform.commands.PlatformCommands;
 import net.kyori.event.EventBus;
 
 public final class CommandsModule implements ImpactorModule {
@@ -41,6 +42,7 @@ public final class CommandsModule implements ImpactorModule {
             event.register(EconomyCommands.class);
             event.register(PaginationCommands.class);
             event.register(TranslationCommands.class);
+            event.register(PlatformCommands.class);
         });
     }
 }

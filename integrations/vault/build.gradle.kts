@@ -14,3 +14,9 @@ dependencies {
     implementation(project(":api:config"))
     implementation(project(":api:economy"))
 }
+
+tasks {
+    jar {
+        archiveClassifier.set("")
+    }
+}

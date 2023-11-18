@@ -25,14 +25,11 @@
 
 package net.impactdev.impactor.minecraft.plugin;
 
-import com.google.common.collect.Sets;
-import net.impactdev.impactor.core.modules.ImpactorModule;
+import net.impactdev.impactor.core.modules.ModuleInitializer;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
 import net.impactdev.impactor.minecraft.items.ItemsModule;
 import net.impactdev.impactor.minecraft.ui.UIModule;
-
-import java.util.Set;
 
 public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
 
@@ -41,11 +38,10 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
     }
 
     @Override
-    protected Set<Class<? extends ImpactorModule>> modules() {
-        return Sets.newHashSet(
-                ItemsModule.class,
-                UIModule.class
-        );
+    protected ModuleInitializer registerModules() {
+        return super.registerModules()
+                .with(ItemsModule.class)
+                .with(UIModule.class);
     }
 
     @Override

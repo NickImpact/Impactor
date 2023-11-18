@@ -25,11 +25,6 @@
 
 package net.impactdev.impactor.core.plugin;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ClassInfoList;
-import io.github.classgraph.ScanResult;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.scheduler.AbstractJavaScheduler;
 import net.impactdev.impactor.core.commands.CommandsModule;
@@ -45,24 +40,21 @@ import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.api.APIRegister;
 import net.impactdev.impactor.core.api.ImpactorService;
+import net.impactdev.impactor.core.modules.ModuleInitializer;
 import net.impactdev.impactor.core.permissions.LuckPermsPermissionsService;
 import net.impactdev.impactor.core.permissions.NoOpPermissionsService;
 import net.impactdev.impactor.core.economy.EconomyModule;
-import net.impactdev.impactor.core.modules.ImpactorModule;
+import net.impactdev.impactor.core.permissions.PermissionsModule;
 import net.impactdev.impactor.core.text.TextModule;
 import net.impactdev.impactor.core.translations.TranslationsModule;
 import net.impactdev.impactor.core.utility.future.Futures;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable {
 
@@ -75,7 +67,8 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
             .version("@version@")
             .build();
 
-    private final Set<ImpactorModule> modules = Sets.newHashSet();
+    @MonotonicNonNull
+    private ModuleInitializer initializer;
 
     public BaseImpactorPlugin(ImpactorBootstrapper bootstrapper) {
         instance = this;
@@ -106,6 +99,16 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         return null;
     }
 
+    protected ModuleInitializer registerModules() {
+        ModuleInitializer initializer = new ModuleInitializer();
+        return initializer.with(ConfigModule.class)
+                .with(CommandsModule.class)
+                .with(EconomyModule.class)
+                .with(PermissionsModule.class)
+                .with(TextModule.class)
+                .with(TranslationsModule.class);
+    }
+
     @Override
     public void construct() {
         this.bootstrapper.logger().info("Initializing API...");
@@ -113,38 +116,12 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         APIRegister.register(service);
 
         this.bootstrapper.logger().info("Registering modules...");
-        Set<Class<? extends ImpactorModule>> modules = new LinkedHashSet<>(Lists.newArrayList(
-                ConfigModule.class,
-                CommandsModule.class,
-                EconomyModule.class,
-                TextModule.class,
-                TranslationsModule.class
-        ));
-
-        modules.addAll(Optional.ofNullable(this.modules()).orElse(Collections.emptySet()));
-        Set<ImpactorModule> collection = modules.stream().map(type -> {
-            try {
-                return type.getConstructor().newInstance();
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to load class module", e);
-            }
-        }).peek(module -> {
-            module.factories(service.factories());
-            module.builders(service.builders());
-            module.services(service.services());
-            module.subscribe(service.events());
-        }).collect(Collectors.toSet());
-
-        Platform platform = Impactor.instance().platform();
-        if(platform.info().plugin("luckperms").isPresent()) {
-            this.logger().info("LuckPerms detected, initializing luckperms integration...");
-            service.services().register(PermissionsService.class, new LuckPermsPermissionsService());
-        } else {
-            this.logger().info("No particular permissions service located, all permissions are now allowed!");
-            service.services().register(PermissionsService.class, new NoOpPermissionsService());
+        this.initializer = this.registerModules();
+        try {
+            this.initializer.construct(service);
+        } catch (Exception e) {
+            ExceptionPrinter.print(this.logger(), e);
         }
-
-        this.modules.addAll(collection);
 
         this.logger().info("Registering commands...");
         ImpactorCommandRegistry registry = new ImpactorCommandRegistry();
@@ -156,14 +133,11 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         this.bootstrapper.logger().info("Initializing modules...");
 
         Impactor service = Impactor.instance();
-        this.modules.forEach(module -> {
-            try {
-                module.init(service, this.logger());
-            }
-            catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        try {
+            this.initializer.initialize(service, this.logger());
+        } catch (Exception e) {
+            ExceptionPrinter.print(this.logger(), e);
+        }
     }
 
     @Override
@@ -186,46 +160,6 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         Futures.shutdown();
 
         this.logger().info("Scheduler shutdown successfully!");
-    }
-
-    protected abstract Set<Class<? extends ImpactorModule>> modules();
-
-    /**
-     * For 1.16.5, this code works perfectly in a non-forge environment. However, with forge, there's
-     * a discrepancy with the TransformingClassLoader which prevents this tool from finding
-     * the class file assets. Per forums, this should be fixed with 1.17.1+ due to forge switching
-     * to the java module system. This code will be reactivated then, but for now, we are stuck with a
-     * manual solution.
-     * <p>
-     * This problem affects sponge and forge only (SpongeForge, SpongeVanilla, Forge).
-     */
-    private void initializeModules(Impactor service) {
-        ClassGraph graph = new ClassGraph()
-                .acceptPackages("net.impactdev.impactor")
-                .overrideClassLoaders(this.getClass().getClassLoader());
-
-        try (ScanResult scan = graph.scan()) {
-            ClassInfoList list = scan.getClassesImplementing(ImpactorModule.class);
-            this.bootstrapper.logger().info("Scan complete, found " + list.size() + " modules, now loading...");
-            list.stream()
-                    .map(info -> info.loadClass(ImpactorModule.class))
-                    .map(type -> {
-                        try {
-                            return type.getConstructor().newInstance();
-                        }
-                        catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .forEach(module -> {
-                        module.factories(service.factories());
-                        module.builders(service.builders());
-                        module.services(service.services());
-                    });
-            this.bootstrapper.logger().info("Module loading complete!");
-        } catch (Exception e) {
-            ExceptionPrinter.print(this.logger(), e);
-        }
     }
 
     public InputStream resource(Function<Path, Path> target) {
