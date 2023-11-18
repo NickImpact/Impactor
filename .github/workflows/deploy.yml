@@ -11,7 +11,6 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-20.04
-    needs: build
     steps:
       - uses: actions/checkout@v2
         with:
@@ -32,7 +31,12 @@ jobs:
         uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
         with:
           arguments: publish
+        env:
+          NEXUS_USER: ${{ secrets.NEXUS_USER }}
+          NEXUS_PW: ${{ secrets.NEXUS_PW }}
       - name: Publish to Modrinth
         uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
         with:
           arguments: modrinth
+        env:
+          MODRINTH_GRADLE_TOKEN: ${{ secrets.MODRINTH_GRADLE_TOKEN }}
