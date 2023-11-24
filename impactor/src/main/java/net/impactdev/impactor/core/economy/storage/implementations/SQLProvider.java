@@ -58,7 +58,7 @@ public final class SQLProvider implements EconomyStorageImplementation {
 
     public static final String HAS_ACCOUNT = "SELECT 1 FROM '{prefix}accounts' WHERE uuid = ? AND currency = ?";
     public static final String ACCOUNT = "SELECT * FROM '{prefix}accounts' WHERE uuid = ? AND currency = ?";
-    public static final String INSERT_ACCOUNT = "INSERT INTO '{prefix}accounts' (uuid, currency, balance, virtual) VALUES(?, ?, ?, ?)";
+    public static final String UPDATE_OR_INSERT_ACCOUNT = "INSERT INTO '{prefix}accounts' (uuid, currency, virtual, balance) VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE balance = VALUES(balance)";
     public static final String ALL_ACCOUNTS = "SELECT * FROM '{prefix}accounts'";
     public static final String DELETE_ACCOUNT = "DELETE FROM '{prefix}accounts' WHERE uuid = ? AND currency = ?";
     public static final String TRUNCATE_ACCOUNTS = "TRUNCATE TABLE '{prefix}accounts'";
@@ -173,11 +173,11 @@ public final class SQLProvider implements EconomyStorageImplementation {
 
     @Override
     public void save(Account account) throws Exception {
-        this.query(INSERT_ACCOUNT, (connection, ps) -> {
+        this.query(UPDATE_OR_INSERT_ACCOUNT, (connection, ps) -> {
             ps.setBytes(1, this.uuidToBytes(account.owner()));
             ps.setString(2, account.currency().key().asString());
-            ps.setBigDecimal(3, account.balance());
-            ps.setBoolean(4, account.virtual());
+            ps.setBoolean(3, account.virtual());
+            ps.setBigDecimal(4, account.balance());
 
             ps.executeUpdate();
             return null;

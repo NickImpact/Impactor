@@ -71,7 +71,7 @@ public abstract class HikariConnection implements SQLConnection {
     @Override
     public void init() throws Exception {
         HikariConfig config = new HikariConfig();
-        config.setPoolName("Impactor (" + (index++) + ")");
+        config.setPoolName("Impactor (Hikari Pool: " + (index++) + ")");
 
         String[] addressSplit = this.credentials.getAddress().split(":");
         String address = addressSplit[0];

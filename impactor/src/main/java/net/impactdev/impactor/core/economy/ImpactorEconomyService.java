@@ -61,7 +61,7 @@ public final class ImpactorEconomyService implements EconomyService {
         }
 
         this.provider = new ImpactorCurrencyProvider(currencies);
-        this.storage = StorageFactory.instance(BaseImpactorPlugin.instance(), this.config.get(EconomyConfig.STORAGE_TYPE), StorageType.JSON);
+        this.storage = StorageFactory.instance(BaseImpactorPlugin.instance(), this.config, StorageType.JSON);
 
         try {
             this.storage.init();

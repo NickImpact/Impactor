@@ -50,23 +50,23 @@ import static net.kyori.adventure.text.Component.text;
 public final class EconomyConfig {
 
     public static final ConfigKey<StorageType> STORAGE_TYPE = key(adapter ->
-            StorageType.parse(adapter.getString("storage-method", "json"))
+            StorageType.parse(adapter.getString("storage.method", "json"))
     );
     public static final ConfigKey<StorageCredentials> STORAGE_CREDENTIALS = notReloadable(key(adapter -> {
-        String address = adapter.getString("data.address", "localhost");
-        String database = adapter.getString("data.database", "minecraft");
-        String username = adapter.getString("data.username", "root");
-        String password = adapter.getString("data.password", "");
+        String address = adapter.getString("storage.data.address", "localhost");
+        String database = adapter.getString("storage.data.database", "minecraft");
+        String username = adapter.getString("storage.data.username", "root");
+        String password = adapter.getString("storage.data.password", "");
 
-        int maxPoolSize = adapter.getInteger("data.pool-settings.maximum-pool-size", 10);
-        int minIdle = adapter.getInteger("data.pool-settings.minimum-idle", maxPoolSize);
-        int maxLifetime = adapter.getInteger("data.pool-settings.maximum-lifetime", 1800000);
-        int connectionTimeout = adapter.getInteger("data.pool-settings.connection-timeout", 5000);
-        int keepAliveTime = adapter.getInteger("data.pool-settings.keep-alive", 0);
-        Map<String, String> props = ImmutableMap.copyOf(adapter.getStringMap("data.pool-settings.properties", ImmutableMap.of()));
+        int maxPoolSize = adapter.getInteger("storage.data.pool-settings.maximum-pool-size", 10);
+        int minIdle = adapter.getInteger("storage.data.pool-settings.minimum-idle", maxPoolSize);
+        int maxLifetime = adapter.getInteger("storage.data.pool-settings.maximum-lifetime", 1800000);
+        int connectionTimeout = adapter.getInteger("storage.data.pool-settings.connection-timeout", 5000);
+        int keepAliveTime = adapter.getInteger("storage.data.pool-settings.keep-alive", 0);
+        Map<String, String> props = ImmutableMap.copyOf(adapter.getStringMap("storage.data.pool-settings.properties", ImmutableMap.of()));
         return new StorageCredentials(address, database, username, password, maxPoolSize, minIdle, maxLifetime, keepAliveTime, connectionTimeout, props);
     }));
-    public static final ConfigKey<String> SQL_TABLE_PREFIX = notReloadable(stringKey("table-prefix", "economy_"));
+    public static final ConfigKey<String> SQL_TABLE_PREFIX = notReloadable(stringKey("storage.table-prefix", "economy_"));
 
 
     public static final ConfigKey<Boolean> APPLY_RESTRICTIONS = booleanKey("restrictions.enabled", true);
