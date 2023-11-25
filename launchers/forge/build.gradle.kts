@@ -1,3 +1,5 @@
+import extensions.writeVersion
+
 plugins {
     id("impactor.launcher-conventions")
     id("impactor.publishing-conventions")
@@ -95,15 +97,7 @@ publishing {
 
             groupId = "net.impactdev.impactor.launchers"
             artifactId = "forge"
-
-            val plugin = rootProject.property("plugin").toString()
-            val minecraft = rootProject.property("minecraft").toString()
-            val snapshot = rootProject.property("snapshot") == "true"
-
-            version = "${plugin}+${minecraft}"
-            if(snapshot) {
-                version += "-SNAPSHOT"
-            }
+            version = writeVersion()
         }
     }
 }

@@ -23,16 +23,22 @@
  *
  */
 
-package net.impactdev.impactor.core.integrations;
+package net.impactdev.impactor.core.storage.hikari;
 
-import net.impactdev.impactor.api.events.ImpactorEvent;
-import net.impactdev.impactor.api.logging.PluginLogger;
-import net.kyori.event.EventBus;
+import net.impactdev.impactor.api.storage.StorageCredentials;
+import net.impactdev.impactor.api.storage.connection.sql.SQLConnection;
+import net.impactdev.impactor.api.storage.connection.sql.hikari.HikariConnectionBuilder;
 
-public interface Integration {
+public abstract class HikariConnectionBuilderImpl<T extends SQLConnection, B extends HikariConnectionBuilder<T, B>>
+        implements HikariConnectionBuilder<T, B>
+{
 
-    String name();
+    protected StorageCredentials credentials;
 
-    void subscribe(PluginLogger logger, EventBus<ImpactorEvent> bus);
-
+    @SuppressWarnings("unchecked")
+    @Override
+    public B credentials(StorageCredentials credentials) {
+        this.credentials = credentials;
+        return (B) this;
+    }
 }

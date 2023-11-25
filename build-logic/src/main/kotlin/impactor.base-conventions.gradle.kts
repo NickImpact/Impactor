@@ -1,4 +1,4 @@
-import java.io.ByteArrayOutputStream
+import extensions.getLatestGitCommitHash
 
 plugins {
     `java-library`
@@ -54,7 +54,15 @@ license {
     }
 }
 
-blossom {
-    replaceToken("@version@", project.version)
-    replaceToken("@githash@", getLatestGitCommitHash())
+sourceSets {
+//    replaceToken("@version@", project.version)
+//    replaceToken("@githash@", getLatestGitCommitHash())
+    main {
+        blossom {
+            javaSources {
+                property("version", project.version.toString())
+                property("commit", project.getLatestGitCommitHash())
+            }
+        }
+    }
 }

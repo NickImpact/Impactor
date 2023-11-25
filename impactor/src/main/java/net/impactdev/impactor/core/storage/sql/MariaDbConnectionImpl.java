@@ -23,21 +23,41 @@
  *
  */
 
-package net.impactdev.impactor.core.integrations;
+package net.impactdev.impactor.core.storage.sql;
 
-import org.intellij.lang.annotations.Pattern;
+import net.impactdev.impactor.api.storage.StorageCredentials;
+import net.impactdev.impactor.api.storage.connection.sql.hikari.MariaDBConnection;
+import net.impactdev.impactor.core.storage.hikari.DriverBasedHikariConnection;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.function.Function;
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Dependency {
+public class MariaDbConnectionImpl extends DriverBasedHikariConnection implements MariaDBConnection {
+    public MariaDbConnectionImpl(StorageCredentials credentials) {
+        super(credentials);
+    }
 
-    @Pattern("[a-z][a-z0-9_-]{0,63}")
-    String value();
+    @Override
+    public String name() {
+        return "MariaDB";
+    }
 
-    boolean optional() default false;
+    @Override
+    public Function<String, String> statementProcessor() {
+        return s -> s.replace('\'', '`'); // use backticks for quotes
+    }
+
+    @Override
+    protected String driverClassName() {
+        return "org.mariadb.jdbc.Driver";
+    }
+
+    @Override
+    protected String driverJdbcIdentifier() {
+        return "mariadb";
+    }
+
+    @Override
+    protected String defaultPort() {
+        return "3306";
+    }
 }

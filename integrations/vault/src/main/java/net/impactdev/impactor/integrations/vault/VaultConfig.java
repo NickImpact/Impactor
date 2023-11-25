@@ -23,17 +23,18 @@
  *
  */
 
-package net.impactdev.impactor.core.integrations;
+package net.impactdev.impactor.integrations.vault;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import net.impactdev.impactor.api.configuration.key.ConfigKey;
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Dependencies {
+import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.booleanKey;
+import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.stringKey;
 
-    Dependency[] value();
+public final class VaultConfig {
+
+    public static final ConfigKey<Boolean> USE_VAULT = booleanKey("use-vault", true);
+    public static final ConfigKey<String> VAULT_SYMBOL = stringKey("vault.symbol", "$");
+    public static final ConfigKey<Boolean> VAULT_SYMBOL_PREFIX = booleanKey("vault.symbol-is-prefix", true);
+
 
 }

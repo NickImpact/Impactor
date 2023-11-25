@@ -1,3 +1,5 @@
+import extensions.writeVersion
+
 plugins {
     id("impactor.base-conventions")
     id("impactor.publishing-conventions")
@@ -24,13 +26,13 @@ dependencies {
     }
 
     // Databases
-    api("com.zaxxer:HikariCP:4.0.3")
+    api("com.zaxxer:HikariCP:5.0.1")
     api("com.h2database:h2:2.1.214")
-    api("mysql:mysql-connector-java:8.0.32")
+    api("mysql:mysql-connector-java:8.0.33")
     api("org.mariadb.jdbc:mariadb-java-client:3.1.2")
-    api("org.mongodb:mongo-java-driver:3.12.2")
+    api("org.mongodb:mongo-java-driver:3.12.12")
 
-    api("com.github.ben-manes.caffeine:caffeine:2.9.3")
+    api("com.github.ben-manes.caffeine:caffeine:3.1.5")
     implementation("io.github.classgraph:classgraph:4.8.157")
     implementation("net.luckperms:api:5.4")
     implementation("me.lucko:spark-api:0.1-SNAPSHOT")
@@ -44,8 +46,8 @@ dependencies {
     testImplementation("net.kyori:adventure-text-serializer-ansi:4.14.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
-    testImplementation("org.mockito:mockito-core:4.7.0")
-    testRuntimeOnly("org.apache.logging.log4j:log4j-core:2.19.0")
+    testImplementation("org.mockito:mockito-core:5.2.0")
+    testRuntimeOnly("org.apache.logging.log4j:log4j-core:2.20.0")
 }
 
 tasks.withType(Test::class) {
@@ -78,13 +80,7 @@ publishing {
 
             groupId = "net.impactdev.impactor"
             artifactId = "common"
-
-            val snapshot = rootProject.property("snapshot") == "true"
-
-            version = rootProject.property("plugin").toString()
-            if(snapshot) {
-                version += "-SNAPSHOT"
-            }
+            version = writeVersion()
         }
     }
 }

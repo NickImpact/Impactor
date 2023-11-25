@@ -34,14 +34,11 @@ import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.platform.sources.metadata.MetadataKey;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
-import net.impactdev.impactor.core.commands.events.RegisterCommandsEvent;
 import net.impactdev.impactor.core.modules.ImpactorModule;
-import net.impactdev.impactor.core.platform.commands.PlatformCommands;
 import net.impactdev.impactor.core.platform.sources.metadata.MetadataKeyFactory;
 import net.impactdev.impactor.forge.platform.performance.ForgePerformanceMonitorFactory;
 import net.impactdev.impactor.forge.platform.sources.ForgePlatformFactory;
 import net.impactdev.impactor.forge.platform.sources.ForgePlatformPlayerService;
-import net.kyori.event.EventBus;
 
 @SuppressWarnings("unused")
 public class ForgePlatformModule implements ImpactorModule {
