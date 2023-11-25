@@ -1,3 +1,5 @@
+import extensions.getLatestGitCommitHash
+
 plugins {
     `java-library`
     id("org.cadixdev.licenser")
@@ -52,7 +54,15 @@ license {
     }
 }
 
-blossom {
-    replaceToken("@version@", project.version)
-    replaceToken("@githash@", getLatestGitCommitHash())
+sourceSets {
+//    replaceToken("@version@", project.version)
+//    replaceToken("@githash@", getLatestGitCommitHash())
+    main {
+        blossom {
+            javaSources {
+                property("version", project.version.toString())
+                property("commit", project.getLatestGitCommitHash())
+            }
+        }
+    }
 }

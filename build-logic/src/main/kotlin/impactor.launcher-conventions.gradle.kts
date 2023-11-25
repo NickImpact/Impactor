@@ -1,3 +1,5 @@
+import extensions.isRelease
+import extensions.writeVersion
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
@@ -17,7 +19,6 @@ tasks {
         archiveBaseName.set("Impactor-${project.name.capitalize()}")
         archiveVersion.set(writeVersion())
     }
-
 }
 
 tasks.withType<PublishToMavenRepository> {
@@ -32,6 +33,7 @@ modrinth {
     token.set(System.getenv("MODRINTH_GRADLE_TOKEN"))
     projectId.set("Impactor")
     versionNumber.set(writeVersion())
+    versionName.set("Impactor ${writeVersion()}")
 
     versionType.set(if(!isRelease()) "beta" else "release")
     uploadFile.set(tasks.remapJar)
@@ -39,7 +41,11 @@ modrinth {
     gameVersions.set(listOf(rootProject.property("minecraft").toString()))
 
     // https://github.com/modrinth/minotaur
-    // TODO - Changelog integration
     // TODO - Project Body Sync
-    debugMode.set(true)
+    val plugin = rootProject.property("plugin")
+    val contents = rootProject.buildDir.toPath()
+            .resolve("deploy")
+            .resolve("$plugin.md")
+
+    changelog.set(contents.toFile().readLines().joinToString(separator = "\n"))
 }

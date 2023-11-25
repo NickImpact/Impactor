@@ -1,3 +1,5 @@
+import extensions.writeVersion
+
 plugins {
     id("impactor.launcher-conventions")
     id("impactor.publishing-conventions")
