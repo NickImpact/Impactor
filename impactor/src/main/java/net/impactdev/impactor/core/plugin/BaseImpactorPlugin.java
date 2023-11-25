@@ -165,8 +165,6 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         this.logger().info("Schedulers shutdown successfully!");
     }
 
-    protected abstract Set<Class<? extends ImpactorModule>> modules();
-
     protected void setupSchedulers() {
         this.logger().info("Setting up schedulers...");
         Schedulers.register(Scheduler.ASYNCHRONOUS, new AsyncScheduler());

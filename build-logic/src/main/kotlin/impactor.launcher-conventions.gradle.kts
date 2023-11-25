@@ -1,6 +1,7 @@
 import extensions.isRelease
 import extensions.writeVersion
 import net.fabricmc.loom.task.RemapJarTask
+import java.nio.file.Files
 
 plugins {
     id("impactor.loom-conventions")
@@ -106,10 +107,18 @@ modrinth {
 
     // https://github.com/modrinth/minotaur
     // TODO - Project Body Sync
+    changelog.set(readChangelog())
+}
+
+fun readChangelog(): String {
     val plugin = rootProject.property("plugin")
     val contents = rootProject.buildDir.toPath()
-            .resolve("deploy")
-            .resolve("$plugin.md")
+        .resolve("deploy")
+        .resolve("$plugin.md")
 
-    changelog.set(contents.toFile().readLines().joinToString(separator = "\n"))
+    if(!Files.exists(contents)) {
+        return "No changelog notes available..."
+    }
+
+    return contents.toFile().readLines().joinToString(separator = "\n")
 }
