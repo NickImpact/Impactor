@@ -27,8 +27,8 @@ package net.impactdev.impactor.minecraft.scoreboard;
 
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.core.modules.ImpactorModule;
-import net.impactdev.impactor.minecraft.scoreboard.implementations.PacketImplementation;
-import net.impactdev.impactor.minecraft.scoreboard.viewed.ViewedImpactorScoreboard;
+//import net.impactdev.impactor.minecraft.scoreboard.implementations.PacketImplementation;
+//import net.impactdev.impactor.minecraft.scoreboard.viewed.ViewedImpactorScoreboard;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 
@@ -37,14 +37,14 @@ public final class ScoreboardModule implements ImpactorModule {
     @Override
     public void factories(FactoryProvider provider) {
         provider.register(ScoreboardRenderer.Factory.class, new ImplementationFactory());
-        provider.register(AssignedScoreboard.Factory.class, new ViewedImpactorScoreboard.ViewedScoreboardFactory());
     }
 
     private static final class ImplementationFactory implements ScoreboardRenderer.Factory {
 
         @Override
         public ScoreboardRenderer packets() {
-            return new PacketImplementation();
+//            return new PacketImplementation();
+            return null;
         }
 
     }

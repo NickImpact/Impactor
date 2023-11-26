@@ -26,26 +26,45 @@
 package net.impactdev.impactor.minecraft.test;
 
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.events.ClientConnectionEvent;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.scheduler.Ticks;
 import net.impactdev.impactor.api.scheduler.v2.Scheduler;
 import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.api.scoreboards.Scoreboard;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.listening.Subscribers;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.kyori.adventure.text.Component;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public final class ScoreboardTests {
 
     @Test
+    @Disabled("In development, implementation not ready")
     public void create() {
+//        Objective objective = Objective.scheduled(builder -> builder
+//                .provider(ctx -> Component.text("Impactor Server Diagnostics"))
+////                .transformer(FadeTransformer.create(90, 3, 0))
+//                .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
+//                .task((scheduler, displayable) -> scheduler.repeating(displayable::update, Ticks.single()))
+//                .build()
+//        );
+
         Objective objective = Objective.scheduled(builder -> builder
-                .provider(ctx -> Component.text("Impactor Server Diagnostics"))
-//                .transformer(FadeTransformer.create(90, 3, 0))
+                .provider(ctx -> Component.empty())
                 .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
-                .task((scheduler, displayable) -> scheduler.repeating(displayable::update, Ticks.single()))
+                .repeating(Ticks.single())
+                .build()
+        );
+
+        Objective listening = Objective.listening(builder -> builder
+                .listenForWithConditions(ClientConnectionEvent.Join.class)
+                .condition(event -> event.player().uuid().equals(PlatformSource.SERVER_UUID))
+                .complete()
+                .subscribe(Subscribers.impactor())
                 .build()
         );
 

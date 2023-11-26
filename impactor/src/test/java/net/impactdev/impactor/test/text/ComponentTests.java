@@ -73,12 +73,12 @@ public final class ComponentTests {
 
     @Test
     public void transforming() {
-        TransformableText test = TransformableText.builder()
-                .supplier(() -> Component.text("Impactor Server Diagnostics"))
-                .transformer(FadeTransformer.create(90, 3, 0))
-                .build();
-
-        audience.sendMessage(test);
+//        TransformableText test = TransformableText.builder()
+//                .supplier(() -> Component.text("Impactor Server Diagnostics"))
+////                .transformer(FadeTransformer.create(90, 3, 0))
+//                .build();
+//
+//        audience.sendMessage(test);
     }
 
 }

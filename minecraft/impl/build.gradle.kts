@@ -2,8 +2,8 @@ import extensions.writeVersion
 
 plugins {
     id("impactor.base-conventions")
-    id("impactor.loom-conventions")
     id("impactor.publishing-conventions")
+    id("org.spongepowered.gradle.vanilla")
 }
 
 repositories {
@@ -17,6 +17,10 @@ java {
     }
 }
 
+minecraft {
+    version("${rootProject.property("minecraft")}")
+}
+
 dependencies {
     api(project(":api:scoreboard"))
     api(project(":impactor"))
@@ -25,8 +29,8 @@ dependencies {
     implementation("org.spongepowered:mixin:0.8.5")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
-    compileOnly("com.google.auto.service:auto-service:1.0-rc5")
-    annotationProcessor("com.google.auto.service:auto-service:1.0-rc5:processor")
+    compileOnly("com.google.auto.service:auto-service:1.0.1")
+//    annotationProcessor("com.google.auto.service:auto-service:1.0.1:processor")
 
     testImplementation("net.kyori:adventure-text-serializer-ansi:4.14.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")

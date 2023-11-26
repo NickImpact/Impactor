@@ -25,6 +25,10 @@
 
 package net.impactdev.impactor.minecraft.plugin;
 
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.scheduler.Ticks;
+import net.impactdev.impactor.api.scheduler.v2.Scheduler;
+import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.core.modules.ModuleInitializer;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
@@ -32,6 +36,11 @@ import net.impactdev.impactor.minecraft.items.ItemsModule;
 import net.impactdev.impactor.minecraft.platform.GamePlatform;
 import net.impactdev.impactor.minecraft.scheduler.SyncScheduler;
 import net.impactdev.impactor.minecraft.ui.UIModule;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
 

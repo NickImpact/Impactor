@@ -27,8 +27,8 @@ package net.impactdev.impactor.minecraft.scoreboard;
 
 import net.impactdev.impactor.api.scoreboards.Scoreboard;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
-import net.impactdev.impactor.api.scoreboards.resolvers.lines.ScoreboardLine;
-import net.impactdev.impactor.api.scoreboards.resolvers.objectives.Objective;
+import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 
 import java.util.ArrayList;
 import java.util.List;
