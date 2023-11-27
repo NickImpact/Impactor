@@ -29,8 +29,8 @@ dependencies {
     implementation("org.spongepowered:mixin:0.8.5")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
-    compileOnly("com.google.auto.service:auto-service:1.0.1")
-//    annotationProcessor("com.google.auto.service:auto-service:1.0.1:processor")
+    compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
+    annotationProcessor("com.google.auto.service:auto-service:1.1.1")
 
     testImplementation("net.kyori:adventure-text-serializer-ansi:4.14.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
