@@ -1,6 +1,7 @@
 import extensions.isRelease
 import extensions.writeVersion
 import net.fabricmc.loom.task.RemapJarTask
+import java.nio.file.Files
 
 plugins {
     id("impactor.loom-conventions")
@@ -36,16 +37,25 @@ modrinth {
     versionName.set("Impactor ${writeVersion()}")
 
     versionType.set(if(!isRelease()) "beta" else "release")
-    uploadFile.set(tasks.remapJar)
+    uploadFile.set(tasks["remapProductionJar"])
 
     gameVersions.set(listOf(rootProject.property("minecraft").toString()))
 
     // https://github.com/modrinth/minotaur
     // TODO - Project Body Sync
+    changelog.set(readChangelog())
+    debugMode.set(true)
+}
+
+fun readChangelog(): String {
     val plugin = rootProject.property("plugin")
     val contents = rootProject.buildDir.toPath()
-            .resolve("deploy")
-            .resolve("$plugin.md")
+        .resolve("deploy")
+        .resolve("$plugin.md")
 
-    changelog.set(contents.toFile().readLines().joinToString(separator = "\n"))
+    if(!Files.exists(contents)) {
+        return "No changelog notes available..."
+    }
+
+    return contents.toFile().readLines().joinToString(separator = "\n")
 }
