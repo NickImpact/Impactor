@@ -46,7 +46,7 @@ public final class ImpactorScoreboard implements Scoreboard {
     }
 
     @Override
-    public ScoreboardRenderer implementation() {
+    public ScoreboardRenderer renderer() {
         return this.implementation;
     }
 
@@ -67,7 +67,7 @@ public final class ImpactorScoreboard implements Scoreboard {
         private final List<ScoreboardLine> lines = new ArrayList<>();
 
         @Override
-        public ScoreboardBuilder implementation(ScoreboardRenderer implementation) {
+        public ScoreboardBuilder renderer(ScoreboardRenderer implementation) {
             this.implementation = implementation;
             return this;
         }

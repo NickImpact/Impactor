@@ -23,7 +23,7 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.test;
+package net.impactdev.impactor.minecraft.test.scoreboards;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
@@ -36,8 +36,9 @@ import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.api.scoreboards.Scoreboard;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
 import net.impactdev.impactor.api.scoreboards.display.formatters.rgb.RainbowFormatter;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.listening.Subscribers;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.SchedulerConfiguration;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolverConfiguration;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.subscribing.Subscribers;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.subscribing.SubscriptionConfiguration;
 import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
@@ -54,44 +55,31 @@ public final class ScoreboardTests {
     @Test
     @Disabled("In development, implementation not ready")
     public void create() {
-        Objective objective = Objective.scheduled(builder -> builder
-                .provider(ctx -> Component.empty())
-                .formatter(RainbowFormatter.builder()
-                        .phase(0)
-                        .increment(3)
-                        .build()
-                )
-                .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
-                .repeating(Ticks.single())
-                .build()
-        ).build();
-
-        Objective listening = Objective.listening(builder -> builder
-                .listenForWithConditions(ClientConnectionEvent.Join.class)
-                .condition(event -> event.player().uuid().equals(PlatformSource.SERVER_UUID))
-                .complete()
-                .subscribe(Subscribers.impactor())
-                .build()
-        ).formatter(new BlankFormatter()).build();
-
-        ScoreboardLine online = ScoreboardLine.scheduled(builder -> builder
+        Objective objective = Objective.builder()
+                .resolver(ScheduledResolverConfiguration.builder()
+                        .formatter(RainbowFormatter.builder().phase(0).increment(3).locked(false).build())
                         .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
-                        .repeating(5, TimeUnit.SECONDS)
-                        .provider(ctx -> Component.text(Impactor.instance().services().provide(PlatformPlayerService.class).online().size()))
+                        .repeating(Ticks.single())
                         .build()
                 )
-                .score(Score.builder()
-                        .score(15)
-                        .formatter(new BlankFormatter())
-                        .locked(true)
+                .formatter(BlankFormatter.INSTANCE)
+                .build();
+
+        Objective listening = Objective.builder()
+                .formatter(BlankFormatter.INSTANCE)
+                .resolver(SubscriptionConfiguration.builder()
+                        .provider(context -> Component.empty())
+                        .listenForWithConditions(ClientConnectionEvent.Join.class)
+                        .condition(event -> event.player().uuid().equals(PlatformSource.SERVER_UUID))
+                        .complete()
+                        .subscribe(Subscribers.impactor())
                         .build()
                 )
                 .build();
 
         Scoreboard scoreboard = Scoreboard.builder()
-                .renderer(ScoreboardRenderer.packets())
+                .renderer(new TestRenderer())
                 .objective(objective)
-                .line(online)
                 .build();
 
         AssignedScoreboard viewed = scoreboard.assignTo(PlatformPlayer.getOrCreate(PlatformSource.SERVER_UUID));
