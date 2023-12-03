@@ -23,7 +23,26 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.scoreboard.display.resolvers;
+package net.impactdev.impactor.minecraft.test;
 
-public interface Dummy {
+import net.impactdev.impactor.api.logging.PluginLogger;
+import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
+
+public class TestBootstrapper extends ImpactorBootstrapper {
+
+    public TestBootstrapper(PluginLogger logger) {
+        super(logger);
+    }
+
+    public void launch() {
+        this.plugin.construct();
+        this.plugin.setup();
+    }
+
+    @Override
+    protected BaseImpactorPlugin createPlugin() {
+        return new TestPlugin(this);
+    }
+
 }

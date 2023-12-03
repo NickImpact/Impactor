@@ -27,12 +27,18 @@ package net.impactdev.impactor.minecraft.scoreboard;
 
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.impactdev.impactor.api.scoreboards.Scoreboard;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolverConfiguration;
+import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 //import net.impactdev.impactor.minecraft.scoreboard.implementations.PacketImplementation;
 //import net.impactdev.impactor.minecraft.scoreboard.viewed.ViewedImpactorScoreboard;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
+import net.impactdev.impactor.minecraft.scoreboard.assigned.AssignedScoreboardImpl;
+import net.impactdev.impactor.minecraft.scoreboard.display.lines.ImpactorScoreboardLine;
+import net.impactdev.impactor.minecraft.scoreboard.display.objectives.ImpactorObjective;
 import net.impactdev.impactor.minecraft.scoreboard.display.resolvers.scheduled.ScheduledResolverConfigurationImpl;
 import net.impactdev.impactor.minecraft.scoreboard.renderers.PacketBasedRenderer;
 
@@ -41,12 +47,16 @@ public final class ScoreboardModule implements ImpactorModule {
     @Override
     public void factories(FactoryProvider provider) {
         provider.register(ScoreboardRenderer.Factory.class, new ImplementationFactory());
+
+        provider.register(AssignedScoreboard.Factory.class, AssignedScoreboardImpl::new);
     }
 
     @Override
     public void builders(BuilderProvider provider) {
         // Scoreboard
         provider.register(Scoreboard.ScoreboardBuilder.class, ImpactorScoreboard.ImpactorScoreboardBuilder::new);
+        provider.register(Objective.ObjectiveBuilder.class, ImpactorObjective.ImpactorObjectiveBuilder::new);
+        provider.register(ScoreboardLine.LineBuilder.class, ImpactorScoreboardLine.ImpactorScoreboardLineBuilder::new);
 
         // Resolvers
         provider.register(ScheduledResolverConfiguration.Configuration.class, ScheduledResolverConfigurationImpl.TaskBuilder::new);

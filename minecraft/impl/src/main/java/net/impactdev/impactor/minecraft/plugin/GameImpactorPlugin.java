@@ -35,6 +35,7 @@ import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
 import net.impactdev.impactor.minecraft.items.ItemsModule;
 import net.impactdev.impactor.minecraft.platform.GamePlatform;
 import net.impactdev.impactor.minecraft.scheduler.SyncScheduler;
+import net.impactdev.impactor.minecraft.scoreboard.ScoreboardModule;
 import net.impactdev.impactor.minecraft.ui.UIModule;
 
 import java.time.Duration;
@@ -52,6 +53,7 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
     protected ModuleInitializer registerModules() {
         return super.registerModules()
                 .with(ItemsModule.class)
+                .with(ScoreboardModule.class)
                 .with(UIModule.class);
     }
 

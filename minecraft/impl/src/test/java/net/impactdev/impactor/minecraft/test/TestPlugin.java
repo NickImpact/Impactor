@@ -23,7 +23,30 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.scoreboard.display.resolvers;
+package net.impactdev.impactor.minecraft.test;
 
-public interface Dummy {
+import net.impactdev.impactor.api.scheduler.Ticks;
+import net.impactdev.impactor.core.modules.ModuleInitializer;
+import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
+import net.impactdev.impactor.minecraft.scoreboard.ScoreboardModule;
+import net.impactdev.impactor.minecraft.test.dummies.TestCommandsModule;
+import net.impactdev.impactor.minecraft.test.dummies.TestPlatform;
+import net.impactdev.impactor.minecraft.test.dummies.TestScheduler;
+
+public class TestPlugin extends BaseImpactorPlugin {
+
+    public TestPlugin(ImpactorBootstrapper bootstrapper) {
+        super(bootstrapper);
+    }
+
+    @Override
+    protected ModuleInitializer registerModules() {
+        return super.registerModules()
+                .with(TestPlatform.TestPlatformModule.class)
+                .with(TestScheduler.TestSchedulerModule.class)
+                .with(TestCommandsModule.class)
+                .with(ScoreboardModule.class);
+    }
+
 }

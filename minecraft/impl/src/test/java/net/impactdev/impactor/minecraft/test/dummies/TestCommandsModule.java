@@ -23,7 +23,16 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.scoreboard.display.resolvers;
+package net.impactdev.impactor.minecraft.test.dummies;
 
-public interface Dummy {
+import net.impactdev.impactor.api.commands.ImpactorCommandManager;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.core.modules.ImpactorModule;
+
+public class TestCommandsModule implements ImpactorModule {
+
+    @Override
+    public void factories(FactoryProvider provider) {
+        provider.register(ImpactorCommandManager.Factory.class, new TestCommandManagerFactory());
+    }
 }

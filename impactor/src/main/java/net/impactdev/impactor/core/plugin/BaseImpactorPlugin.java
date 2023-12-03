@@ -109,6 +109,7 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
                 .with(CommandsModule.class)
                 .with(EconomyModule.class)
                 .with(PermissionsModule.class)
+                .with(SchedulerModule.class)
                 .with(TextModule.class)
                 .with(TranslationsModule.class);
     }

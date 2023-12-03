@@ -44,6 +44,8 @@ import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.impactdev.impactor.api.scoreboards.score.Score;
 import net.impactdev.impactor.api.scoreboards.score.formatters.BlankFormatter;
+import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
+import net.impactdev.impactor.minecraft.test.TestPlugin;
 import net.kyori.adventure.text.Component;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -53,10 +55,11 @@ import java.util.concurrent.TimeUnit;
 public final class ScoreboardTests {
 
     @Test
-    @Disabled("In development, implementation not ready")
-    public void create() {
+//    @Disabled("In development, implementation not ready")
+    public void create() throws InterruptedException {
         Objective objective = Objective.builder()
                 .resolver(ScheduledResolverConfiguration.builder()
+                        .provider(context -> Component.text("Impactor Scoreboard Test"))
                         .formatter(RainbowFormatter.builder().phase(0).increment(3).locked(false).build())
                         .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
                         .repeating(Ticks.single())
@@ -65,24 +68,30 @@ public final class ScoreboardTests {
                 .formatter(BlankFormatter.INSTANCE)
                 .build();
 
-        Objective listening = Objective.builder()
-                .formatter(BlankFormatter.INSTANCE)
-                .resolver(SubscriptionConfiguration.builder()
-                        .provider(context -> Component.empty())
-                        .listenForWithConditions(ClientConnectionEvent.Join.class)
-                        .condition(event -> event.player().uuid().equals(PlatformSource.SERVER_UUID))
-                        .complete()
-                        .subscribe(Subscribers.impactor())
-                        .build()
-                )
-                .build();
+//        Objective listening = Objective.builder()
+//                .formatter(BlankFormatter.INSTANCE)
+//                .resolver(SubscriptionConfiguration.builder()
+//                        .provider(context -> Component.empty())
+//                        .listenForWithConditions(ClientConnectionEvent.Join.class)
+//                        .condition(event -> event.player().uuid().equals(PlatformSource.SERVER_UUID))
+//                        .complete()
+//                        .subscribe(Subscribers.impactor())
+//                        .build()
+//                )
+//                .build();
 
+        TestRenderer renderer = new TestRenderer();
         Scoreboard scoreboard = Scoreboard.builder()
-                .renderer(new TestRenderer())
+                .renderer(renderer)
                 .objective(objective)
                 .build();
 
         AssignedScoreboard viewed = scoreboard.assignTo(PlatformPlayer.getOrCreate(PlatformSource.SERVER_UUID));
+        viewed.open();
+
+        Thread.sleep(5000);
+        PrettyPrinter printer = renderer.printer;
+        printer.log(TestPlugin.instance().logger());
     }
 
 }

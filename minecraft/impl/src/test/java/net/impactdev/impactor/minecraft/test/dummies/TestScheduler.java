@@ -23,7 +23,31 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.scoreboard.display.resolvers;
+package net.impactdev.impactor.minecraft.test.dummies;
 
-public interface Dummy {
+import net.impactdev.impactor.api.logging.PluginLogger;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.scheduler.AbstractJavaScheduler;
+import net.impactdev.impactor.api.scheduler.SchedulerAdapter;
+import net.impactdev.impactor.core.modules.ImpactorModule;
+import net.impactdev.impactor.minecraft.test.TestPlugin;
+
+import java.util.concurrent.Executor;
+
+public class TestScheduler extends AbstractJavaScheduler {
+    public TestScheduler(PluginLogger logger) {
+        super(logger);
+    }
+
+    @Override
+    public Executor sync() {
+        return Runnable::run;
+    }
+
+    public static class TestSchedulerModule implements ImpactorModule {
+        @Override
+        public void factories(FactoryProvider provider) {
+            provider.register(SchedulerAdapter.class, new TestScheduler(TestPlugin.instance().logger()));
+        }
+    }
 }

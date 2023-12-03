@@ -23,7 +23,38 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.scoreboard.display.resolvers;
+package net.impactdev.impactor.minecraft.test.dummies;
 
-public interface Dummy {
+import net.impactdev.impactor.api.items.ImpactorItemStack;
+import net.impactdev.impactor.api.items.platform.ItemTransaction;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.sources.SourceType;
+import net.impactdev.impactor.core.platform.sources.ImpactorPlatformSource;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
+
+public class TestPlatformPlayer extends ImpactorPlatformSource implements PlatformPlayer {
+
+    public TestPlatformPlayer(UUID uuid) {
+        super(uuid, SourceType.PLAYER);
+    }
+
+    @Override
+    public ItemTransaction offer(ImpactorItemStack stack) {
+        return null;
+    }
+
+    @Override
+    public ItemTransaction take(ImpactorItemStack stack) {
+        return null;
+    }
+
+    public static final class TestFactory implements PlatformPlayer.Factory {
+
+        @Override
+        public PlatformPlayer player(@NotNull UUID uuid) {
+            return new TestPlatformPlayer(uuid);
+        }
+    }
 }

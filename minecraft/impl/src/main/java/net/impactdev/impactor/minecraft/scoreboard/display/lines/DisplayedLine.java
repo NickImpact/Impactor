@@ -23,7 +23,29 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.scoreboard.display.resolvers;
+package net.impactdev.impactor.minecraft.scoreboard.display.lines;
 
-public interface Dummy {
+import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
+import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
+import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
+import net.impactdev.impactor.minecraft.scoreboard.display.AbstractDisplay;
+
+public class DisplayedLine extends AbstractDisplay implements ScoreboardLine.Displayed {
+
+    private final ScoreboardLine delegate;
+
+    public DisplayedLine(AssignedScoreboard scoreboard, ScoreboardLine delegate) {
+        super(scoreboard, delegate.resolver().create());
+        this.delegate = delegate;
+    }
+
+    @Override
+    public ScoreboardLine delegate() {
+        return this.delegate;
+    }
+
+    @Override
+    protected void render(AssignedScoreboard scoreboard, ScoreboardRenderer renderer) {
+        renderer.line(scoreboard.viewer(), this);
+    }
 }

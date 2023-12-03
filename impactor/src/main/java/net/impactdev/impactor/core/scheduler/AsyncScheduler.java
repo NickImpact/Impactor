@@ -87,7 +87,7 @@ public class AsyncScheduler implements Scheduler {
 
     @Override
     public SchedulerTask delayed(@NotNull Runnable action, @NotNull Ticks ticks) {
-        return this.delayed(action::run, ticks.ticks() / 20, TimeUnit.SECONDS);
+        return this.delayed(action, this.ticksToMillis(ticks), TimeUnit.SECONDS);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class AsyncScheduler implements Scheduler {
 
     @Override
     public SchedulerTask repeating(@NotNull Runnable action, @NotNull Ticks ticks) {
-        return this.repeating(action, ticks.ticks() / 20, TimeUnit.SECONDS);
+        return this.repeating(action, this.ticksToMillis(ticks), TimeUnit.SECONDS);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class AsyncScheduler implements Scheduler {
 
     @Override
     public SchedulerTask delayedAndRepeating(@NotNull Runnable action, @NotNull Ticks delay, @NotNull Ticks interval) {
-        return this.delayedAndRepeating(action, delay.ticks() / 20, interval.ticks() / 20, TimeUnit.SECONDS);
+        return this.delayedAndRepeating(action, this.ticksToMillis(delay), this.ticksToMillis(interval), TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -156,6 +156,10 @@ public class AsyncScheduler implements Scheduler {
                 );
             }
         });
+    }
+
+    private long ticksToMillis(Ticks ticks) {
+        return ticks.ticks() * 50;
     }
 
     private static final class WorkerThreadFactory implements ForkJoinPool.ForkJoinWorkerThreadFactory {

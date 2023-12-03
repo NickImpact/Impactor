@@ -26,26 +26,56 @@
 package net.impactdev.impactor.minecraft.scoreboard.display.objectives;
 
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
-import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.config.ResolverConfiguration;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
-import net.impactdev.impactor.minecraft.scoreboard.display.AbstractDisplay;
+import net.impactdev.impactor.api.scoreboards.score.ScoreFormatter;
+import org.jetbrains.annotations.Nullable;
 
-public final class DisplayedObjective extends AbstractDisplay implements Objective.Displayed {
+public final class ImpactorObjective implements Objective {
 
-    private final Objective delegate;
+    private final ResolverConfiguration<?> resolver;
+    private final ScoreFormatter formatter;
 
-    public DisplayedObjective(AssignedScoreboard parent, Objective delegate) {
-        super(parent, delegate.resolver().create());
-        this.delegate = delegate;
+    private ImpactorObjective(ImpactorObjectiveBuilder builder) {
+        this.resolver = builder.resolver;
+        this.formatter = builder.formatter;
     }
 
     @Override
-    public Objective delegate() {
-        return this.delegate;
+    public ResolverConfiguration<?> resolver() {
+        return this.resolver;
     }
 
     @Override
-    protected void render(AssignedScoreboard scoreboard, ScoreboardRenderer renderer) {
-        renderer.objective(scoreboard.viewer(), this);
+    public @Nullable ScoreFormatter formatter() {
+        return this.formatter;
     }
+
+    public DisplayedObjective create(AssignedScoreboard scoreboard) {
+        return new DisplayedObjective(scoreboard, this);
+    }
+
+    public static final class ImpactorObjectiveBuilder implements ObjectiveBuilder {
+
+        private ResolverConfiguration<?> resolver;
+        private ScoreFormatter formatter;
+
+        @Override
+        public ObjectiveBuilder resolver(ResolverConfiguration<?> configuration) {
+            this.resolver = configuration;
+            return this;
+        }
+
+        @Override
+        public ObjectiveBuilder formatter(ScoreFormatter formatter) {
+            this.formatter = formatter;
+            return this;
+        }
+
+        @Override
+        public Objective build() {
+            return new ImpactorObjective(this);
+        }
+    }
+
 }
