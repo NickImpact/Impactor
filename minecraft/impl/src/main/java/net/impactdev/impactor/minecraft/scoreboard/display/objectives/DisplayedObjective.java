@@ -46,6 +46,6 @@ public final class DisplayedObjective extends AbstractDisplay implements Objecti
 
     @Override
     protected void render(AssignedScoreboard scoreboard, ScoreboardRenderer renderer) {
-        renderer.objective(scoreboard.viewer(), this);
+        renderer.objective(scoreboard, this);
     }
 }

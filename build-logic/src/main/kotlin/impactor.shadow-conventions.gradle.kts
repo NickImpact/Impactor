@@ -15,6 +15,7 @@ tasks {
             include(project(":api:items"))
             include(project(":api:players"))
             include(project(":api:plugins"))
+            include(project(":api:scoreboard"))
             include(project(":api:storage"))
             include(project(":api:text"))
             include(project(":api:translations"))

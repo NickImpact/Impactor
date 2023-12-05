@@ -37,7 +37,7 @@ import java.util.UUID;
 public class TestPlatformPlayer extends ImpactorPlatformSource implements PlatformPlayer {
 
     public TestPlatformPlayer(UUID uuid) {
-        super(uuid, SourceType.PLAYER);
+        super(uuid, SourceType.SERVER);
     }
 
     @Override

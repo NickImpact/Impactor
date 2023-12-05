@@ -46,6 +46,6 @@ public class DisplayedLine extends AbstractDisplay implements ScoreboardLine.Dis
 
     @Override
     protected void render(AssignedScoreboard scoreboard, ScoreboardRenderer renderer) {
-        renderer.line(scoreboard.viewer(), this);
+        renderer.line(scoreboard, this);
     }
 }

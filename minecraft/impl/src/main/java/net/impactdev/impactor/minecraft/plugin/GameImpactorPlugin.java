@@ -65,21 +65,6 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
     @Override
     public void starting() {
         ((SyncScheduler) Schedulers.require(Scheduler.SYNCHRONOUS)).initialize(this.platform().server());
-
-        Scheduler async = Schedulers.require(Scheduler.ASYNCHRONOUS);
-        async.delayedAndRepeating(() -> this.logger().info("Testing"), Ticks.of(20), Ticks.of(30 * 20));
-
-        AtomicReference<Instant> marker = new AtomicReference<>();
-        Scheduler sync = Schedulers.require(Scheduler.SYNCHRONOUS);
-        sync.repeating(() -> {
-            if(marker.get() == null) {
-                marker.set(Instant.now());
-                this.logger().info("Invoking first synchronized action!");
-            } else {
-                Duration since = Duration.between(marker.get(), marker.updateAndGet(current -> Instant.now()));
-                this.logger().info("Invoking synchronized action, took " + since.getSeconds() + " seconds since last iteration...");
-            }
-        }, 5, TimeUnit.SECONDS);
     }
 
     @Override

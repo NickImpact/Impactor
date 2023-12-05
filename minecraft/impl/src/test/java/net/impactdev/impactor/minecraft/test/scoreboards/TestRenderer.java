@@ -25,49 +25,61 @@
 
 package net.impactdev.impactor.minecraft.test.scoreboards;
 
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
 import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
-import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.ansi.ANSIComponentSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 import java.util.Optional;
 
 public class TestRenderer implements ScoreboardRenderer {
 
-    public final PrettyPrinter printer = new PrettyPrinter(80);
+    public final Logger logger = LoggerFactory.getLogger("Impactor");
+    private final Marker marker = MarkerFactory.getMarker("Scoreboards");
+
     private final ANSIComponentSerializer serializer = ANSIComponentSerializer.ansi();
 
     @Override
-    public void objective(PlatformPlayer viewer, Objective.Displayed objective) {
-        this.printer.title(this.serializer.serialize(objective.text()));
+    public void objective(AssignedScoreboard scoreboard, Objective.Displayed objective) {
+        this.logger.info(this.marker, this.serializer.serialize(objective.text()));
     }
 
     @Override
-    public void line(PlatformPlayer viewer, ScoreboardLine.Displayed line) {
-        this.printer.add(this.serializer.serialize(line.text()));
+    public void line(AssignedScoreboard scoreboard, ScoreboardLine.Displayed line) {
+        this.logger.info(this.marker, this.serializer.serialize(line.text()));
 
         Component score = Optional.ofNullable(line.delegate().score().formatter())
                 .map(formatter -> formatter.format(line.delegate().score().value()))
                 .orElse(Component.text(line.delegate().score().value()));
-        this.printer.add("- Score: %s", this.serializer.serialize(score));
-        this.printer.add("  * Formatted: %b", line.delegate().score().formatter() != null);
-        this.printer.newline();
+        this.logger.info(this.marker, "- Score: {}", this.serializer.serialize(score));
+        this.logger.info(this.marker, "  * Formatted: {}", line.delegate().score().formatter() != null);
+        this.logger.info(this.marker, "");
+    }
+
+    @Override
+    public void createTeam(AssignedScoreboard scoreboard, ScoreboardLine.Displayed line) {
+
+    }
+
+    @Override
+    public void destroyTeam(AssignedScoreboard scoreboard, ScoreboardLine.Displayed line) {
+
     }
 
     @Override
     public void show(AssignedScoreboard scoreboard) {
-        scoreboard.objective().resolver().start(scoreboard.objective());
-        scoreboard.lines().forEach(line -> line.resolver().start(line));
+
     }
 
     @Override
-    public void hide(AssignedScoreboard scoreboard) {}
+    public void hide(AssignedScoreboard scoreboard) {
 
-    @Override
-    public void registerTeam(PlatformPlayer viewer) {}
+    }
 
 }

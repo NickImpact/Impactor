@@ -25,22 +25,41 @@
 
 package net.impactdev.impactor.minecraft.scoreboard;
 
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.events.ImpactorEvent;
+import net.impactdev.impactor.api.platform.players.PlatformPlayerService;
+import net.impactdev.impactor.api.platform.players.events.ClientConnectionEvent;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.api.scheduler.Ticks;
+import net.impactdev.impactor.api.scheduler.v2.Scheduler;
+import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.impactdev.impactor.api.scoreboards.Scoreboard;
+import net.impactdev.impactor.api.scoreboards.display.formatters.rgb.ColorCycle;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolver;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolverConfiguration;
 import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
+import net.impactdev.impactor.api.scoreboards.score.Score;
+import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 //import net.impactdev.impactor.minecraft.scoreboard.implementations.PacketImplementation;
 //import net.impactdev.impactor.minecraft.scoreboard.viewed.ViewedImpactorScoreboard;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
+import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.minecraft.scoreboard.assigned.AssignedScoreboardImpl;
+import net.impactdev.impactor.minecraft.scoreboard.display.formatters.ColorCycleFormatter;
 import net.impactdev.impactor.minecraft.scoreboard.display.lines.ImpactorScoreboardLine;
 import net.impactdev.impactor.minecraft.scoreboard.display.objectives.ImpactorObjective;
 import net.impactdev.impactor.minecraft.scoreboard.display.resolvers.scheduled.ScheduledResolverConfigurationImpl;
+import net.impactdev.impactor.minecraft.scoreboard.display.score.ImpactorScore;
 import net.impactdev.impactor.minecraft.scoreboard.renderers.PacketBasedRenderer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.event.EventBus;
+
+import static net.kyori.adventure.text.Component.text;
 
 public final class ScoreboardModule implements ImpactorModule {
 
@@ -57,9 +76,64 @@ public final class ScoreboardModule implements ImpactorModule {
         provider.register(Scoreboard.ScoreboardBuilder.class, ImpactorScoreboard.ImpactorScoreboardBuilder::new);
         provider.register(Objective.ObjectiveBuilder.class, ImpactorObjective.ImpactorObjectiveBuilder::new);
         provider.register(ScoreboardLine.LineBuilder.class, ImpactorScoreboardLine.ImpactorScoreboardLineBuilder::new);
+        provider.register(Score.ScoreBuilder.class, ImpactorScore.ImpactorScoreBuilder::new);
 
         // Resolvers
         provider.register(ScheduledResolverConfiguration.Configuration.class, ScheduledResolverConfigurationImpl.TaskBuilder::new);
+
+        // Formatters
+        provider.register(ColorCycle.Config.class, ColorCycleFormatter.FormatterConfig::new);
+    }
+
+    @Override
+    public void subscribe(EventBus<ImpactorEvent> bus) {
+        bus.subscribe(ClientConnectionEvent.Join.class, event -> {
+            BaseImpactorPlugin.instance().logger().info("Connection established, attempting to send scoreboard...");
+
+            Objective objective = Objective.builder()
+                    .resolver(ScheduledResolverConfiguration.builder()
+                            .provider((viewer, context) -> text("Impactor Testing")
+                                    .appendSpace()
+                                    .append(text("(").color(NamedTextColor.GRAY))
+                                    .append(text(Impactor.instance().services().provide(PlatformPlayerService.class).online().size()))
+                                    .append(text(")").color(NamedTextColor.GRAY))
+                            )
+                            .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
+                            .repeating(Ticks.of(1))
+                            .formatter(ColorCycle.configure().frames(90).increment(3).build())
+                            .build()
+                    )
+                    .build();
+
+            ScoreboardLine tps = ScoreboardLine.builder()
+                    .resolver(ScheduledResolverConfiguration.builder()
+                            .provider((viewer, context) -> TextProcessor.mini().parse("<gray>TPS: <green><impactor:tps>"))
+                            .scheduler(Schedulers.require(Scheduler.SYNCHRONOUS))
+                            .repeating(Ticks.single())
+                            .build()
+                    )
+                    .score(Score.builder().score(2).build())
+                    .build();
+            ScoreboardLine mspt = ScoreboardLine.builder()
+                    .resolver(ScheduledResolverConfiguration.builder()
+                            .provider((viewer, context) -> TextProcessor.mini().parse("<gray>MSPT: <green><impactor:mspt>"))
+                            .scheduler(Schedulers.require(Scheduler.SYNCHRONOUS))
+                            .repeating(Ticks.single())
+                            .build()
+                    )
+                    .score(Score.builder().score(1).build())
+                    .build();
+
+            Scoreboard scoreboard = Scoreboard.builder()
+                    .renderer(ScoreboardRenderer.packets())
+                    .objective(objective)
+                    .line(tps)
+                    .line(mspt)
+                    .build();
+
+            AssignedScoreboard assigned = scoreboard.assignTo(event.player());
+            Schedulers.require(Scheduler.SYNCHRONOUS).publish(assigned::open);
+        });
     }
 
     private static final class ImplementationFactory implements ScoreboardRenderer.Factory {

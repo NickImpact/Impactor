@@ -26,6 +26,8 @@ dependencies {
     api(project(":impactor"))
     api(project(":minecraft:api"))
 
+    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+
     implementation("org.spongepowered:mixin:0.8.5")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 

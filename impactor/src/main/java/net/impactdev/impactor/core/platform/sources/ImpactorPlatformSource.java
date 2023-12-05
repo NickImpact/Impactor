@@ -28,6 +28,7 @@ package net.impactdev.impactor.core.platform.sources;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.platform.sources.SourceType;
 import net.impactdev.impactor.api.platform.sources.metadata.MetadataKey;
+import net.impactdev.impactor.core.utility.pointers.AbstractPointerCapable;
 import net.kyori.adventure.text.Component;
 
 import java.util.HashMap;
@@ -37,7 +38,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public abstract class ImpactorPlatformSource implements PlatformSource {
+public abstract class ImpactorPlatformSource extends AbstractPointerCapable implements PlatformSource {
 
     private final UUID uuid;
     private final SourceType type;

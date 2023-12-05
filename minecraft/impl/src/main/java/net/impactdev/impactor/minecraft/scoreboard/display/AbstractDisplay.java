@@ -32,9 +32,10 @@ import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
 import net.impactdev.impactor.api.scoreboards.display.Display;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.ComponentResolver;
 import net.impactdev.impactor.api.utility.Context;
+import net.impactdev.impactor.core.utility.pointers.AbstractPointerCapable;
 import net.kyori.adventure.text.Component;
 
-public abstract class AbstractDisplay implements Display {
+public abstract class AbstractDisplay extends AbstractPointerCapable implements Display {
 
     private final AssignedScoreboard scoreboard;
     protected final ComponentResolver resolver;
@@ -60,7 +61,7 @@ public abstract class AbstractDisplay implements Display {
         context.pointer(ScoreboardPointers.ASSIGNED, this.scoreboard);
         context.pointer(PlatformPlayer.PLAYER, this.scoreboard.viewer());
 
-        this.display = this.resolver.resolve(context);
+        this.display = this.resolver.resolve(this.scoreboard.viewer(), context);
         this.render(this.scoreboard, this.scoreboard.configuration().renderer());
     }
 

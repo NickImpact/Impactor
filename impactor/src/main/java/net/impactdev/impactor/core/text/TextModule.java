@@ -60,11 +60,9 @@ public final class TextModule implements ImpactorModule {
 
     @Override
     public void init(Impactor impactor, PluginLogger logger) throws Exception {
-        Impactor api = Impactor.instance();
-        PlaceholderService service = api.services().provide(PlaceholderService.class);
+        PlaceholderService service = impactor.services().provide(PlaceholderService.class);
 
         BaseImpactorPlugin.instance().logger().info("Firing placeholder registration event");
-
         EventPublisher.post(new ImpactorRegisterPlaceholdersEvent(service));
     }
 }

@@ -30,6 +30,8 @@ import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.PlatformPlayerService;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.api.text.placeholders.PlaceholderArguments;
@@ -37,6 +39,7 @@ import net.impactdev.impactor.api.translations.metadata.LanguageInfo;
 import net.impactdev.impactor.core.economy.context.TransactionContext;
 import net.impactdev.impactor.core.economy.context.TransferTransactionContext;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 
@@ -56,8 +59,11 @@ public final class ImpactorPlaceholders {
     public static final ImpactorPlaceholder NAME = new ImpactorPlaceholder(
             impactor("name"),
             (viewer, ctx) -> ctx.request(PlatformSource.class)
+                    .or(() -> ctx.request(PlatformPlayer.class))
+                    .or(() -> ctx.request(PlatformSource.SOURCE))
+                    .or(() -> ctx.request(PlatformPlayer.PLAYER))
                     .map(PlatformSource::name)
-                    .orElse(empty())
+                    .orElse(Component.empty())
     );
 
     public static final ImpactorPlaceholder UUID = new ImpactorPlaceholder(

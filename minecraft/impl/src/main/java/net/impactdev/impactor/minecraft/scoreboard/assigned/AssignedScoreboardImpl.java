@@ -31,13 +31,17 @@ import net.impactdev.impactor.api.scoreboards.Scoreboard;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
 import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
+import net.impactdev.impactor.core.utility.pointers.AbstractPointerCapable;
 import net.impactdev.impactor.minecraft.scoreboard.display.lines.ImpactorScoreboardLine;
 import net.impactdev.impactor.minecraft.scoreboard.display.objectives.ImpactorObjective;
+import net.minecraft.ChatFormatting;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public final class AssignedScoreboardImpl implements AssignedScoreboard {
+public final class AssignedScoreboardImpl extends AbstractPointerCapable implements AssignedScoreboard {
+
+    public static String MEMBER_PREFIX = "§B§5§D";
 
     private final Scoreboard config;
     private final PlatformPlayer viewer;
@@ -45,6 +49,8 @@ public final class AssignedScoreboardImpl implements AssignedScoreboard {
     private final ScoreboardRenderer renderer;
     private final Objective.Displayed objective;
     private final List<ScoreboardLine.Displayed> lines;
+
+    private final ColorSelector colors = new ColorSelector();
 
     public AssignedScoreboardImpl(Scoreboard config, PlatformPlayer viewer) {
         this.config = config;
@@ -81,16 +87,24 @@ public final class AssignedScoreboardImpl implements AssignedScoreboard {
     @Override
     public void open() {
         this.renderer.show(this);
+        this.objective().resolver().start(this.objective());
+        this.lines().forEach(line -> line.resolver().start(line));
     }
 
     @Override
     public void hide() {
+        this.objective().resolver().shutdown(this.objective());
+        this.lines().forEach(line -> line.resolver().shutdown(line));
         this.renderer.hide(this);
     }
 
     @Override
     public void destroy() {
         this.hide();
+    }
+
+    public ColorSelector colors() {
+        return this.colors;
     }
 
     private <I, T extends I> T translate(I input, Class<T> target) {
@@ -102,6 +116,16 @@ public final class AssignedScoreboardImpl implements AssignedScoreboard {
         @Override
         public AssignedScoreboard create(@NotNull Scoreboard parent, @NotNull PlatformPlayer viewer) {
             return new AssignedScoreboardImpl(parent, viewer);
+        }
+
+    }
+
+    public static final class ColorSelector {
+
+        private int index = 0;
+
+        public ChatFormatting select() {
+            return ChatFormatting.values()[this.index++];
         }
 
     }

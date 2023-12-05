@@ -25,60 +25,35 @@
 
 package net.impactdev.impactor.minecraft.test.scoreboards;
 
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.platform.players.PlatformPlayerService;
-import net.impactdev.impactor.api.platform.players.events.ClientConnectionEvent;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.scheduler.Ticks;
 import net.impactdev.impactor.api.scheduler.v2.Scheduler;
 import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.api.scoreboards.Scoreboard;
-import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
-import net.impactdev.impactor.api.scoreboards.display.formatters.rgb.RainbowFormatter;
+import net.impactdev.impactor.api.scoreboards.display.formatters.rgb.ColorCycle;
+import net.impactdev.impactor.api.scoreboards.display.formatters.rgb.Rainbow;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolverConfiguration;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.subscribing.Subscribers;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.subscribing.SubscriptionConfiguration;
-import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
-import net.impactdev.impactor.api.scoreboards.score.Score;
 import net.impactdev.impactor.api.scoreboards.score.formatters.BlankFormatter;
-import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
-import net.impactdev.impactor.minecraft.test.TestPlugin;
-import net.kyori.adventure.text.Component;
-import org.junit.jupiter.api.Disabled;
+import net.impactdev.impactor.api.text.TextProcessor;
 import org.junit.jupiter.api.Test;
-
-import java.util.concurrent.TimeUnit;
 
 public final class ScoreboardTests {
 
     @Test
-//    @Disabled("In development, implementation not ready")
     public void create() throws InterruptedException {
         Objective objective = Objective.builder()
                 .resolver(ScheduledResolverConfiguration.builder()
-                        .provider(context -> Component.text("Impactor Scoreboard Test"))
-                        .formatter(RainbowFormatter.builder().phase(0).increment(3).locked(false).build())
+                        .provider((viewer, context) -> TextProcessor.mini().parse(viewer, "<impactor:name> Hello!", context))
+                        .formatter(ColorCycle.configure().frames(90).increment(3).build())
                         .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
                         .repeating(Ticks.single())
                         .build()
                 )
                 .formatter(BlankFormatter.INSTANCE)
                 .build();
-
-//        Objective listening = Objective.builder()
-//                .formatter(BlankFormatter.INSTANCE)
-//                .resolver(SubscriptionConfiguration.builder()
-//                        .provider(context -> Component.empty())
-//                        .listenForWithConditions(ClientConnectionEvent.Join.class)
-//                        .condition(event -> event.player().uuid().equals(PlatformSource.SERVER_UUID))
-//                        .complete()
-//                        .subscribe(Subscribers.impactor())
-//                        .build()
-//                )
-//                .build();
 
         TestRenderer renderer = new TestRenderer();
         Scoreboard scoreboard = Scoreboard.builder()
@@ -90,8 +65,7 @@ public final class ScoreboardTests {
         viewed.open();
 
         Thread.sleep(5000);
-        PrettyPrinter printer = renderer.printer;
-        printer.log(TestPlugin.instance().logger());
+        viewed.hide();
     }
 
 }

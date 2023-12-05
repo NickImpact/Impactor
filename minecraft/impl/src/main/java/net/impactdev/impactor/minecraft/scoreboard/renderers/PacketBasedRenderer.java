@@ -32,68 +32,81 @@ import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
 import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
+import net.impactdev.impactor.minecraft.scoreboard.assigned.AssignedScoreboardImpl;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.pointer.Pointer;
+import net.kyori.adventure.text.Component;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket;
 import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket;
 import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket;
+import net.minecraft.network.protocol.game.ClientboundSetScorePacket;
+import net.minecraft.server.ServerScoreboard;
 import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 
+import java.util.Arrays;
+
 public class PacketBasedRenderer implements ScoreboardRenderer {
 
-    @Override
-    public void objective(PlatformPlayer viewer, Objective.Displayed objective) {
-        ClientboundSetObjectivePacket packet = new ClientboundSetObjectivePacket(
-                this.createObjective(viewer, objective),
-                0
-        );
+    private static final Pointer<net.minecraft.world.scores.Objective> OBJECTIVE = Pointer.pointer(
+            net.minecraft.world.scores.Objective.class,
+            Key.key("impactor", "objective")
+    );
+    private static final Pointer<PlayerTeam> TEAM = Pointer.pointer(
+            PlayerTeam.class,
+            Key.key("impactor", "team")
+    );
+    private static final Pointer<ChatFormatting> COLOR = Pointer.pointer(
+            ChatFormatting.class,
+            Key.key("impactor", "color")
+    );
 
-        ((ImpactorPlatformPlayer) viewer).asMinecraftPlayer().ifPresent(player -> {
-            player.connection.send(packet);
-        });
+    @Override
+    public void objective(AssignedScoreboard scoreboard, Objective.Displayed objective) {
+        net.minecraft.world.scores.Objective minecraft = scoreboard.require(OBJECTIVE);
+        minecraft.setDisplayName(AdventureTranslator.toNative(objective.text()));
+        ClientboundSetObjectivePacket update = new ClientboundSetObjectivePacket(minecraft, 2);
+
+        this.publish(scoreboard.viewer(), update);
     }
 
     @Override
-    @SuppressWarnings("DataFlowIssue")
-    public void line(PlatformPlayer viewer, ScoreboardLine.Displayed line) {
-        PlayerTeam team = new PlayerTeam(null, viewer.uuid().toString());
-        team.setDisplayName(AdventureTranslator.toNative(line.text()));
-        team.setColor(ChatFormatting.WHITE);
+    public void line(AssignedScoreboard scoreboard, ScoreboardLine.Displayed line) {
+        net.minecraft.world.scores.Objective objective = scoreboard.require(OBJECTIVE);
+        PlayerTeam team = line.require(TEAM);
+        team.setPlayerPrefix(AdventureTranslator.toNative(line.text()));
 
-        team.setNameTagVisibility(Team.Visibility.ALWAYS);
-        team.setCollisionRule(Team.CollisionRule.ALWAYS);
+        final ClientboundSetPlayerTeamPacket update = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, false);
+        final ClientboundSetScorePacket score = new ClientboundSetScorePacket(
+                ServerScoreboard.Method.CHANGE,
+                objective.getName(),
+                team.getName(),
+                line.delegate().score().value()
+        );
 
-        ClientboundSetPlayerTeamPacket packet = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, false);
-
-        ((ImpactorPlatformPlayer) viewer).asMinecraftPlayer().ifPresent(player -> {
-            player.connection.send(packet);
-        });
+        this.publish(scoreboard.viewer(), update, score);
     }
 
     @Override
     public void show(AssignedScoreboard scoreboard) {
-        ((ImpactorPlatformPlayer) scoreboard.viewer()).asMinecraftPlayer().ifPresent(player -> {
-            net.minecraft.world.scores.Objective objective = this.createObjective(scoreboard.viewer(), scoreboard.objective());
-            ClientboundSetObjectivePacket create = new ClientboundSetObjectivePacket(
-                    objective,
-                    0
-            );
+        net.minecraft.world.scores.Objective objective = this.createObjective(scoreboard.viewer(), scoreboard.objective());
+        ClientboundSetObjectivePacket create = new ClientboundSetObjectivePacket(objective, 0);
+        ClientboundSetDisplayObjectivePacket display = new ClientboundSetDisplayObjectivePacket(Scoreboard.DISPLAY_SLOT_SIDEBAR, objective);
 
-            ClientboundSetDisplayObjectivePacket display = new ClientboundSetDisplayObjectivePacket(2, objective);
-            player.connection.send(create);
-            player.connection.send(display);
+        scoreboard.with(OBJECTIVE, objective);
+        this.publish(scoreboard.viewer(), create, display);
 
-            for(ScoreboardLine.Displayed line : scoreboard.lines()) {
-                this.line(scoreboard.viewer(), line);
-            }
-        });
+        scoreboard.lines().forEach(line -> this.createTeam(scoreboard, line));
     }
 
     @Override
     public void hide(AssignedScoreboard scoreboard) {
         ((ImpactorPlatformPlayer) scoreboard.viewer()).asMinecraftPlayer().ifPresent(player -> {
-            net.minecraft.world.scores.Objective objective = this.createObjective(scoreboard.viewer(), scoreboard.objective());
+            net.minecraft.world.scores.Objective objective = scoreboard.require(OBJECTIVE);
             ClientboundSetObjectivePacket remove = new ClientboundSetObjectivePacket(objective, 1);
 
             player.connection.send(remove);
@@ -101,19 +114,52 @@ public class PacketBasedRenderer implements ScoreboardRenderer {
     }
 
     @Override
-    public void registerTeam(PlatformPlayer viewer) {
+    public void createTeam(AssignedScoreboard scoreboard, ScoreboardLine.Displayed line) {
+        ChatFormatting formatting = this.translate(scoreboard, AssignedScoreboardImpl.class).colors().select();
+        line.with(COLOR, formatting);
 
+        Scoreboard minecraft = new Scoreboard();
+        PlayerTeam team = new PlayerTeam(minecraft, "IMD-" + formatting.getId());
+        line.with(TEAM, team);
+        team.setColor(formatting);
+        team.setNameTagVisibility(Team.Visibility.ALWAYS);
+        team.setCollisionRule(Team.CollisionRule.ALWAYS);
+
+        final ClientboundSetPlayerTeamPacket packet = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true);
+        final ClientboundSetPlayerTeamPacket member = ClientboundSetPlayerTeamPacket.createPlayerPacket(
+                team,
+                AssignedScoreboardImpl.MEMBER_PREFIX + formatting + ChatFormatting.RESET,
+                ClientboundSetPlayerTeamPacket.Action.ADD
+        );
+        this.publish(scoreboard.viewer(), packet, member);
     }
 
-    @SuppressWarnings("DataFlowIssue")
+    @Override
+    public void destroyTeam(AssignedScoreboard scoreboard, ScoreboardLine.Displayed line) {
+        PlayerTeam team = line.require(TEAM);
+        ClientboundSetPlayerTeamPacket packet = ClientboundSetPlayerTeamPacket.createRemovePacket(team);
+
+        this.publish(scoreboard.viewer(), packet);
+    }
+
     private net.minecraft.world.scores.Objective createObjective(PlatformPlayer viewer, Objective.Displayed objective) {
         return new net.minecraft.world.scores.Objective(
-                null,
+                new Scoreboard(),
                 viewer.uuid().toString(),
                 ObjectiveCriteria.DUMMY,
                 AdventureTranslator.toNative(objective.text()),
                 ObjectiveCriteria.RenderType.INTEGER
         );
+    }
+
+    private void publish(PlatformPlayer player, Packet<?>... packets) {
+        ((ImpactorPlatformPlayer) player).asMinecraftPlayer()
+                .map(p -> p.connection)
+                .ifPresent(connection -> Arrays.stream(packets).forEach(connection::send));
+    }
+
+    private <I, T extends I> T translate(I input, Class<T> target) {
+        return target.cast(input);
     }
 
 }

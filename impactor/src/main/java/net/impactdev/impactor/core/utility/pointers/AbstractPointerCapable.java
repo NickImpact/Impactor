@@ -23,36 +23,33 @@
  *
  */
 
-package net.impactdev.impactor.fabric.platform.sources;
+package net.impactdev.impactor.core.utility.pointers;
 
-import net.impactdev.impactor.core.translations.locale.LocaleProvider;
-import net.impactdev.impactor.fabric.FabricImpactorBootstrap;
-import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
-import net.minecraft.server.level.ServerPlayer;
+import net.impactdev.impactor.api.utility.pointers.PointerCapable;
+import net.kyori.adventure.pointer.Pointer;
+import net.kyori.adventure.pointer.Pointers;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Locale;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.function.Supplier;
 
-public class FabricPlatformPlayer extends ImpactorPlatformPlayer {
+public abstract class AbstractPointerCapable implements PointerCapable {
 
-    public FabricPlatformPlayer(UUID uuid) {
-        super(uuid);
+    private Pointers pointers = Pointers.empty();
+
+    @Override
+    public @NotNull Pointers pointers() {
+        return this.pointers;
     }
 
     @Override
-    public Locale locale() {
-        return this.asMinecraftPlayer()
-                .map(player -> (LocaleProvider) player)
-                .map(LocaleProvider::locale)
-                .orElse(Locale.getDefault());
+    public <T> PointerCapable with(Pointer<T> pointer, T value) {
+        this.pointers = this.pointers.toBuilder().withStatic(pointer, value).build();
+        return this;
     }
 
     @Override
-    public Optional<ServerPlayer> asMinecraftPlayer() {
-        return FabricImpactorBootstrap.instance().server()
-                .map(server -> server.getPlayerList().getPlayer(this.uuid()))
-                .or(() -> this.get(ImpactorPlatformPlayer.PLAYER_FALLBACK));
+    public <T> PointerCapable withDynamic(Pointer<T> pointer, Supplier<T> supplier) {
+        this.pointers = this.pointers.toBuilder().withDynamic(pointer, supplier).build();
+        return this;
     }
-
 }

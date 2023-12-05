@@ -25,7 +25,6 @@
 
 package net.impactdev.impactor.minecraft.test;
 
-import net.impactdev.impactor.api.scheduler.Ticks;
 import net.impactdev.impactor.core.modules.ModuleInitializer;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;

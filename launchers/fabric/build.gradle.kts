@@ -24,6 +24,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${rootProject.property("fabric-loader")}")
     listOf(
         "fabric-lifecycle-events-v1",
+        "fabric-entity-events-v1",
         "fabric-command-api-v2",
         "fabric-networking-api-v1",
     ).forEach { modImplementation(fabricApi.module(it, rootProject.property("fabric-api").toString())) }
