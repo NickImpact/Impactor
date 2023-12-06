@@ -41,8 +41,6 @@ import java.util.List;
 
 public final class AssignedScoreboardImpl extends AbstractPointerCapable implements AssignedScoreboard {
 
-    public static String MEMBER_PREFIX = "§B§5§D";
-
     private final Scoreboard config;
     private final PlatformPlayer viewer;
 
@@ -109,15 +107,6 @@ public final class AssignedScoreboardImpl extends AbstractPointerCapable impleme
 
     private <I, T extends I> T translate(I input, Class<T> target) {
         return target.cast(input);
-    }
-
-    public static final class AssignedScoreboardFactory implements AssignedScoreboard.Factory {
-
-        @Override
-        public AssignedScoreboard create(@NotNull Scoreboard parent, @NotNull PlatformPlayer viewer) {
-            return new AssignedScoreboardImpl(parent, viewer);
-        }
-
     }
 
     public static final class ColorSelector {

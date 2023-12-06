@@ -44,7 +44,7 @@ public class ScheduledResolverImpl extends AbstractComponentResolver implements 
     private SchedulerTask task;
 
     public ScheduledResolverImpl(ScheduledResolverConfigurationImpl config) {
-        super(config.provider(), config.formatter());
+        super(config.component());
 
         this.configuration = config;
         this.scheduler = config.scheduler();

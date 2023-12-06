@@ -31,8 +31,11 @@ import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
 import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
+import net.impactdev.impactor.minecraft.mixins.ClientboundSetObjectivePacketAccessor;
+import net.impactdev.impactor.minecraft.mixins.ClientboundSetPlayerTeamPacketParametersAccessor;
 import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
 import net.impactdev.impactor.minecraft.scoreboard.assigned.AssignedScoreboardImpl;
+import net.impactdev.impactor.minecraft.scoreboard.assigned.ScoreboardComponents;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointer;
 import net.kyori.adventure.text.Component;
@@ -49,42 +52,36 @@ import net.minecraft.world.scores.Team;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PacketBasedRenderer implements ScoreboardRenderer {
 
-    private static final Pointer<net.minecraft.world.scores.Objective> OBJECTIVE = Pointer.pointer(
-            net.minecraft.world.scores.Objective.class,
-            Key.key("impactor", "objective")
-    );
-    private static final Pointer<PlayerTeam> TEAM = Pointer.pointer(
-            PlayerTeam.class,
-            Key.key("impactor", "team")
-    );
-    private static final Pointer<ChatFormatting> COLOR = Pointer.pointer(
-            ChatFormatting.class,
-            Key.key("impactor", "color")
-    );
+    private static final Pointer<Integer> TEAM_INDEX = Pointer.pointer(Integer.class, Key.key("impactor", "team-index"));
 
     @Override
     public void objective(AssignedScoreboard scoreboard, Objective.Displayed objective) {
-        net.minecraft.world.scores.Objective minecraft = scoreboard.require(OBJECTIVE);
-        minecraft.setDisplayName(AdventureTranslator.toNative(objective.text()));
-        ClientboundSetObjectivePacket update = new ClientboundSetObjectivePacket(minecraft, 2);
+        ClientboundSetObjectivePacket update = new ClientboundSetObjectivePacket(ScoreboardComponents.OBJECTIVE, 2);
+        ClientboundSetObjectivePacketAccessor accessor = this.translate(update, ClientboundSetObjectivePacketAccessor.class);
+        accessor.title(AdventureTranslator.toNative(objective.text()));
 
         this.publish(scoreboard.viewer(), update);
     }
 
     @Override
     public void line(AssignedScoreboard scoreboard, ScoreboardLine.Displayed line) {
-        net.minecraft.world.scores.Objective objective = scoreboard.require(OBJECTIVE);
-        PlayerTeam team = line.require(TEAM);
-        team.setPlayerPrefix(AdventureTranslator.toNative(line.text()));
+        PlayerTeam team = ScoreboardComponents.team(line.require(TEAM_INDEX));
+        applyLineTextToPacket(scoreboard, line, team, false);
+    }
 
-        final ClientboundSetPlayerTeamPacket update = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, false);
+    private void applyLineTextToPacket(AssignedScoreboard scoreboard, ScoreboardLine.Displayed line, PlayerTeam team, boolean create) {
+        final ClientboundSetPlayerTeamPacket update = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, create);
+        ClientboundSetPlayerTeamPacketParametersAccessor accessor = this.translate(update.getParameters().get(), ClientboundSetPlayerTeamPacketParametersAccessor.class);
+        accessor.prefix(AdventureTranslator.toNative(line.text()));
+
         final ClientboundSetScorePacket score = new ClientboundSetScorePacket(
                 ServerScoreboard.Method.CHANGE,
-                objective.getName(),
-                team.getName(),
+                ScoreboardComponents.OBJECTIVE_NAME,
+                ScoreboardComponents.fakeName(line.require(TEAM_INDEX)),
                 line.delegate().score().value()
         );
 
@@ -93,21 +90,22 @@ public class PacketBasedRenderer implements ScoreboardRenderer {
 
     @Override
     public void show(AssignedScoreboard scoreboard) {
-        net.minecraft.world.scores.Objective objective = this.createObjective(scoreboard.viewer(), scoreboard.objective());
-        ClientboundSetObjectivePacket create = new ClientboundSetObjectivePacket(objective, 0);
-        ClientboundSetDisplayObjectivePacket display = new ClientboundSetDisplayObjectivePacket(Scoreboard.DISPLAY_SLOT_SIDEBAR, objective);
+        ClientboundSetObjectivePacket create = new ClientboundSetObjectivePacket(ScoreboardComponents.OBJECTIVE, 0);
+        ClientboundSetDisplayObjectivePacket display = new ClientboundSetDisplayObjectivePacket(Scoreboard.DISPLAY_SLOT_SIDEBAR, ScoreboardComponents.OBJECTIVE);
 
-        scoreboard.with(OBJECTIVE, objective);
         this.publish(scoreboard.viewer(), create, display);
 
-        scoreboard.lines().forEach(line -> this.createTeam(scoreboard, line));
+        AtomicInteger index = new AtomicInteger();
+        scoreboard.lines().forEach(line -> {
+            line.with(TEAM_INDEX, index.getAndIncrement());
+            this.createTeam(scoreboard, line);
+        });
     }
 
     @Override
     public void hide(AssignedScoreboard scoreboard) {
         ((ImpactorPlatformPlayer) scoreboard.viewer()).asMinecraftPlayer().ifPresent(player -> {
-            net.minecraft.world.scores.Objective objective = scoreboard.require(OBJECTIVE);
-            ClientboundSetObjectivePacket remove = new ClientboundSetObjectivePacket(objective, 1);
+            ClientboundSetObjectivePacket remove = new ClientboundSetObjectivePacket(ScoreboardComponents.OBJECTIVE, 1);
 
             player.connection.send(remove);
         });
@@ -115,41 +113,16 @@ public class PacketBasedRenderer implements ScoreboardRenderer {
 
     @Override
     public void createTeam(AssignedScoreboard scoreboard, ScoreboardLine.Displayed line) {
-        ChatFormatting formatting = this.translate(scoreboard, AssignedScoreboardImpl.class).colors().select();
-        line.with(COLOR, formatting);
-
-        Scoreboard minecraft = new Scoreboard();
-        PlayerTeam team = new PlayerTeam(minecraft, "IMD-" + formatting.getId());
-        line.with(TEAM, team);
-        team.setColor(formatting);
-        team.setNameTagVisibility(Team.Visibility.ALWAYS);
-        team.setCollisionRule(Team.CollisionRule.ALWAYS);
-
-        final ClientboundSetPlayerTeamPacket packet = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true);
-        final ClientboundSetPlayerTeamPacket member = ClientboundSetPlayerTeamPacket.createPlayerPacket(
-                team,
-                AssignedScoreboardImpl.MEMBER_PREFIX + formatting + ChatFormatting.RESET,
-                ClientboundSetPlayerTeamPacket.Action.ADD
-        );
-        this.publish(scoreboard.viewer(), packet, member);
+        PlayerTeam team = ScoreboardComponents.team(line.require(TEAM_INDEX));
+        applyLineTextToPacket(scoreboard, line, team, true);
     }
 
     @Override
     public void destroyTeam(AssignedScoreboard scoreboard, ScoreboardLine.Displayed line) {
-        PlayerTeam team = line.require(TEAM);
+        PlayerTeam team = ScoreboardComponents.team(line.require(TEAM_INDEX));
         ClientboundSetPlayerTeamPacket packet = ClientboundSetPlayerTeamPacket.createRemovePacket(team);
 
         this.publish(scoreboard.viewer(), packet);
-    }
-
-    private net.minecraft.world.scores.Objective createObjective(PlatformPlayer viewer, Objective.Displayed objective) {
-        return new net.minecraft.world.scores.Objective(
-                new Scoreboard(),
-                viewer.uuid().toString(),
-                ObjectiveCriteria.DUMMY,
-                AdventureTranslator.toNative(objective.text()),
-                ObjectiveCriteria.RenderType.INTEGER
-        );
     }
 
     private void publish(PlatformPlayer player, Packet<?>... packets) {

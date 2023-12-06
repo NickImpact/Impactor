@@ -1,5 +1,6 @@
 import extensions.isRelease
 import extensions.writeVersion
+import gradle.kotlin.dsl.accessors._99454b32dbd9d870c3769e463ec2442a.include
 import net.fabricmc.loom.task.RemapJarTask
 import java.nio.file.Files
 
@@ -18,6 +19,7 @@ dependencies {
         "net.kyori:adventure-text-serializer-plain:4.14.0",
         "net.kyori:adventure-text-serializer-legacy:4.14.0",
         "net.kyori:adventure-text-serializer-gson:4.14.0",
+        "net.kyori:adventure-text-serializer-json:4.14.0",
         "net.kyori:adventure-text-minimessage:4.14.0",
         "net.kyori:adventure-text-logger-slf4j:4.14.0",
         "net.kyori:event-api:5.0.0-SNAPSHOT",

@@ -34,20 +34,31 @@ import net.impactdev.impactor.api.scoreboards.Scoreboard;
 import net.impactdev.impactor.api.scoreboards.display.formatters.rgb.ColorCycle;
 import net.impactdev.impactor.api.scoreboards.display.formatters.rgb.Rainbow;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolverConfiguration;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.text.ComponentElement;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.text.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.impactdev.impactor.api.scoreboards.score.formatters.BlankFormatter;
 import net.impactdev.impactor.api.text.TextProcessor;
+import net.kyori.adventure.text.Component;
 import org.junit.jupiter.api.Test;
 
 public final class ScoreboardTests {
 
     @Test
     public void create() throws InterruptedException {
+        ScoreboardComponent component = ScoreboardComponent.create(
+                ComponentElement.create((viewer, context) -> TextProcessor.mini().parse(viewer, "<impactor:name> Hello!", context))
+        );
+
+        ScoreboardComponent c2 = component.append(ComponentElement.create(
+                ColorCycle.configure().frames(90).increment(3).build(),
+                (viewer, context) -> Component.text("ABC")
+        ));
+
         Objective objective = Objective.builder()
                 .resolver(ScheduledResolverConfiguration.builder()
-                        .provider((viewer, context) -> TextProcessor.mini().parse(viewer, "<impactor:name> Hello!", context))
-                        .formatter(ColorCycle.configure().frames(90).increment(3).build())
+                        .component(c2)
                         .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
                         .repeating(Ticks.single())
                         .build()

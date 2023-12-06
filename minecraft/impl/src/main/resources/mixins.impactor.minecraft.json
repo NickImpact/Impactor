@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "net.impactdev.impactor.minecraft.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "mixins": [
+    "ClientboundSetObjectivePacketAccessor",
+    "ClientboundSetPlayerTeamPacketParametersAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

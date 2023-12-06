@@ -62,6 +62,7 @@ public final class ImpactorPlaceholders {
                     .or(() -> ctx.request(PlatformPlayer.class))
                     .or(() -> ctx.request(PlatformSource.SOURCE))
                     .or(() -> ctx.request(PlatformPlayer.PLAYER))
+                    .or(() -> Optional.ofNullable(viewer))
                     .map(PlatformSource::name)
                     .orElse(Component.empty())
     );
@@ -69,9 +70,13 @@ public final class ImpactorPlaceholders {
     public static final ImpactorPlaceholder UUID = new ImpactorPlaceholder(
             impactor("uuid"),
             (viewer, ctx) -> ctx.request(PlatformSource.class)
+                    .or(() -> ctx.request(PlatformPlayer.class))
+                    .or(() -> ctx.request(PlatformSource.SOURCE))
+                    .or(() -> ctx.request(PlatformPlayer.PLAYER))
+                    .or(() -> Optional.ofNullable(viewer))
                     .map(PlatformSource::uuid)
-                    .map(id -> text(id.toString()))
-                    .orElse(empty())
+                    .map(uuid -> text(uuid.toString()))
+                    .orElse(Component.empty())
     );
 
     public static final ImpactorPlaceholder TPS = new ImpactorPlaceholder(

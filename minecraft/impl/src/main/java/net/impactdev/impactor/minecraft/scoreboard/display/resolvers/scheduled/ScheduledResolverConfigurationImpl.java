@@ -31,38 +31,33 @@ import net.impactdev.impactor.api.scheduler.v2.Scheduler;
 import net.impactdev.impactor.api.scoreboards.display.formatters.DisplayFormatter;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.ComponentProvider;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.ComponentResolver;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolver;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolverConfiguration;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.text.ScoreboardComponent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
 public final class ScheduledResolverConfigurationImpl implements ScheduledResolverConfiguration {
 
-    private final ComponentProvider provider;
+    private final ScoreboardComponent component;
     private final Scheduler scheduler;
-    private final DisplayFormatter formatter;
     private final ScheduledTaskProvider task;
 
     public ScheduledResolverConfigurationImpl(TaskBuilder builder) {
-        this.provider = builder.provider;
+        this.component = builder.component;
         this.scheduler = builder.scheduler;
-        this.formatter = builder.formatter;
         this.task = builder.task;
     }
 
     @Override
-    public ComponentProvider provider() {
-        return this.provider;
-    }
-
-    @Override
-    public @Nullable DisplayFormatter formatter() {
-        return this.formatter;
-    }
-
-    @Override
-    public ComponentResolver create() {
+    public ScheduledResolver create() {
         return new ScheduledResolverImpl(this);
+    }
+
+    @Override
+    public ScoreboardComponent component() {
+        return this.component;
     }
 
     @Override
@@ -76,20 +71,13 @@ public final class ScheduledResolverConfigurationImpl implements ScheduledResolv
 
     public static final class TaskBuilder implements Configuration, TaskProperties {
 
-        private ComponentProvider provider;
-        private DisplayFormatter formatter;
+        private ScoreboardComponent component;
         private Scheduler scheduler;
         private ScheduledTaskProvider task;
 
         @Override
-        public Configuration provider(ComponentProvider provider) {
-            this.provider = provider;
-            return this;
-        }
-
-        @Override
-        public Configuration formatter(DisplayFormatter formatter) {
-            this.formatter = formatter;
+        public Configuration component(ScoreboardComponent component) {
+            this.component = component;
             return this;
         }
 
@@ -127,6 +115,7 @@ public final class ScheduledResolverConfigurationImpl implements ScheduledResolv
         public ScheduledResolverConfiguration build() {
             return new ScheduledResolverConfigurationImpl(this);
         }
+
     }
 
     @FunctionalInterface

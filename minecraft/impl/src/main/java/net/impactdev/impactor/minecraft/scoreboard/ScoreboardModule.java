@@ -37,8 +37,11 @@ import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.impactdev.impactor.api.scoreboards.Scoreboard;
 import net.impactdev.impactor.api.scoreboards.display.formatters.rgb.ColorCycle;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.NoOpResolver;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolver;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolverConfiguration;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.text.ComponentElement;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.text.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.impactdev.impactor.api.scoreboards.score.Score;
@@ -55,10 +58,15 @@ import net.impactdev.impactor.minecraft.scoreboard.display.objectives.ImpactorOb
 import net.impactdev.impactor.minecraft.scoreboard.display.resolvers.scheduled.ScheduledResolverConfigurationImpl;
 import net.impactdev.impactor.minecraft.scoreboard.display.score.ImpactorScore;
 import net.impactdev.impactor.minecraft.scoreboard.renderers.PacketBasedRenderer;
+import net.impactdev.impactor.minecraft.scoreboard.text.ImpactorComponentElement;
+import net.impactdev.impactor.minecraft.scoreboard.text.ImpactorScoreboardComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.event.EventBus;
 
+import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.space;
 import static net.kyori.adventure.text.Component.text;
 
 public final class ScoreboardModule implements ImpactorModule {
@@ -66,8 +74,9 @@ public final class ScoreboardModule implements ImpactorModule {
     @Override
     public void factories(FactoryProvider provider) {
         provider.register(ScoreboardRenderer.Factory.class, new ImplementationFactory());
-
         provider.register(AssignedScoreboard.Factory.class, AssignedScoreboardImpl::new);
+        provider.register(ScoreboardComponent.Factory.class, new ImpactorScoreboardComponent.ScoreboardComponentFactory());
+        provider.register(ComponentElement.ElementFactory.class, new ImpactorComponentElement.ComponentElementFactory());
     }
 
     @Override
@@ -92,47 +101,99 @@ public final class ScoreboardModule implements ImpactorModule {
 
             Objective objective = Objective.builder()
                     .resolver(ScheduledResolverConfiguration.builder()
-                            .provider((viewer, context) -> text("Impactor Testing")
-                                    .appendSpace()
-                                    .append(text("(").color(NamedTextColor.GRAY))
-                                    .append(text(Impactor.instance().services().provide(PlatformPlayerService.class).online().size()))
-                                    .append(text(")").color(NamedTextColor.GRAY))
-                            )
+                            .component(ScoreboardComponent.create(ComponentElement.create(
+                                    (viewer, context) -> text("»").color(NamedTextColor.GRAY).appendSpace()
+                            )).append(ComponentElement.create(
+                                    ColorCycle.configure().frames(90).increment(3).build(),
+                                    (viewer, context) -> text("Impactor Scoreboard Testing")
+                            )).append(ComponentElement.create(
+                                    (viewer, context) -> space().append(text("«").color(NamedTextColor.GRAY))
+                            )))
                             .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
-                            .repeating(Ticks.of(1))
-                            .formatter(ColorCycle.configure().frames(90).increment(3).build())
+                            .repeating(Ticks.single())
                             .build()
                     )
                     .build();
 
+            ScoreboardComponent tpsComponent = ScoreboardComponent.create(text("TPS: ").color(NamedTextColor.GRAY))
+                    .append(ComponentElement.create(
+                            ColorCycle.configure().frames(90).increment(3).build(),
+                            (viewer, context) -> TextProcessor.mini().parse("<impactor:tps>")
+                    ));
+
             ScoreboardLine tps = ScoreboardLine.builder()
                     .resolver(ScheduledResolverConfiguration.builder()
-                            .provider((viewer, context) -> TextProcessor.mini().parse("<gray>TPS: <green><impactor:tps>"))
-                            .scheduler(Schedulers.require(Scheduler.SYNCHRONOUS))
+                            .component(tpsComponent)
+                            .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
+                            .repeating(Ticks.single())
+                            .build()
+                    )
+                    .score(Score.builder().score(3).build())
+                    .build();
+
+            ScoreboardComponent msptComponent = ScoreboardComponent.create(text("MSPT: ").color(NamedTextColor.GRAY))
+                    .append(ComponentElement.create(
+                            ColorCycle.configure().frames(90).increment(3).build(),
+                            (viewer, context) -> TextProcessor.mini().parse("<impactor:mspt>")
+                    ));
+
+            ScoreboardLine mspt = ScoreboardLine.builder()
+                    .resolver(ScheduledResolverConfiguration.builder()
+                            .component(msptComponent)
+                            .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
                             .repeating(Ticks.single())
                             .build()
                     )
                     .score(Score.builder().score(2).build())
                     .build();
-            ScoreboardLine mspt = ScoreboardLine.builder()
-                    .resolver(ScheduledResolverConfiguration.builder()
-                            .provider((viewer, context) -> TextProcessor.mini().parse("<gray>MSPT: <green><impactor:mspt>"))
-                            .scheduler(Schedulers.require(Scheduler.SYNCHRONOUS))
-                            .repeating(Ticks.single())
-                            .build()
-                    )
-                    .score(Score.builder().score(1).build())
-                    .build();
 
             Scoreboard scoreboard = Scoreboard.builder()
                     .renderer(ScoreboardRenderer.packets())
                     .objective(objective)
+                    .line(ScoreboardLine.builder()
+                            .score(Score.builder().score(15).build())
+                            .resolver(NoOpResolver.create(ScoreboardComponent.create(
+                                    text("Player Details:").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                            )))
+                            .build()
+                    )
+                    .line(ScoreboardLine.builder()
+                            .score(Score.builder().score(14).build())
+                            .resolver(NoOpResolver.create(ScoreboardComponent.create(ComponentElement.create(
+                                    (viewer, context) -> TextProcessor.mini().parse(viewer, "<gray>Name: <yellow><impactor:name>")
+                            ))))
+                            .build()
+                    )
+                    .line(ScoreboardLine.builder()
+                            .score(Score.builder().score(13).build())
+                            .resolver(NoOpResolver.create(ScoreboardComponent.create(ComponentElement.create(
+                                    (viewer, context) -> TextProcessor.mini().parse(viewer, "<gray>UUID: <yellow><impactor:uuid>")
+                            ))))
+                            .build()
+                    )
+                    .line(ScoreboardLine.builder()
+                            .score(Score.builder().score(4).build())
+                            .resolver(NoOpResolver.create(ScoreboardComponent.create(empty())))
+                            .build()
+                    )
                     .line(tps)
                     .line(mspt)
+                    .line(ScoreboardLine.builder()
+                            .score(Score.builder().score(1).build())
+                            .resolver(ScheduledResolverConfiguration.builder()
+                                    .component(ScoreboardComponent.create(
+                                            text("Memory Usage: ").color(NamedTextColor.GRAY)
+                                    ).append(ComponentElement.create((viewer, context) -> TextProcessor.mini().parse("<yellow><impactor:memory_used><gray>/<yellow><impactor:memory_total> MB"))))
+                                    .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
+                                    .repeating(Ticks.single())
+                                    .build()
+                            )
+                            .build()
+                    )
                     .build();
 
             AssignedScoreboard assigned = scoreboard.assignTo(event.player());
-            Schedulers.require(Scheduler.SYNCHRONOUS).publish(assigned::open);
+            assigned.open();
         });
     }
 
