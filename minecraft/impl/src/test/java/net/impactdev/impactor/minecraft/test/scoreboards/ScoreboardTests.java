@@ -26,13 +26,13 @@
 package net.impactdev.impactor.minecraft.test.scoreboards;
 
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.events.ClientConnectionEvent;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.scheduler.Ticks;
 import net.impactdev.impactor.api.scheduler.v2.Scheduler;
 import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.api.scoreboards.Scoreboard;
-import net.impactdev.impactor.api.scoreboards.display.formatters.rgb.ColorCycle;
-import net.impactdev.impactor.api.scoreboards.display.formatters.rgb.Rainbow;
+import net.impactdev.impactor.api.scoreboards.display.formatters.styling.rgb.ColorCycle;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolverConfiguration;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.text.ComponentElement;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.text.ScoreboardComponent;

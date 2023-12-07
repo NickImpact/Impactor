@@ -23,19 +23,34 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.mixins;
+package net.impactdev.impactor.minecraft.mixins.entity;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.minecraft.api.events.EntityMoveEvent;
+import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.math.vector.Vector3d;
 
-@Mixin(ClientboundSetObjectivePacket.class)
-public interface ClientboundSetObjectivePacketAccessor {
+@Mixin(Entity.class)
+public abstract class EntityMixin {
 
-    @Mutable
-    @Accessor("displayName")
-    void title(Component title);
+    @Inject(method = "setPos(DDD)V", at = @At("HEAD"))
+    public void postMovementUpdate(double x, double y, double z, CallbackInfo info) {
+        final Entity target = (Entity) (Object) this;
+        Impactor.instance().events().post(new EntityMoveEvent() {
+            @Override
+            public Entity entity() {
+                return target;
+            }
+
+            @Override
+            public Vector3d position() {
+                return new Vector3d(x, y, z);
+            }
+        });
+    }
 
 }

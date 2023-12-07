@@ -25,8 +25,8 @@
 
 package net.impactdev.impactor.minecraft.scoreboard.display.formatters;
 
-import net.impactdev.impactor.api.scoreboards.display.formatters.ColorFormatter;
-import net.impactdev.impactor.api.scoreboards.display.formatters.rgb.ColorCycle;
+import net.impactdev.impactor.api.scoreboards.display.formatters.styling.ColorFormatter;
+import net.impactdev.impactor.api.scoreboards.display.formatters.styling.rgb.ColorCycle;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.util.HSVLike;
 
@@ -43,7 +43,6 @@ public class ColorCycleFormatter extends ColorFormatter implements ColorCycle {
     private int index = 0;
 
     protected ColorCycleFormatter(FormatterConfig config) {
-        super(config.locked);
         this.frames = config.frames;
         this.increment = config.increment;
         this.phase = config.phase;
@@ -91,8 +90,6 @@ public class ColorCycleFormatter extends ColorFormatter implements ColorCycle {
         private int frames;
         private int increment;
         private int phase;
-
-        private boolean locked;
 
         @Override
         public Config frames(int frames) {

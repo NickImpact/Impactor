@@ -23,19 +23,16 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.mixins;
+package net.impactdev.impactor.minecraft.api.events;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import net.impactdev.impactor.api.events.ImpactorEvent;
+import net.minecraft.world.entity.Entity;
+import org.spongepowered.math.vector.Vector3d;
 
-@Mixin(ClientboundSetPlayerTeamPacket.Parameters.class)
-public interface ClientboundSetPlayerTeamPacketParametersAccessor {
+public interface EntityMoveEvent extends ImpactorEvent {
 
-    @Mutable
-    @Accessor("playerPrefix")
-    void prefix(Component component);
+    Entity entity();
+
+    Vector3d position();
 
 }

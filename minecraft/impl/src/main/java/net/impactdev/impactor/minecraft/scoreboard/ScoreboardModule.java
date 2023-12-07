@@ -25,9 +25,7 @@
 
 package net.impactdev.impactor.minecraft.scoreboard;
 
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.events.ImpactorEvent;
-import net.impactdev.impactor.api.platform.players.PlatformPlayerService;
 import net.impactdev.impactor.api.platform.players.events.ClientConnectionEvent;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
@@ -36,10 +34,10 @@ import net.impactdev.impactor.api.scheduler.v2.Scheduler;
 import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.impactdev.impactor.api.scoreboards.Scoreboard;
-import net.impactdev.impactor.api.scoreboards.display.formatters.rgb.ColorCycle;
+import net.impactdev.impactor.api.scoreboards.display.formatters.styling.rgb.ColorCycle;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.NoOpResolver;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolver;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolverConfiguration;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.subscribing.SubscriptionConfiguration;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.text.ComponentElement;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.text.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
@@ -51,16 +49,17 @@ import net.impactdev.impactor.core.modules.ImpactorModule;
 //import net.impactdev.impactor.minecraft.scoreboard.viewed.ViewedImpactorScoreboard;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import net.impactdev.impactor.minecraft.api.events.EntityMoveEvent;
 import net.impactdev.impactor.minecraft.scoreboard.assigned.AssignedScoreboardImpl;
 import net.impactdev.impactor.minecraft.scoreboard.display.formatters.ColorCycleFormatter;
 import net.impactdev.impactor.minecraft.scoreboard.display.lines.ImpactorScoreboardLine;
 import net.impactdev.impactor.minecraft.scoreboard.display.objectives.ImpactorObjective;
 import net.impactdev.impactor.minecraft.scoreboard.display.resolvers.scheduled.ScheduledResolverConfigurationImpl;
+import net.impactdev.impactor.minecraft.scoreboard.display.resolvers.subscribing.ImpactorSubscriberConfiguration;
 import net.impactdev.impactor.minecraft.scoreboard.display.score.ImpactorScore;
 import net.impactdev.impactor.minecraft.scoreboard.renderers.PacketBasedRenderer;
 import net.impactdev.impactor.minecraft.scoreboard.text.ImpactorComponentElement;
 import net.impactdev.impactor.minecraft.scoreboard.text.ImpactorScoreboardComponent;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.event.EventBus;
@@ -77,6 +76,7 @@ public final class ScoreboardModule implements ImpactorModule {
         provider.register(AssignedScoreboard.Factory.class, AssignedScoreboardImpl::new);
         provider.register(ScoreboardComponent.Factory.class, new ImpactorScoreboardComponent.ScoreboardComponentFactory());
         provider.register(ComponentElement.ElementFactory.class, new ImpactorComponentElement.ComponentElementFactory());
+        provider.register(SubscriptionConfiguration.Component.class, new ImpactorSubscriberConfiguration.Factory());
     }
 
     @Override
@@ -166,9 +166,12 @@ public final class ScoreboardModule implements ImpactorModule {
                     )
                     .line(ScoreboardLine.builder()
                             .score(Score.builder().score(13).build())
-                            .resolver(NoOpResolver.create(ScoreboardComponent.create(ComponentElement.create(
-                                    (viewer, context) -> TextProcessor.mini().parse(viewer, "<gray>UUID: <yellow><impactor:uuid>")
-                            ))))
+                            .resolver(SubscriptionConfiguration.component(
+                                    ScoreboardComponent.create(ComponentElement.create(
+                                            (viewer, context) -> TextProcessor.mini().parse(viewer, "<gray>Location: <yellow><impactor:position>")
+                                    )))
+                                    .listenAndFilter(EntityMoveEvent.class, e -> e.entity().getUUID().equals(event.player().uuid()))
+                            )
                             .build()
                     )
                     .line(ScoreboardLine.builder()

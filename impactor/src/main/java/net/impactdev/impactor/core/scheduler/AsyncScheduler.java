@@ -87,7 +87,7 @@ public class AsyncScheduler implements Scheduler {
 
     @Override
     public SchedulerTask delayed(@NotNull Runnable action, @NotNull Ticks ticks) {
-        return this.delayed(action, this.ticksToMillis(ticks), TimeUnit.SECONDS);
+        return this.delayed(action, this.ticksToMillis(ticks), TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class AsyncScheduler implements Scheduler {
 
     @Override
     public SchedulerTask repeating(@NotNull Runnable action, @NotNull Ticks ticks) {
-        return this.repeating(action, this.ticksToMillis(ticks), TimeUnit.SECONDS);
+        return this.repeating(action, this.ticksToMillis(ticks), TimeUnit.MILLISECONDS);
     }
 
     @Override

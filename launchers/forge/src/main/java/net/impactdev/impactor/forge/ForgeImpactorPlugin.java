@@ -26,6 +26,7 @@
 package net.impactdev.impactor.forge;
 
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
+import net.impactdev.impactor.api.scoreboards.display.resolvers.subscribing.Subscriber;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.modules.ModuleInitializer;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
@@ -34,8 +35,12 @@ import net.impactdev.impactor.forge.platform.ForgePlatformModule;
 import net.impactdev.impactor.forge.scheduler.ForgeSchedulerModule;
 import net.impactdev.impactor.forge.ui.ForgeUIModule;
 import net.impactdev.impactor.minecraft.plugin.GameImpactorPlugin;
+import net.kyori.event.EventSubscription;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.Event;
 
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorPlugin {
 
@@ -55,6 +60,21 @@ public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorP
                 .with(ForgeUIModule.class)
                 .with(ForgePlatformModule.class)
                 .with(ForgeCommandModule.class);
+    }
+
+    public <T extends Event> void test() {
+        Subscriber<T> subscriber = new Subscriber<>() {
+            @Override
+            public void validateEventType(Class<T> event) throws IllegalArgumentException {
+
+            }
+
+            @Override
+            public EventSubscription subscribe(Class<T> event, Consumer<T> listener) {
+                MinecraftForge.EVENT_BUS.addListener(listener);
+                return () -> MinecraftForge.EVENT_BUS.unregister(listener);
+            }
+        } ;
     }
 
 }
