@@ -4,11 +4,11 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "mixins": [
-    "entity.EntityMixin",
     "networking.ClientboundSetObjectivePacketAccessor",
     "networking.ClientboundSetPlayerTeamPacketParametersAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "refmap": "mixins.impactor.minecraft.refmap.json"
 }

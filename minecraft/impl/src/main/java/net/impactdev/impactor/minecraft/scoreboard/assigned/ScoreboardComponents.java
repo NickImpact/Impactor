@@ -26,13 +26,13 @@
 package net.impactdev.impactor.minecraft.scoreboard.assigned;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
 import net.kyori.adventure.text.Component;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
-import org.apache.commons.compress.utils.Lists;
 
 import java.util.List;
 

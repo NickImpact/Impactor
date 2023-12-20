@@ -28,6 +28,8 @@ package net.impactdev.impactor.minecraft.scoreboard.display.resolvers.subscribin
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
+import net.impactdev.impactor.api.scheduler.v2.Scheduler;
+import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.api.scoreboards.display.Display;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.subscribing.SubscriptionConfiguration;
 import net.impactdev.impactor.api.scoreboards.display.resolvers.subscribing.SubscriptionResolver;
@@ -63,7 +65,8 @@ public class SubscriptionResolverImpl<T extends ImpactorEvent> implements Subscr
         this.subscription = Impactor.instance().events().subscribe(this.configuration.event(), event -> {
             Optional.ofNullable(this.configuration.filter())
                     .map(filter -> filter.test(event))
-                    .ifPresentOrElse(ignore -> display.resolve(), display::resolve);
+                    .filter(filter -> filter)
+                    .ifPresent(ignore -> display.resolve());
         });
     }
 

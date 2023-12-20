@@ -26,7 +26,9 @@
 package net.impactdev.impactor.minecraft.mixins.entity;
 
 import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.minecraft.api.events.EntityMoveEvent;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -51,6 +53,25 @@ public abstract class EntityMixin {
                 return new Vector3d(x, y, z);
             }
         });
+
+        if(target instanceof ServerPlayer player) {
+            Impactor.instance().events().post(new EntityMoveEvent.Player() {
+                @Override
+                public PlatformPlayer player() {
+                    return PlatformPlayer.getOrCreate(player.getUUID());
+                }
+
+                @Override
+                public Entity entity() {
+                    return target;
+                }
+
+                @Override
+                public Vector3d position() {
+                    return new Vector3d(x, y, z);
+                }
+            });
+        }
     }
 
 }

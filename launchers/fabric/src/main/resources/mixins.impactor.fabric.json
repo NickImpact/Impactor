@@ -4,9 +4,9 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "mixins": [
+    "core.MinecraftServerMixin",
     "core.ServerboundClientInformationPacketAccessor",
-    "core.ServerPlayerMixin",
-    "core.MinecraftServerMixin"
+    "core.ServerPlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

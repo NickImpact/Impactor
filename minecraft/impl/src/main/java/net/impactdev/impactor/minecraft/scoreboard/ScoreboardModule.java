@@ -101,14 +101,13 @@ public final class ScoreboardModule implements ImpactorModule {
 
             Objective objective = Objective.builder()
                     .resolver(ScheduledResolverConfiguration.builder()
-                            .component(ScoreboardComponent.create(ComponentElement.create(
-                                    (viewer, context) -> text("»").color(NamedTextColor.GRAY).appendSpace()
-                            )).append(ComponentElement.create(
-                                    ColorCycle.configure().frames(90).increment(3).build(),
-                                    (viewer, context) -> text("Impactor Scoreboard Testing")
-                            )).append(ComponentElement.create(
-                                    (viewer, context) -> space().append(text("«").color(NamedTextColor.GRAY))
-                            )))
+                            .component(ScoreboardComponent.create(text("»").color(NamedTextColor.GRAY).appendSpace())
+                                    .append(ComponentElement.create(
+                                            ColorCycle.configure().frames(90).increment(3).build(),
+                                            (viewer, context) -> text("Impactor Scoreboard Testing")
+                                    ))
+                                    .append(space().append(text("«").color(NamedTextColor.GRAY)))
+                            )
                             .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
                             .repeating(Ticks.single())
                             .build()
@@ -170,7 +169,7 @@ public final class ScoreboardModule implements ImpactorModule {
                                     ScoreboardComponent.create(ComponentElement.create(
                                             (viewer, context) -> TextProcessor.mini().parse(viewer, "<gray>Location: <yellow><impactor:position>")
                                     )))
-                                    .listenAndFilter(EntityMoveEvent.class, e -> e.entity().getUUID().equals(event.player().uuid()))
+                                    .listenAndFilter(EntityMoveEvent.Player.class, e -> e.entity().getUUID().equals(event.player().uuid()))
                             )
                             .build()
                     )

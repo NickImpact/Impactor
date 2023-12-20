@@ -1,5 +1,6 @@
 import extensions.isRelease
 import extensions.writeVersion
+import gradle.kotlin.dsl.accessors._99454b32dbd9d870c3769e463ec2442a.implementation
 import gradle.kotlin.dsl.accessors._99454b32dbd9d870c3769e463ec2442a.include
 import net.fabricmc.loom.task.RemapJarTask
 import java.nio.file.Files
@@ -7,6 +8,11 @@ import java.nio.file.Files
 plugins {
     id("impactor.loom-conventions")
     id("com.modrinth.minotaur")
+}
+
+val bundle: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
 }
 
 dependencies {

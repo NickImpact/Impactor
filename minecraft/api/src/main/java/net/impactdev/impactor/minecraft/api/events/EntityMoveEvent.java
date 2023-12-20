@@ -26,6 +26,7 @@
 package net.impactdev.impactor.minecraft.api.events;
 
 import net.impactdev.impactor.api.events.ImpactorEvent;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -34,5 +35,11 @@ public interface EntityMoveEvent extends ImpactorEvent {
     Entity entity();
 
     Vector3d position();
+
+    interface Player extends EntityMoveEvent {
+
+        PlatformPlayer player();
+
+    }
 
 }

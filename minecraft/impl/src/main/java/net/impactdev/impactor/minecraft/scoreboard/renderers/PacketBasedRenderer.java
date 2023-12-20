@@ -57,7 +57,7 @@ public class PacketBasedRenderer implements ScoreboardRenderer {
     public void objective(AssignedScoreboard scoreboard, Objective.Displayed objective) {
         ClientboundSetObjectivePacket update = new ClientboundSetObjectivePacket(ScoreboardComponents.OBJECTIVE, 2);
         ClientboundSetObjectivePacketAccessor accessor = this.translate(update, ClientboundSetObjectivePacketAccessor.class);
-        accessor.title(AdventureTranslator.toNative(objective.text()));
+        accessor.impactor$title(AdventureTranslator.toNative(objective.text()));
 
         this.publish(scoreboard.viewer(), update);
     }
