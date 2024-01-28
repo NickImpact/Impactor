@@ -112,4 +112,9 @@ public final class ImpactorEconomyService implements EconomyService {
     public CompletableFuture<Void> deleteAccount(Currency currency, UUID uuid) {
         return this.storage.delete(currency, uuid);
     }
+
+    @Override
+    public void save(Account account) {
+        this.storage.save(account);
+    }
 }
