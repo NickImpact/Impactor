@@ -20,8 +20,8 @@ dependencies {
     implementation(libs.minotaur)
     implementation(libs.architecturyPlugin)
 
-//    implementation("net.dv8tion:JDA:5.0.0-beta.19") {
-//        exclude(module = "opus-java")
-//    }
-//    implementation("club.minnced:discord-webhooks:0.8.4")
+    implementation("net.dv8tion:JDA:5.0.0-beta.19") {
+        exclude(module = "opus-java")
+    }
+    implementation("club.minnced:discord-webhooks:0.8.4")
 }
