@@ -23,30 +23,17 @@
  *
  */
 
-package net.impactdev.impactor.core.commands.events;
+package net.impactdev.impactor.core.mail;
 
-import net.impactdev.impactor.api.commands.CommandSource;
-import net.impactdev.impactor.api.events.ImpactorEvent;
-import net.impactdev.impactor.api.utility.ExceptionPrinter;
-import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
-import org.incendo.cloud.annotations.AnnotationParser;
+import net.impactdev.impactor.api.configuration.key.ConfigKey;
+import net.impactdev.impactor.api.storage.StorageType;
 
+import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.key;
 
-public final class RegisterCommandsEvent implements ImpactorEvent {
+public final class MailConfig {
 
-    private final AnnotationParser<CommandSource> parser;
+    public static final ConfigKey<StorageType> STORAGE_TYPE = key(adapter ->
+            StorageType.parse(adapter.getString("storage-method", "json"))
+    );
 
-    public RegisterCommandsEvent(AnnotationParser<CommandSource> parser) {
-        this.parser = parser;
-    }
-
-    public void register(Class<?> type) {
-        try {
-            final Object instance = type.getConstructor().newInstance();
-            parser.parse(instance);
-        } catch (Exception e) {
-            ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
-        }
-    }
-    
 }

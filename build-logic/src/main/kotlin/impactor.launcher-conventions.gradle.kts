@@ -1,11 +1,12 @@
 import extensions.isRelease
 import extensions.writeVersion
 import net.fabricmc.loom.task.RemapJarTask
+import org.gradle.configurationcache.extensions.capitalized
 import java.nio.file.Files
 
 plugins {
-    id("impactor.loom-conventions")
     id("com.modrinth.minotaur")
+    id("impactor.loom-conventions")
 }
 
 tasks {
@@ -33,7 +34,7 @@ tasks.withType<GenerateModuleMetadata> {
 modrinth {
     token.set(System.getenv("MODRINTH_GRADLE_TOKEN"))
     projectId.set("Impactor")
-    versionNumber.set(writeVersion())
+    versionNumber.set("${writeVersion()}-${project.name.capitalized()}")
     versionName.set("Impactor ${writeVersion()}")
 
     versionType.set(if(!isRelease()) "beta" else "release")
@@ -49,13 +50,15 @@ modrinth {
 
 fun readChangelog(): String {
     val plugin = rootProject.property("plugin")
-    val contents = rootProject.buildDir.toPath()
+    val contents = rootProject.layout.buildDirectory
+        .asFile
+        .get()
         .resolve("deploy")
         .resolve("$plugin.md")
 
-    if(!Files.exists(contents)) {
+    if(!contents.exists()) {
         return "No changelog notes available..."
     }
 
-    return contents.toFile().readLines().joinToString(separator = "\n")
+    return contents.readLines().joinToString(separator = "\n")
 }

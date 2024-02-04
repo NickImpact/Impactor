@@ -23,30 +23,39 @@
  *
  */
 
-package net.impactdev.impactor.core.commands.events;
+package net.impactdev.impactor.core.mail;
 
-import net.impactdev.impactor.api.commands.CommandSource;
-import net.impactdev.impactor.api.events.ImpactorEvent;
-import net.impactdev.impactor.api.utility.ExceptionPrinter;
-import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
-import org.incendo.cloud.annotations.AnnotationParser;
+import net.impactdev.impactor.api.mail.MailMessage;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
 
-public final class RegisterCommandsEvent implements ImpactorEvent {
+public record ImpactorMailMessage(
+        @NotNull UUID uuid,
+        @Nullable UUID sender,
+        @NotNull Component content,
+        @NotNull Instant timestamp
+) implements MailMessage {
 
-    private final AnnotationParser<CommandSource> parser;
-
-    public RegisterCommandsEvent(AnnotationParser<CommandSource> parser) {
-        this.parser = parser;
+    @Override
+    public Optional<UUID> source() {
+        return Optional.ofNullable(this.sender);
     }
 
-    public void register(Class<?> type) {
-        try {
-            final Object instance = type.getConstructor().newInstance();
-            parser.parse(instance);
-        } catch (Exception e) {
-            ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
+    public static class MaillMessageFactory implements Factory {
+
+        @Override
+        public MailMessage create(Component message) {
+            return new ImpactorMailMessage(UUID.randomUUID(), null, message, Instant.now());
+        }
+
+        @Override
+        public MailMessage create(UUID source, Component message) {
+            return new ImpactorMailMessage(UUID.randomUUID(), source, message, Instant.now());
         }
     }
-    
 }

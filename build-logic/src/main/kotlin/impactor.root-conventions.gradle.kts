@@ -1,5 +1,6 @@
-import extensions.writeVersion
+import extensions.isRelease
 import tasks.GenerateChangelog
+import tasks.PublishToDiscord
 import java.nio.file.Files
 
 plugins {
@@ -34,8 +35,15 @@ tasks {
         }
     }
 
+    val publishToDiscord = tasks.register("discord", PublishToDiscord::class)
+
     build {
-        dependsOn(writeChangelog)
+        if(this.project.isRelease()) {
+            dependsOn(writeChangelog)
+            dependsOn(publishToDiscord)
+        }
+
+        dependsOn(publishToDiscord)
     }
 
     assemble {

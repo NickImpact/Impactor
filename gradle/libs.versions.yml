@@ -10,9 +10,9 @@ versions:
   licenser: 0.6.1
   shadow: 7.1.2
   blossom: 2.1.0
-  loom: 1.1-SNAPSHOT
-  minotaur: 2.+
+  loom: 1.5-SNAPSHOT
   architectury-plugin: 3.4-SNAPSHOT
+  minotaur: 2.+
 
   # fabric/remap
   fabric-loader: 0.14.16
@@ -34,6 +34,9 @@ versions:
 
   # Cloud
   cloud: 1.9.0-SNAPSHOT
+
+  # Utility
+  gson: 2.10.1
 
 dependencies:
 
@@ -173,3 +176,9 @@ dependencies:
     group: cloud.commandframework
     name: cloud-fabric
     version: { ref: cloud }
+
+  # Utilities
+  gson:
+    group: com.google.code.gson
+    name: gson
+    version: { ref: gson }

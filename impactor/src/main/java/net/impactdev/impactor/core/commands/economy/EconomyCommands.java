@@ -25,14 +25,6 @@
 
 package net.impactdev.impactor.core.commands.economy;
 
-import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandDescription;
-import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.annotations.CommandPermission;
-import cloud.commandframework.annotations.Flag;
-import cloud.commandframework.annotations.ProxiedBy;
-import cloud.commandframework.annotations.processing.CommandContainer;
-import com.google.common.base.Preconditions;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.configuration.Config;
@@ -41,10 +33,8 @@ import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransferTransaction;
-import net.impactdev.impactor.api.economy.transactions.composer.TransferComposer;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyResultType;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.impactdev.impactor.api.utility.Context;
@@ -53,24 +43,29 @@ import net.impactdev.impactor.core.economy.ImpactorEconomyService;
 import net.impactdev.impactor.core.economy.context.TransactionContext;
 import net.impactdev.impactor.core.economy.context.TransferTransactionContext;
 import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.util.TriState;
+import org.incendo.cloud.annotations.Argument;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Flag;
+import org.incendo.cloud.annotations.Permission;
+import org.incendo.cloud.annotations.ProxiedBy;
+import org.incendo.cloud.annotations.processing.CommandContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings({"DuplicatedCode", "unused"})
 @CommandContainer
-@CommandPermission("impactor.commands.economy.base")
+@Permission("impactor.commands.economy.base")
 public final class EconomyCommands {
 
+    @Command("economy|eco balance [currency] [target]")
     @ProxiedBy("balance")
-    @CommandMethod("economy|eco balance [currency] [target]")
-    @CommandPermission("impactor.commands.economy.balance")
+    @Permission("impactor.commands.economy.balance")
     @CommandDescription("Fetches the balance of the source or identified target")
     public void balance(final @NotNull CommandSource source, @Nullable @Argument("target") PlatformSource target, @Nullable @Argument("currency") Currency currency) {
         EconomyService service = EconomyService.instance();
@@ -85,9 +80,9 @@ public final class EconomyCommands {
         ImpactorTranslations.ECONOMY_BALANCE.send(source, context);
     }
 
+    @Command("economy|eco withdraw <amount> [currency] [target]")
     @ProxiedBy("withdraw")
-    @CommandMethod("economy|eco withdraw <amount> [currency] [target]")
-    @CommandPermission("impactor.commands.economy.withdraw")
+    @Permission("impactor.commands.economy.withdraw")
     public void withdraw(
             final @NotNull CommandSource source,
             @Argument("amount") double amount,
@@ -116,9 +111,9 @@ public final class EconomyCommands {
 
     }
 
+    @Command("economy|eco deposit <amount> [currency] [target]")
     @ProxiedBy("deposit")
-    @CommandMethod("economy|eco deposit <amount> [currency] [target]")
-    @CommandPermission("impactor.commands.economy.deposit")
+    @Permission("impactor.commands.economy.deposit")
     public void deposit(
             final @NotNull CommandSource source,
             @Argument("amount") double amount,
@@ -146,8 +141,8 @@ public final class EconomyCommands {
         });
     }
 
-    @CommandMethod("economy|eco set <amount> [currency] [target]")
-    @CommandPermission("impactor.commands.economy.set")
+    @Command("economy|eco set <amount> [currency] [target]")
+    @Permission("impactor.commands.economy.set")
     public void set(
             final @NotNull CommandSource source,
             @Argument("amount") double amount,
@@ -176,8 +171,8 @@ public final class EconomyCommands {
 
     }
 
-    @CommandMethod("economy|eco reset [currency] [target]")
-    @CommandPermission("impactor.commands.economy.reset")
+    @Command("economy|eco reset [currency] [target]")
+    @Permission("impactor.commands.economy.reset")
     public void reset(
             final @NotNull CommandSource source,
             @Nullable @Argument("target") PlatformSource target,
@@ -204,9 +199,9 @@ public final class EconomyCommands {
         });
     }
 
+    @Command("economy|eco pay <amount> <target> [currency] [source]")
     @ProxiedBy("pay")
-    @CommandMethod("economy|eco pay <amount> <target> [currency] [source]")
-    @CommandPermission("impactor.commands.economy.pay.base")
+    @Permission("impactor.commands.economy.pay.base")
     public void transfer(
             final @NotNull CommandSource source,
             @Argument("amount") double amount,
@@ -278,9 +273,9 @@ public final class EconomyCommands {
         });
     }
 
+    @Command("economy|eco baltop")
     @ProxiedBy("baltop")
-    @CommandMethod("economy|eco baltop")
-    @CommandPermission("impactor.commands.economy.baltop")
+    @Permission("impactor.commands.economy.baltop")
     public void baltop(final CommandSource source, @Nullable @Flag("currency") Currency currency, @Flag("extended") boolean nonPlayers) {
         EconomyService service = EconomyService.instance();
         Currency target = currency != null ? currency : service.currencies().primary();

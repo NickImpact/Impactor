@@ -5,17 +5,6 @@ plugins {
     id("impactor.publishing-conventions")
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
-
-architectury {
-    platformSetupLoomIde()
-    forge()
-}
-
 loom {
     forge {
         runs {
@@ -38,7 +27,7 @@ dependencies {
 
     include("io.leangen.geantyref:geantyref:1.3.13")
 
-    modImplementation("net.impactdev.impactor.commands:forge:5.1.1+1.20.1-SNAPSHOT") {
+    modImplementation("net.impactdev.impactor.commands:forge:5.2.0+1.20.1-SNAPSHOT") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")

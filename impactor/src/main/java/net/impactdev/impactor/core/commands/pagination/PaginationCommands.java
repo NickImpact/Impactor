@@ -25,26 +25,26 @@
 
 package net.impactdev.impactor.core.commands.pagination;
 
-import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.annotations.processing.CommandContainer;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.core.text.pagination.ActivePagination;
+import org.incendo.cloud.annotations.Argument;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.processing.CommandContainer;
 
 @CommandContainer
 public class PaginationCommands {
 
-    @CommandMethod("pagination <pagination> next")
+    @Command("pagination <pagination> next")
     public void next(CommandSource source, @Argument("pagination") ActivePagination pagination) {
         pagination.nextPage(source);
     }
 
-    @CommandMethod("pagination <pagination> prev")
+    @Command("pagination <pagination> prev")
     public void previous(CommandSource source, @Argument("pagination") ActivePagination pagination) {
         pagination.previousPage(source);
     }
 
-    @CommandMethod("pagination <pagination> <page>")
+    @Command("pagination <pagination> <page>")
     public void page(CommandSource source, @Argument("pagination") ActivePagination pagination, @Argument("page") int page) {
         pagination.send(source, page);
     }

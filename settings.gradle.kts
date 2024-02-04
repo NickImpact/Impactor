@@ -14,7 +14,7 @@ pluginManagement {
 }
 
 plugins {
-    id("ca.stellardrift.polyglot-version-catalogs") version "5.0.1"
+    id("ca.stellardrift.polyglot-version-catalogs") version "6.1.0"
 }
 
 rootProject.name = "Impactor"
@@ -23,6 +23,7 @@ include("api:core")
 include("api:config")
 include("api:economy")
 include("api:items")
+include("api:mail")
 include("api:players")
 include("api:plugins")
 include("api:storage")

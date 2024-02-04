@@ -23,30 +23,24 @@
  *
  */
 
-package net.impactdev.impactor.core.commands.events;
+package net.impactdev.impactor.core.mail.storage;
 
-import net.impactdev.impactor.api.commands.CommandSource;
-import net.impactdev.impactor.api.events.ImpactorEvent;
-import net.impactdev.impactor.api.utility.ExceptionPrinter;
-import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
-import org.incendo.cloud.annotations.AnnotationParser;
+import net.impactdev.impactor.api.mail.MailMessage;
+import net.impactdev.impactor.api.mail.filters.MailFilter;
+import net.impactdev.impactor.api.storage.connection.StorageConnection;
+import net.kyori.adventure.util.TriState;
 
+import java.util.List;
+import java.util.UUID;
 
-public final class RegisterCommandsEvent implements ImpactorEvent {
+public interface MailStorageImplementation extends StorageConnection {
 
-    private final AnnotationParser<CommandSource> parser;
+    List<MailMessage> mail(UUID target) throws Exception;
 
-    public RegisterCommandsEvent(AnnotationParser<CommandSource> parser) {
-        this.parser = parser;
-    }
+    boolean append(UUID target, MailMessage message) throws Exception;
 
-    public void register(Class<?> type) {
-        try {
-            final Object instance = type.getConstructor().newInstance();
-            parser.parse(instance);
-        } catch (Exception e) {
-            ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
-        }
-    }
-    
+    TriState delete(UUID target, MailMessage message) throws Exception;
+
+    TriState deleteWhere(UUID target, MailFilter filter) throws Exception;
+
 }

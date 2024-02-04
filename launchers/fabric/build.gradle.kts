@@ -11,11 +11,6 @@ java {
     }
 }
 
-architectury {
-    platformSetupLoomIde()
-    fabric()
-}
-
 repositories {
     maven("https://maven.nucleoid.xyz/") { name = "Nucleoid" }
 }
@@ -31,7 +26,7 @@ dependencies {
     implementation(project(":minecraft:impl"))
     modImplementation("ca.landonjw.gooeylibs:fabric:3.0.0-1.20.1-SNAPSHOT@jar")
 
-    modImplementation("net.impactdev.impactor.commands:fabric:5.1.1+1.20.1-SNAPSHOT") {
+    modImplementation("net.impactdev.impactor.commands:fabric:5.2.0+1.20.1-SNAPSHOT") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")
@@ -108,5 +103,6 @@ modrinth {
 configurations.all {
     resolutionStrategy {
         force("net.fabricmc:fabric-loader:${rootProject.property("fabric-loader")}")
+        force("com.google.code.gson:gson:2.10.1")
     }
 }

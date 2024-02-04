@@ -41,9 +41,9 @@ public class TestPlugin extends BaseImpactorPlugin {
     @Override
     protected ModuleInitializer registerModules() {
         return super.registerModules()
+                .with(TestCommandsModule.class)
                 .with(TestPlatform.TestPlatformModule.class)
-                .with(TestScheduler.TestSchedulerModule.class)
-                .with(TestCommandsModule.class);
+                .with(TestScheduler.TestSchedulerModule.class);
     }
 
 }

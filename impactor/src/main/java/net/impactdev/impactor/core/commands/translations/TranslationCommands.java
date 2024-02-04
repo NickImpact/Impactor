@@ -25,26 +25,26 @@
 
 package net.impactdev.impactor.core.commands.translations;
 
-import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.annotations.CommandPermission;
-import cloud.commandframework.annotations.processing.CommandContainer;
 import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.translations.metadata.LanguageInfo;
 import net.impactdev.impactor.api.utility.Context;
 import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
+import org.incendo.cloud.annotations.Argument;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.Permission;
+import org.incendo.cloud.annotations.processing.CommandContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 import java.util.Set;
 
 @CommandContainer
-@CommandPermission("impactor.commands.translations.base")
+@Permission("impactor.commands.translations.base")
 public final class TranslationCommands {
 
-    @CommandMethod("translations view <language>")
-    @CommandPermission("impactor.commands.translations.view")
+    @Command("translations view <language>")
+    @Permission("impactor.commands.translations.view")
     public void view(final @NotNull CommandSource source, @Argument("language") Locale locale) {
         ImpactorTranslations.TRANSLATIONS_SEARCHING.send(source, Context.empty());
 
@@ -73,8 +73,8 @@ public final class TranslationCommands {
         ImpactorTranslations.TRANSLATIONS_INFO_HEADER_FOOTER.send(source, context);
     }
 
-    @CommandMethod("translations install")
-    @CommandPermission("impactor.commands.translations.install")
+    @Command("translations install")
+    @Permission("impactor.commands.translations.install")
     public void install(final @NotNull CommandSource source) {
         ImpactorTranslations.TRANSLATIONS_SEARCHING.send(source, Context.empty());
         Set<LanguageInfo> languages = ImpactorTranslations.MANAGER.repository().available().join();
