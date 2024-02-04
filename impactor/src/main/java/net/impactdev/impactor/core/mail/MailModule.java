@@ -25,28 +25,22 @@
 
 package net.impactdev.impactor.core.mail;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Binder;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
+import net.impactdev.impactor.api.mail.MailMessage;
 import net.impactdev.impactor.api.mail.MailService;
+import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 
-public final class MailModule extends AbstractModule implements ImpactorModule {
+public final class MailModule implements ImpactorModule {
 
-    private final Injector injector = Guice.createInjector();
+    @Override
+    public void factories(FactoryProvider provider) {
+        provider.register(MailMessage.Factory.class, new ImpactorMailMessage.MaillMessageFactory());
+    }
 
     @Override
     public void services(ServiceProvider provider) {
-        provider.register(MailService.class, this.injector.getInstance(MailService.class));
+        provider.register(MailService.class, new ImpactorMailService());
     }
 
-    @Override
-    protected void configure() {
-        bind(MailService.class).to(ImpactorMailService.class);
-    }
 }

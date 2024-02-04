@@ -46,4 +46,16 @@ public record ImpactorMailMessage(
         return Optional.ofNullable(this.sender);
     }
 
+    public static class MaillMessageFactory implements Factory {
+
+        @Override
+        public MailMessage create(Component message) {
+            return new ImpactorMailMessage(UUID.randomUUID(), null, message, Instant.now());
+        }
+
+        @Override
+        public MailMessage create(UUID source, Component message) {
+            return new ImpactorMailMessage(UUID.randomUUID(), source, message, Instant.now());
+        }
+    }
 }

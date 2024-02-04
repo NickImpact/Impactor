@@ -53,7 +53,7 @@ public final class ImpactorMailService implements MailService {
     ImpactorMailService() {
         this.config = Config.builder()
                 .path(BaseImpactorPlugin.instance().configurationDirectory().resolve("mail.conf"))
-                .provider(EconomyConfig.class)
+                .provider(MailConfig.class)
                 .provideIfMissing(() -> BaseImpactorPlugin.instance().resource(root -> root.resolve("configs").resolve("mail.conf")))
                 .build();
 
@@ -77,6 +77,11 @@ public final class ImpactorMailService implements MailService {
     @Override
     public CompletableFuture<Boolean> send(@NotNull UUID source, @NotNull UUID target, @NotNull Component message) {
         return this.storage.send(target, new ImpactorMailMessage(UUID.randomUUID(), source, message, Instant.now()));
+    }
+
+    @Override
+    public CompletableFuture<Boolean> send(@NotNull UUID target, @NotNull MailMessage message) {
+        return this.storage.send(target, message);
     }
 
     @Override

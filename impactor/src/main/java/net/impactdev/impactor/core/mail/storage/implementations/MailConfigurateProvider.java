@@ -178,13 +178,13 @@ public final class MailConfigurateProvider implements MailStorageImplementation 
             try {
                 UUID uuid = UUID.fromString(path.getFileName().toString().replace(".json", ""));
                 ConfigurationNode node = this.loader.loader(path).load();
-                UUID sender = node.node("sender").get(UUID.class);
+                UUID source = node.node("source").get(UUID.class);
                 Instant instant = node.node("timestamp").get(Instant.class);
 
                 JsonElement json = Objects.requireNonNull(node.node("message").get(JsonElement.class));
                 Component message = GsonComponentSerializer.gson().deserializeFromTree(json);
 
-                return Optional.of(new ImpactorMailMessage(uuid, sender, message, instant));
+                return Optional.of(new ImpactorMailMessage(uuid, source, message, instant));
             } catch (Exception e) {
                 ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
                 return Optional.empty();
@@ -208,10 +208,10 @@ public final class MailConfigurateProvider implements MailStorageImplementation 
                 ConfigurationLoader<?> loader = this.loader.loader(target);
                 ConfigurationNode node = loader.createNode();
                 if(message.source().isPresent()) {
-                    node.set(UUID.class, message.source().get());
+                    node.node("source").set(UUID.class, message.source().get());
                 }
-                node.set(Instant.class, message.timestamp());
-                node.set(JsonElement.class, json);
+                node.node("timestamp").set(Instant.class, message.timestamp());
+                node.node("message").set(JsonElement.class, json);
 
                 loader.save(node);
             }

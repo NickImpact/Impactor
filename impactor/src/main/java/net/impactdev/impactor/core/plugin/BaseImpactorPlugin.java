@@ -40,6 +40,7 @@ import net.impactdev.impactor.api.services.permissions.PermissionsService;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.api.APIRegister;
 import net.impactdev.impactor.core.api.ImpactorService;
+import net.impactdev.impactor.core.mail.MailModule;
 import net.impactdev.impactor.core.modules.ModuleInitializer;
 import net.impactdev.impactor.core.permissions.LuckPermsPermissionsService;
 import net.impactdev.impactor.core.permissions.NoOpPermissionsService;
@@ -104,6 +105,7 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         return initializer.with(ConfigModule.class)
                 .with(CommandsModule.class)
                 .with(EconomyModule.class)
+                .with(MailModule.class)
                 .with(PermissionsModule.class)
                 .with(TextModule.class)
                 .with(TranslationsModule.class);
