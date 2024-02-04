@@ -34,6 +34,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
+import java.util.function.Supplier;
 
 public final class ImpactorEconomyTransferTransaction implements EconomyTransferTransaction {
 
@@ -42,7 +43,7 @@ public final class ImpactorEconomyTransferTransaction implements EconomyTransfer
     private final Account to;
     private final BigDecimal amount;
     private final EconomyResultType result;
-    private final Component message;
+    private final Supplier<Component> message;
 
     public ImpactorEconomyTransferTransaction(TransactionBuilder builder) {
         this.currency = builder.currency;
@@ -79,7 +80,7 @@ public final class ImpactorEconomyTransferTransaction implements EconomyTransfer
     }
 
     @Override
-    public @Nullable Component message() {
+    public @Nullable Supplier<Component> message() {
         return this.message;
     }
 
@@ -94,7 +95,7 @@ public final class ImpactorEconomyTransferTransaction implements EconomyTransfer
         private Account to;
         private BigDecimal amount;
         private EconomyResultType result;
-        private Component message;
+        private Supplier<Component> message;
 
         public TransactionBuilder currency(final Currency currency) {
             this.currency = currency;
@@ -121,7 +122,7 @@ public final class ImpactorEconomyTransferTransaction implements EconomyTransfer
             return this;
         }
 
-        public TransactionBuilder message(Component message) {
+        public TransactionBuilder message(Supplier<Component> message) {
             this.message = message;
             return this;
         }

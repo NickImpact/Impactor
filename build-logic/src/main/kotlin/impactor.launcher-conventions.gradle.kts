@@ -1,6 +1,11 @@
+import extensions.isRelease
+import extensions.writeVersion
 import net.fabricmc.loom.task.RemapJarTask
+import org.gradle.configurationcache.extensions.capitalized
+import java.nio.file.Files
 
 plugins {
+    id("com.modrinth.minotaur")
     id("impactor.loom-conventions")
 }
 
@@ -16,7 +21,6 @@ tasks {
         archiveBaseName.set("Impactor-${project.name.capitalize()}")
         archiveVersion.set(writeVersion())
     }
-
 }
 
 tasks.withType<PublishToMavenRepository> {
@@ -27,16 +31,34 @@ tasks.withType<GenerateModuleMetadata> {
     dependsOn(tasks["remapProductionJar"])
 }
 
-fun writeVersion(): String
-{
-    val plugin = rootProject.property("plugin")
-    val minecraft = rootProject.property("minecraft")
-    val snapshot = rootProject.property("snapshot") == "true"
+modrinth {
+    token.set(System.getenv("MODRINTH_GRADLE_TOKEN"))
+    projectId.set("Impactor")
+    versionNumber.set("${writeVersion()}-${project.name.capitalized()}")
+    versionName.set("Impactor ${writeVersion()}")
 
-    var version = "$plugin+$minecraft"
-    if(snapshot) {
-        version = "$version-SNAPSHOT"
+    versionType.set(if(!isRelease()) "beta" else "release")
+    uploadFile.set(tasks["remapProductionJar"])
+
+    gameVersions.set(listOf(rootProject.property("minecraft").toString()))
+
+    // https://github.com/modrinth/minotaur
+    // TODO - Project Body Sync
+    changelog.set(readChangelog())
+    debugMode.set(true)
+}
+
+fun readChangelog(): String {
+    val plugin = rootProject.property("plugin")
+    val contents = rootProject.layout.buildDirectory
+        .asFile
+        .get()
+        .resolve("deploy")
+        .resolve("$plugin.md")
+
+    if(!contents.exists()) {
+        return "No changelog notes available..."
     }
 
-    return version
+    return contents.readLines().joinToString(separator = "\n")
 }

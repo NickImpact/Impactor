@@ -25,12 +25,6 @@
 
 package net.impactdev.impactor.core.commands.parsers;
 
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.translations.TranslationManager;
@@ -38,41 +32,38 @@ import net.impactdev.impactor.api.translations.metadata.LanguageInfo;
 import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
 import org.apache.commons.lang3.LocaleUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.context.CommandInput;
+import org.incendo.cloud.parser.ArgumentParseResult;
+import org.incendo.cloud.parser.ArgumentParser;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.incendo.cloud.suggestion.Suggestion;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-public class LocaleParser implements ArgumentParser<CommandSource, Locale> {
+public class LocaleParser implements ArgumentParser<CommandSource, Locale>, BlockingSuggestionProvider<CommandSource> {
 
     @Override
-    public @NonNull ArgumentParseResult<@NonNull Locale> parse(@NonNull CommandContext<@NonNull CommandSource> context, @NonNull Queue<@NonNull String> args) {
-        String input = args.peek();
-        if (input == null) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    LocaleParser.class,
-                    context
-            ));
-        }
-
-        Locale locale = TranslationManager.parseLocale(input);
+    public @NonNull ArgumentParseResult<@NonNull Locale> parse(@NonNull CommandContext<@NonNull CommandSource> context, @NonNull CommandInput input) {
+        String argument = input.peekString();
+        Locale locale = TranslationManager.parseLocale(argument);
         if(!LocaleUtils.isAvailableLocale(locale)) {
             return ArgumentParseResult.failure(new IllegalArgumentException("Invalid locale: " + input));
         }
 
-        args.remove();
+        input.readString();
         return ArgumentParseResult.success(locale);
     }
 
     @Override
-    public @NonNull List<@NonNull String> suggestions(@NonNull CommandContext<CommandSource> context, @NonNull String input) {
-        List<String> options = Lists.newArrayList();
+    public @NonNull Iterable<@NonNull Suggestion> suggestions(@NonNull CommandContext<CommandSource> context, @NonNull CommandInput input) {
+        List<Suggestion> options = Lists.newArrayList();
         Set<LanguageInfo> available = ImpactorTranslations.MANAGER.repository().available().join();
         available.forEach(info -> {
-            if(info.id().toLowerCase().startsWith(input.toLowerCase())) {
-                options.add(info.id());
+            if(info.id().toLowerCase().startsWith(input.peekString().toLowerCase())) {
+                options.add(Suggestion.simple(info.id()));
             }
         });
 

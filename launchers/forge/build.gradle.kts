@@ -1,17 +1,8 @@
+import extensions.writeVersion
+
 plugins {
     id("impactor.launcher-conventions")
     id("impactor.publishing-conventions")
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
-
-architectury {
-    platformSetupLoomIde()
-    forge()
 }
 
 loom {
@@ -25,7 +16,6 @@ loom {
         }
 
         mixinConfig("mixins.impactor.forge.json")
-        mixinConfig("mixins.impactor.forge.commands.json")
     }
 }
 
@@ -37,14 +27,14 @@ dependencies {
 
     include("io.leangen.geantyref:geantyref:1.3.13")
 
-//    modImplementation("net.impactdev.impactor.commands:forge:5.1.1+1.20.1-SNAPSHOT") {
-//        exclude("net.impactdev.impactor.api", "config")
-//        exclude("net.impactdev.impactor.api", "core")
-//        exclude("net.impactdev.impactor.api", "items")
-//        exclude("net.impactdev.impactor.api", "players")
-//        exclude("net.impactdev.impactor.api", "plugins")
-//        exclude("net.impactdev.impactor.api", "storage")
-//    }
+    modImplementation("net.impactdev.impactor.commands:forge:5.2.0+1.20.1-SNAPSHOT") {
+        exclude("net.impactdev.impactor.api", "config")
+        exclude("net.impactdev.impactor.api", "core")
+        exclude("net.impactdev.impactor.api", "items")
+        exclude("net.impactdev.impactor.api", "players")
+        exclude("net.impactdev.impactor.api", "plugins")
+        exclude("net.impactdev.impactor.api", "storage")
+    }
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
@@ -62,6 +52,7 @@ tasks {
             include(dependency("cloud.commandframework:cloud-annotations:.*"))
             include(dependency("cloud.commandframework:cloud-brigadier:.*"))
             include(dependency("cloud.commandframework:cloud-services:.*"))
+            include(dependency("$mapped.cloud.commandframework:cloud-forge:.*"))
             include(dependency("cloud.commandframework:cloud-minecraft-extras:.*"))
 
             exclude("forge-client-extra.jar")
@@ -95,29 +86,11 @@ publishing {
 
             groupId = "net.impactdev.impactor.launchers"
             artifactId = "forge"
-
-            val plugin = rootProject.property("plugin").toString()
-            val minecraft = rootProject.property("minecraft").toString()
-            val snapshot = rootProject.property("snapshot") == "true"
-
-            version = "${plugin}+${minecraft}"
-            if(snapshot) {
-                version += "-SNAPSHOT"
-            }
+            version = writeVersion()
         }
     }
 }
 
-fun writeVersion(): String
-{
-    val plugin = rootProject.property("plugin")
-    val minecraft = rootProject.property("minecraft")
-    val snapshot = rootProject.property("snapshot") == "true"
-
-    var version = "$plugin+$minecraft"
-    if(snapshot) {
-        version = "$version-SNAPSHOT"
-    }
-
-    return version
+modrinth {
+    loaders.set(listOf("forge"))
 }

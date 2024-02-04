@@ -25,41 +25,37 @@
 
 package net.impactdev.impactor.core.commands.parsers;
 
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.currency.CurrencyProvider;
+import net.impactdev.impactor.core.utility.future.Futures;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.context.CommandInput;
+import org.incendo.cloud.parser.ArgumentParseResult;
+import org.incendo.cloud.parser.ArgumentParser;
+import org.incendo.cloud.suggestion.Suggestion;
+import org.incendo.cloud.suggestion.SuggestionProvider;
 
 import java.util.List;
-import java.util.Queue;
-import java.util.function.BiFunction;
+import java.util.concurrent.CompletableFuture;
 
-public final class CurrencyParser implements ArgumentParser<CommandSource, Currency> {
+public final class CurrencyParser implements ArgumentParser<CommandSource, Currency>, SuggestionProvider<CommandSource> {
 
     @Override
-    public @NonNull ArgumentParseResult<@NonNull Currency> parse(@NonNull CommandContext<@NonNull CommandSource> context, @NonNull Queue<@NonNull String> args) {
-        final String input = args.peek();
-        if(input == null) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    CurrencyParser.class,
-                    context
-            ));
-        }
+    public @NonNull ArgumentParseResult<@NonNull Currency> parse(@NonNull CommandContext<@NonNull CommandSource> context, @NonNull CommandInput input) {
+        final String value = input.peekString();
 
         try {
             final Key key;
-            if(input.contains(":")) {
-                key = Key.key(input);
+            if(value.contains(":")) {
+                key = Key.key(value);
             } else {
-                key = Key.key("impactor", input);
+                key = Key.key("impactor", value);
             }
 
             return Impactor.instance().services()
@@ -67,7 +63,7 @@ public final class CurrencyParser implements ArgumentParser<CommandSource, Curre
                     .currencies()
                     .currency(key)
                     .map(currency -> {
-                        args.remove();
+                        input.readString();
                         return currency;
                     })
                     .map(ArgumentParseResult::success)
@@ -81,24 +77,22 @@ public final class CurrencyParser implements ArgumentParser<CommandSource, Curre
     }
 
     @Override
-    public @NonNull List<@NonNull String> suggestions(@NonNull CommandContext<CommandSource> context, @NonNull String input) {
-        List<String> results = Lists.newArrayList();
+    public @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(@NonNull CommandContext<CommandSource> context, @NonNull CommandInput input) {
+        String argument = input.peekString();
+        return Futures.execute(() -> {
+            List<String> results = Lists.newArrayList();
 
-        CurrencyProvider currencies = Impactor.instance().services().provide(EconomyService.class).currencies();
-        currencies.registered().forEach(currency -> {
-            if(currency.key().value().startsWith(input)) {
-                results.add(currency.key().value());
-                results.add(currency.key().asString());
-            } else if(currency.key().asString().startsWith(input)) {
-                results.add(currency.key().asString());
-            }
+            CurrencyProvider currencies = Impactor.instance().services().provide(EconomyService.class).currencies();
+            currencies.registered().forEach(currency -> {
+                if(currency.key().value().startsWith(argument)) {
+                    results.add(currency.key().value());
+                    results.add(currency.key().asString());
+                } else if(currency.key().asString().startsWith(argument)) {
+                    results.add(currency.key().asString());
+                }
+            });
+
+            return results.stream().map(Suggestion::simple).toList();
         });
-
-        return results;
-    }
-
-    @Override
-    public @NonNull <O> ArgumentParser<CommandSource, O> map(BiFunction<CommandContext<CommandSource>, Currency, ArgumentParseResult<O>> mapper) {
-        return ArgumentParser.super.map(mapper);
     }
 }

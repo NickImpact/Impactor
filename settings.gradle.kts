@@ -14,7 +14,7 @@ pluginManagement {
 }
 
 plugins {
-    id("ca.stellardrift.polyglot-version-catalogs") version "5.0.1"
+    id("ca.stellardrift.polyglot-version-catalogs") version "6.1.0"
 }
 
 rootProject.name = "Impactor"
@@ -36,3 +36,6 @@ include("minecraft:api")
 include("minecraft:impl")
 include("launchers:forge")
 include("launchers:fabric")
+
+// Integrations
+include("integrations:vault")

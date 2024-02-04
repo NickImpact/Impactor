@@ -34,9 +34,6 @@ import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.text.events.RegisterPlaceholdersEvent;
 import net.impactdev.impactor.api.text.placeholders.PlaceholderArguments;
-import net.impactdev.impactor.core.integrations.Dependencies;
-import net.impactdev.impactor.core.integrations.Dependency;
-import net.impactdev.impactor.core.integrations.Integration;
 import net.impactdev.impactor.fabric.platform.FabricPlatform;
 import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
 import net.kyori.adventure.key.Key;
@@ -46,15 +43,12 @@ import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Optional;
 
-@Dependencies(@Dependency("placeholder-api"))
-public final class PlaceholderAPIIntegration implements Integration {
+public final class PlaceholderAPIIntegration {
 
-    @Override
     public String name() {
         return "Placeholder API";
     }
 
-    @Override
     public void subscribe(PluginLogger logger, EventBus<ImpactorEvent> bus) {
         logger.info("Integrating with PlaceholderAPI...");
 

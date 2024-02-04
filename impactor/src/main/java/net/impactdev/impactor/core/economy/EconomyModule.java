@@ -27,6 +27,7 @@ package net.impactdev.impactor.core.economy;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.EconomyService;
+import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.transactions.composer.TransactionComposer;
 import net.impactdev.impactor.api.economy.transactions.composer.TransferComposer;
 import net.impactdev.impactor.api.events.ImpactorEvent;
@@ -35,6 +36,9 @@ import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.api.economy.currency.Currency;
+import net.impactdev.impactor.core.commands.economy.EconomyCommands;
+import net.impactdev.impactor.core.commands.events.RegisterCommandsEvent;
+import net.impactdev.impactor.core.economy.accounts.ImpactorAccount;
 import net.impactdev.impactor.core.economy.currency.ImpactorCurrency;
 import net.impactdev.impactor.core.economy.registration.EconomyRegistrationProvider;
 import net.impactdev.impactor.core.economy.registration.ImpactorSuggestEconomyServiceEvent;
@@ -49,6 +53,7 @@ public class EconomyModule implements ImpactorModule {
     @Override
     public void builders(BuilderProvider provider) {
         provider.register(Currency.CurrencyBuilder.class, ImpactorCurrency.ImpactorCurrencyBuilder::new);
+        provider.register(Account.AccountBuilder.class, ImpactorAccount.ImpactorAccountBuilder::new);
 
         provider.register(TransactionComposer.class, BaseTransactionComposer::new);
         provider.register(TransferComposer.class, TransferTransactionComposer::new);

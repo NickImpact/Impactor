@@ -23,17 +23,22 @@
  *
  */
 
-package net.impactdev.impactor.core.integrations;
+package net.impactdev.impactor.core.storage.hikari;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import net.impactdev.impactor.api.storage.StorageCredentials;
+import net.impactdev.impactor.api.storage.connection.sql.SQLConnection;
+import net.impactdev.impactor.api.storage.connection.sql.hikari.HikariConnectionBuilder;
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Dependencies {
+public abstract class HikariConnectionBuilderImpl<T extends SQLConnection, B extends HikariConnectionBuilder<T, B>>
+        implements HikariConnectionBuilder<T, B>
+{
 
-    Dependency[] value();
+    protected StorageCredentials credentials;
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public B credentials(StorageCredentials credentials) {
+        this.credentials = credentials;
+        return (B) this;
+    }
 }

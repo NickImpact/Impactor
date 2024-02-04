@@ -25,32 +25,32 @@
 
 package net.impactdev.impactor.core.commands.parsers;
 
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.parsing.ParserException;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandSource;
-import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerService;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.context.CommandInput;
+import org.incendo.cloud.parser.ArgumentParseResult;
+import org.incendo.cloud.parser.ArgumentParser;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.incendo.cloud.suggestion.Suggestion;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class PlatformSourceParser implements ArgumentParser<CommandSource, PlatformSource> {
+public final class PlatformSourceParser implements ArgumentParser<CommandSource, PlatformSource>, BlockingSuggestionProvider<CommandSource> {
 
     private final PlainTextComponentSerializer plain = PlainTextComponentSerializer.plainText();
     
     @Override
-    public @NonNull ArgumentParseResult<@NonNull PlatformSource> parse(@NonNull CommandContext<@NonNull CommandSource> context, @NonNull Queue<@NonNull String> args) {
+    public @NonNull ArgumentParseResult<@NonNull PlatformSource> parse(@NonNull CommandContext<@NonNull CommandSource> context, @NonNull CommandInput args) {
         PlatformPlayerService service = Impactor.instance().services().provide(PlatformPlayerService.class);
         Set<PlatformPlayer> online = service.online();
         Set<PlatformSource> options = new HashSet<>();
@@ -58,11 +58,11 @@ public final class PlatformSourceParser implements ArgumentParser<CommandSource,
         options.addAll(online);
 
         Optional<PlatformSource> match = options.stream()
-                .filter(player -> this.plain.serialize(player.name()).equals(args.peek()))
+                .filter(player -> this.plain.serialize(player.name()).equals(args.peekString()))
                 .findFirst();
 
         return match.map(player -> {
-                    args.remove();
+                    args.readString();
                     return player;
                 })
                 .map(ArgumentParseResult::success)
@@ -70,7 +70,7 @@ public final class PlatformSourceParser implements ArgumentParser<CommandSource,
     }
 
     @Override
-    public @NonNull List<@NonNull String> suggestions(@NonNull CommandContext<CommandSource> context, @NonNull String input) {
+    public @NonNull Iterable<@NonNull Suggestion> suggestions(@NonNull CommandContext<CommandSource> context, @NonNull CommandInput input) {
         PlatformPlayerService service = Impactor.instance().services().provide(PlatformPlayerService.class);
         List<String> names = service.online().stream()
                 .map(player -> this.plain.serialize(player.name()))
@@ -79,7 +79,8 @@ public final class PlatformSourceParser implements ArgumentParser<CommandSource,
         names.add("Server");
 
         return names.stream()
-                .filter(name -> name.startsWith(input))
+                .filter(name -> name.startsWith(input.peekString()))
+                .map(Suggestion::simple)
                 .collect(Collectors.toList());
     }
 

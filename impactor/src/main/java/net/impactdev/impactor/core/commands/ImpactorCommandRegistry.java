@@ -25,14 +25,6 @@
 
 package net.impactdev.impactor.core.commands;
 
-import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.processing.CommandContainer;
-import cloud.commandframework.arguments.parser.ParserParameter;
-import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.arguments.parser.StandardParameters;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
-import com.google.common.collect.Lists;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
@@ -43,7 +35,6 @@ import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.commands.ImpactorCommandManager;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
-import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.commands.events.RegisterCommandsEvent;
 import net.impactdev.impactor.core.commands.parsers.ActivePaginationParser;
 import net.impactdev.impactor.core.commands.parsers.CurrencyParser;
@@ -52,11 +43,23 @@ import net.impactdev.impactor.core.commands.parsers.PlatformSourceParser;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.text.pagination.ActivePagination;
 import net.impactdev.impactor.core.utility.events.EventPublisher;
+import org.incendo.cloud.annotations.AnnotationParser;
+import org.incendo.cloud.annotations.processing.CommandContainer;
+import org.incendo.cloud.component.DefaultValue;
+import org.incendo.cloud.help.result.CommandEntry;
+import org.incendo.cloud.meta.CommandMeta;
+import org.incendo.cloud.minecraft.extras.AudienceProvider;
+import org.incendo.cloud.minecraft.extras.MinecraftHelp;
+import org.incendo.cloud.suggestion.Suggestion;
+import org.incendo.cloud.suggestion.SuggestionProvider;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 
 public final class ImpactorCommandRegistry {
 
@@ -71,19 +74,28 @@ public final class ImpactorCommandRegistry {
 
     public void registerAllCommands() {
         AnnotationParser<CommandSource> parser = this.createParser();
-
-        List<Class<?>> containers = this.collectCommandContainers(Impactor.instance());
-
-        containers.forEach(container -> {
-            try {
-                final Object instance = container.getConstructor().newInstance();
-                parser.parse(instance);
-            } catch (Exception e) {
-                ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
-            }
-        });
-
         EventPublisher.post(new RegisterCommandsEvent(parser));
+
+        MinecraftHelp<CommandSource> helper = MinecraftHelp.<CommandSource>builder()
+                .commandManager(this.manager.delegate())
+                .audienceProvider(AudienceProvider.nativeAudience())
+                .commandPrefix("/impactor help")
+                .build();
+
+        this.manager().delegate().command(this.manager()
+                .delegate()
+                .commandBuilder("impactor")
+                .literal("help")
+                .optional("query", greedyStringParser(), DefaultValue.constant(""), SuggestionProvider.blocking((ctx, in) -> this.manager.delegate().createHelpHandler()
+                        .queryRootIndex(ctx.sender())
+                        .entries()
+                        .stream()
+                        .map(CommandEntry::syntax)
+                        .map(Suggestion::simple)
+                        .collect(Collectors.toList())
+                ))
+                .handler(context -> helper.queryCommands(Objects.requireNonNull(context.get("query")), context.sender()))
+        );
     }
 
     public void registerArgumentParsers() {
@@ -109,23 +121,13 @@ public final class ImpactorCommandRegistry {
     }
 
     private AnnotationParser<CommandSource> createParser() {
-        return new AnnotationParser<>(
+        AnnotationParser<CommandSource> parser = new AnnotationParser<>(
                 this.manager.delegate(),
                 CommandSource.class,
-                parameters -> {
-                    SimpleCommandMeta.Builder meta = CommandMeta.simple();
-
-                    if(parameters.has(StandardParameters.DESCRIPTION)) {
-                        meta.with(CommandMeta.DESCRIPTION, parameters.get(StandardParameters.DESCRIPTION, ""));
-                    }
-
-                    if(parameters.has(StandardParameters.HIDDEN)) {
-                        meta.with(CommandMeta.HIDDEN, parameters.get(StandardParameters.HIDDEN, false));
-                    }
-
-                    return meta.build();
-                }
+                parameters -> CommandMeta.empty()
         );
+
+        return parser;
     }
 
     private List<Class<?>> collectCommandContainers(Impactor service) {

@@ -25,11 +25,11 @@
 
 package net.impactdev.impactor.core.commands.events;
 
-import cloud.commandframework.annotations.AnnotationParser;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import org.incendo.cloud.annotations.AnnotationParser;
 
 
 public final class RegisterCommandsEvent implements ImpactorEvent {

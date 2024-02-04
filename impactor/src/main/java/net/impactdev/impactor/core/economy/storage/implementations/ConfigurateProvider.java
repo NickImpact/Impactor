@@ -60,7 +60,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
-public class EconomyConfigurateProvider implements EconomyStorageImplementation {
+public class ConfigurateProvider implements EconomyStorageImplementation {
 
     private final ConfigurateLoader loader;
     private final Path root;
@@ -82,7 +82,7 @@ public class EconomyConfigurateProvider implements EconomyStorageImplementation 
 
     private final LoadingCache<Path, ReentrantLock> ioLocks;
 
-    public EconomyConfigurateProvider(@NotNull final ConfigurateLoader loader) {
+    public ConfigurateProvider(@NotNull final ConfigurateLoader loader) {
         this.loader = loader;
         this.root = Paths.get("config").resolve("impactor").resolve("economy");
         this.ioLocks = Caffeine.newBuilder()

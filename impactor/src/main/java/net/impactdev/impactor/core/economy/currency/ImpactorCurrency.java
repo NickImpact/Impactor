@@ -25,14 +25,16 @@
 
 package net.impactdev.impactor.core.economy.currency;
 
+import com.google.common.base.Strings;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.util.TriState;
-import net.luckperms.api.util.Tristate;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 import static net.kyori.adventure.text.Component.text;
@@ -50,7 +52,7 @@ public class ImpactorCurrency implements Currency {
     private final boolean primary;
     private final TriState transferable;
 
-    private final String pattern;
+    private final String formatPattern;
 
     private ImpactorCurrency(final ImpactorCurrencyBuilder builder) {
         this.key = builder.key;
@@ -63,7 +65,14 @@ public class ImpactorCurrency implements Currency {
         this.primary = builder.primary;
         this.transferable = builder.transferable;
 
-        this.pattern = "%." + this.decimals + "f";
+        StringBuilder sb = new StringBuilder();
+        sb.append("#,##0");
+        if(this.decimals > 0) {
+            sb.append(".");
+            sb.append(Strings.repeat("0", this.decimals));
+        }
+
+        this.formatPattern = sb.toString();
     }
 
     @Override
@@ -93,7 +102,8 @@ public class ImpactorCurrency implements Currency {
 
     @Override
     public Component format(@NotNull BigDecimal amount, boolean condensed, @NotNull Locale locale) {
-        Component value = text(String.format(locale, this.pattern, amount.doubleValue()));
+        DecimalFormat formatter = new DecimalFormat(this.formatPattern, new DecimalFormatSymbols(locale));
+        Component value = text(formatter.format(amount.doubleValue()));
         if(condensed) {
             return this.formatting.modify(this, value);
         }

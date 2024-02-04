@@ -40,19 +40,20 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public final class BaseTransactionComposer implements TransactionComposer {
 
     private Account account;
     private BigDecimal amount;
     private EconomyTransactionType type;
-    private final Map<EconomyResultType, Component> messages = Maps.newHashMap();
+    private final Map<EconomyResultType, Supplier<Component>> messages = Maps.newHashMap();
 
     public BigDecimal amount() {
         return this.amount;
     }
 
-    public Map<EconomyResultType, Component> messages() {
+    public Map<EconomyResultType, Supplier<Component>> messages() {
         return this.messages;
     }
 
@@ -75,13 +76,13 @@ public final class BaseTransactionComposer implements TransactionComposer {
     }
 
     @Override
-    public TransactionComposer message(@NotNull EconomyResultType type, @NotNull Component message) {
+    public TransactionComposer message(@NotNull EconomyResultType type, @NotNull Supplier<@NotNull Component> message) {
         this.messages.put(type, message);
         return this;
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull EconomyTransaction> send() {
+    public EconomyTransaction build() {
         Preconditions.checkNotNull(this.account, "account");
         Preconditions.checkNotNull(this.type, "type");
 
@@ -96,7 +97,7 @@ public final class BaseTransactionComposer implements TransactionComposer {
     @FunctionalInterface
     private interface Executor {
 
-        CompletableFuture<EconomyTransaction> transact(ImpactorAccount account, BaseTransactionComposer composer);
+        EconomyTransaction transact(ImpactorAccount account, BaseTransactionComposer composer);
 
     }
 
@@ -120,7 +121,7 @@ public final class BaseTransactionComposer implements TransactionComposer {
                     .orElseThrow(() -> new IllegalArgumentException("No valid executor registered"));
         }
 
-        public CompletableFuture<EconomyTransaction> transact(ImpactorAccount account, BaseTransactionComposer composer) {
+        public EconomyTransaction transact(ImpactorAccount account, BaseTransactionComposer composer) {
             return this.executor.transact(account, composer);
         }
     }

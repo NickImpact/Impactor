@@ -25,35 +25,44 @@
 
 package net.impactdev.impactor.core.economy.storage;
 
+import net.impactdev.impactor.api.configuration.Config;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
 import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.api.storage.connection.configurate.loaders.HoconLoader;
 import net.impactdev.impactor.api.storage.connection.configurate.loaders.JsonLoader;
 import net.impactdev.impactor.api.storage.connection.configurate.loaders.YamlLoader;
-import net.impactdev.impactor.core.economy.storage.implementations.EconomyConfigurateProvider;
+import net.impactdev.impactor.core.economy.EconomyConfig;
+import net.impactdev.impactor.core.economy.storage.implementations.ConfigurateProvider;
+import net.impactdev.impactor.core.economy.storage.implementations.SQLProvider;
+import net.impactdev.impactor.core.storage.sql.MariaDbConnectionImpl;
+import net.impactdev.impactor.core.storage.sql.MySQLConnectionImpl;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-public final class EconomyStorageFactory {
+public final class StorageFactory {
 
-    public static EconomyStorage instance(ImpactorPlugin plugin, @Nullable StorageType type, @NotNull StorageType fallback) {
-        StorageType use = Optional.ofNullable(type).orElse(fallback);
+    public static EconomyStorage instance(ImpactorPlugin plugin, @NotNull Config config, @NotNull StorageType fallback) {
+        StorageType use = Optional.ofNullable(config.get(EconomyConfig.STORAGE_TYPE)).orElse(fallback);
         plugin.logger().info("Loading storage provider... [" + use.getName() + "]");
-        return new EconomyStorage(createNewImplementation(use));
+        return new EconomyStorage(createNewImplementation(use, config));
     }
 
-    private static EconomyStorageImplementation createNewImplementation(StorageType type) {
-        switch (type) {
-            case JSON:
-                return new EconomyConfigurateProvider(new JsonLoader());
-            case YAML:
-                return new EconomyConfigurateProvider(new YamlLoader());
-            case HOCON:
-                return new EconomyConfigurateProvider(new HoconLoader());
-        }
+    private static EconomyStorageImplementation createNewImplementation(StorageType type, Config config) {
+        return switch (type) {
+            case JSON -> new ConfigurateProvider(new JsonLoader());
+            case YAML -> new ConfigurateProvider(new YamlLoader());
+            case HOCON -> new ConfigurateProvider(new HoconLoader());
+            case MYSQL -> new SQLProvider(
+                    new MySQLConnectionImpl(config.get(EconomyConfig.STORAGE_CREDENTIALS)),
+                    config.get(EconomyConfig.SQL_TABLE_PREFIX)
+            );
+            case MARIADB -> new SQLProvider(
+                    new MariaDbConnectionImpl(config.get(EconomyConfig.STORAGE_CREDENTIALS)),
+                    config.get(EconomyConfig.SQL_TABLE_PREFIX)
+            );
+            default -> throw new IllegalArgumentException("Unsupported storage type: " + type);
+        };
 
-        throw new IllegalArgumentException("Unsupported storage type: " + type);
     }
 }

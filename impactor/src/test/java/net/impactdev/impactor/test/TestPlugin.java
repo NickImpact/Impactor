@@ -25,16 +25,12 @@
 
 package net.impactdev.impactor.test;
 
-import com.google.common.collect.Sets;
-import net.impactdev.impactor.core.commands.ImpactorCommandRegistry;
-import net.impactdev.impactor.core.modules.ImpactorModule;
+import net.impactdev.impactor.core.modules.ModuleInitializer;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
 import net.impactdev.impactor.test.dummies.TestCommandsModule;
 import net.impactdev.impactor.test.dummies.TestPlatform;
 import net.impactdev.impactor.test.dummies.TestScheduler;
-
-import java.util.Set;
 
 public class TestPlugin extends BaseImpactorPlugin {
 
@@ -43,17 +39,11 @@ public class TestPlugin extends BaseImpactorPlugin {
     }
 
     @Override
-    protected void registerCommandMappings(ImpactorCommandRegistry registry) {
-
-    }
-
-    @Override
-    protected Set<Class<? extends ImpactorModule>> modules() {
-        return Sets.newHashSet(
-                TestPlatform.TestPlatformModule.class,
-                TestScheduler.TestSchedulerModule.class,
-                TestCommandsModule.class
-        );
+    protected ModuleInitializer registerModules() {
+        return super.registerModules()
+                .with(TestCommandsModule.class)
+                .with(TestPlatform.TestPlatformModule.class)
+                .with(TestScheduler.TestSchedulerModule.class);
     }
 
 }
