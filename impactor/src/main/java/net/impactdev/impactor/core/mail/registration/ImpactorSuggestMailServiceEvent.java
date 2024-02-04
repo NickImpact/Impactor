@@ -23,31 +23,38 @@
  *
  */
 
-package net.impactdev.impactor.core.mail;
+package net.impactdev.impactor.core.mail.registration;
 
-import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.logging.PluginLogger;
-import net.impactdev.impactor.api.mail.MailMessage;
 import net.impactdev.impactor.api.mail.MailService;
-import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.core.mail.registration.ImpactorSuggestMailServiceEvent;
-import net.impactdev.impactor.core.mail.registration.MailServiceRegistrationProvider;
-import net.impactdev.impactor.core.modules.ImpactorModule;
+import net.impactdev.impactor.api.mail.events.SuggestMailServiceEvent;
+import net.impactdev.impactor.api.platform.plugins.PluginMetadata;
+import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
+import org.jetbrains.annotations.Range;
 
-public final class MailModule implements ImpactorModule {
+import java.util.function.Supplier;
 
-    @Override
-    public void factories(FactoryProvider provider) {
-        provider.register(MailMessage.Factory.class, new ImpactorMailMessage.MaillMessageFactory());
+public class ImpactorSuggestMailServiceEvent implements SuggestMailServiceEvent {
+
+    private final MailServiceRegistrationProvider provider;
+
+    public ImpactorSuggestMailServiceEvent(MailServiceRegistrationProvider provider) {
+        this.provider = provider;
     }
 
     @Override
-    public void init(Impactor impactor, PluginLogger logger) throws Exception {
-        MailServiceRegistrationProvider registration = new MailServiceRegistrationProvider();
-        impactor.events().post(new ImpactorSuggestMailServiceEvent(registration));
+    @SuppressWarnings("ConstantValue")
+    public void suggest(
+            final PluginMetadata suggestor,
+            final Supplier<MailService> service,
+            final @Range(from = 0, to = Integer.MAX_VALUE) int priority
+    ) {
+        if(priority < 0) {
+            BaseImpactorPlugin.instance().logger().warn(suggestor.name() + " attempted to suggest their mail service" +
+                    "with a priority lower than 0 (" + priority + "), this suggestion has been ignored!");
 
-        String service = registration.suggestion().metadata().name().orElse(registration.suggestion().metadata().id());
-        logger.info("Registering mail service (Provider: " + service + ")");
-        impactor.services().register(MailService.class, registration.suggestion().supplier().get());
+            return;
+        }
+
+        this.provider.suggest(suggestor, priority, service);
     }
 }

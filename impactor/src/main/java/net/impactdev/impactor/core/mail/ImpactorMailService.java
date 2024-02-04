@@ -25,12 +25,13 @@
 
 package net.impactdev.impactor.core.mail;
 
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.configuration.Config;
 import net.impactdev.impactor.api.mail.MailMessage;
 import net.impactdev.impactor.api.mail.MailService;
+import net.impactdev.impactor.api.mail.events.SendMailEvent;
 import net.impactdev.impactor.api.mail.filters.MailFilter;
 import net.impactdev.impactor.api.storage.StorageType;
-import net.impactdev.impactor.core.economy.EconomyConfig;
 import net.impactdev.impactor.core.mail.storage.MailStorage;
 import net.impactdev.impactor.core.mail.storage.MailStorageFactory;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
@@ -50,7 +51,7 @@ public final class ImpactorMailService implements MailService {
     private final Config config;
     private final MailStorage storage;
 
-    ImpactorMailService() {
+    public ImpactorMailService() {
         this.config = Config.builder()
                 .path(BaseImpactorPlugin.instance().configurationDirectory().resolve("mail.conf"))
                 .provider(MailConfig.class)
@@ -71,16 +72,19 @@ public final class ImpactorMailService implements MailService {
 
     @Override
     public CompletableFuture<Boolean> sendFromServer(@NotNull UUID target, @NotNull Component message) {
-        return this.storage.send(target, new ImpactorMailMessage(UUID.randomUUID(), null, message, Instant.now()));
+        return this.send(target, new ImpactorMailMessage(UUID.randomUUID(), null, message, Instant.now()));
     }
 
     @Override
     public CompletableFuture<Boolean> send(@NotNull UUID source, @NotNull UUID target, @NotNull Component message) {
-        return this.storage.send(target, new ImpactorMailMessage(UUID.randomUUID(), source, message, Instant.now()));
+        return this.send(target, new ImpactorMailMessage(UUID.randomUUID(), source, message, Instant.now()));
     }
 
     @Override
     public CompletableFuture<Boolean> send(@NotNull UUID target, @NotNull MailMessage message) {
+        SendMailEvent event = new SendMailEvent(target, message);
+        Impactor.instance().events().post(event);
+
         return this.storage.send(target, message);
     }
 
