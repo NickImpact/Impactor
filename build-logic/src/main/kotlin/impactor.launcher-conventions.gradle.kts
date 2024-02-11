@@ -2,7 +2,6 @@ import extensions.isRelease
 import extensions.writeVersion
 import net.fabricmc.loom.task.RemapJarTask
 import org.gradle.configurationcache.extensions.capitalized
-import java.nio.file.Files
 
 plugins {
     id("com.modrinth.minotaur")
@@ -19,7 +18,7 @@ tasks {
         inputFile.set(shadowJar.flatMap { it.archiveFile })
 
         archiveBaseName.set("Impactor-${project.name.capitalize()}")
-        archiveVersion.set(writeVersion())
+        archiveVersion.set(writeVersion(true))
     }
 }
 
@@ -34,8 +33,8 @@ tasks.withType<GenerateModuleMetadata> {
 modrinth {
     token.set(System.getenv("MODRINTH_GRADLE_TOKEN"))
     projectId.set("Impactor")
-    versionNumber.set("${writeVersion()}-${project.name.capitalized()}")
-    versionName.set("Impactor ${writeVersion()}")
+    versionNumber.set("${writeVersion(true)}-${project.name.capitalized()}")
+    versionName.set("Impactor ${writeVersion(true)}")
 
     versionType.set(if(!isRelease()) "beta" else "release")
     uploadFile.set(tasks["remapProductionJar"])

@@ -203,7 +203,7 @@ public final class EconomyCommands {
     @ProxiedBy("pay")
     @Permission("impactor.commands.economy.pay.base")
     public void transfer(
-            final @NotNull CommandSource source,
+            final @NotNull CommandSource sender,
             @Argument("amount") double amount,
             @Argument("target") PlatformSource target,
             @Nullable @Argument("currency") Currency currency,
@@ -211,31 +211,31 @@ public final class EconomyCommands {
     ) {
         EconomyService service = EconomyService.instance();
         Currency c = currency != null ? currency : service.currencies().primary();
-        PlatformSource focus = from != null ? from : source.source();
+        PlatformSource focus = from != null ? from : sender.source();
 
         Context context = Context.empty();
         context.append(Currency.class, c);
 
         if(from != null) {
             PermissionsService permissions = Impactor.instance().services().provide(PermissionsService.class);
-            if(!permissions.hasPermission(source.source(), "impactor.commands.economy.pay.other")) {
-                ImpactorTranslations.NO_PERMISSION.send(source, context);
+            if(!permissions.hasPermission(sender.source(), "impactor.commands.economy.pay.other")) {
+                ImpactorTranslations.NO_PERMISSION.send(sender, context);
                 return;
             }
         } else {
-            if(target.uuid().equals(source.uuid())) {
-                ImpactorTranslations.ECONOMY_CANT_PAY_SELF.send(source, context);
+            if(target.uuid().equals(sender.uuid())) {
+                ImpactorTranslations.ECONOMY_CANT_PAY_SELF.send(sender, context);
                 return;
             }
         }
 
         if(c.transferable() == TriState.FALSE) {
-            ImpactorTranslations.ECONOMY_TRANSFER_NOT_ALLOWED.send(source, context);
+            ImpactorTranslations.ECONOMY_TRANSFER_NOT_ALLOWED.send(sender, context);
             return;
         } else {
             Config config = ((ImpactorEconomyService) service).config();
             if(c.transferable() == TriState.NOT_SET && !config.get(EconomyConfig.ALLOW_TRANSFER_ON_NOT_SET)) {
-                ImpactorTranslations.ECONOMY_TRANSFER_NOT_ALLOWED.send(source, context);
+                ImpactorTranslations.ECONOMY_TRANSFER_NOT_ALLOWED.send(sender, context);
                 return;
             }
         }
@@ -251,10 +251,10 @@ public final class EconomyCommands {
                     .to(to)
                     .from(s)
                     .amount(total)
-                    .message(EconomyResultType.NOT_ENOUGH_FUNDS, () -> ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.resolve(source.locale(), context))
-                    .message(EconomyResultType.INVALID, () -> ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.resolve(source.locale(), context))
-                    .message(EconomyResultType.FAILED, () -> ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.resolve(source.locale(), context))
-                    .message(EconomyResultType.SUCCESS, () -> ImpactorTranslations.ECONOMY_TRANSFER.resolve(source.locale(), context))
+                    .message(EconomyResultType.NOT_ENOUGH_FUNDS, () -> ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.resolve(sender.locale(), context))
+                    .message(EconomyResultType.INVALID, () -> ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.resolve(sender.locale(), context))
+                    .message(EconomyResultType.FAILED, () -> ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.resolve(sender.locale(), context))
+                    .message(EconomyResultType.SUCCESS, () -> ImpactorTranslations.ECONOMY_TRANSFER.resolve(sender.locale(), context))
                     .build();
 
             context.append(TransferTransactionContext.class, new TransferTransactionContext(
@@ -263,9 +263,9 @@ public final class EconomyCommands {
                     transaction.result()
             ));
 
-            transaction.inform(source);
+            transaction.inform(sender);
             if(!target.equals(focus) && transaction.successful()) {
-                context.append(PlatformSource.class, source.source());
+                context.append(PlatformSource.class, sender.source());
                 context.append(BigDecimal.class, total);
 
                 ImpactorTranslations.ECONOMY_RECEIVE_PAYMENT.send(target, context);

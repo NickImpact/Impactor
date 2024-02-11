@@ -15,13 +15,18 @@ fun Project.isRelease(): Boolean {
     return !this.isSnapshot() && !this.isReleaseCandidate()
 }
 
-fun Project.writeVersion(): String {
+fun Project.writeVersion(includeMinecraft: Boolean): String {
     val plugin = rootProject.property("plugin")
     val minecraft = rootProject.property("minecraft")
     val snapshot = rootProject.property("snapshot") == "true"
     val rc = Integer.parseInt(rootProject.property("release-candidate").toString())
 
-    var version = "$plugin+$minecraft"
+    var version = if(includeMinecraft) {
+        "$plugin+$minecraft"
+    } else {
+        "$plugin"
+    }
+
     if(snapshot) {
         version = "$version-SNAPSHOT"
     } else {

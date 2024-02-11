@@ -42,8 +42,6 @@ tasks {
             dependsOn(writeChangelog)
             dependsOn(publishToDiscord)
         }
-
-        dependsOn(publishToDiscord)
     }
 
     assemble {

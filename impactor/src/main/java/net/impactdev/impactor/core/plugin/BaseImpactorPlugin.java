@@ -124,6 +124,11 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         } catch (Exception e) {
             ExceptionPrinter.print(this.logger(), e);
         }
+
+        this.bootstrapper.logger().info("Registering commands...");
+        ImpactorCommandRegistry registry = new ImpactorCommandRegistry();
+        registry.registerArgumentParsers();
+        registry.registerAllCommands();
     }
 
     public void setup() {

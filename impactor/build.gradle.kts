@@ -81,7 +81,7 @@ publishing {
 
             groupId = "net.impactdev.impactor"
             artifactId = "common"
-            version = writeVersion()
+            version = writeVersion(true)
         }
     }
 }

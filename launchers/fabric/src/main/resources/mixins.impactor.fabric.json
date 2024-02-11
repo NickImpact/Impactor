@@ -10,6 +10,5 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "refmap": "mixins.impactor.fabric.refmap.json"
+  }
 }

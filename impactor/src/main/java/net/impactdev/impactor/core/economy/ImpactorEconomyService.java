@@ -114,7 +114,7 @@ public final class ImpactorEconomyService implements EconomyService {
     }
 
     @Override
-    public void save(Account account) {
-        this.storage.save(account);
+    public CompletableFuture<Void> save(Account account) {
+        return this.storage.save(account);
     }
 }

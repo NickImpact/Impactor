@@ -38,13 +38,7 @@ import net.kyori.event.EventBus;
 
 public final class CommandsModule implements ImpactorModule {
 
-    @Override
-    public void init(Impactor impactor, PluginLogger logger) throws Exception {
-        logger.info("Registering commands...");
-        ImpactorCommandRegistry registry = new ImpactorCommandRegistry();
-        registry.registerArgumentParsers();
-        registry.registerAllCommands();
-    }
+
 
     @Override
     public void subscribe(EventBus<ImpactorEvent> bus) {

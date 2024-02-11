@@ -26,19 +26,21 @@ dependencies {
     implementation(project(":minecraft:impl"))
     modImplementation("ca.landonjw.gooeylibs:fabric:3.0.0-1.20.1-SNAPSHOT@jar")
 
-    modImplementation("net.impactdev.impactor.commands:fabric:5.2.0+1.20.1-SNAPSHOT") {
+    include(modImplementation("net.impactdev.impactor.commands:fabric:5.2.0+1.20.1-SNAPSHOT") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")
         exclude("net.impactdev.impactor.api", "players")
         exclude("net.impactdev.impactor.api", "plugins")
         exclude("net.impactdev.impactor.api", "storage")
-    }
+    })
 
     listOf(
         libs.cloudAnnotations,
         libs.cloudMinecraftExtras,
-        libs.cloudFabric
+        libs.cloudFabric,
+        libs.cloudConfirmations,
+        libs.cloudProcessorsCommon
     ).forEach { include(it) }
 
     modCompileOnly("eu.pb4:placeholder-api:2.0.0-pre.1+1.19.2")
@@ -51,10 +53,10 @@ dependencies {
 
 tasks {
     processResources {
-        inputs.property("version", writeVersion())
+        inputs.property("version", writeVersion(true))
 
         filesMatching("fabric.mod.json") {
-            expand("version" to writeVersion())
+            expand("version" to writeVersion(true))
         }
     }
 
@@ -62,7 +64,6 @@ tasks {
         val mapped = "loom_mappings_1_20_1_layered_hash_40359_v2"
         dependencies {
             include(dependency("net.impactdev.impactor.commands:common:.*"))
-            include(dependency("$mapped.net.impactdev.impactor.commands:fabric:.*"))
 
             include(dependency("org.apache.maven:maven-artifact:.*"))
             include(dependency("$mapped.ca.landonjw.gooeylibs:fabric:.*"))
@@ -87,7 +88,7 @@ publishing {
 
             groupId = "net.impactdev.impactor.launchers"
             artifactId = "fabric"
-            version = writeVersion()
+            version = writeVersion(true)
         }
     }
 }

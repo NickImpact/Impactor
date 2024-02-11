@@ -11,7 +11,7 @@ data class Placeholder(val parser: Function<Project, String>) {
 
     companion object {
 
-        val VERSION = PlaceholderRegistry.register("version", Placeholder { it.writeVersion() })
+        val VERSION = PlaceholderRegistry.register("version", Placeholder { it.writeVersion(true) })
         val GIT_COMMIT = PlaceholderRegistry.register("commit", Placeholder { it.getLatestGitCommitHash() })
         val PREVIOUS_TAG = PlaceholderRegistry.register("tags:previous", Placeholder { it.getPreviousTag() })
         val LATEST_TAG = PlaceholderRegistry.register("tags:latest", Placeholder { it.getLatestTag() })

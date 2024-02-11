@@ -33,7 +33,7 @@ publishing {
 
             groupId = "net.impactdev.impactor.minecraft"
             artifactId = "impl"
-            version = writeVersion()
+            version = writeVersion(true)
         }
     }
 }

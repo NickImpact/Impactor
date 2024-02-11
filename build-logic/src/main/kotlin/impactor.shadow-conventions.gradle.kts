@@ -13,6 +13,7 @@ tasks {
             include(project(":api:config"))
             include(project(":api:economy"))
             include(project(":api:items"))
+            include(project(":api:mail"))
             include(project(":api:players"))
             include(project(":api:plugins"))
             include(project(":api:storage"))
