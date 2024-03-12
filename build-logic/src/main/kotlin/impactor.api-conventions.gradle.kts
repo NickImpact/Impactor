@@ -12,7 +12,7 @@ publishing {
 
             groupId = "net.impactdev.impactor${project.findProperty("maven.root")?.let { ".$it" } ?: ""}"
             artifactId = project.findProperty("maven.artifactID")?.toString() ?: project.name
-            version = writeVersion()
+            version = writeVersion(false)
         }
     }
 }

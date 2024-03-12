@@ -25,13 +25,13 @@
 
 package net.impactdev.impactor.minecraft.utility.adventure;
 
-import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.annotations.processing.CommandContainer;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.utility.Context;
 import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
 import net.kyori.adventure.text.event.ClickCallback;
+import org.incendo.cloud.annotations.Argument;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.processing.CommandContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,7 +43,7 @@ public final class ClickCallbackCommand {
 
     public static final String COMMAND_ID = "impactor-callback";
 
-    @CommandMethod(COMMAND_ID + " [id]")
+    @Command(COMMAND_ID + " [id]")
     public void execute(final @NotNull CommandSource source, final @Argument("id") UUID uuid) {
         @Nullable
         final ClickCallbackRegistry.CallbackRegistration registration = ClickCallbackRegistry.INSTANCE

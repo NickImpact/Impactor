@@ -25,21 +25,17 @@
 
 package net.impactdev.impactor.minecraft.test.dummies;
 
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
-import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
-import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.commands.ImpactorCommandManager;
-import net.impactdev.impactor.api.commands.brigadier.BrigadierMapper;
 import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.platform.plugins.PluginMetadata;
-import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.execution.ExecutionCoordinator;
+import org.incendo.cloud.internal.CommandRegistrationHandler;
+import org.incendo.cloud.meta.CommandMeta;
+import org.incendo.cloud.meta.SimpleCommandMeta;
+import org.incendo.cloud.processors.confirmation.ConfirmationManager;
 
 public class TestCommandManagerFactory implements ImpactorCommandManager.Factory {
     @Override
@@ -52,8 +48,8 @@ public class TestCommandManagerFactory implements ImpactorCommandManager.Factory
 
             @Override
             public CommandManager<CommandSource> delegate() {
-                return new CommandManager<CommandSource>(
-                        CommandExecutionCoordinator.simpleCoordinator(),
+                return new CommandManager<>(
+                        ExecutionCoordinator.simpleCoordinator(),
                         CommandRegistrationHandler.nullCommandRegistrationHandler()
                 ) {
 
@@ -70,17 +66,7 @@ public class TestCommandManagerFactory implements ImpactorCommandManager.Factory
             }
 
             @Override
-            public BrigadierMapper mapper() {
-                return new BrigadierMapper() {
-                    @Override
-                    public <T extends ArgumentParser<CommandSource, ?>> void map(Key key, TypeToken<T> type, boolean useCloudSuggestions) {
-
-                    }
-                };
-            }
-
-            @Override
-            public CommandConfirmationManager<CommandSource> confirmations() {
+            public ConfirmationManager<CommandSource> confirmations() {
                 return null;
             }
         };

@@ -104,6 +104,14 @@ public final class VaultService implements EconomyService {
         return CompletableFuture.completedFuture(null);
     }
 
+    @Override
+    public CompletableFuture<Void> save(Account account) {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(account.owner());
+        double balance = this.delegate.getBalance(player);
+        double difference = account.balance().doubleValue() - balance;
+        return CompletableFuture.runAsync(() -> this.delegate.depositPlayer(player, difference));
+    }
+
     public static final class VaultReadyEvent implements ImpactorEvent {
 
         private final Economy service;

@@ -67,7 +67,7 @@ import java.util.function.Supplier;
 
 public final class ImpactorAccount implements Account {
 
-    private final ImpactorEconomyService service = (ImpactorEconomyService) Impactor.instance()
+    private final EconomyService service = Impactor.instance()
             .services()
             .provide(EconomyService.class);
 
@@ -371,7 +371,7 @@ public final class ImpactorAccount implements Account {
     }
 
     private void save() {
-        this.service.storage().save(this);
+        this.service.save(this);
     }
 
     private void postAndVerify(@NotNull ImpactorEvent event) throws PostResult.CompositeException {

@@ -35,7 +35,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(ClientboundSetPlayerTeamPacket.Parameters.class)
 public interface ClientboundSetPlayerTeamPacketParametersAccessor {
 
-    @Unique
     @Mutable
     @Accessor("playerPrefix")
     void impactor$prefix(Component component);

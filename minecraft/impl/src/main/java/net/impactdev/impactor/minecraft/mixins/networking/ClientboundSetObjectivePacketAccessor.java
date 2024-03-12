@@ -35,7 +35,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(ClientboundSetObjectivePacket.class)
 public interface ClientboundSetObjectivePacketAccessor {
 
-    @Unique
     @Mutable
     @Accessor("displayName")
     void impactor$title(Component title);

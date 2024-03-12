@@ -23,23 +23,24 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.api.events;
+package net.impactdev.impactor.core.mail.storage;
 
-import net.impactdev.impactor.api.events.ImpactorEvent;
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.minecraft.world.entity.Entity;
-import org.spongepowered.math.vector.Vector3d;
+import net.impactdev.impactor.api.mail.MailMessage;
+import net.impactdev.impactor.api.mail.filters.MailFilter;
+import net.impactdev.impactor.api.storage.connection.StorageConnection;
+import net.kyori.adventure.util.TriState;
 
-public interface EntityMoveEvent extends ImpactorEvent {
+import java.util.List;
+import java.util.UUID;
 
-    Entity entity();
+public interface MailStorageImplementation extends StorageConnection {
 
-    Vector3d position();
+    List<MailMessage> mail(UUID target) throws Exception;
 
-    interface Player extends EntityMoveEvent {
+    boolean append(UUID target, MailMessage message) throws Exception;
 
-        PlatformPlayer player();
+    TriState delete(UUID target, MailMessage message) throws Exception;
 
-    }
+    TriState deleteWhere(UUID target, MailFilter filter) throws Exception;
 
 }

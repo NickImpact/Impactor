@@ -10,13 +10,13 @@ versions:
   licenser: 0.6.1
   shadow: 7.1.2
   blossom: 2.1.0
-  loom: 1.4-SNAPSHOT
-  minotaur: 2.+
+  loom: 1.5-SNAPSHOT
   architectury-plugin: 3.4-SNAPSHOT
+  minotaur: 2.+
 
   # fabric/remap
   fabric-loader: 0.14.16
-  fabric-api: 0.75.1+1.18.2
+  fabric-api: 0.92.0+1.20.1
 
   # forge
   forge: 1.19.2-43.2.0
@@ -33,7 +33,11 @@ versions:
   mockk: 1.12.1
 
   # Cloud
-  cloud: 1.9.0-SNAPSHOT
+  cloud: 2.0.0-beta.1
+  cloud-new: 1.0.0-beta.1
+
+  # Utility
+  gson: 2.10.1
 
 dependencies:
 
@@ -150,26 +154,40 @@ dependencies:
 
   # Cloud Command Framework
   cloudCore:
-    group: cloud.commandframework
+    group: org.incendo
     name: cloud-core
     version: { ref: cloud }
   cloudAnnotations:
-    group: cloud.commandframework
+    group: org.incendo
     name: cloud-annotations
     version: { ref: cloud }
   cloudBrigadier:
-    group: cloud.commandframework
+    group: org.incendo
     name: cloud-brigadier
     version: { ref: cloud }
   cloudServices:
-    group: cloud.commandframework
+    group: org.incendo
     name: cloud-services
     version: { ref: cloud }
   cloudMinecraftExtras:
-    group: cloud.commandframework
+    group: org.incendo
     name: cloud-minecraft-extras
     version: { ref: cloud }
   cloudFabric:
-    group: cloud.commandframework
+    group: org.incendo
     name: cloud-fabric
     version: { ref: cloud }
+  cloudConfirmations:
+    group: org.incendo
+    name: cloud-processors-confirmation
+    version: { ref: cloud-new }
+  cloudProcessorsCommon:
+    group: org.incendo
+    name: cloud-processors-common
+    version: { ref: cloud-new }
+
+  # Utilities
+  gson:
+    group: com.google.code.gson
+    name: gson
+    version: { ref: gson }

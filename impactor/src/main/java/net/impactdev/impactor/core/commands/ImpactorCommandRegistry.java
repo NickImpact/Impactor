@@ -25,13 +25,6 @@
 
 package net.impactdev.impactor.core.commands;
 
-import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.processing.CommandContainer;
-import cloud.commandframework.arguments.parser.StandardParameters;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
-import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
@@ -40,7 +33,6 @@ import io.leangen.geantyref.TypeToken;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.commands.ImpactorCommandManager;
-import net.impactdev.impactor.api.commands.brigadier.BrigadierMapper;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.core.commands.events.RegisterCommandsEvent;
@@ -51,13 +43,23 @@ import net.impactdev.impactor.core.commands.parsers.PlatformSourceParser;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.text.pagination.ActivePagination;
 import net.impactdev.impactor.core.utility.events.EventPublisher;
-import net.kyori.adventure.key.Key;
+import org.incendo.cloud.annotations.AnnotationParser;
+import org.incendo.cloud.annotations.processing.CommandContainer;
+import org.incendo.cloud.component.DefaultValue;
+import org.incendo.cloud.help.result.CommandEntry;
+import org.incendo.cloud.meta.CommandMeta;
+import org.incendo.cloud.minecraft.extras.AudienceProvider;
+import org.incendo.cloud.minecraft.extras.MinecraftHelp;
+import org.incendo.cloud.suggestion.Suggestion;
+import org.incendo.cloud.suggestion.SuggestionProvider;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 
 public final class ImpactorCommandRegistry {
 
@@ -74,20 +76,25 @@ public final class ImpactorCommandRegistry {
         AnnotationParser<CommandSource> parser = this.createParser();
         EventPublisher.post(new RegisterCommandsEvent(parser));
 
-        MinecraftHelp<CommandSource> helper = new MinecraftHelp<>(
-                "/impactor help",
-                CommandSource::source,
-                this.manager().delegate()
-        );
+        MinecraftHelp<CommandSource> helper = MinecraftHelp.<CommandSource>builder()
+                .commandManager(this.manager.delegate())
+                .audienceProvider(AudienceProvider.nativeAudience())
+                .commandPrefix("/impactor help")
+                .build();
 
         this.manager().delegate().command(this.manager()
                 .delegate()
                 .commandBuilder("impactor")
                 .literal("help")
-                .argument(StringArgument.optional("query", StringArgument.StringMode.GREEDY))
-                .handler(context -> {
-                    helper.queryCommands(Objects.requireNonNull(context.getOrDefault("query", "")), context.getSender());
-                })
+                .optional("query", greedyStringParser(), DefaultValue.constant(""), SuggestionProvider.blocking((ctx, in) -> this.manager.delegate().createHelpHandler()
+                        .queryRootIndex(ctx.sender())
+                        .entries()
+                        .stream()
+                        .map(CommandEntry::syntax)
+                        .map(Suggestion::simple)
+                        .collect(Collectors.toList())
+                ))
+                .handler(context -> helper.queryCommands(Objects.requireNonNull(context.get("query")), context.sender()))
         );
     }
 
@@ -111,29 +118,16 @@ public final class ImpactorCommandRegistry {
                 TypeToken.get(ActivePagination.class),
                 options -> new ActivePaginationParser()
         );
-
-        BrigadierMapper mapper = this.manager().mapper();
-        mapper.map(Key.key("minecraft", "resource_location"), TypeToken.get(CurrencyParser.class));
     }
 
     private AnnotationParser<CommandSource> createParser() {
-        return new AnnotationParser<>(
+        AnnotationParser<CommandSource> parser = new AnnotationParser<>(
                 this.manager.delegate(),
                 CommandSource.class,
-                parameters -> {
-                    SimpleCommandMeta.Builder meta = CommandMeta.simple();
-
-                    if(parameters.has(StandardParameters.DESCRIPTION)) {
-                        meta.with(CommandMeta.DESCRIPTION, parameters.get(StandardParameters.DESCRIPTION, ""));
-                    }
-
-                    if(parameters.has(StandardParameters.HIDDEN)) {
-                        meta.with(CommandMeta.HIDDEN, parameters.get(StandardParameters.HIDDEN, false));
-                    }
-
-                    return meta.build();
-                }
+                parameters -> CommandMeta.empty()
         );
+
+        return parser;
     }
 
     private List<Class<?>> collectCommandContainers(Impactor service) {

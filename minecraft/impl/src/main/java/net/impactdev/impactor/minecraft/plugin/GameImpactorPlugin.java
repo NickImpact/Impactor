@@ -25,6 +25,11 @@
 
 package net.impactdev.impactor.minecraft.plugin;
 
+import com.mojang.brigadier.arguments.ArgumentType;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.commands.CommandSource;
+import net.impactdev.impactor.api.commands.events.RegisterBrigadierMappingsEvent;
+import net.impactdev.impactor.core.commands.parsers.CurrencyParser;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.scheduler.Ticks;
 import net.impactdev.impactor.api.scheduler.v2.Scheduler;
@@ -37,6 +42,13 @@ import net.impactdev.impactor.minecraft.platform.GamePlatform;
 import net.impactdev.impactor.minecraft.scheduler.SyncScheduler;
 import net.impactdev.impactor.minecraft.scoreboard.ScoreboardModule;
 import net.impactdev.impactor.minecraft.ui.UIModule;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
+import org.incendo.cloud.brigadier.argument.BrigadierMapping;
+import org.incendo.cloud.brigadier.argument.BrigadierMappings;
+import org.incendo.cloud.parser.ArgumentParser;
+
+import java.util.function.Function;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -60,6 +72,14 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
     @Override
     public void construct() {
         super.construct();
+        Impactor.instance().events().subscribe(RegisterBrigadierMappingsEvent.class, event -> {
+            BrigadierMappings<CommandSource, CommandSourceStack> mappings = (BrigadierMappings<CommandSource, CommandSourceStack>) event.mappings();
+            BrigadierMapping<?, CurrencyParser, CommandSourceStack> currency = this.createMapping(
+                    parser -> ResourceLocationArgument.id()
+            );
+
+            mappings.registerMapping(CurrencyParser.class, currency);
+        });
     }
 
     @Override
@@ -76,5 +96,14 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
 
     private GamePlatform platform() {
         return ((GamePlatform) Impactor.instance().platform());
+    }
+
+    private <T, K extends ArgumentParser<CommandSource, T>> BrigadierMapping<?, K, CommandSourceStack> createMapping(
+            Function<K, ? extends ArgumentType<?>> adapter
+    ) {
+        return BrigadierMapping.<CommandSource, K, CommandSourceStack>builder()
+                .cloudSuggestions()
+                .to(adapter)
+                .build();
     }
 }

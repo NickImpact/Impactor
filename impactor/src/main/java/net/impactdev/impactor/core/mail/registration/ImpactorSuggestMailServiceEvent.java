@@ -23,30 +23,38 @@
  *
  */
 
-package net.impactdev.impactor.core.commands.events;
+package net.impactdev.impactor.core.mail.registration;
 
-import net.impactdev.impactor.api.commands.CommandSource;
-import net.impactdev.impactor.api.events.ImpactorEvent;
-import net.impactdev.impactor.api.utility.ExceptionPrinter;
+import net.impactdev.impactor.api.mail.MailService;
+import net.impactdev.impactor.api.mail.events.SuggestMailServiceEvent;
+import net.impactdev.impactor.api.platform.plugins.PluginMetadata;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
-import org.incendo.cloud.annotations.AnnotationParser;
+import org.jetbrains.annotations.Range;
 
+import java.util.function.Supplier;
 
-public final class RegisterCommandsEvent implements ImpactorEvent {
+public class ImpactorSuggestMailServiceEvent implements SuggestMailServiceEvent {
 
-    private final AnnotationParser<CommandSource> parser;
+    private final MailServiceRegistrationProvider provider;
 
-    public RegisterCommandsEvent(AnnotationParser<CommandSource> parser) {
-        this.parser = parser;
+    public ImpactorSuggestMailServiceEvent(MailServiceRegistrationProvider provider) {
+        this.provider = provider;
     }
 
-    public void register(Class<?> type) {
-        try {
-            final Object instance = type.getConstructor().newInstance();
-            parser.parse(instance);
-        } catch (Exception e) {
-            ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
+    @Override
+    @SuppressWarnings("ConstantValue")
+    public void suggest(
+            final PluginMetadata suggestor,
+            final Supplier<MailService> service,
+            final @Range(from = 0, to = Integer.MAX_VALUE) int priority
+    ) {
+        if(priority < 0) {
+            BaseImpactorPlugin.instance().logger().warn(suggestor.name() + " attempted to suggest their mail service" +
+                    "with a priority lower than 0 (" + priority + "), this suggestion has been ignored!");
+
+            return;
         }
+
+        this.provider.suggest(suggestor, priority, service);
     }
-    
 }

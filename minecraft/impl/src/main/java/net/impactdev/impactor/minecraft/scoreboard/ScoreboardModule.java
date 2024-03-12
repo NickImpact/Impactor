@@ -45,11 +45,8 @@ import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.impactdev.impactor.api.scoreboards.score.Score;
 import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.core.modules.ImpactorModule;
-//import net.impactdev.impactor.minecraft.scoreboard.implementations.PacketImplementation;
-//import net.impactdev.impactor.minecraft.scoreboard.viewed.ViewedImpactorScoreboard;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
-import net.impactdev.impactor.minecraft.api.events.EntityMoveEvent;
 import net.impactdev.impactor.minecraft.scoreboard.assigned.AssignedScoreboardImpl;
 import net.impactdev.impactor.minecraft.scoreboard.display.formatters.ColorCycleFormatter;
 import net.impactdev.impactor.minecraft.scoreboard.display.lines.ImpactorScoreboardLine;
@@ -161,16 +158,6 @@ public final class ScoreboardModule implements ImpactorModule {
                             .resolver(NoOpResolver.create(ScoreboardComponent.create(ComponentElement.create(
                                     (viewer, context) -> TextProcessor.mini().parse(viewer, "<gray>Name: <yellow><impactor:name>")
                             ))))
-                            .build()
-                    )
-                    .line(ScoreboardLine.builder()
-                            .score(Score.builder().score(13).build())
-                            .resolver(SubscriptionConfiguration.component(
-                                    ScoreboardComponent.create(ComponentElement.create(
-                                            (viewer, context) -> TextProcessor.mini().parse(viewer, "<gray>Location: <yellow><impactor:position>")
-                                    )))
-                                    .listenAndFilter(EntityMoveEvent.Player.class, e -> e.entity().getUUID().equals(event.player().uuid()))
-                            )
                             .build()
                     )
                     .line(ScoreboardLine.builder()

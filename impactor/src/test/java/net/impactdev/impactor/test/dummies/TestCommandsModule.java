@@ -25,14 +25,50 @@
 
 package net.impactdev.impactor.test.dummies;
 
+import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.commands.ImpactorCommandManager;
+import net.impactdev.impactor.api.logging.PluginLogger;
+import net.impactdev.impactor.api.platform.plugins.PluginMetadata;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.core.modules.ImpactorModule;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.execution.ExecutionCoordinator;
+import org.incendo.cloud.internal.CommandRegistrationHandler;
+import org.incendo.cloud.processors.confirmation.ConfirmationManager;
 
 public class TestCommandsModule implements ImpactorModule {
 
     @Override
     public void factories(FactoryProvider provider) {
-        provider.register(ImpactorCommandManager.Factory.class, new TestCommandManagerFactory());
+        provider.register(ImpactorCommandManager.Factory.class, new ImpactorCommandManager.Factory() {
+            @Override
+            public ImpactorCommandManager create(PluginMetadata metadata, PluginLogger logger) {
+                return new ImpactorCommandManager() {
+                    @Override
+                    public PluginMetadata provider() {
+                        return null;
+                    }
+
+                    @Override
+                    public CommandManager<CommandSource> delegate() {
+                        return new CommandManager<CommandSource>(
+                                ExecutionCoordinator.simpleCoordinator(),
+                                CommandRegistrationHandler.nullCommandRegistrationHandler()
+                        ) {
+                            @Override
+                            public boolean hasPermission(@NonNull CommandSource sender, @NonNull String permission) {
+                                return true;
+                            }
+                        };
+                    }
+
+                    @Override
+                    public ConfirmationManager<CommandSource> confirmations() {
+                        return null;
+                    }
+                };
+            }
+        });
     }
 }

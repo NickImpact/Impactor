@@ -23,30 +23,31 @@
  *
  */
 
-package net.impactdev.impactor.core.commands;
+package net.impactdev.impactor.core.mail;
 
 import net.impactdev.impactor.api.Impactor;
-import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.logging.PluginLogger;
-import net.impactdev.impactor.core.commands.economy.EconomyCommands;
-import net.impactdev.impactor.core.commands.events.RegisterCommandsEvent;
-import net.impactdev.impactor.core.commands.pagination.PaginationCommands;
-import net.impactdev.impactor.core.commands.translations.TranslationCommands;
+import net.impactdev.impactor.api.mail.MailMessage;
+import net.impactdev.impactor.api.mail.MailService;
+import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.core.mail.registration.ImpactorSuggestMailServiceEvent;
+import net.impactdev.impactor.core.mail.registration.MailServiceRegistrationProvider;
 import net.impactdev.impactor.core.modules.ImpactorModule;
-import net.impactdev.impactor.core.platform.commands.PlatformCommands;
-import net.kyori.event.EventBus;
 
-public final class CommandsModule implements ImpactorModule {
-
-
+public final class MailModule implements ImpactorModule {
 
     @Override
-    public void subscribe(EventBus<ImpactorEvent> bus) {
-        bus.subscribe(RegisterCommandsEvent.class, event -> {
-            event.register(EconomyCommands.class);
-            event.register(PaginationCommands.class);
-            event.register(TranslationCommands.class);
-            event.register(PlatformCommands.class);
-        });
+    public void factories(FactoryProvider provider) {
+        provider.register(MailMessage.Factory.class, new ImpactorMailMessage.MaillMessageFactory());
+    }
+
+    @Override
+    public void init(Impactor impactor, PluginLogger logger) throws Exception {
+        MailServiceRegistrationProvider registration = new MailServiceRegistrationProvider();
+        impactor.events().post(new ImpactorSuggestMailServiceEvent(registration));
+
+        String service = registration.suggestion().metadata().name().orElse(registration.suggestion().metadata().id());
+        logger.info("Registering mail service (Provider: " + service + ")");
+        impactor.services().register(MailService.class, registration.suggestion().supplier().get());
     }
 }

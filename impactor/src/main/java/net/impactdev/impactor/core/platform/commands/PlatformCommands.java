@@ -25,15 +25,18 @@
 
 package net.impactdev.impactor.core.platform.commands;
 
-import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.annotations.CommandPermission;
-import cloud.commandframework.annotations.processing.CommandContainer;
-import cloud.commandframework.exceptions.CommandExecutionException;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.api.utility.Context;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.translations.internal.ImpactorTranslations;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.event.HoverEventSource;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.Permission;
+import org.incendo.cloud.annotations.processing.CommandContainer;
+import org.incendo.cloud.exception.CommandExecutionException;
 
 import java.io.BufferedOutputStream;
 import java.io.PrintStream;
@@ -44,13 +47,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @CommandContainer
-@CommandPermission("impactor.commands.platform.base")
+@Permission("impactor.commands.platform.base")
 public class PlatformCommands {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
-    @CommandMethod("impactor platform info")
-    @CommandPermission("impactor.commands.platform.info")
+    @Command("impactor platform info")
+    @Permission("impactor.commands.platform.info")
     public void info(final CommandSource source) {
         PrettyPrinter printer = new PrettyPrinter(80);
         printer.title("Platform Information");

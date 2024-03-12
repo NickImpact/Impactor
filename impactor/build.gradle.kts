@@ -13,13 +13,14 @@ dependencies {
     api(project(":api:core"))
     api(project(":api:config"))
     api(project(":api:economy"))
+    api(project(":api:mail"))
     api(project(":api:players"))
     api(project(":api:plugins"))
     api(project(":api:storage"))
     api(project(":api:text"))
     api(project(":api:translations"))
 
-    api("net.impactdev.impactor.api:commands:5.1.1+1.20.1-SNAPSHOT") {
+    api("net.impactdev.impactor.api:commands:5.2.0+1.20.1-SNAPSHOT") {
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")
         exclude("net.impactdev.impactor.api", "players")
@@ -80,7 +81,7 @@ publishing {
 
             groupId = "net.impactdev.impactor"
             artifactId = "common"
-            version = writeVersion()
+            version = writeVersion(true)
         }
     }
 }

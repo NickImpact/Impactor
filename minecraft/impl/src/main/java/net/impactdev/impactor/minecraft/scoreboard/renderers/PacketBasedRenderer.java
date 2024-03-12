@@ -71,7 +71,7 @@ public class PacketBasedRenderer implements ScoreboardRenderer {
     private void applyLineTextToPacket(AssignedScoreboard scoreboard, ScoreboardLine.Displayed line, PlayerTeam team, boolean create) {
         final ClientboundSetPlayerTeamPacket update = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, create);
         ClientboundSetPlayerTeamPacketParametersAccessor accessor = this.translate(update.getParameters().get(), ClientboundSetPlayerTeamPacketParametersAccessor.class);
-        accessor.prefix(AdventureTranslator.toNative(line.text()));
+        accessor.impactor$prefix(AdventureTranslator.toNative(line.text()));
 
         final ClientboundSetScorePacket score = new ClientboundSetScorePacket(
                 ServerScoreboard.Method.CHANGE,

@@ -25,20 +25,18 @@
 
 package net.impactdev.impactor.core.commands.parsers;
 
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import com.google.common.base.Suppliers;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.core.text.pagination.ActivePagination;
 import net.impactdev.impactor.core.text.pagination.PaginationService;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.context.CommandInput;
+import org.incendo.cloud.parser.ArgumentParseResult;
+import org.incendo.cloud.parser.ArgumentParser;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Queue;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -50,33 +48,21 @@ public class ActivePaginationParser implements ArgumentParser<CommandSource, Act
     private static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$");
 
     @Override
-    public @NonNull ArgumentParseResult<@NonNull ActivePagination> parse(@NonNull CommandContext<@NonNull CommandSource> context, @NonNull Queue<@NonNull String> args) {
-        final String input = args.peek();
-        if(input == null) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    ActivePaginationParser.class,
-                    context
-            ));
-        }
-
-        Matcher matcher = UUID_PATTERN.matcher(input);
+    public @NonNull ArgumentParseResult<@NonNull ActivePagination> parse(@NonNull CommandContext<@NonNull CommandSource> context, @NonNull CommandInput input) {
+        final String argument = input.peekString();
+        Matcher matcher = UUID_PATTERN.matcher(argument);
         if(matcher.matches()) {
-            UUID uuid = UUID.fromString(input);
+            UUID uuid = UUID.fromString(argument);
             PaginationService service = SERVICE.get();
 
             @Nullable ActivePagination pagination = service.pagination(uuid).orElse(null);
             if(pagination != null) {
-                args.poll();
+                input.readString();
                 return ArgumentParseResult.success(pagination);
             }
         }
 
         return ArgumentParseResult.failure(new IllegalArgumentException("No active pagination for that ID"));
-    }
-
-    @Override
-    public @NonNull List<@NonNull String> suggestions(@NonNull CommandContext<CommandSource> commandContext, @NonNull String input) {
-        return ArgumentParser.super.suggestions(commandContext, input);
     }
 
 }

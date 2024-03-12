@@ -1,13 +1,13 @@
 import extensions.isRelease
 import extensions.writeVersion
-import gradle.kotlin.dsl.accessors._99454b32dbd9d870c3769e463ec2442a.implementation
-import gradle.kotlin.dsl.accessors._99454b32dbd9d870c3769e463ec2442a.include
 import net.fabricmc.loom.task.RemapJarTask
-import java.nio.file.Files
+import org.gradle.configurationcache.extensions.capitalized
 
 plugins {
     id("impactor.loom-conventions")
+
     id("com.modrinth.minotaur")
+    id("com.github.johnrengelman.shadow")
 }
 
 val bundle: Configuration by configurations.creating {
@@ -42,12 +42,34 @@ tasks {
         inputFile.set(shadowJar.flatMap { it.archiveFile })
 
         archiveBaseName.set("Impactor-${project.name.capitalize()}")
-        archiveVersion.set(writeVersion())
+        archiveVersion.set(writeVersion(true))
     }
     val minecraft = rootProject.property("minecraft")
 
     shadowJar {
+        archiveBaseName.set("Impactor-${project.name}")
+        archiveClassifier.set("dev-shadow")
+
         dependencies {
+            include(project(":api:core"))
+            include(project(":api:config"))
+            include(project(":api:economy"))
+            include(project(":api:items"))
+            include(project(":api:mail"))
+            include(project(":api:players"))
+            include(project(":api:plugins"))
+            include(project(":api:scoreboard"))
+            include(project(":api:storage"))
+            include(project(":api:text"))
+            include(project(":api:translations"))
+            include(project(":api:ui"))
+            include(project(":impactor"))
+            include(project(":minecraft:api"))
+            include(project(":minecraft:impl"))
+
+            include(dependency("net.impactdev:json:.*"))
+            include(dependency("net.impactdev.impactor.api:commands:.*"))
+
             listOf(
                 "com.zaxxer:HikariCP:.*",
                 "com.h2database:h2:.*",
@@ -105,28 +127,31 @@ tasks.withType<GenerateModuleMetadata> {
 modrinth {
     token.set(System.getenv("MODRINTH_GRADLE_TOKEN"))
     projectId.set("Impactor")
-    versionNumber.set(writeVersion())
-    versionName.set("Impactor ${writeVersion()}")
+    versionNumber.set("${writeVersion(true)}-${project.name.capitalized()}")
+    versionName.set("Impactor ${writeVersion(true)}")
 
     versionType.set(if(!isRelease()) "beta" else "release")
-    uploadFile.set(tasks.remapJar)
+    uploadFile.set(tasks["remapProductionJar"])
 
     gameVersions.set(listOf(rootProject.property("minecraft").toString()))
 
     // https://github.com/modrinth/minotaur
     // TODO - Project Body Sync
     changelog.set(readChangelog())
+    debugMode.set(true)
 }
 
 fun readChangelog(): String {
     val plugin = rootProject.property("plugin")
-    val contents = rootProject.buildDir.toPath()
+    val contents = rootProject.layout.buildDirectory
+        .asFile
+        .get()
         .resolve("deploy")
         .resolve("$plugin.md")
 
-    if(!Files.exists(contents)) {
+    if(!contents.exists()) {
         return "No changelog notes available..."
     }
 
-    return contents.toFile().readLines().joinToString(separator = "\n")
+    return contents.readLines().joinToString(separator = "\n")
 }
