@@ -26,7 +26,6 @@
 package net.impactdev.impactor.minecraft.scoreboard.display.lines;
 
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
-import net.impactdev.impactor.api.scoreboards.ContextualProvider;
 import net.impactdev.impactor.api.scoreboards.display.text.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboards.lines.LineTickConsumer;
 import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
