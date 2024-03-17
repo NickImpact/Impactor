@@ -6,7 +6,9 @@
   "mixins": [
     "core.MinecraftServerMixin",
     "core.ServerboundClientInformationPacketAccessor",
-    "core.ServerPlayerMixin"
+    "core.ServerPlayerMixin",
+    "networking.ClientboundSetObjectivePacketAccessor",
+    "networking.ClientboundSetPlayerTeamPacketParametersAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

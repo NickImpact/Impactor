@@ -49,6 +49,7 @@ public abstract class AbstractDisplay extends AbstractPointerCapable implements 
     protected AbstractDisplay(AssignedScoreboard scoreboard, Displayable displayable) {
         this.scoreboard = scoreboard;
         this.component = displayable.component();
+        this.text.set(this.component.resolve(this.scoreboard.viewer()));
         this.updater = Optional.ofNullable(displayable.updater()).map(UpdaterConfiguration::generate).orElse(null);
     }
 
@@ -68,6 +69,7 @@ public abstract class AbstractDisplay extends AbstractPointerCapable implements 
     @Override
     public void tick() {
         this.text.set(this.component.resolve(this.scoreboard.viewer()));
+        this.onTick(this.scoreboard);
         this.render(this.scoreboard, this.scoreboard.configuration().renderer());
     }
 }

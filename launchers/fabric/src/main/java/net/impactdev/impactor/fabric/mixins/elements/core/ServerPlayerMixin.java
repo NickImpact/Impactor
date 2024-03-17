@@ -23,20 +23,36 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.mixins.networking;
+package net.impactdev.impactor.fabric.mixins.elements.core;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket;
+import net.impactdev.impactor.core.translations.locale.LocaleCache;
+import net.impactdev.impactor.core.translations.locale.LocaleProvider;
+import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
+import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientboundSetPlayerTeamPacket.Parameters.class)
-public interface ClientboundSetPlayerTeamPacketParametersAccessor {
+import java.util.Locale;
 
-    @Mutable
-    @Accessor("playerPrefix")
-    void impactor$prefix(Component component);
+@SuppressWarnings("FieldCanBeLocal")
+@Mixin(ServerPlayer.class)
+public abstract class ServerPlayerMixin implements LocaleProvider {
 
+    @Unique
+    private Locale impactor$language = Locale.US;
+
+    @SuppressWarnings("ConstantConditions")
+    @Inject(method = "updateOptions", at = @At("TAIL"))
+    public void impactor$updateClientLanguage(ServerboundClientInformationPacket packet, CallbackInfo ci) {
+        ServerboundClientInformationPacketAccessor accessor = (ServerboundClientInformationPacketAccessor) (Object) packet;
+        this.impactor$language = LocaleCache.getLocale(accessor.impactor$accessor$language());
+    }
+
+    @Override
+    public Locale locale() {
+        return this.impactor$language;
+    }
 }

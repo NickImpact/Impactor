@@ -25,15 +25,15 @@
 
 package net.impactdev.impactor.minecraft.scoreboard.renderers;
 
+import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
 import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
-import net.impactdev.impactor.minecraft.mixins.networking.ClientboundSetObjectivePacketAccessor;
-import net.impactdev.impactor.minecraft.mixins.networking.ClientboundSetPlayerTeamPacketParametersAccessor;
 import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
+import net.impactdev.impactor.minecraft.mixins.MixinBridge;
 import net.impactdev.impactor.minecraft.scoreboard.assigned.ScoreboardComponents;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.pointer.Pointer;
@@ -56,8 +56,7 @@ public class PacketBasedRenderer implements ScoreboardRenderer {
     @Override
     public void objective(AssignedScoreboard scoreboard, Objective.Displayed objective) {
         ClientboundSetObjectivePacket update = new ClientboundSetObjectivePacket(ScoreboardComponents.OBJECTIVE, 2);
-        ClientboundSetObjectivePacketAccessor accessor = this.translate(update, ClientboundSetObjectivePacketAccessor.class);
-        accessor.impactor$title(AdventureTranslator.toNative(objective.text()));
+        Impactor.instance().factories().provide(MixinBridge.class).setObjectiveTitle(update, objective.text());
 
         this.publish(scoreboard.viewer(), update);
     }
@@ -70,8 +69,7 @@ public class PacketBasedRenderer implements ScoreboardRenderer {
 
     private void applyLineTextToPacket(AssignedScoreboard scoreboard, ScoreboardLine.Displayed line, PlayerTeam team, boolean create) {
         final ClientboundSetPlayerTeamPacket update = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, create);
-        ClientboundSetPlayerTeamPacketParametersAccessor accessor = this.translate(update.getParameters().get(), ClientboundSetPlayerTeamPacketParametersAccessor.class);
-        accessor.impactor$prefix(AdventureTranslator.toNative(line.text()));
+        Impactor.instance().factories().provide(MixinBridge.class).setPlayerTeamPrefix(update, line.text());
 
         final ClientboundSetScorePacket score = new ClientboundSetScorePacket(
                 ServerScoreboard.Method.CHANGE,

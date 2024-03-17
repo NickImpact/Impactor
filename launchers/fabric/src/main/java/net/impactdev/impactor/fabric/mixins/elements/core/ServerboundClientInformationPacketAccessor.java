@@ -23,20 +23,15 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.mixins.networking;
+package net.impactdev.impactor.fabric.mixins.elements.core;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket;
+import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(ClientboundSetObjectivePacket.class)
-public interface ClientboundSetObjectivePacketAccessor {
+@Mixin(ServerboundClientInformationPacket.class)
+public interface ServerboundClientInformationPacketAccessor {
 
-    @Mutable
-    @Accessor("displayName")
-    void impactor$title(Component title);
+    @Accessor("language") String impactor$accessor$language();
 
 }

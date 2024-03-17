@@ -25,27 +25,19 @@
 
 package net.impactdev.impactor.minecraft.scoreboard;
 
-import net.impactdev.impactor.api.events.ImpactorEvent;
-import net.impactdev.impactor.api.platform.players.events.ClientConnectionEvent;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
-import net.impactdev.impactor.api.scheduler.Ticks;
-import net.impactdev.impactor.api.scheduler.v2.Scheduler;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.impactdev.impactor.api.scoreboards.Scoreboard;
 import net.impactdev.impactor.api.scoreboards.display.formatters.styling.rgb.ColorCycle;
 import net.impactdev.impactor.api.scoreboards.display.text.ComponentElement;
 import net.impactdev.impactor.api.scoreboards.display.text.ScoreboardComponent;
-import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLineBuilder;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.impactdev.impactor.api.scoreboards.score.Score;
 import net.impactdev.impactor.api.scoreboards.updaters.scheduled.ScheduledConfiguration;
-import net.impactdev.impactor.api.scoreboards.updaters.scheduled.ScheduledUpdater;
-import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
-import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.minecraft.scoreboard.assigned.AssignedScoreboardImpl;
 import net.impactdev.impactor.minecraft.scoreboard.display.formatters.ColorCycleFormatter;
 import net.impactdev.impactor.minecraft.scoreboard.display.lines.ImpactorScoreboardLine;
@@ -56,15 +48,6 @@ import net.impactdev.impactor.minecraft.scoreboard.text.ImpactorComponentElement
 import net.impactdev.impactor.minecraft.scoreboard.text.ImpactorScoreboardComponent;
 import net.impactdev.impactor.minecraft.scoreboard.updaters.scheduled.ScheduledConfigurationImpl;
 import net.impactdev.impactor.minecraft.scoreboard.updaters.subscribed.SubscribedConfigurationImpl;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.event.EventBus;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static net.kyori.adventure.text.Component.empty;
-import static net.kyori.adventure.text.Component.space;
-import static net.kyori.adventure.text.Component.text;
 
 public final class ScoreboardModule implements ImpactorModule {
 

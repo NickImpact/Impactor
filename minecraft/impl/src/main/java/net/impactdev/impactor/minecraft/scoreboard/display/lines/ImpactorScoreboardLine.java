@@ -35,12 +35,14 @@ import net.impactdev.impactor.api.scoreboards.updaters.UpdaterConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 public final class ImpactorScoreboardLine implements ScoreboardLine {
 
     private final ScoreboardComponent text;
     private final Score score;
     private final UpdaterConfiguration<?> updater;
-    final LineTickConsumer lineTickConsumer;
+    private final LineTickConsumer lineTickConsumer;
 
     public ImpactorScoreboardLine(ImpactorScoreboardLineBuilder builder) {
         this.text = builder.text;
@@ -67,6 +69,10 @@ public final class ImpactorScoreboardLine implements ScoreboardLine {
     @Override
     public @Nullable UpdaterConfiguration<?> updater() {
         return this.updater;
+    }
+
+    Optional<LineTickConsumer> lineTickConsumer() {
+        return Optional.ofNullable(this.lineTickConsumer);
     }
 
     public static final class ImpactorScoreboardLineBuilder implements ScoreboardLineBuilder {

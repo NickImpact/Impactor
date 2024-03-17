@@ -26,9 +26,6 @@ dependencies {
     api(project(":impactor"))
     api(project(":minecraft:api"))
 
-    implementation("org.spongepowered:mixin:0.8.5")
-    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
-
     compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
     annotationProcessor("com.google.auto.service:auto-service:1.1.1")
 

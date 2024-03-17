@@ -60,6 +60,6 @@ public class DisplayedLine extends AbstractDisplay implements ScoreboardLine.Dis
 
     @Override
     protected void onTick(AssignedScoreboard scoreboard) {
-        this.delegate.lineTickConsumer.onScoreTick(scoreboard.viewer(), this.score);
+        this.delegate.lineTickConsumer().ifPresent(consumer -> consumer.onScoreTick(scoreboard.viewer(), this.score));
     }
 }

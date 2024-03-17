@@ -23,15 +23,44 @@
  *
  */
 
-package net.impactdev.impactor.fabric.mixins.core;
+package net.impactdev.impactor.fabric.mixins.elements.core;
 
-import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
+import net.impactdev.impactor.api.platform.performance.MemoryWatcher;
+import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Mth;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(ServerboundClientInformationPacket.class)
-public interface ServerboundClientInformationPacketAccessor {
+@Mixin(MinecraftServer.class)
+public class MinecraftServerMixin implements PerformanceMonitor {
 
-    @Accessor("language") String impactor$accessor$language();
+    @Shadow
+    private float averageTickTime;
+    @Shadow @Final
+    public long[] tickTimes;
+
+    @Override
+    public double ticksPerSecond() {
+        return 1000 / Math.max(50, this.averageTickTime);
+    }
+
+    @Override
+    public double averageTickDuration() {
+        int length = this.tickTimes.length;
+        long sum = 0;
+
+        for(long tick : this.tickTimes) {
+            sum += tick;
+        }
+
+        return (sum / (double) length) / 1000000;
+    }
+
+    @Override
+    public MemoryWatcher memory() {
+        return new MemoryWatcher();
+    }
 
 }

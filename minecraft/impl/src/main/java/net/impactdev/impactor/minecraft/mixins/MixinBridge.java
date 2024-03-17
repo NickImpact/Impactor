@@ -23,44 +23,19 @@
  *
  */
 
-package net.impactdev.impactor.fabric.mixins.core;
+package net.impactdev.impactor.minecraft.mixins;
 
-import net.impactdev.impactor.api.platform.performance.MemoryWatcher;
-import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Mth;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import net.kyori.adventure.text.Component;
+import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket;
+import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket;
 
-@Mixin(MinecraftServer.class)
-public class MinecraftServerMixin implements PerformanceMonitor {
+/**
+ *
+ */
+public interface MixinBridge {
 
-    @Shadow
-    private float averageTickTime;
-    @Shadow @Final
-    public long[] tickTimes;
+    void setObjectiveTitle(ClientboundSetObjectivePacket source, Component component);
 
-    @Override
-    public double ticksPerSecond() {
-        return 1000 / Math.max(50, this.averageTickTime);
-    }
-
-    @Override
-    public double averageTickDuration() {
-        int length = this.tickTimes.length;
-        long sum = 0;
-
-        for(long tick : this.tickTimes) {
-            sum += tick;
-        }
-
-        return (sum / (double) length) / 1000000;
-    }
-
-    @Override
-    public MemoryWatcher memory() {
-        return new MemoryWatcher();
-    }
+    void setPlayerTeamPrefix(ClientboundSetPlayerTeamPacket source, Component component);
 
 }

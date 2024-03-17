@@ -36,9 +36,11 @@ import net.impactdev.impactor.core.modules.ModuleInitializer;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
 import net.impactdev.impactor.fabric.commands.FabricCommandModule;
 import net.impactdev.impactor.fabric.integrations.PlaceholderAPIIntegration;
+import net.impactdev.impactor.fabric.mixins.bridge.FabricMixinBridge;
 import net.impactdev.impactor.fabric.platform.FabricPlatformModule;
 import net.impactdev.impactor.fabric.scheduler.FabricSchedulerModule;
 import net.impactdev.impactor.fabric.ui.FabricUIModule;
+import net.impactdev.impactor.minecraft.mixins.MixinBridge;
 import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
 import net.impactdev.impactor.minecraft.plugin.GameImpactorPlugin;
 
@@ -51,6 +53,8 @@ public final class FabricImpactorPlugin extends GameImpactorPlugin implements Im
     @Override
     public void construct() {
         super.construct();
+
+        Impactor.instance().factories().register(MixinBridge.class, new FabricMixinBridge());
 
         Platform platform = Impactor.instance().platform();
         if(platform.info().plugin("placeholder-api").isPresent()) {

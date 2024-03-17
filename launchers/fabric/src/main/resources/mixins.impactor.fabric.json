@@ -1,12 +1,14 @@
 {
   "required": true,
-  "package": "net.impactdev.impactor.fabric.mixins",
+  "package": "net.impactdev.impactor.fabric.mixins.elements",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "mixins": [
     "core.MinecraftServerMixin",
     "core.ServerboundClientInformationPacketAccessor",
-    "core.ServerPlayerMixin"
+    "core.ServerPlayerMixin",
+    "networking.ClientboundSetObjectivePacketAccessor",
+    "networking.ClientboundSetPlayerTeamPacketParametersAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
