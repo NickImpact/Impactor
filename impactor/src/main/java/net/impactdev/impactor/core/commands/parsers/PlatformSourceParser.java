@@ -41,6 +41,7 @@ import org.incendo.cloud.suggestion.Suggestion;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -58,7 +59,7 @@ public final class PlatformSourceParser implements ArgumentParser<CommandSource,
         options.addAll(online);
 
         Optional<PlatformSource> match = options.stream()
-                .filter(player -> this.plain.serialize(player.name()).equals(args.peekString()))
+                .filter(player -> this.plain.serialize(player.name()).equalsIgnoreCase(args.peekString()))
                 .findFirst();
 
         return match.map(player -> {
@@ -79,7 +80,7 @@ public final class PlatformSourceParser implements ArgumentParser<CommandSource,
         names.add("Server");
 
         return names.stream()
-                .filter(name -> name.startsWith(input.peekString()))
+                .filter(name -> name.toLowerCase().startsWith(input.peekString().toLowerCase()))
                 .map(Suggestion::simple)
                 .collect(Collectors.toList());
     }
