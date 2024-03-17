@@ -41,9 +41,7 @@ public final class ImpactorScoreboardLine implements ScoreboardLine {
     private final ScoreboardComponent text;
     private final Score score;
     private final UpdaterConfiguration<?> updater;
-
-    private final LineTickConsumer lineTickConsumer;
-    private final ContextualProvider contextualProvider;
+    final LineTickConsumer lineTickConsumer;
 
     public ImpactorScoreboardLine(ImpactorScoreboardLineBuilder builder) {
         this.text = builder.text;
@@ -51,7 +49,6 @@ public final class ImpactorScoreboardLine implements ScoreboardLine {
         this.updater = builder.updater;
 
         this.lineTickConsumer = builder.lineTickConsumer;
-        this.contextualProvider = builder.contextualProvider;
     }
 
     @Override
@@ -80,7 +77,6 @@ public final class ImpactorScoreboardLine implements ScoreboardLine {
         private Score score;
 
         private LineTickConsumer lineTickConsumer;
-        private ContextualProvider contextualProvider;
 
         @Override
         public ScoreboardLineBuilder text(ScoreboardComponent component) {

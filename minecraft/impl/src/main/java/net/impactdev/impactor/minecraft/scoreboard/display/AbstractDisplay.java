@@ -44,7 +44,7 @@ public abstract class AbstractDisplay extends AbstractPointerCapable implements 
 
     private final Updater updater;
     private final ScoreboardComponent component;
-    private final AtomicReference<Component> text = new AtomicReference<>(Component.empty());
+    protected final AtomicReference<Component> text = new AtomicReference<>(Component.empty());
 
     protected AbstractDisplay(AssignedScoreboard scoreboard, Displayable displayable) {
         this.scoreboard = scoreboard;
@@ -63,6 +63,7 @@ public abstract class AbstractDisplay extends AbstractPointerCapable implements 
     }
 
     protected abstract void render(AssignedScoreboard scoreboard, ScoreboardRenderer renderer);
+    protected void onTick(AssignedScoreboard scoreboard) {}
 
     @Override
     public void tick() {

@@ -34,10 +34,10 @@ import net.impactdev.impactor.minecraft.scoreboard.display.score.ImpactorScore;
 
 public class DisplayedLine extends AbstractDisplay implements ScoreboardLine.Displayed {
 
-    private final ScoreboardLine delegate;
+    private final ImpactorScoreboardLine delegate;
     private final Score.Mutable score;
 
-    public DisplayedLine(AssignedScoreboard scoreboard, ScoreboardLine delegate) {
+    public DisplayedLine(AssignedScoreboard scoreboard, ImpactorScoreboardLine delegate) {
         super(scoreboard, delegate);
         this.delegate = delegate;
         this.score = ((ImpactorScore) delegate.score()).asMutable();
@@ -56,5 +56,10 @@ public class DisplayedLine extends AbstractDisplay implements ScoreboardLine.Dis
     @Override
     protected void render(AssignedScoreboard scoreboard, ScoreboardRenderer renderer) {
         renderer.line(scoreboard, this);
+    }
+
+    @Override
+    protected void onTick(AssignedScoreboard scoreboard) {
+        this.delegate.lineTickConsumer.onScoreTick(scoreboard.viewer(), this.score);
     }
 }
