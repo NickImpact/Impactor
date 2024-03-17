@@ -11,19 +11,31 @@ repositories {
     maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
-minecraft {
-    version("${rootProject.property("minecraft")}")
-}
-
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
+minecraft {
+    version("${rootProject.property("minecraft")}")
+}
+
 dependencies {
-    api(project(":minecraft:api"))
+    api(project(":api:scoreboard"))
     api(project(":impactor"))
+    api(project(":minecraft:api"))
+
+    implementation("org.spongepowered:mixin:0.8.5")
+    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
+
+    compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
+    annotationProcessor("com.google.auto.service:auto-service:1.1.1")
+
+    testImplementation("net.kyori:adventure-text-serializer-ansi:4.14.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
+    testImplementation("net.kyori:adventure-text-logger-slf4j:4.14.0")
 }
 
 publishing {
@@ -36,4 +48,12 @@ publishing {
             version = writeVersion(true)
         }
     }
+}
+
+tasks.withType(Test::class) {
+    useJUnitPlatform()
+
+    // Allow JUnit to find our TestInitializer and invoke its
+    // before all callback for all tests
+    jvmArgs("-Djunit.jupiter.extensions.autodetection.enabled=true")
 }

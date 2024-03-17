@@ -40,7 +40,6 @@ import net.impactdev.impactor.core.text.pagination.PaginationService;
 import net.impactdev.impactor.core.text.placeholders.ImpactorPlaceholderService;
 import net.impactdev.impactor.core.text.placeholders.ImpactorRegisterPlaceholdersEvent;
 import net.impactdev.impactor.core.utility.events.EventPublisher;
-import net.kyori.event.PostResult;
 
 public final class TextModule implements ImpactorModule {
     @Override
@@ -61,11 +60,9 @@ public final class TextModule implements ImpactorModule {
 
     @Override
     public void init(Impactor impactor, PluginLogger logger) throws Exception {
-        Impactor api = Impactor.instance();
-        PlaceholderService service = api.services().provide(PlaceholderService.class);
+        PlaceholderService service = impactor.services().provide(PlaceholderService.class);
 
         BaseImpactorPlugin.instance().logger().info("Firing placeholder registration event");
-
         EventPublisher.post(new ImpactorRegisterPlaceholdersEvent(service));
     }
 }

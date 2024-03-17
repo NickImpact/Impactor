@@ -44,6 +44,8 @@ import net.impactdev.impactor.minecraft.api.key.ResourceKeyTranslator;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.inventory.Book;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.pointer.Pointer;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
@@ -83,6 +85,11 @@ import java.util.UUID;
 
 public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource implements PlatformPlayer {
 
+    public static final Pointer<ServerPlayer> PLAYER_FALLBACK = Pointer.pointer(
+            ServerPlayer.class,
+            Key.key("impactor", "player-fallback")
+    );
+
     public ImpactorPlatformPlayer(UUID uuid) {
         super(uuid, SourceType.PLAYER);
 
@@ -114,7 +121,7 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
         );
     }
 
-    protected abstract Optional<ServerPlayer> asMinecraftPlayer();
+    public abstract Optional<ServerPlayer> asMinecraftPlayer();
 
     private Optional<GameProfile> profile() {
         GameProfileCache cache = ((GamePlatform) Impactor.instance().platform()).server().getProfileCache();

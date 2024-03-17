@@ -26,7 +26,6 @@
 package net.impactdev.impactor.forge;
 
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.modules.ModuleInitializer;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
 import net.impactdev.impactor.forge.commands.ForgeCommandModule;
@@ -34,8 +33,6 @@ import net.impactdev.impactor.forge.platform.ForgePlatformModule;
 import net.impactdev.impactor.forge.scheduler.ForgeSchedulerModule;
 import net.impactdev.impactor.forge.ui.ForgeUIModule;
 import net.impactdev.impactor.minecraft.plugin.GameImpactorPlugin;
-
-import java.util.Set;
 
 public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorPlugin {
 

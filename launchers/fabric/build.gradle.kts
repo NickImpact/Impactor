@@ -11,8 +11,24 @@ java {
     }
 }
 
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
 repositories {
     maven("https://maven.nucleoid.xyz/") { name = "Nucleoid" }
+}
+
+configurations {
+    all {
+        resolutionStrategy {
+            force("net.fabricmc.fabric-api:fabric-networking-api-v1:1.3.11+1802ada577")
+            force("net.fabricmc.fabric-api:fabric-command-api-v2:2.2.13+1802ada577")
+            force("net.fabricmc.fabric-api:fabric-lifecycle-events-v1:2.2.22+1802ada577")
+            force("net.fabricmc.fabric-api:fabric-api-base:0.4.31+1802ada577")
+        }
+    }
 }
 
 dependencies {
@@ -25,7 +41,6 @@ dependencies {
 
     implementation(project(":minecraft:impl"))
     modImplementation("ca.landonjw.gooeylibs:fabric:3.0.0-1.20.1-SNAPSHOT@jar")
-
     include(modImplementation("net.impactdev.impactor.commands:fabric:5.2.0+1.20.1-SNAPSHOT") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
@@ -37,13 +52,13 @@ dependencies {
 
     listOf(
         libs.cloudAnnotations,
-        libs.cloudMinecraftExtras,
         libs.cloudFabric,
+        libs.cloudMinecraftExtras,
         libs.cloudConfirmations,
         libs.cloudProcessorsCommon
     ).forEach { include(it) }
 
-    modCompileOnly("eu.pb4:placeholder-api:2.0.0-pre.1+1.19.2")
+    modCompileOnly("eu.pb4:placeholder-api:2.1.3+1.20.1")
     include("io.leangen.geantyref:geantyref:1.3.13")
 
     modRuntimeOnly("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")

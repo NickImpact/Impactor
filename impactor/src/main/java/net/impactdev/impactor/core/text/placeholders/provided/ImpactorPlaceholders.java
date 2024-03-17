@@ -30,15 +30,21 @@ import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.PlatformPlayerService;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
+import net.impactdev.impactor.api.platform.sources.metadata.MetadataKeys;
 import net.impactdev.impactor.api.text.TextProcessor;
 import net.impactdev.impactor.api.text.placeholders.PlaceholderArguments;
 import net.impactdev.impactor.api.translations.metadata.LanguageInfo;
+import net.impactdev.impactor.api.utility.Context;
 import net.impactdev.impactor.core.economy.context.TransactionContext;
 import net.impactdev.impactor.core.economy.context.TransferTransactionContext;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -55,16 +61,24 @@ public final class ImpactorPlaceholders {
 
     public static final ImpactorPlaceholder NAME = new ImpactorPlaceholder(
             impactor("name"),
-            (viewer, ctx) -> ctx.request(PlatformSource.class)
+            (viewer, ctx) -> resolveSource(viewer, ctx)
                     .map(PlatformSource::name)
-                    .orElse(empty())
+                    .orElse(Component.empty())
     );
 
     public static final ImpactorPlaceholder UUID = new ImpactorPlaceholder(
             impactor("uuid"),
-            (viewer, ctx) -> ctx.request(PlatformSource.class)
+            (viewer, ctx) -> resolveSource(viewer, ctx)
                     .map(PlatformSource::uuid)
-                    .map(id -> text(id.toString()))
+                    .map(uuid -> text(uuid.toString()))
+                    .orElse(Component.empty())
+    );
+
+    public static final ImpactorPlaceholder POSITION = new ImpactorPlaceholder(
+            impactor("position"),
+            (viewer, context) -> resolveSource(viewer, context)
+                    .flatMap(source -> source.metadata(MetadataKeys.POSITION))
+                    .map(pos -> text(String.format("%.2f, %.2f, %.2f", pos.x(), pos.y(), pos.z())))
                     .orElse(empty())
     );
 
@@ -231,4 +245,11 @@ public final class ImpactorPlaceholders {
         return Key.key("impactor", key);
     }
 
+    private static Optional<PlatformSource> resolveSource(PlatformSource viewer, Context context) {
+        return context.request(PlatformSource.class)
+                .or(() -> context.request(PlatformPlayer.class))
+                .or(() -> context.request(PlatformSource.SOURCE))
+                .or(() -> context.request(PlatformPlayer.PLAYER))
+                .or(() -> Optional.ofNullable(viewer));
+    }
 }

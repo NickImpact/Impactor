@@ -50,8 +50,9 @@ public class FabricPlatformPlayer extends ImpactorPlatformPlayer {
 
     @Override
     public Optional<ServerPlayer> asMinecraftPlayer() {
-        return Optional.ofNullable(FabricImpactorBootstrap.instance().server().get())
-                .map(server -> server.getPlayerList().getPlayer(this.uuid()));
+        return FabricImpactorBootstrap.instance().server()
+                .map(server -> server.getPlayerList().getPlayer(this.uuid()))
+                .or(() -> this.get(ImpactorPlatformPlayer.PLAYER_FALLBACK));
     }
 
 }

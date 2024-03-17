@@ -25,11 +25,13 @@
 
 package net.impactdev.impactor.fabric;
 
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.events.ImpactorEventBus;
 import net.impactdev.impactor.api.platform.Platform;
+import net.impactdev.impactor.api.platform.players.PlatformPlayer;
+import net.impactdev.impactor.api.platform.players.events.ClientConnectionEvent;
 import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.modules.ModuleInitializer;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
 import net.impactdev.impactor.fabric.commands.FabricCommandModule;
@@ -37,9 +39,8 @@ import net.impactdev.impactor.fabric.integrations.PlaceholderAPIIntegration;
 import net.impactdev.impactor.fabric.platform.FabricPlatformModule;
 import net.impactdev.impactor.fabric.scheduler.FabricSchedulerModule;
 import net.impactdev.impactor.fabric.ui.FabricUIModule;
+import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
 import net.impactdev.impactor.minecraft.plugin.GameImpactorPlugin;
-
-import java.util.Set;
 
 public final class FabricImpactorPlugin extends GameImpactorPlugin implements ImpactorPlugin {
 
@@ -56,6 +57,13 @@ public final class FabricImpactorPlugin extends GameImpactorPlugin implements Im
             var papi = new PlaceholderAPIIntegration();
             papi.subscribe(this.logger(), ImpactorEventBus.bus());
         }
+
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            PlatformPlayer player = PlatformPlayer.getOrCreate(handler.player.getUUID());
+            player.withDynamic(ImpactorPlatformPlayer.PLAYER_FALLBACK, () -> handler.player);
+
+            Impactor.instance().events().post((ClientConnectionEvent.Join) () -> player);
+        });
     }
 
     @Override

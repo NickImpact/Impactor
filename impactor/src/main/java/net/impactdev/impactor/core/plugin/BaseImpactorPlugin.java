@@ -27,6 +27,8 @@ package net.impactdev.impactor.core.plugin;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.scheduler.AbstractJavaScheduler;
+import net.impactdev.impactor.api.scheduler.v2.Scheduler;
+import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.core.commands.CommandsModule;
 import net.impactdev.impactor.core.commands.ImpactorCommandRegistry;
 import net.impactdev.impactor.core.configuration.ConfigModule;
@@ -46,6 +48,8 @@ import net.impactdev.impactor.core.permissions.LuckPermsPermissionsService;
 import net.impactdev.impactor.core.permissions.NoOpPermissionsService;
 import net.impactdev.impactor.core.economy.EconomyModule;
 import net.impactdev.impactor.core.permissions.PermissionsModule;
+import net.impactdev.impactor.core.scheduler.AsyncScheduler;
+import net.impactdev.impactor.core.scheduler.SchedulerModule;
 import net.impactdev.impactor.core.text.TextModule;
 import net.impactdev.impactor.core.translations.TranslationsModule;
 import net.impactdev.impactor.core.utility.future.Futures;
@@ -107,6 +111,7 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
                 .with(EconomyModule.class)
                 .with(MailModule.class)
                 .with(PermissionsModule.class)
+                .with(SchedulerModule.class)
                 .with(TextModule.class)
                 .with(TranslationsModule.class);
     }
@@ -129,6 +134,8 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
         ImpactorCommandRegistry registry = new ImpactorCommandRegistry();
         registry.registerArgumentParsers();
         registry.registerAllCommands();
+
+        this.setupSchedulers();
     }
 
     public void setup() {
@@ -143,25 +150,27 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
     }
 
     @Override
-    public void starting() {
-
-    }
+    public void starting() {}
 
     @Override
-    public void started() {
-
-    }
+    public void started() {}
 
     @Override
     public void shutdown() {
-        this.logger().info("Shutting down Impactor scheduler");
+        this.logger().info("Shutting down schedulers...");
         AbstractJavaScheduler scheduler = (AbstractJavaScheduler) Impactor.instance().scheduler();
         scheduler.shutdownExecutor();
         scheduler.shutdownScheduler();
 
+        Schedulers.shutdown(this.logger());
         Futures.shutdown();
 
-        this.logger().info("Scheduler shutdown successfully!");
+        this.logger().info("Schedulers shutdown successfully!");
+    }
+
+    protected void setupSchedulers() {
+        this.logger().info("Setting up schedulers...");
+        Schedulers.register(Scheduler.ASYNCHRONOUS, new AsyncScheduler());
     }
 
     public InputStream resource(Function<Path, Path> target) {

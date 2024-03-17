@@ -30,6 +30,7 @@ import net.impactdev.impactor.core.translations.locale.LocaleProvider;
 import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
 import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -40,6 +41,7 @@ import java.util.Locale;
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin implements LocaleProvider {
 
+    @Unique
     private Locale impactor$language = Locale.US;
 
     @SuppressWarnings("ConstantConditions")
