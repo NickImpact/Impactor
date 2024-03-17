@@ -35,7 +35,7 @@ public final class DisplayedObjective extends AbstractDisplay implements Objecti
     private final Objective delegate;
 
     public DisplayedObjective(AssignedScoreboard parent, Objective delegate) {
-        super(parent, delegate.resolver().create());
+        super(parent, delegate);
         this.delegate = delegate;
     }
 

@@ -26,24 +26,32 @@
 package net.impactdev.impactor.minecraft.scoreboard.display.lines;
 
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.config.ResolverConfiguration;
+import net.impactdev.impactor.api.scoreboards.ContextualProvider;
+import net.impactdev.impactor.api.scoreboards.display.text.ScoreboardComponent;
+import net.impactdev.impactor.api.scoreboards.lines.LineTickConsumer;
 import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLineBuilder;
 import net.impactdev.impactor.api.scoreboards.score.Score;
+import net.impactdev.impactor.api.scoreboards.updaters.UpdaterConfiguration;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class ImpactorScoreboardLine implements ScoreboardLine {
 
-    private final ResolverConfiguration<?> resolver;
+    private final ScoreboardComponent text;
     private final Score score;
+    private final UpdaterConfiguration<?> updater;
+
+    private final LineTickConsumer lineTickConsumer;
+    private final ContextualProvider contextualProvider;
 
     public ImpactorScoreboardLine(ImpactorScoreboardLineBuilder builder) {
-        this.resolver = builder.resolver;
+        this.text = builder.text;
         this.score = builder.score;
-    }
+        this.updater = builder.updater;
 
-    @Override
-    public ResolverConfiguration<?> resolver() {
-        return this.resolver;
+        this.lineTickConsumer = builder.lineTickConsumer;
+        this.contextualProvider = builder.contextualProvider;
     }
 
     @Override
@@ -55,20 +63,46 @@ public final class ImpactorScoreboardLine implements ScoreboardLine {
         return new DisplayedLine(scoreboard, this);
     }
 
-    public static final class ImpactorScoreboardLineBuilder implements LineBuilder {
+    @Override
+    public ScoreboardComponent component() {
+        return this.text;
+    }
 
-        private ResolverConfiguration<?> resolver;
+    @Override
+    public @Nullable UpdaterConfiguration<?> updater() {
+        return this.updater;
+    }
+
+    public static final class ImpactorScoreboardLineBuilder implements ScoreboardLineBuilder {
+
+        private ScoreboardComponent text;
+        private UpdaterConfiguration<?> updater;
         private Score score;
 
+        private LineTickConsumer lineTickConsumer;
+        private ContextualProvider contextualProvider;
+
         @Override
-        public LineBuilder resolver(ResolverConfiguration<?> resolver) {
-            this.resolver = resolver;
+        public ScoreboardLineBuilder text(ScoreboardComponent component) {
+            this.text = component;
             return this;
         }
 
         @Override
-        public LineBuilder score(Score score) {
+        public ScoreboardLineBuilder score(Score score) {
             this.score = score;
+            return this;
+        }
+
+        @Override
+        public ScoreboardLineBuilder updater(UpdaterConfiguration<?> config) {
+            this.updater = config;
+            return this;
+        }
+
+        @Override
+        public ScoreboardLineBuilder onTickLine(LineTickConsumer resolver) {
+            this.lineTickConsumer = resolver;
             return this;
         }
 

@@ -28,20 +28,29 @@ package net.impactdev.impactor.minecraft.scoreboard.display.lines;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
 import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
+import net.impactdev.impactor.api.scoreboards.score.Score;
 import net.impactdev.impactor.minecraft.scoreboard.display.AbstractDisplay;
+import net.impactdev.impactor.minecraft.scoreboard.display.score.ImpactorScore;
 
 public class DisplayedLine extends AbstractDisplay implements ScoreboardLine.Displayed {
 
     private final ScoreboardLine delegate;
+    private final Score.Mutable score;
 
     public DisplayedLine(AssignedScoreboard scoreboard, ScoreboardLine delegate) {
-        super(scoreboard, delegate.resolver().create());
+        super(scoreboard, delegate);
         this.delegate = delegate;
+        this.score = ((ImpactorScore) delegate.score()).asMutable();
     }
 
     @Override
     public ScoreboardLine delegate() {
         return this.delegate;
+    }
+
+    @Override
+    public Score.Mutable score() {
+        return this.score;
     }
 
     @Override

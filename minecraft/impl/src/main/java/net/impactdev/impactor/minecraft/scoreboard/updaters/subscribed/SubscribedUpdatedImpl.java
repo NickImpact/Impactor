@@ -23,53 +23,36 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.scoreboard.display.resolvers.scheduled;
+package net.impactdev.impactor.minecraft.scoreboard.updaters.subscribed;
 
-import net.impactdev.impactor.api.scheduler.SchedulerTask;
-import net.impactdev.impactor.api.scheduler.v2.Scheduler;
 import net.impactdev.impactor.api.scoreboards.display.Display;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.AbstractComponentResolver;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolver;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolverConfiguration;
+import net.impactdev.impactor.api.scoreboards.updaters.subscriber.SubscriberUpdater;
+import net.kyori.event.EventSubscription;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-public class ScheduledResolverImpl extends AbstractComponentResolver implements ScheduledResolver {
+public final class SubscribedUpdatedImpl implements SubscriberUpdater {
 
-    private final ScheduledResolverConfiguration configuration;
-
-    private final Scheduler scheduler;
-    private final ScheduledResolverConfigurationImpl.ScheduledTaskProvider provider;
+    private final SubscriptionProvider provider;
 
     @MonotonicNonNull
-    private SchedulerTask task;
+    private EventSubscription subscription;
 
-    public ScheduledResolverImpl(ScheduledResolverConfigurationImpl config) {
-        super(config.component());
-
-        this.configuration = config;
-        this.scheduler = config.scheduler();
-        this.provider = config.task();
+    public SubscribedUpdatedImpl(SubscriptionProvider provider) {
+        this.provider = provider;
     }
 
     @Override
-    public ScheduledResolverConfiguration configuration() {
-        return this.configuration;
+    public void start(Display display) {
+        this.subscription = this.provider.subscribe(display);
     }
 
     @Override
-    public SchedulerTask task() {
-        return this.task;
+    public void stop(Display display) {
+        this.subscription.unsubscribe();
     }
 
     @Override
-    public void start(Display displayable) {
-        this.task = this.provider.schedule(this.scheduler, displayable::resolve);
+    public EventSubscription subscription() {
+        return this.subscription;
     }
-
-    @Override
-    public void shutdown(Display displayable) {
-        this.task.cancel();
-    }
-
-
 }

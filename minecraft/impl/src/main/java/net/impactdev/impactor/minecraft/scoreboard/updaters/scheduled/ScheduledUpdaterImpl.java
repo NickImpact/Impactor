@@ -23,25 +23,36 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.scoreboard.text;
+package net.impactdev.impactor.minecraft.scoreboard.updaters.scheduled;
 
-import net.impactdev.impactor.api.scoreboards.display.formatters.DisplayFormatter;
-import net.impactdev.impactor.api.scoreboards.display.text.ComponentProvider;
-import net.impactdev.impactor.api.scoreboards.display.text.ComponentElement;
-import org.jetbrains.annotations.Nullable;
+import net.impactdev.impactor.api.scheduler.SchedulerTask;
+import net.impactdev.impactor.api.scoreboards.display.Display;
+import net.impactdev.impactor.api.scoreboards.updaters.scheduled.ScheduledUpdater;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-public record ImpactorComponentElement(
-        ComponentProvider provider,
-        DisplayFormatter formatter
-) implements ComponentElement {
+public final class ScheduledUpdaterImpl implements ScheduledUpdater {
 
-    public static final class ComponentElementFactory implements ElementFactory {
+    private final ScheduledConfigurationImpl config;
 
-        @Override
-        public ComponentElement element(ComponentProvider provider, @Nullable DisplayFormatter formatter) {
-            return new ImpactorComponentElement(provider, formatter);
-        }
+    @MonotonicNonNull
+    private SchedulerTask task;
 
+    public ScheduledUpdaterImpl(ScheduledConfigurationImpl config) {
+        this.config = config;
     }
 
+    @Override
+    public void start(Display display) {
+        this.task = this.config.provider().provide(this.config.scheduler(), display::tick);
+    }
+
+    @Override
+    public void stop(Display display) {
+        this.task.cancel();
+    }
+
+    @Override
+    public SchedulerTask task() {
+        return this.task;
+    }
 }

@@ -35,8 +35,8 @@ public final class ImpactorScore implements Score {
 
     private final ScoreFormatter formatter;
 
-    private int value;
-    private boolean locked;
+    private final int value;
+    private final boolean locked;
 
     public ImpactorScore(ImpactorScoreBuilder builder) {
         this.value = builder.value;
@@ -50,16 +50,6 @@ public final class ImpactorScore implements Score {
     }
 
     @Override
-    public void lock() {
-        this.locked = true;
-    }
-
-    @Override
-    public void unlock() {
-        this.locked = false;
-    }
-
-    @Override
     public int value() {
         return this.value;
     }
@@ -69,24 +59,66 @@ public final class ImpactorScore implements Score {
         return this.formatter;
     }
 
-    @Override
-    public boolean update(IntUnaryOperator operator) {
-        if(this.locked) {
-            return false;
-        }
-
-        this.value = operator.applyAsInt(this.value);
-        return true;
+    public Score.Mutable asMutable() {
+        return new ImpactorMutableScore(this.value, this.formatter, this.locked);
     }
 
-    @Override
-    public boolean set(int value) {
-        if(this.locked) {
-            return false;
+    public static final class ImpactorMutableScore implements Score.Mutable {
+
+        private final ScoreFormatter formatter;
+        private int score;
+        private boolean locked;
+
+        public ImpactorMutableScore(int score, ScoreFormatter formatter, boolean locked) {
+            this.score = score;
+            this.formatter = formatter;
+            this.locked = locked;
         }
 
-        this.value = value;
-        return true;
+        @Override
+        public boolean locked() {
+            return this.locked;
+        }
+
+        @Override
+        public void lock() {
+            this.locked = true;
+        }
+
+        @Override
+        public void unlock() {
+            this.locked = false;
+        }
+
+        @Override
+        public int value() {
+            return this.score;
+        }
+
+        @Override
+        public @Nullable ScoreFormatter formatter() {
+            return this.formatter;
+        }
+
+        @Override
+        public boolean update(IntUnaryOperator operator) {
+            if(this.locked) {
+                return false;
+            }
+
+            this.score = operator.applyAsInt(this.score);
+            return true;
+        }
+
+        @Override
+        public boolean set(int value) {
+            if(this.locked) {
+                return false;
+            }
+
+            this.score = value;
+            return true;
+        }
     }
 
     public static final class ImpactorScoreBuilder implements ScoreBuilder {

@@ -23,25 +23,14 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.scoreboard.text;
+package net.impactdev.impactor.minecraft.scoreboard.updaters.scheduled;
 
-import net.impactdev.impactor.api.scoreboards.display.formatters.DisplayFormatter;
-import net.impactdev.impactor.api.scoreboards.display.text.ComponentProvider;
-import net.impactdev.impactor.api.scoreboards.display.text.ComponentElement;
-import org.jetbrains.annotations.Nullable;
+import net.impactdev.impactor.api.scheduler.SchedulerTask;
+import net.impactdev.impactor.api.scheduler.v2.Scheduler;
 
-public record ImpactorComponentElement(
-        ComponentProvider provider,
-        DisplayFormatter formatter
-) implements ComponentElement {
+@FunctionalInterface
+public interface ScheduledTaskProvider {
 
-    public static final class ComponentElementFactory implements ElementFactory {
-
-        @Override
-        public ComponentElement element(ComponentProvider provider, @Nullable DisplayFormatter formatter) {
-            return new ImpactorComponentElement(provider, formatter);
-        }
-
-    }
+    SchedulerTask provide(Scheduler scheduler, Runnable action);
 
 }

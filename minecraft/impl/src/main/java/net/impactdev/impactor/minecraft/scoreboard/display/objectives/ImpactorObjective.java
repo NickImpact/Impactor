@@ -26,24 +26,31 @@
 package net.impactdev.impactor.minecraft.scoreboard.display.objectives;
 
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.config.ResolverConfiguration;
+import net.impactdev.impactor.api.scoreboards.display.text.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.impactdev.impactor.api.scoreboards.score.ScoreFormatter;
+import net.impactdev.impactor.api.scoreboards.updaters.UpdaterConfiguration;
 import org.jetbrains.annotations.Nullable;
 
 public final class ImpactorObjective implements Objective {
 
-    private final ResolverConfiguration<?> resolver;
+    private final ScoreboardComponent text;
     private final ScoreFormatter formatter;
+    private final UpdaterConfiguration<?> updater;
 
     private ImpactorObjective(ImpactorObjectiveBuilder builder) {
-        this.resolver = builder.resolver;
+        this.text = builder.text;
         this.formatter = builder.formatter;
+        this.updater = builder.updater;
+    }
+
+    public DisplayedObjective create(AssignedScoreboard scoreboard) {
+        return new DisplayedObjective(scoreboard, this);
     }
 
     @Override
-    public ResolverConfiguration<?> resolver() {
-        return this.resolver;
+    public ScoreboardComponent text() {
+        return this.text;
     }
 
     @Override
@@ -51,24 +58,37 @@ public final class ImpactorObjective implements Objective {
         return this.formatter;
     }
 
-    public DisplayedObjective create(AssignedScoreboard scoreboard) {
-        return new DisplayedObjective(scoreboard, this);
+    @Override
+    public ScoreboardComponent component() {
+        return this.text;
+    }
+
+    @Override
+    public @Nullable UpdaterConfiguration<?> updater() {
+        return this.updater;
     }
 
     public static final class ImpactorObjectiveBuilder implements ObjectiveBuilder {
 
-        private ResolverConfiguration<?> resolver;
+        private ScoreboardComponent text;
         private ScoreFormatter formatter;
+        private UpdaterConfiguration<?> updater;
 
         @Override
-        public ObjectiveBuilder resolver(ResolverConfiguration<?> configuration) {
-            this.resolver = configuration;
+        public ObjectiveBuilder text(ScoreboardComponent component) {
+            this.text = component;
             return this;
         }
 
         @Override
         public ObjectiveBuilder formatter(ScoreFormatter formatter) {
             this.formatter = formatter;
+            return this;
+        }
+
+        @Override
+        public ObjectiveBuilder updater(UpdaterConfiguration<?> config) {
+            this.updater = config;
             return this;
         }
 

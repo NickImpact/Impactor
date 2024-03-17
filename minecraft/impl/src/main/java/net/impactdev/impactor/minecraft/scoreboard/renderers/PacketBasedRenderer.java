@@ -77,7 +77,7 @@ public class PacketBasedRenderer implements ScoreboardRenderer {
                 ServerScoreboard.Method.CHANGE,
                 ScoreboardComponents.OBJECTIVE_NAME,
                 ScoreboardComponents.fakeName(line.require(TEAM_INDEX)),
-                line.delegate().score().value()
+                line.score().value()
         );
 
         this.publish(scoreboard.viewer(), update, score);

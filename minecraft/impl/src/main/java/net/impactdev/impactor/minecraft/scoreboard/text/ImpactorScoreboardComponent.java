@@ -28,9 +28,8 @@ package net.impactdev.impactor.minecraft.scoreboard.text;
 import com.google.common.collect.ImmutableList;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.scoreboards.display.formatters.DisplayFormatter;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.text.ComponentElement;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.text.ScoreboardComponent;
-import net.impactdev.impactor.api.utility.Context;
+import net.impactdev.impactor.api.scoreboards.display.text.ComponentElement;
+import net.impactdev.impactor.api.scoreboards.display.text.ScoreboardComponent;
 import net.kyori.adventure.text.Component;
 
 import java.util.List;
@@ -52,11 +51,11 @@ public final class ImpactorScoreboardComponent implements ScoreboardComponent {
     }
 
     @Override
-    public Component resolve(PlatformSource viewer, Context context) {
+    public Component resolve(PlatformSource viewer) {
         return this.elements.stream()
                 .map(element -> Optional.ofNullable(element.formatter())
                         .map(formatter -> {
-                            Component result = formatter.format(element.provider().parse(viewer, context));
+                            Component result = formatter.format(element.provider().parse(viewer));
 
                             if(formatter instanceof DisplayFormatter.Stateful stateful) {
                                 stateful.step();
@@ -64,7 +63,7 @@ public final class ImpactorScoreboardComponent implements ScoreboardComponent {
 
                             return result;
                         })
-                        .orElse(element.provider().parse(viewer, context))
+                        .orElse(element.provider().parse(viewer))
                 )
                 .reduce(Component::append)
                 .orElse(Component.empty());

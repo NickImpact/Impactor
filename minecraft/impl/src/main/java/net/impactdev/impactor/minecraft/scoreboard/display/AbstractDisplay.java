@@ -25,50 +25,48 @@
 
 package net.impactdev.impactor.minecraft.scoreboard.display;
 
-import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
-import net.impactdev.impactor.api.scoreboards.ScoreboardPointers;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
 import net.impactdev.impactor.api.scoreboards.display.Display;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.ComponentResolver;
-import net.impactdev.impactor.api.utility.Context;
+import net.impactdev.impactor.api.scoreboards.display.Displayable;
+import net.impactdev.impactor.api.scoreboards.display.text.ScoreboardComponent;
+import net.impactdev.impactor.api.scoreboards.updaters.Updater;
+import net.impactdev.impactor.api.scoreboards.updaters.UpdaterConfiguration;
 import net.impactdev.impactor.core.utility.pointers.AbstractPointerCapable;
 import net.kyori.adventure.text.Component;
+
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class AbstractDisplay extends AbstractPointerCapable implements Display {
 
     private final AssignedScoreboard scoreboard;
-    protected final ComponentResolver resolver;
-    private Component display = Component.empty();
 
-    protected AbstractDisplay(AssignedScoreboard scoreboard, ComponentResolver resolver) {
+    private final Updater updater;
+    private final ScoreboardComponent component;
+    private final AtomicReference<Component> text = new AtomicReference<>(Component.empty());
+
+    protected AbstractDisplay(AssignedScoreboard scoreboard, Displayable displayable) {
         this.scoreboard = scoreboard;
-        this.resolver = resolver;
-    }
-
-    protected Context context() {
-        return Context.empty();
+        this.component = displayable.component();
+        this.updater = Optional.ofNullable(displayable.updater()).map(UpdaterConfiguration::generate).orElse(null);
     }
 
     @Override
-    public ComponentResolver resolver() {
-        return this.resolver;
+    public Component text() {
+        return this.text.get();
     }
 
     @Override
-    public void resolve() {
-        Context context = this.context();
-        context.pointer(ScoreboardPointers.ASSIGNED, this.scoreboard);
-        context.pointer(PlatformPlayer.PLAYER, this.scoreboard.viewer());
-
-        this.display = this.resolver.resolve(this.scoreboard.viewer(), context);
-        this.render(this.scoreboard, this.scoreboard.configuration().renderer());
+    public Updater updater() {
+        return this.updater;
     }
 
     protected abstract void render(AssignedScoreboard scoreboard, ScoreboardRenderer renderer);
 
     @Override
-    public Component text() {
-        return this.display;
+    public void tick() {
+        this.text.set(this.component.resolve(this.scoreboard.viewer()));
+        this.render(this.scoreboard, this.scoreboard.configuration().renderer());
     }
 }

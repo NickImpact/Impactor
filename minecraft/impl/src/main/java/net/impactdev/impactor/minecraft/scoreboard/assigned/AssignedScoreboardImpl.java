@@ -38,6 +38,7 @@ import net.minecraft.ChatFormatting;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Optional;
 
 public final class AssignedScoreboardImpl extends AbstractPointerCapable implements AssignedScoreboard {
 
@@ -47,8 +48,6 @@ public final class AssignedScoreboardImpl extends AbstractPointerCapable impleme
     private final ScoreboardRenderer renderer;
     private final Objective.Displayed objective;
     private final List<ScoreboardLine.Displayed> lines;
-
-    private final ColorSelector colors = new ColorSelector();
 
     public AssignedScoreboardImpl(Scoreboard config, PlatformPlayer viewer) {
         this.config = config;
@@ -85,14 +84,16 @@ public final class AssignedScoreboardImpl extends AbstractPointerCapable impleme
     @Override
     public void open() {
         this.renderer.show(this);
-        this.objective().resolver().start(this.objective());
-        this.lines().forEach(line -> line.resolver().start(line));
+
+        Optional.ofNullable(this.objective.updater()).ifPresent(updater -> updater.start(this.objective));
+        this.lines().forEach(line -> Optional.ofNullable(line.updater()).ifPresent(updater -> updater.start(line)));
     }
 
     @Override
     public void hide() {
-        this.objective().resolver().shutdown(this.objective());
-        this.lines().forEach(line -> line.resolver().shutdown(line));
+        Optional.ofNullable(this.objective.updater()).ifPresent(updater -> updater.stop(this.objective));
+        this.lines().forEach(line -> Optional.ofNullable(line.updater()).ifPresent(updater -> updater.stop(line)));
+
         this.renderer.hide(this);
     }
 
@@ -101,21 +102,8 @@ public final class AssignedScoreboardImpl extends AbstractPointerCapable impleme
         this.hide();
     }
 
-    public ColorSelector colors() {
-        return this.colors;
-    }
-
     private <I, T extends I> T translate(I input, Class<T> target) {
         return target.cast(input);
     }
 
-    public static final class ColorSelector {
-
-        private int index = 0;
-
-        public ChatFormatting select() {
-            return ChatFormatting.values()[this.index++];
-        }
-
-    }
 }

@@ -26,19 +26,18 @@
 package net.impactdev.impactor.minecraft.test.scoreboards;
 
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.platform.players.events.ClientConnectionEvent;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.scheduler.Ticks;
 import net.impactdev.impactor.api.scheduler.v2.Scheduler;
 import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.api.scoreboards.Scoreboard;
 import net.impactdev.impactor.api.scoreboards.display.formatters.styling.rgb.ColorCycle;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.scheduled.ScheduledResolverConfiguration;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.text.ComponentElement;
-import net.impactdev.impactor.api.scoreboards.display.resolvers.text.ScoreboardComponent;
+import net.impactdev.impactor.api.scoreboards.display.text.ComponentElement;
+import net.impactdev.impactor.api.scoreboards.display.text.ScoreboardComponent;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
 import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.impactdev.impactor.api.scoreboards.score.formatters.BlankFormatter;
+import net.impactdev.impactor.api.scoreboards.updaters.scheduled.ScheduledUpdater;
 import net.impactdev.impactor.api.text.TextProcessor;
 import net.kyori.adventure.text.Component;
 import org.junit.jupiter.api.Test;
@@ -48,21 +47,17 @@ public final class ScoreboardTests {
     @Test
     public void create() throws InterruptedException {
         ScoreboardComponent component = ScoreboardComponent.create(
-                ComponentElement.create((viewer, context) -> TextProcessor.mini().parse(viewer, "<impactor:name> Hello!", context))
+                ComponentElement.create((viewer) -> TextProcessor.mini().parse(viewer, "<impactor:name> Hello!"))
         );
 
         ScoreboardComponent c2 = component.append(ComponentElement.create(
                 ColorCycle.configure().frames(90).increment(3).build(),
-                (viewer, context) -> Component.text("ABC")
+                (viewer) -> Component.text("ABC")
         ));
 
         Objective objective = Objective.builder()
-                .resolver(ScheduledResolverConfiguration.builder()
-                        .component(c2)
-                        .scheduler(Schedulers.require(Scheduler.ASYNCHRONOUS))
-                        .repeating(Ticks.single())
-                        .build()
-                )
+                .text(c2)
+                .updater(ScheduledUpdater.scheduler(Scheduler.ASYNCHRONOUS).repeating(Ticks.single()))
                 .formatter(BlankFormatter.INSTANCE)
                 .build();
 

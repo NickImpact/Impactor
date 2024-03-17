@@ -23,25 +23,12 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.scoreboard.text;
+package net.impactdev.impactor.minecraft.scoreboard.updaters.subscribed;
 
-import net.impactdev.impactor.api.scoreboards.display.formatters.DisplayFormatter;
-import net.impactdev.impactor.api.scoreboards.display.text.ComponentProvider;
-import net.impactdev.impactor.api.scoreboards.display.text.ComponentElement;
-import org.jetbrains.annotations.Nullable;
+import net.impactdev.impactor.api.scoreboards.display.Display;
+import net.kyori.event.EventSubscription;
 
-public record ImpactorComponentElement(
-        ComponentProvider provider,
-        DisplayFormatter formatter
-) implements ComponentElement {
-
-    public static final class ComponentElementFactory implements ElementFactory {
-
-        @Override
-        public ComponentElement element(ComponentProvider provider, @Nullable DisplayFormatter formatter) {
-            return new ImpactorComponentElement(provider, formatter);
-        }
-
-    }
-
+@FunctionalInterface
+public interface SubscriptionProvider {
+    EventSubscription subscribe(Display display);
 }
