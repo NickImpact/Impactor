@@ -142,7 +142,7 @@ public final class VaultService implements EconomyService {
                     .name(text(delegate.currencyNameSingular()))
                     .plural(text(delegate.currencyNamePlural()))
                     .symbol(text(config.get(VaultConfig.VAULT_SYMBOL)))
-                    .formatting(config.get(VaultConfig.VAULT_SYMBOL_PREFIX) ? Currency.SymbolFormatting.BEFORE : Currency.SymbolFormatting.AFTER)
+                    .formatting(config.get(VaultConfig.VAULT_FORMATTING))
                     .decimals(delegate.fractionalDigits())
                     .transferable(true)
                     .starting(BigDecimal.ZERO)

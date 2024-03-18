@@ -26,15 +26,20 @@
 package net.impactdev.impactor.integrations.vault;
 
 import net.impactdev.impactor.api.configuration.key.ConfigKey;
+import net.impactdev.impactor.api.economy.currency.Currency;
 
 import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.booleanKey;
+import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.key;
 import static net.impactdev.impactor.api.configuration.key.ConfigKeyFactory.stringKey;
 
 public final class VaultConfig {
 
     public static final ConfigKey<Boolean> USE_VAULT = booleanKey("use-vault", true);
     public static final ConfigKey<String> VAULT_SYMBOL = stringKey("vault.symbol", "$");
-    public static final ConfigKey<Boolean> VAULT_SYMBOL_PREFIX = booleanKey("vault.symbol-is-prefix", true);
+    public static final ConfigKey<Currency.CurrencyFormatting> VAULT_FORMATTING = key(adapter -> new Currency.CurrencyFormatting(
+            adapter.getString("vault.formatting.condensed", "<symbol><amount>"),
+            adapter.getString("vault.formatting.expanded", "<amount> <name>")
+    ));
 
 
 }
