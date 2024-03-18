@@ -47,7 +47,6 @@ tasks {
     val publishToDiscord = tasks.register("discord", PublishToDiscord::class)
 
     build {
-        dependsOn(readme)
         if(this.project.isRelease()) {
             dependsOn(writeChangelog)
             dependsOn(publishToDiscord)

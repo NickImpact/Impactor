@@ -124,6 +124,10 @@ tasks.withType<GenerateModuleMetadata> {
     dependsOn(tasks["remapProductionJar"])
 }
 
+tasks.modrinth {
+    dependsOn(tasks.modrinthSyncBody)
+}
+
 modrinth {
     token.set(System.getenv("MODRINTH_GRADLE_TOKEN"))
     projectId.set("Impactor")
@@ -135,8 +139,7 @@ modrinth {
 
     gameVersions.set(listOf(rootProject.property("minecraft").toString()))
 
-    // https://github.com/modrinth/minotaur
-    // TODO - Project Body Sync
+    syncBodyFrom.set(rootProject.file("README.md").readText(Charsets.UTF_8))
     changelog.set(readChangelog())
     debugMode.set(!project.isRelease())
 }
