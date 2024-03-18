@@ -34,6 +34,7 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.scheduler.Ticks;
 import net.impactdev.impactor.api.scheduler.v2.Scheduler;
 import net.impactdev.impactor.api.scheduler.v2.Schedulers;
+import net.impactdev.impactor.core.commands.parsers.PlatformSourceParser;
 import net.impactdev.impactor.core.modules.ModuleInitializer;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
@@ -43,6 +44,7 @@ import net.impactdev.impactor.minecraft.scheduler.SyncScheduler;
 import net.impactdev.impactor.minecraft.scoreboard.ScoreboardModule;
 import net.impactdev.impactor.minecraft.ui.UIModule;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import org.incendo.cloud.brigadier.argument.BrigadierMapping;
 import org.incendo.cloud.brigadier.argument.BrigadierMappings;
@@ -71,15 +73,20 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
 
     @Override
     public void construct() {
-        super.construct();
         Impactor.instance().events().subscribe(RegisterBrigadierMappingsEvent.class, event -> {
             BrigadierMappings<CommandSource, CommandSourceStack> mappings = (BrigadierMappings<CommandSource, CommandSourceStack>) event.mappings();
             BrigadierMapping<?, CurrencyParser, CommandSourceStack> currency = this.createMapping(
                     parser -> ResourceLocationArgument.id()
             );
 
+            BrigadierMapping<?, PlatformSourceParser, CommandSourceStack> sources = this.createMapping(
+                    parser -> EntityArgument.entity()
+            );
+
+            mappings.registerMapping(PlatformSourceParser.class, sources);
             mappings.registerMapping(CurrencyParser.class, currency);
         });
+        super.construct();
     }
 
     @Override

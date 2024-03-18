@@ -78,6 +78,10 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
     public BaseImpactorPlugin(ImpactorBootstrapper bootstrapper) {
         instance = this;
         this.bootstrapper = bootstrapper;
+
+        this.bootstrapper.logger().info("Initializing API...");
+        Impactor service = new ImpactorService();
+        APIRegister.register(service);
     }
 
     public static BaseImpactorPlugin instance() {
@@ -118,14 +122,10 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
 
     @Override
     public void construct() {
-        this.bootstrapper.logger().info("Initializing API...");
-        Impactor service = new ImpactorService();
-        APIRegister.register(service);
-
         this.bootstrapper.logger().info("Registering modules...");
         this.initializer = this.registerModules();
         try {
-            this.initializer.construct(service);
+            this.initializer.construct(Impactor.instance());
         } catch (Exception e) {
             ExceptionPrinter.print(this.logger(), e);
         }

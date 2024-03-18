@@ -41,13 +41,19 @@ import org.incendo.cloud.suggestion.Suggestion;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public final class PlatformSourceParser implements ArgumentParser<CommandSource, PlatformSource>, BlockingSuggestionProvider<CommandSource> {
+public final class PlatformSourceParser implements
+        ArgumentParser<CommandSource, PlatformSource>,
+        BlockingSuggestionProvider<CommandSource>
+{
 
+    private static final Pattern SELECTOR = Pattern.compile("@[rs]");
     private final PlainTextComponentSerializer plain = PlainTextComponentSerializer.plainText();
     
     @Override
@@ -58,11 +64,23 @@ public final class PlatformSourceParser implements ArgumentParser<CommandSource,
         options.add(PlatformSource.server());
         options.addAll(online);
 
-        Optional<PlatformSource> match = options.stream()
-                .filter(player -> this.plain.serialize(player.name()).equalsIgnoreCase(args.peekString()))
-                .findFirst();
+        Optional<PlatformSource> target;
 
-        return match.map(player -> {
+        String input = args.peekString();
+        Matcher selector = SELECTOR.matcher(input);
+        if(selector.matches()) {
+            try {
+                target = Optional.of(this.parseFromSelector(context, input));
+            } catch (IllegalArgumentException e) {
+                return ArgumentParseResult.failure(e);
+            }
+        } else {
+            target = options.stream()
+                    .filter(player -> this.plain.serialize(player.name()).equalsIgnoreCase(args.peekString()))
+                    .findFirst();
+        }
+
+        return target.map(player -> {
                     args.readString();
                     return player;
                 })
@@ -78,6 +96,8 @@ public final class PlatformSourceParser implements ArgumentParser<CommandSource,
                 .collect(Collectors.toList());
 
         names.add("Server");
+        names.add("@r");
+        names.add("@s");
 
         return names.stream()
                 .filter(name -> name.toLowerCase().startsWith(input.peekString().toLowerCase()))
@@ -85,4 +105,16 @@ public final class PlatformSourceParser implements ArgumentParser<CommandSource,
                 .collect(Collectors.toList());
     }
 
+    private PlatformSource parseFromSelector(CommandContext<CommandSource> context, String input) {
+        String selector = input.substring(1);
+        return switch (selector.toLowerCase()) {
+            case "s" -> context.sender().source();
+            case "r" -> {
+                Random rng = new Random();
+                List<PlatformPlayer> players = Impactor.instance().services().provide(PlatformPlayerService.class).online().stream().toList();
+                yield players.get(rng.nextInt(players.size()));
+            }
+            default -> throw new IllegalArgumentException("Invalid selector: " + selector);
+        };
+    }
 }
