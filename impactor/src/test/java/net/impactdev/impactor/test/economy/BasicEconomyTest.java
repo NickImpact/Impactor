@@ -281,7 +281,7 @@ public class BasicEconomyTest {
                 .name(Component.text("Test"))
                 .plural(Component.text("Test"))
                 .decimals(3)
-                .formatting(Currency.SymbolFormatting.BEFORE)
+                .formatting(new Currency.CurrencyFormatting("<symbol><amount>", "<amount> <name>"))
                 .symbol(Component.text('$'))
                 .starting(BigDecimal.TEN)
                 .build();
@@ -308,7 +308,7 @@ public class BasicEconomyTest {
                 .name(Component.text("Test"))
                 .plural(Component.text("Test"))
                 .decimals(3)
-                .formatting(Currency.SymbolFormatting.BEFORE)
+                .formatting(new Currency.CurrencyFormatting("<symbol><amount>", "<amount> <name>"))
                 .symbol(Component.text('$'))
                 .starting(BigDecimal.TEN)
                 .build();

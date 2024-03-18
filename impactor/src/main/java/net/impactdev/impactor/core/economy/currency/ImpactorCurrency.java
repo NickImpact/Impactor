@@ -29,6 +29,9 @@ import com.google.common.base.Strings;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.util.TriState;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,7 +51,7 @@ public class ImpactorCurrency implements Currency {
     private final Component symbol;
     private final BigDecimal starting;
     private final int decimals;
-    private final SymbolFormatting formatting;
+    private final CurrencyFormatting formatting;
     private final boolean primary;
     private final TriState transferable;
 
@@ -96,23 +99,22 @@ public class ImpactorCurrency implements Currency {
     }
 
     @Override
-    public SymbolFormatting formatting() {
+    public CurrencyFormatting formatting() {
         return this.formatting;
     }
 
     @Override
     public Component format(@NotNull BigDecimal amount, boolean condensed, @NotNull Locale locale) {
         DecimalFormat formatter = new DecimalFormat(this.formatPattern, new DecimalFormatSymbols(locale));
-        Component value = text(formatter.format(amount.doubleValue()));
-        if(condensed) {
-            return this.formatting.modify(this, value);
-        }
+        MiniMessage mini = MiniMessage.miniMessage();
+        TagResolver.Single symbol = Placeholder.component("symbol", this.symbol);
+        TagResolver.Single value = Placeholder.component("amount", text(formatter.format(amount.doubleValue())));
+        TagResolver.Single expanded = Placeholder.component("name", amount.doubleValue() == 1 ? this.singular() : this.plural());
 
-        if(amount.doubleValue() == 1) {
-            return value.append(Component.space()).append(this.singular());
-        } else {
-            return value.append(Component.space()).append(this.plural());
-        }
+        return mini.deserialize(
+                condensed ? this.formatting.condensed() : this.formatting.expanded(),
+                symbol, value, expanded
+        );
     }
 
     @Override
@@ -142,11 +144,13 @@ public class ImpactorCurrency implements Currency {
         private Component name;
         private Component plural;
         private Component symbol;
-        private SymbolFormatting formatting;
+        private CurrencyFormatting formatting;
         private BigDecimal starting;
         private int decimals;
         private boolean primary;
         private TriState transferable = TriState.NOT_SET;
+
+        private String formatTemplate;
 
         @Override
         public CurrencyBuilder key(@NotNull Key key) {
@@ -173,7 +177,7 @@ public class ImpactorCurrency implements Currency {
         }
 
         @Override
-        public CurrencyBuilder formatting(@NotNull SymbolFormatting format) {
+        public CurrencyBuilder formatting(@NotNull CurrencyFormatting format) {
             this.formatting = format;
             return this;
         }

@@ -96,11 +96,11 @@ public final class EconomyConfig {
                     .key(Key.key(option))
                     .name(text(adapter.getString(modifier.apply("singular"), "Dollar")))
                     .plural(text(adapter.getString(modifier.apply("plural"), "Dollars")))
-                    .symbol(text(adapter.getString(modifier.apply("symbol.character"), "$")))
-                    .formatting(Currency.SymbolFormatting.fromIdentifier(adapter.getString(
-                            modifier.apply("symbol.placement"),
-                            Currency.SymbolFormatting.BEFORE.name().toLowerCase()
-                    )))
+                    .symbol(text(adapter.getString(modifier.apply("symbol"), "$")))
+                    .formatting(new Currency.CurrencyFormatting(
+                            adapter.getString(modifier.apply("formatting.condensed"), "<symbol><amount>"),
+                            adapter.getString(modifier.apply("formatting.expanded"), "<amount> <name>")
+                    ))
                     .decimals(adapter.getInteger(modifier.apply("decimals"), 2))
                     .starting(BigDecimal.valueOf(adapter.getDouble(modifier.apply("default-balance"), 500)));
 
