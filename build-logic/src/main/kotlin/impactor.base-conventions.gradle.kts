@@ -55,8 +55,6 @@ license {
 }
 
 sourceSets {
-//    replaceToken("@version@", project.version)
-//    replaceToken("@githash@", getLatestGitCommitHash())
     main {
         blossom {
             javaSources {

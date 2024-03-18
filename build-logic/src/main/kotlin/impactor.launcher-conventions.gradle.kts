@@ -138,7 +138,7 @@ modrinth {
     // https://github.com/modrinth/minotaur
     // TODO - Project Body Sync
     changelog.set(readChangelog())
-    debugMode.set(true)
+    debugMode.set(!project.isRelease())
 }
 
 fun readChangelog(): String {

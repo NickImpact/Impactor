@@ -8,6 +8,15 @@ plugins {
 }
 
 tasks {
+    val readme = tasks.register("readme", Copy::class) {
+        from("build-logic")
+        into(project.layout.projectDirectory)
+        include("README.template.md")
+        rename { _ -> "README.md"}
+        expand("version" to project.version)
+        doNotTrackState("This is just a generation task")
+    }
+
     val collect by registering(Copy::class) {
         val filters = mapOf(
             ":launchers:fabric" to "remapProductionJar",
@@ -17,7 +26,7 @@ tasks {
         val tasks = subprojects.filter { filters.containsKey(it.path) }.map { it.tasks.named(filters.getValue(it.path)) }
         dependsOn(tasks)
         from(tasks)
-        into(buildDir.resolve("deploy"))
+        into(layout.buildDirectory.asFile.get().resolve("deploy"))
     }
 
     val changelog = tasks.register("changelog", GenerateChangelog::class)
@@ -38,6 +47,7 @@ tasks {
     val publishToDiscord = tasks.register("discord", PublishToDiscord::class)
 
     build {
+        dependsOn(readme)
         if(this.project.isRelease()) {
             dependsOn(writeChangelog)
             dependsOn(publishToDiscord)
