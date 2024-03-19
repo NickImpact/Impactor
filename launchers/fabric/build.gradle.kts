@@ -55,7 +55,8 @@ dependencies {
         libs.cloudFabric,
         libs.cloudMinecraftExtras,
         libs.cloudConfirmations,
-        libs.cloudProcessorsCommon
+        libs.cloudProcessorsCommon,
+        libs.adventureFabric
     ).forEach { include(it) }
 
     modCompileOnly("eu.pb4:placeholder-api:2.1.3+1.20.1")
