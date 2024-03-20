@@ -23,11 +23,16 @@
  *
  */
 
-package net.impactdev.impactor.forge.commands;
+package net.impactdev.impactor.forge;
 
 import net.impactdev.impactor.api.commands.ImpactorCommandManager;
+import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.providers.FactoryProvider;
+import net.impactdev.impactor.core.commands.events.RegisterCommandsEvent;
 import net.impactdev.impactor.core.modules.ImpactorModule;
+import net.impactdev.impactor.forge.adventure.ClickCallbackCommand;
+import net.impactdev.impactor.forge.commands.ForgeCommandManagerFactory;
+import net.kyori.event.EventBus;
 
 public class ForgeCommandModule implements ImpactorModule {
 
@@ -36,4 +41,8 @@ public class ForgeCommandModule implements ImpactorModule {
         provider.register(ImpactorCommandManager.Factory.class, new ForgeCommandManagerFactory());
     }
 
+    @Override
+    public void subscribe(EventBus<ImpactorEvent> bus) {
+        bus.subscribe(RegisterCommandsEvent.class, e -> e.register(ClickCallbackCommand.class));
+    }
 }

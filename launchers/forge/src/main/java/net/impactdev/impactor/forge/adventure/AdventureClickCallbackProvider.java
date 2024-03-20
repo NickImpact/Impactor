@@ -23,34 +23,21 @@
  *
  */
 
-package net.impactdev.impactor.forge;
+package net.impactdev.impactor.forge.adventure;
 
-import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.core.modules.ModuleInitializer;
-import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
-import net.impactdev.impactor.forge.platform.ForgePlatformModule;
-import net.impactdev.impactor.forge.scheduler.ForgeSchedulerModule;
-import net.impactdev.impactor.forge.ui.ForgeUIModule;
-import net.impactdev.impactor.minecraft.plugin.GameImpactorPlugin;
+import com.google.auto.service.AutoService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.event.ClickCallback;
+import net.kyori.adventure.text.event.ClickEvent;
+import org.jetbrains.annotations.NotNull;
 
-public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorPlugin {
-
-    public ForgeImpactorPlugin(ImpactorBootstrapper bootstrapper) {
-        super(bootstrapper);
-    }
+@SuppressWarnings("UnstableApiUsage")
+@AutoService(ClickCallback.Provider.class)
+public class AdventureClickCallbackProvider implements ClickCallback.Provider {
 
     @Override
-    public void construct() {
-        super.construct();
-    }
-
-    @Override
-    protected ModuleInitializer registerModules() {
-        return super.registerModules()
-                .with(ForgeSchedulerModule.class)
-                .with(ForgeUIModule.class)
-                .with(ForgePlatformModule.class)
-                .with(ForgeCommandModule.class);
+    public @NotNull ClickEvent create(@NotNull ClickCallback<Audience> callback, @NotNull ClickCallback.Options options) {
+        return ClickEvent.runCommand(ClickCallbackRegistry.INSTANCE.register(callback, options));
     }
 
 }

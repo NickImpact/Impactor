@@ -23,34 +23,31 @@
  *
  */
 
-package net.impactdev.impactor.forge;
+package net.impactdev.impactor.forge.adventure;
 
-import net.impactdev.impactor.api.plugin.ImpactorPlugin;
-import net.impactdev.impactor.core.modules.ModuleInitializer;
-import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
-import net.impactdev.impactor.forge.platform.ForgePlatformModule;
-import net.impactdev.impactor.forge.scheduler.ForgeSchedulerModule;
-import net.impactdev.impactor.forge.ui.ForgeUIModule;
-import net.impactdev.impactor.minecraft.plugin.GameImpactorPlugin;
+import com.google.auto.service.AutoService;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import net.kyori.adventure.text.logger.slf4j.ComponentLoggerProvider;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.LoggerFactory;
 
-public class ForgeImpactorPlugin extends GameImpactorPlugin implements ImpactorPlugin {
+import java.util.Locale;
 
-    public ForgeImpactorPlugin(ImpactorBootstrapper bootstrapper) {
-        super(bootstrapper);
-    }
-
-    @Override
-    public void construct() {
-        super.construct();
-    }
+@SuppressWarnings("UnstableApiUsage")
+@AutoService(ComponentLoggerProvider.class)
+public final class AdventureComponentLoggerProvider implements ComponentLoggerProvider {
 
     @Override
-    protected ModuleInitializer registerModules() {
-        return super.registerModules()
-                .with(ForgeSchedulerModule.class)
-                .with(ForgeUIModule.class)
-                .with(ForgePlatformModule.class)
-                .with(ForgeCommandModule.class);
+    public @NotNull ComponentLogger logger(@NotNull LoggerHelper helper, @NotNull String name) {
+        return helper.delegating(LoggerFactory.getLogger(name), this::serialize);
+    }
+
+    private String serialize(final Component message) {
+        final Component rendered = GlobalTranslator.render(message, Locale.getDefault());
+        return PlainTextComponentSerializer.plainText().serialize(rendered);
     }
 
 }

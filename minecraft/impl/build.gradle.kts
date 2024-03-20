@@ -26,9 +26,6 @@ dependencies {
     api(project(":impactor"))
     api(project(":minecraft:api"))
 
-    compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
-    annotationProcessor("com.google.auto.service:auto-service:1.1.1")
-
     testImplementation("net.kyori:adventure-text-serializer-ansi:4.14.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")

@@ -51,8 +51,8 @@ dependencies {
     })
 
     listOf(
-        libs.cloudAnnotations,
         libs.cloudFabric,
+        libs.cloudAnnotations,
         libs.cloudMinecraftExtras,
         libs.cloudConfirmations,
         libs.cloudProcessorsCommon,

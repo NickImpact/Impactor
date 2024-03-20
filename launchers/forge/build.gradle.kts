@@ -25,15 +25,28 @@ dependencies {
     implementation(project(":minecraft:impl"))
     modImplementation("ca.landonjw.gooeylibs:forge:3.0.0-1.20.1-SNAPSHOT@jar")
 
+    compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
+    annotationProcessor("com.google.auto.service:auto-service:1.1.1")
+
     include("io.leangen.geantyref:geantyref:1.3.13")
-    include(modImplementation("net.impactdev.impactor.commands:forge:5.2.0+1.20.1-SNAPSHOT") {
+
+    modImplementation("net.impactdev.impactor.commands:forge:5.2.0+1.20.1-SNAPSHOT") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")
         exclude("net.impactdev.impactor.api", "players")
         exclude("net.impactdev.impactor.api", "plugins")
         exclude("net.impactdev.impactor.api", "storage")
-    })
+    }
+
+    listOf(
+        libs.cloudCore,
+        libs.cloudServices,
+        libs.cloudAnnotations,
+        libs.cloudMinecraftExtras,
+        libs.cloudConfirmations,
+        libs.cloudProcessorsCommon,
+    ).forEach { include(it) }
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
@@ -44,10 +57,13 @@ tasks {
         val mapped = "loom_mappings_1_20_1_layered_hash_40359_v2_forge_1_20_1_47_0_3_forge"
         dependencies {
             include(dependency("$mapped.ca.landonjw.gooeylibs:forge:.*"))
+            include(dependency("$mapped.net.impactdev.impactor.commands:forge:.*"))
+            include(dependency("$mapped.net.impactdev.impactor.commands:common:.*"))
+            include(dependency("$mapped.net.impactdev.impactor.api:commands:.*"))
 
             exclude("ca/landonjw/gooeylibs2/forge/GooeyLibs.class")
             exclude("**/PlatformMethods.class")
-//            exclude("client-extra.jar")
+            exclude("**/client-extra.jar")
         }
 
         val prefix = "net.impactdev.impactor.relocations"
@@ -56,7 +72,6 @@ tasks {
             "okio",
             "okhttp"
         ).forEach { relocate(it, "$prefix.$it") }
-
     }
 
     processResources {
