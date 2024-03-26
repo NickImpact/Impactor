@@ -49,7 +49,6 @@ tasks {
     build {
         if(this.project.isRelease()) {
             dependsOn(writeChangelog)
-            dependsOn(publishToDiscord)
         }
     }
 

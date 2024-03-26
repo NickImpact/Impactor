@@ -69,9 +69,6 @@ public final class FabricImpactorPlugin extends GameImpactorPlugin implements Im
             player.withDynamic(ImpactorPlatformPlayer.PLAYER_FALLBACK, () -> handler.player);
 
             Impactor.instance().events().post((ClientConnectionEvent.Join) () -> player);
-
-            AssignedScoreboard scoreboard = DevScoreboard.SCOREBOARD.assignTo(player);
-            scoreboard.open();
         });
     }
 
