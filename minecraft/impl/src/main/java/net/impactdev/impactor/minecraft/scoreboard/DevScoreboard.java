@@ -129,21 +129,15 @@ public final class DevScoreboard {
             )
             .line(ScoreboardLine.builder().text(ScoreboardComponent.create(empty())).score(Score.of(8)).build())
             .line(ScoreboardLine.builder()
-                    .text(ScoreboardComponent.create(text("Updating Score")))
-                    .updater(ScheduledUpdater.scheduler(Scheduler.SYNCHRONOUS).repeating(3, TimeUnit.SECONDS))
-                    .score(4)
-                    .onTickLine((viewer, score) -> {
-                        int value = score.value();
-                        if(value == 7) {
-                            scoreReversed = true;
-                        } else if(value == 4) {
-                            scoreReversed = false;
-                        }
-
-                        score.set(value + ((scoreReversed ? -1 : 1)));
-                    })
+                    .text(ScoreboardComponent.create(ComponentElement.create(viewer -> {
+                        TextProcessor processor = TextProcessor.mini();
+                        return processor.parse(viewer, "<impactor:account>");
+                    })))
+                    .score(Score.of(7))
+                    .updater(ScheduledUpdater.scheduler(Scheduler.ASYNCHRONOUS).repeating(Ticks.of(5)))
                     .build()
             )
+            .line(ScoreboardLine.builder().text(ScoreboardComponent.create(empty())).score(Score.of(6)).build())
             .line(ScoreboardLine.builder().text(ScoreboardComponent.create(empty())).score(Score.of(3)).build())
             .line(ScoreboardLine.builder()
                     .score(Score.of(2))

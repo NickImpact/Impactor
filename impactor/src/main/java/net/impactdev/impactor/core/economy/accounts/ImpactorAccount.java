@@ -40,6 +40,8 @@ import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransferTransaction;
 import net.impactdev.impactor.api.events.ImpactorEvent;
+import net.impactdev.impactor.api.scheduler.v2.Scheduler;
+import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.economy.EconomyConfig;
 import net.impactdev.impactor.core.economy.ImpactorEconomyService;
@@ -336,6 +338,7 @@ public final class ImpactorAccount implements Account {
         return EconomyTransaction.compose()
                 .account(this)
                 .type(EconomyTransactionType.RESET)
+                .amount(this.currency.defaultAccountBalance())
                 .build();
     }
 
@@ -346,7 +349,7 @@ public final class ImpactorAccount implements Account {
                             .account(this)
                             .currency(this.currency)
                             .amount(amount)
-                            .type(EconomyTransactionType.DEPOSIT);
+                            .type(EconomyTransactionType.RESET);
 
                     EconomyTransactionEvent.Pre pre = this.createAndFirePre(amount, EconomyTransactionType.RESET);
                     if(pre.cancelled()) {
@@ -360,7 +363,7 @@ public final class ImpactorAccount implements Account {
                         .currency(this.currency)
                         .account(this)
                         .amount(this.currency.defaultAccountBalance())
-                        .type(EconomyTransactionType.DEPOSIT)
+                        .type(EconomyTransactionType.RESET)
                         .result(EconomyResultType.FAILED)
                         .build()
         );
@@ -411,7 +414,7 @@ public final class ImpactorAccount implements Account {
                         p.newline();
                     });
 
-            Impactor.instance().scheduler().sync().execute(() -> printer.log(BaseImpactorPlugin.instance().logger(), PrettyPrinter.Level.ERROR));
+            Schedulers.require(Scheduler.SYNCHRONOUS).executor().execute(() -> printer.log(BaseImpactorPlugin.instance().logger(), PrettyPrinter.Level.ERROR));
             return fallback.get();
         }
     }
@@ -457,6 +460,8 @@ public final class ImpactorAccount implements Account {
     private EconomyTransaction createAndFirePost(EconomyTransaction transaction) throws PostResult.CompositeException {
         EconomyTransactionEvent.Post event = new ImpactorEconomyTransactionEvent.Post(transaction);
         this.postAndVerify(event);
+
+        ((ImpactorEconomyService) this.service).storage().logTransaction(transaction);
         return transaction;
     }
 

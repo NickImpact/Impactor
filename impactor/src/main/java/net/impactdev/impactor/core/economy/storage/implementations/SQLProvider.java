@@ -30,6 +30,7 @@ import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.currency.CurrencyProvider;
+import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.storage.connection.sql.SQLConnection;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
@@ -49,6 +50,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
@@ -218,6 +221,16 @@ public final class SQLProvider implements EconomyStorageImplementation {
 
             return null;
         });
+    }
+
+    @Override
+    public void logTransaction(EconomyTransaction transaction) throws Exception {
+
+    }
+
+    @Override
+    public void sync(Account account, Instant since) throws Exception {
+
     }
 
     @Override

@@ -10,8 +10,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.impactdev.impactor.fabric.FabricImpactorBootstrap",
-      "org.incendo.cloud.fabric.internal.LateRegistrationCatcher"
+      "net.impactdev.impactor.fabric.FabricImpactorBootstrap"
     ]
   },
   "mixins": [

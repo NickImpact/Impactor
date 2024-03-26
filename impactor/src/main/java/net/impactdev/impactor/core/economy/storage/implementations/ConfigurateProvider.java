@@ -27,15 +27,22 @@ package net.impactdev.impactor.core.economy.storage.implementations;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.currency.CurrencyProvider;
+import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
+import net.impactdev.impactor.api.economy.transactions.details.EconomyResultType;
+import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerService;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.storage.connection.configurate.ConfigurateLoader;
+import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.economy.accounts.ImpactorAccount;
 import net.impactdev.impactor.core.economy.storage.EconomyStorageImplementation;
@@ -45,20 +52,35 @@ import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.BasicConfigurationNode;
 import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class ConfigurateProvider implements EconomyStorageImplementation {
 
@@ -260,6 +282,123 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
     }
 
     @Override
+    public void logTransaction(EconomyTransaction transaction) throws Exception {
+        Account target = transaction.account();
+        Path accounts = this.root.resolve("accounts");
+        Path transactions = (target.virtual() ? Group.Virtual.transform(accounts) : Group.Users.transform(accounts))
+                .resolve(target.owner().toString().substring(0, 2))
+                .resolve("transactions");
+
+        DateTimeFormatter date = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
+        Path branch = transactions.resolve(date.format(transaction.timestamp()));
+        Path leaf = branch.resolve("transactions.log");
+
+        this.createDirectoriesIfNotExists(leaf.getParent());
+        ReentrantLock lock = Objects.requireNonNull(this.ioLocks.get(leaf));
+        lock.lock();
+
+        try {
+            ConfigurationNode node;
+            if(Files.exists(leaf)) {
+                node = this.loader.loader(leaf).load();
+            } else {
+                node = BasicConfigurationNode.root();
+            }
+
+            int id = node.node("transactions").getInt(0) + 1;
+            node.node("transactions").set(id);
+            node.node("" + id).node("currency").set(transaction.currency().key().asString());
+            node.node("" + id).node("type").set(transaction.type().name());
+            node.node("" + id).node("result").set(transaction.result().name());
+            node.node("" + id).node("amount").set(transaction.amount().doubleValue());
+            node.node("" + id).node("timestamp").set(transaction.timestamp());
+
+            this.loader.loader(leaf).save(node);
+        } catch (Exception e) {
+            ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void sync(Account account, Instant since) throws Exception {
+        Path accounts = this.root.resolve("accounts");
+        Path transactions = (account.virtual() ? Group.Virtual.transform(accounts) : Group.Users.transform(accounts))
+                .resolve(account.owner().toString().substring(0, 2))
+                .resolve("transactions");
+
+        DateTimeFormatter date = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
+        Files.walk(transactions)
+                .filter(Files::isRegularFile)
+                .filter(path -> {
+                    System.out.println("Reading path: " + path);
+                    String name = path.getParent().getFileName().toString();
+                    LocalDate timestamp = LocalDate.parse(name, date);
+
+                    LocalDate compare = LocalDate.ofInstant(since, ZoneId.systemDefault());
+                    return compare.isBefore(timestamp) || compare.isEqual(timestamp);
+                })
+                .map(path -> {
+                    ReentrantLock lock = Objects.requireNonNull(this.ioLocks.get(path));
+                    lock.lock();
+                    try {
+                        return this.loader.loader(path).load();
+                    } catch (Exception e) {
+                        ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);
+                        return null;
+                    } finally {
+                        lock.unlock();
+                    }
+                })
+                .filter(Objects::nonNull)
+                .map(node -> {
+                    NodeCollection collection = new NodeCollection();
+                    int count = node.node("transactions").getInt(0);
+                    for(int i = 0; i < count; i++) {
+                        try {
+                            ConfigurationNode target = node.node("" + (i + 1));
+                            Instant timestamp = target.node("timestamp").get(Instant.class);
+                            Currency currency = EconomyService.instance()
+                                    .currencies()
+                                    .currency(Key.key(target.node("currency").getString()))
+                                    .orElse(null);
+
+                            Preconditions.checkNotNull(timestamp);
+                            if(since.isBefore(timestamp) && currency != null && account.currency().equals(currency)) {
+                                collection.append(target);
+                            }
+                        }
+                        catch (SerializationException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    return collection;
+                })
+                .flatMap(collection -> collection.valid.stream())
+                .map(node -> {
+                    try {
+                        return new LoggedTransaction(
+                                EconomyService.instance()
+                                        .currencies()
+                                        .currency(Key.key(node.node("currency").getString()))
+                                        .orElse(null),
+                                BigDecimal.valueOf(node.node("amount").getDouble(0)),
+                                EconomyTransactionType.valueOf(node.node("type").getString()),
+                                EconomyResultType.valueOf(node.node("result").getString()),
+                                node.node("timestamp").get(Instant.class)
+                        );
+                    }
+                    catch (SerializationException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .sorted((a, b) -> b.timestamp.compareTo(a.timestamp))
+                .forEach(System.out::println);
+    }
+
+    @Override
     public boolean purge() throws Exception {
         FileUtils.cleanDirectory(this.root.toFile());
         return true;
@@ -313,5 +452,21 @@ public class ConfigurateProvider implements EconomyStorageImplementation {
             lock.unlock();
         }
     }
+
+    private static final class NodeCollection {
+        public final List<ConfigurationNode> valid = Lists.newArrayList();
+
+        public void append(ConfigurationNode node) {
+            this.valid.add(node);
+        }
+    }
+
+    private record LoggedTransaction(
+            Currency currency,
+            BigDecimal amount,
+            EconomyTransactionType type,
+            EconomyResultType result,
+            Instant timestamp
+    ) {}
 
 }

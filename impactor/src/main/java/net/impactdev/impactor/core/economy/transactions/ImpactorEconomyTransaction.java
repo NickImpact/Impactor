@@ -32,9 +32,11 @@ import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 import net.impactdev.impactor.api.utility.builders.Builder;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.function.Supplier;
 
 public record ImpactorEconomyTransaction(
@@ -43,6 +45,7 @@ public record ImpactorEconomyTransaction(
         BigDecimal amount,
         EconomyTransactionType type,
         EconomyResultType result,
+        Instant timestamp,
         Supplier<Component> message
 ) implements EconomyTransaction {
 
@@ -62,6 +65,7 @@ public record ImpactorEconomyTransaction(
         private BigDecimal amount;
         private EconomyTransactionType type;
         private EconomyResultType result;
+        private Instant timestamp = Instant.now();
         private Supplier<Component> message;
 
         public TransactionBuilder account(Account account) {
@@ -89,6 +93,11 @@ public record ImpactorEconomyTransaction(
             return this;
         }
 
+        public TransactionBuilder timestamp(Instant timestamp) {
+            this.timestamp = timestamp;
+            return this;
+        }
+
         public TransactionBuilder message(Supplier<Component> message) {
             this.message = message;
             return this;
@@ -96,12 +105,15 @@ public record ImpactorEconomyTransaction(
 
         @Override
         public ImpactorEconomyTransaction build() {
-            return new ImpactorEconomyTransaction(this.account,
+            return new ImpactorEconomyTransaction(
+                    this.account,
                     this.currency,
                     this.amount,
                     this.type,
                     this.result,
-                    this.message);
+                    this.timestamp,
+                    this.message
+            );
         }
     }
 }

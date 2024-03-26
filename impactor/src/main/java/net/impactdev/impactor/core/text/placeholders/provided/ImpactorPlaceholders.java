@@ -40,6 +40,7 @@ import net.impactdev.impactor.api.translations.metadata.LanguageInfo;
 import net.impactdev.impactor.api.utility.Context;
 import net.impactdev.impactor.core.economy.context.TransactionContext;
 import net.impactdev.impactor.core.economy.context.TransferTransactionContext;
+import net.impactdev.impactor.core.economy.placeholders.AccountPlaceholderParser;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.intellij.lang.annotations.Pattern;
@@ -105,27 +106,7 @@ public final class ImpactorPlaceholders {
     );
     public static final ImpactorPlaceholder ECONOMY_ACCOUNT = new ImpactorPlaceholder(
             impactor("account"),
-            (viewer, ctx) -> {
-                PlaceholderArguments arguments = ctx.require(PlaceholderArguments.class);
-                if(!arguments.hasNext()) {
-                    return empty();
-                }
-
-                Account account = ctx.require(Account.class);
-                String option = arguments.pop();
-                switch (option) {
-                    case "balance":
-                        // TODO - Argument support for short or long
-                        return account.currency().format(account.balance());
-                    case "name":
-                        PlatformSource source = PlatformSource.factory().fromID(account.owner());
-                        return source.name();
-                    case "uuid":
-                        return text(account.owner().toString());
-                }
-
-                return empty();
-            }
+            new AccountPlaceholderParser()
     );
     public static final ImpactorPlaceholder ECONOMY_CURRENCY = new ImpactorPlaceholder(
             impactor("currency"),

@@ -30,11 +30,11 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
-import net.impactdev.impactor.api.platform.Platform;
-import net.impactdev.impactor.api.platform.players.PlatformPlayerService;
+import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
+import net.impactdev.impactor.api.scheduler.v2.Scheduler;
+import net.impactdev.impactor.api.scheduler.v2.Schedulers;
 import net.impactdev.impactor.api.storage.Storage;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
@@ -42,7 +42,7 @@ import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.utility.future.ThrowingRunnable;
 import net.impactdev.impactor.core.utility.future.ThrowingSupplier;
 
-import java.util.Objects;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -121,6 +121,18 @@ public final class EconomyStorage implements Storage {
     }
 
     @CanIgnoreReturnValue
+    public CompletableFuture<Void> logTransaction(EconomyTransaction transaction) {
+//        return run(() -> this.implementation.logTransaction(transaction));
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @CanIgnoreReturnValue
+    public CompletableFuture<Void> sync(Account account, Instant since) {
+//        return run(() -> this.implementation.sync(account, since));
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @CanIgnoreReturnValue
     public CompletableFuture<Boolean> purge() {
         return supply(this.implementation::purge);
     }
@@ -136,7 +148,7 @@ public final class EconomyStorage implements Storage {
                 }
                 throw new CompletionException(e);
             }
-        }, Impactor.instance().scheduler().async());
+        }, Schedulers.require(Scheduler.ASYNCHRONOUS).executor());
     }
 
     private static <T> CompletableFuture<T> supply(ThrowingSupplier<T> supplier) {
@@ -150,33 +162,22 @@ public final class EconomyStorage implements Storage {
                 }
                 throw new CompletionException(e);
             }
-        }, Impactor.instance().scheduler().async());
+        }, Schedulers.require(Scheduler.ASYNCHRONOUS).executor());
     }
 
-    private static final class AccountKey {
-        private final Currency currency;
-        private final UUID owner;
-
-        public AccountKey(Currency currency, UUID owner) {
-            this.currency = currency;
-            this.owner = owner;
-        }
+    private record AccountKey(Currency currency, UUID owner) {
 
         public static AccountKey of(Currency currency, UUID owner) {
-            return new AccountKey(currency, owner);
-        }
+                return new AccountKey(currency, owner);
+            }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            AccountKey that = (AccountKey) o;
-            return currency.equals(that.currency) && owner.equals(that.owner);
-        }
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                AccountKey that = (AccountKey) o;
+                return currency.equals(that.currency) && owner.equals(that.owner);
+            }
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(currency, owner);
-        }
     }
 }

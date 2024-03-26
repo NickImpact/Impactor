@@ -68,7 +68,6 @@ public final class EconomyConfig {
     }));
     public static final ConfigKey<String> SQL_TABLE_PREFIX = notReloadable(stringKey("storage.table-prefix", "economy_"));
 
-
     public static final ConfigKey<Boolean> APPLY_RESTRICTIONS = booleanKey("restrictions.enabled", true);
     public static final ConfigKey<BigDecimal> MIN_BALANCE = key(adapter -> {
         double value = adapter.getDouble("restrictions.minimum-balance", 0.0);

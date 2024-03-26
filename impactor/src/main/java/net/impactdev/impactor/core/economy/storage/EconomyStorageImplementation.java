@@ -28,8 +28,11 @@ package net.impactdev.impactor.core.economy.storage;
 import com.google.common.collect.Multimap;
 import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
+import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.storage.connection.StorageConnection;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public interface EconomyStorageImplementation extends StorageConnection {
@@ -43,6 +46,10 @@ public interface EconomyStorageImplementation extends StorageConnection {
     void accounts(Multimap<Currency, Account> cache) throws Exception;
 
     void delete(Currency currency, UUID uuid) throws Exception;
+
+    void logTransaction(EconomyTransaction transaction) throws Exception;
+
+    void sync(Account account, Instant since) throws Exception;
 
     boolean purge() throws Exception;
 
