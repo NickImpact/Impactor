@@ -46,7 +46,7 @@ public class SparkPerformanceMonitor implements PerformanceMonitor {
     }
 
     @Override
-    public double averageTickDuration() {
+    public double impactor$averageTickDuration() {
         return Optional.ofNullable(this.api.mspt())
                 .map(stat -> stat.poll(StatisticWindow.MillisPerTick.MINUTES_1))
                 .map(DoubleAverageInfo::mean)

@@ -27,13 +27,12 @@ package net.impactdev.impactor.minecraft.items.stacks;
 
 import net.impactdev.impactor.api.items.ImpactorItemStack;
 import net.impactdev.impactor.api.items.builders.provided.BasicItemStackBuilder;
-import net.impactdev.impactor.api.items.properties.MetaFlag;
 import net.impactdev.impactor.api.items.properties.enchantments.Enchantment;
 import net.impactdev.impactor.api.items.types.ItemType;
+import net.impactdev.impactor.minecraft.api.items.AdventureTranslator;
 import net.impactdev.impactor.minecraft.api.items.ItemStackTranslator;
-import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.ServerProvider;
 import net.impactdev.impactor.minecraft.items.ImpactorItemType;
-import net.impactdev.impactor.minecraft.api.key.ResourceKeyTranslator;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.BinaryTagType;
@@ -51,9 +50,10 @@ import net.kyori.adventure.nbt.LongBinaryTag;
 import net.kyori.adventure.nbt.ShortBinaryTag;
 import net.kyori.adventure.nbt.StringBinaryTag;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.minecraft.core.Registry;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.ByteTag;
 import net.minecraft.nbt.CompoundTag;
@@ -68,14 +68,19 @@ import net.minecraft.nbt.ShortTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.TagType;
-import net.minecraft.nbt.TagTypes;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.item.component.Unbreakable;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -88,78 +93,86 @@ public final class ImpactorItemStackTranslator implements ItemStackTranslator {
     }
 
     public ItemStack translate(ImpactorItemStack stack) {
+        AdventureTranslator translator = AdventureTranslator.get();
+        AdventureTranslator.Server serverTranslator = AdventureTranslator.Server.get(ServerProvider.server());
+
         ItemLike like = ((ImpactorItemType)stack.type()).minecraft().orElse(null);
         ItemStack result = new ItemStack(like);
         result.setCount(stack.quantity());
         if(stack.title() != null) {
-            result.getOrCreateTagElement("display").putString("Name", GsonComponentSerializer.gson().serialize(stack.title()));
+            result.set(DataComponents.CUSTOM_NAME, serverTranslator.asNative(stack.title()));
         }
 
         if(!stack.lore().isEmpty()) {
-            ListTag lore = new ListTag();
+            List<net.minecraft.network.chat.Component> lore = new ArrayList<>();
             for (Component line : stack.lore()) {
-                lore.add(StringTag.valueOf(GsonComponentSerializer.gson().serialize(line)));
+                lore.add(serverTranslator.asNative(line));
             }
-            result.getOrCreateTagElement("display").put("Lore", lore);
+
+            result.set(DataComponents.LORE, new ItemLore(new ArrayList<>(), lore));
         }
 
         for(Enchantment enchantment : stack.enchantments()) {
-            net.minecraft.world.item.enchantment.Enchantment target = BuiltInRegistries.ENCHANTMENT.get(ResourceKeyTranslator.asResourceLocation(enchantment.type()));
-            result.enchant(target, enchantment.level());
+            ResourceLocation key = translator.asNative(enchantment.type());
+            MinecraftServer server = ServerProvider.server();
+
+            server.registries().compositeAccess().registry(Registries.ENCHANTMENT)
+                    .ifPresent(registry -> {
+                        result.enchant(registry.getHolder(key).orElseThrow(), enchantment.level());
+                    });
         }
 
         if(stack.unbreakable()) {
-            result.getOrCreateTag().putBoolean("Unbreakable", true);
+            result.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
         }
 
-        int flags = 0;
-        for(MetaFlag flag : stack.flags()) {
-            flags |= (1 << flag.ordinal());
-        }
-        result.getOrCreateTag().putInt("HideFlags", flags);
+        if(stack.nbt() != null) {
+            CompoundTag nbt = new CompoundTag();
+            translateNBT(nbt, stack.nbt());
 
-        translateNBT(result.getOrCreateTag(), stack.nbt());
+            result.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
+        }
+
         return result;
     }
 
     @Override
     public ImpactorItemStack from(ItemStack stack) {
-        Key key = ResourceKeyTranslator.toAdventure(BuiltInRegistries.ITEM.getKey(stack.getItem()));
-        ItemType type = ItemType.from(key);
+        AdventureTranslator translator = AdventureTranslator.get();
+        AdventureTranslator.Server server = AdventureTranslator.Server.get(ServerProvider.server());
 
-        CompoundTag nbt = stack.getOrCreateTag();
-        @Nullable ListTag lore = Optional.of(nbt.getCompound("display"))
-                .filter(compound -> !compound.isEmpty())
-                .map(display -> display.getList("Lore", Tag.TAG_STRING))
-                .filter(list -> !list.isEmpty())
-                .orElse(null);
+        Key key = translator.asAdventure(BuiltInRegistries.ITEM.getKey(stack.getItem()));
+        ItemType type = ItemType.from(key);
 
         BasicItemStackBuilder builder = ImpactorItemStack.basic()
                 .type(type)
-                .title(AdventureTranslator.fromNative(stack.getHoverName()))
-                .quantity(stack.getCount())
-                .nbt(this.translateNativeNBT(nbt));
+                .title(server.asAdventure(stack.getHoverName()))
+                .quantity(stack.getCount());
 
+        CustomData custom = stack.get(DataComponents.CUSTOM_DATA);
+        if(custom != null) {
+            builder.nbt(this.translateNativeNBT(custom.copyTag()));
+        }
+
+        ItemLore lore = stack.get(DataComponents.LORE);
         if(lore != null) {
-            builder.lore(lore.stream()
-                    .map(tag -> GsonComponentSerializer.gson().deserialize(tag.getAsString()))
-                    .collect(Collectors.toList())
-            );
+            builder.lore(lore.styledLines().stream().map(server::asAdventure).collect(Collectors.toList()));
         }
 
-        builder.unbreakable(nbt.getBoolean("Unbreakable"));
-        int flags = nbt.getInt("HideFlags");
-        for(MetaFlag flag : MetaFlag.values()) {
-            if((flags & (1 << flag.ordinal())) == 1) {
-                builder.hide(flag);
-            }
+        builder.unbreakable(stack.has(DataComponents.UNBREAKABLE));
+
+        ItemEnchantments enchantments = stack.get(DataComponents.ENCHANTMENTS);
+        if(enchantments != null) {
+            enchantments.entrySet().forEach(entry -> {
+                Holder<net.minecraft.world.item.enchantment.Enchantment> enchantment = entry.getKey();
+                int level = entry.getIntValue();
+
+                Key target = translator.asAdventure(enchantment.unwrapKey().orElseThrow().location());
+
+                builder.enchantment(Enchantment.create(target, level));
+            });
         }
 
-        ListTag enchantments = stack.getEnchantmentTags();
-        for(Tag tag : enchantments) {
-            CompoundTag compound = (CompoundTag) tag;
-            builder.enchantment(Enchantment.create(Key.key(compound.getString("id")), compound.getInt("lvl")));
-        }
         return builder.build();
     }
 

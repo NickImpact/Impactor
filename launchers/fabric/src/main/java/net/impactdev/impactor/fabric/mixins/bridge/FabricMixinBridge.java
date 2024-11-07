@@ -27,7 +27,8 @@ package net.impactdev.impactor.fabric.mixins.bridge;
 
 import net.impactdev.impactor.fabric.mixins.elements.networking.ClientboundSetObjectivePacketAccessor;
 import net.impactdev.impactor.fabric.mixins.elements.networking.ClientboundSetPlayerTeamPacketParametersAccessor;
-import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.ServerProvider;
 import net.impactdev.impactor.minecraft.mixins.MixinBridge;
 import net.kyori.adventure.text.Component;
 import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket;
@@ -37,13 +38,17 @@ public final class FabricMixinBridge implements MixinBridge {
     @Override
     public void setObjectiveTitle(ClientboundSetObjectivePacket source, Component component) {
         ClientboundSetObjectivePacketAccessor accessor = (ClientboundSetObjectivePacketAccessor) source;
-        accessor.impactor$title(AdventureTranslator.toNative(component));
+
+        AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
+        accessor.impactor$title(translator.asNative(component));
     }
 
     @Override
     public void setPlayerTeamPrefix(ClientboundSetPlayerTeamPacket source, Component component) {
         ClientboundSetPlayerTeamPacket.Parameters parameters = source.getParameters().get();
         ClientboundSetPlayerTeamPacketParametersAccessor accessor = (ClientboundSetPlayerTeamPacketParametersAccessor) parameters;
-        accessor.impactor$prefix(AdventureTranslator.toNative(component));
+
+        AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
+        accessor.impactor$prefix(translator.asNative(component));
     }
 }

@@ -33,7 +33,10 @@ import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.currency.CurrencyProvider;
 import net.impactdev.impactor.api.storage.StorageType;
 import net.impactdev.impactor.api.utility.ExceptionPrinter;
+import net.impactdev.impactor.core.economy.accounts.AccountManager;
 import net.impactdev.impactor.core.economy.currency.ImpactorCurrencyProvider;
+import net.impactdev.impactor.core.economy.networking.EconomyNetworkingService;
+import net.impactdev.impactor.core.economy.networking.NetworkingFactory;
 import net.impactdev.impactor.core.economy.storage.EconomyStorage;
 import net.impactdev.impactor.core.economy.storage.StorageFactory;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
@@ -45,6 +48,8 @@ import java.util.concurrent.CompletableFuture;
 public final class ImpactorEconomyService implements EconomyService {
 
     private final CurrencyProvider provider;
+    private final AccountManager manager;
+    private final EconomyNetworkingService networking;
     private final EconomyStorage storage;
     private final Config config;
 
@@ -62,6 +67,8 @@ public final class ImpactorEconomyService implements EconomyService {
 
         this.provider = new ImpactorCurrencyProvider(currencies);
         this.storage = StorageFactory.instance(BaseImpactorPlugin.instance(), this.config, StorageType.JSON);
+        this.manager = new AccountManager(this.storage);
+        this.networking = new NetworkingFactory(BaseImpactorPlugin.instance(), this).create(this.manager);
 
         try {
             this.storage.init();
@@ -84,6 +91,14 @@ public final class ImpactorEconomyService implements EconomyService {
         return this.storage;
     }
 
+    public AccountManager manager() {
+        return this.manager;
+    }
+
+    public EconomyNetworkingService networking() {
+        return this.networking;
+    }
+
     public Config config() {
         return this.config;
     }
@@ -95,7 +110,7 @@ public final class ImpactorEconomyService implements EconomyService {
 
     @Override
     public CompletableFuture<Account> account(Currency currency, UUID uuid) {
-        return this.storage.account(currency, uuid, builder -> builder);
+        return this.manager.account(uuid, currency);
     }
 
     @Override

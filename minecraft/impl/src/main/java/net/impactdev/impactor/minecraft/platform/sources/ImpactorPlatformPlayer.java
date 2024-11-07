@@ -35,12 +35,13 @@ import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.sources.SourceType;
 import net.impactdev.impactor.api.platform.sources.metadata.MetadataKeys;
 import net.impactdev.impactor.core.platform.sources.ImpactorPlatformSource;
+import net.impactdev.impactor.core.translations.locale.LocaleCache;
+import net.impactdev.impactor.minecraft.api.items.AdventureTranslator;
 import net.impactdev.impactor.minecraft.api.items.ItemStackTranslator;
+import net.impactdev.impactor.minecraft.api.items.ServerProvider;
 import net.impactdev.impactor.minecraft.items.transactions.ImpactorItemTransaction;
 import net.impactdev.impactor.minecraft.platform.GamePlatform;
-import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
 import net.impactdev.impactor.minecraft.utility.RandomProvider;
-import net.impactdev.impactor.minecraft.api.key.ResourceKeyTranslator;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.inventory.Book;
@@ -54,7 +55,6 @@ import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.TitlePart;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.network.protocol.game.ClientboundOpenBookPacket;
@@ -70,6 +70,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
@@ -79,6 +80,7 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector2d;
 import org.spongepowered.math.vector.Vector3d;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -92,10 +94,11 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
 
     public ImpactorPlatformPlayer(UUID uuid) {
         super(uuid, SourceType.PLAYER);
+        AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
 
         this.offer(MetadataKeys.DISPLAY_NAME, () -> this.asMinecraftPlayer()
                 .map(Entity::getCustomName)
-                .map(AdventureTranslator::fromNative)
+                .map(translator::asAdventure)
                 .orElse(Component.text("Unknown"))
         );
         this.offer(MetadataKeys.POSITION, () -> this.asMinecraftPlayer()
@@ -130,9 +133,11 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
 
     @Override
     public Component name() {
+        AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
+
         return this.asMinecraftPlayer()
                 .map(Player::getName)
-                .map(AdventureTranslator::fromNative)
+                .map(translator::asAdventure)
                 .orElseGet(() -> this.profile()
                         .map(GameProfile::getName)
                         .map(Component::text)
@@ -188,9 +193,18 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
     }
 
     @Override
+    public Locale locale() {
+        return this.asMinecraftPlayer()
+                .map(player -> LocaleCache.getLocale(player.clientInformation().language()))
+                .orElse(Locale.getDefault());
+    }
+
+    @Override
     public void sendMessage(@NotNull Identity source, @NotNull Component message, @NotNull MessageType type) {
+        AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
+
         Component translated = GlobalTranslator.render(message, this.locale());
-        net.minecraft.network.chat.Component vanilla = AdventureTranslator.toNative(translated);
+        net.minecraft.network.chat.Component vanilla = translator.asNative(translated);
 
 //        this.asMinecraftPlayer().ifPresent(target -> target.sendMessage(vanilla, ChatTypeMapping.mapping(type), source.uuid()));
         this.asMinecraftPlayer().ifPresent(target -> target.sendSystemMessage(vanilla));
@@ -207,6 +221,8 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
 
     @Override
     public <T> void sendTitlePart(@NotNull TitlePart<T> part, @NotNull T value) {
+        AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
+
         this.asMinecraftPlayer().ifPresent(target -> {
             if(part == TitlePart.TIMES) {
                 final Title.Times times = (Title.Times) value;
@@ -218,11 +234,11 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
             } else {
                 if(part == TitlePart.TITLE) {
                     target.connection.send(new ClientboundSetTitleTextPacket(
-                            AdventureTranslator.toNative((Component) value)
+                            translator.asNative((Component) value)
                     ));
                 } else {
                     target.connection.send(new ClientboundSetSubtitleTextPacket(
-                            AdventureTranslator.toNative((Component) value)
+                            translator.asNative((Component) value)
                     ));
                 }
             }
@@ -236,14 +252,16 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
 
     @Override
     public void playSound(@NotNull Sound sound, double x, double y, double z) {
+        AdventureTranslator translator = AdventureTranslator.get();
+
         this.asMinecraftPlayer().ifPresent(target -> {
             final Optional<Holder.Reference<SoundEvent>> reference = BuiltInRegistries.SOUND_EVENT.holders()
-                    .filter(event -> event.is(ResourceKeyTranslator.asResourceLocation(sound.name())))
+                    .filter(event -> event.is(translator.asNative(sound.name())))
                     .findFirst();
 
             reference.ifPresent(soundEventReference -> target.connection.send(new ClientboundSoundPacket(
                     soundEventReference,
-                    AdventureTranslator.asVanilla(sound.source()),
+                    SoundSource.valueOf(sound.source().name()),
                     x,
                     y,
                     z,
@@ -256,9 +274,11 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
 
     @Override
     public void playSound(@NotNull Sound sound, Sound.@NotNull Emitter emitter) {
+        AdventureTranslator translator = AdventureTranslator.get();
+
         this.asMinecraftPlayer().ifPresent(target -> {
             final Optional<Holder.Reference<SoundEvent>> reference = BuiltInRegistries.SOUND_EVENT.holders()
-                    .filter(event -> event.is(ResourceKeyTranslator.asResourceLocation(sound.name())))
+                    .filter(event -> event.is(translator.asNative(sound.name())))
                     .findFirst();
 
             if(reference.isPresent()) {
@@ -275,7 +295,7 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
 
                 target.connection.send(new ClientboundSoundEntityPacket(
                         reference.get(),
-                        AdventureTranslator.asVanilla(sound.source()),
+                        SoundSource.valueOf(sound.source().name()),
                         tracked,
                         sound.volume(),
                         sound.pitch(),
@@ -287,41 +307,18 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
 
     @Override
     public void stopSound(@NotNull SoundStop stop) {
+        AdventureTranslator translator = AdventureTranslator.get();
+
         this.asMinecraftPlayer().ifPresent(target -> {
-            target.connection.send(new ClientboundStopSoundPacket(ResourceKeyTranslator.asResourceLocationNullable(stop.sound()), AdventureTranslator.asVanillaNullable(stop.source())));
+            target.connection.send(new ClientboundStopSoundPacket(
+                    stop.sound() != null ? translator.asNative(stop.sound()) : null,
+                    stop.source() != null ? SoundSource.valueOf(stop.source().name()) : null
+            ));
         });
     }
 
     private net.minecraft.network.chat.Component toVanillaComponent(@NotNull Component message) {
-        return AdventureTranslator.toNative(GlobalTranslator.render(message, this.locale()));
+        AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
+        return translator.asNative(GlobalTranslator.render(message, this.locale()));
     }
-
-//    private enum ChatTypeMapping {
-//        CHAT(ChatType.CHAT, MessageType.CHAT),
-//        SYSTEM(ChatType.SYSTEM, MessageType.SYSTEM);
-//
-//        private final ChatType minecraft;
-//        private final MessageType adventure;
-//
-//        ChatTypeMapping(final ChatType minecraft, final MessageType adventure) {
-//            this.minecraft = minecraft;
-//            this.adventure = adventure;
-//        }
-//
-//        public static ChatType mapping(MessageType type) {
-//            return Arrays.stream(values())
-//                    .filter(m -> m.adventure.equals(type))
-//                    .map(m -> m.minecraft)
-//                    .findFirst()
-//                    .orElseThrow(() -> new IllegalArgumentException("Invalid message type"));
-//        }
-//
-//        public ChatType minecraft() {
-//            return this.minecraft;
-//        }
-//
-//        public MessageType adventure() {
-//            return this.adventure;
-//        }
-//    }
 }

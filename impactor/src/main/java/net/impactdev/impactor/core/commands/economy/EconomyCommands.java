@@ -106,6 +106,9 @@ public final class EconomyCommands {
                 ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
             } else {
                 ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
+                if(service instanceof ImpactorEconomyService impactor) {
+                    impactor.networking().publishTransaction(transaction);
+                }
             }
         });
 
@@ -137,6 +140,9 @@ public final class EconomyCommands {
                 ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
             } else {
                 ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
+                if(service instanceof ImpactorEconomyService impactor) {
+                    impactor.networking().publishTransaction(transaction);
+                }
             }
         });
     }
@@ -166,6 +172,9 @@ public final class EconomyCommands {
                 ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
             } else {
                 ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
+                if(service instanceof ImpactorEconomyService impactor) {
+                    impactor.networking().publishTransaction(transaction);
+                }
             }
         });
 
@@ -195,6 +204,9 @@ public final class EconomyCommands {
                 ImpactorTranslations.ECONOMY_TRANSACTION_FAILED.send(source, context);
             } else {
                 ImpactorTranslations.ECONOMY_TRANSACTION.send(source, context);
+                if(service instanceof ImpactorEconomyService impactor) {
+                    impactor.networking().publishTransaction(transaction);
+                }
             }
         });
     }
@@ -269,6 +281,9 @@ public final class EconomyCommands {
                 context.append(BigDecimal.class, total);
 
                 ImpactorTranslations.ECONOMY_RECEIVE_PAYMENT.send(target, context);
+                if(service instanceof ImpactorEconomyService impactor) {
+                    impactor.networking().publishTransaction(transaction);
+                }
             }
         });
     }

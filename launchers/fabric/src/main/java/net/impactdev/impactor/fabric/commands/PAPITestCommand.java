@@ -29,7 +29,8 @@ import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.Placeholders;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.fabric.FabricImpactorBootstrap;
-import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.ServerProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import org.incendo.cloud.annotation.specifier.Greedy;
@@ -52,7 +53,9 @@ public final class PAPITestCommand {
 
         Component input = Component.literal(placeholder);
         Component result = Placeholders.parseText(input, PlaceholderContext.of(minecraft));
-        source.sendMessage(AdventureTranslator.fromNative(result));
+
+        AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
+        source.sendMessage(translator.asAdventure(result));
     }
 
 }

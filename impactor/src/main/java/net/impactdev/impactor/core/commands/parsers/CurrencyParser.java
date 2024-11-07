@@ -92,7 +92,7 @@ public final class CurrencyParser implements ArgumentParser<CommandSource, Curre
                 }
             });
 
-            return results.stream().map(Suggestion::simple).toList();
+            return results.stream().map(Suggestion::suggestion).toList();
         });
     }
 }

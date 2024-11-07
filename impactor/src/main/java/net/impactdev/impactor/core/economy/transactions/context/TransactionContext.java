@@ -23,15 +23,29 @@
  *
  */
 
-package net.impactdev.impactor.forge.mixins.core;
+package net.impactdev.impactor.core.economy.transactions.context;
 
-import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import net.impactdev.impactor.api.economy.currency.Currency;
+import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
+import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 
-@Mixin(ServerboundClientInformationPacket.class)
-public interface ServerboundClientInformationPacketAccessor {
+import java.math.BigDecimal;
+import java.util.UUID;
 
-    @Accessor("language") String impactor$accessor$language();
+public record TransactionContext(
+        Currency currency,
+        UUID account,
+        EconomyTransactionType type,
+        BigDecimal amount
+) {
+
+    public static TransactionContext from(final EconomyTransaction transaction) {
+        return new TransactionContext(
+                transaction.currency(),
+                transaction.account().owner(),
+                transaction.type(),
+                transaction.amount()
+        );
+    }
 
 }

@@ -5,8 +5,6 @@
   "minVersion": "0.8",
   "mixins": [
     "core.MinecraftServerMixin",
-    "core.ServerboundClientInformationPacketAccessor",
-    "core.ServerPlayerMixin",
     "networking.ClientboundSetObjectivePacketAccessor",
     "networking.ClientboundSetPlayerTeamPacketParametersAccessor"
   ],

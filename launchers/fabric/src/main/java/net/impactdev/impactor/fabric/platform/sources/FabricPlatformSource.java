@@ -29,7 +29,8 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.sources.SourceType;
 import net.impactdev.impactor.core.platform.sources.ImpactorPlatformSource;
 import net.impactdev.impactor.fabric.platform.FabricPlatform;
-import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.ServerProvider;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
@@ -45,6 +46,8 @@ public final class FabricPlatformSource extends ImpactorPlatformSource {
     @Override
     public void sendMessage(@NotNull Identity source, @NotNull Component message, @NotNull MessageType type) {
         FabricPlatform platform = (FabricPlatform) Impactor.instance().platform();
-        platform.server().sendSystemMessage(AdventureTranslator.toNative(message));
+
+        AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
+        platform.server().sendSystemMessage(translator.asNative(message));
     }
 }

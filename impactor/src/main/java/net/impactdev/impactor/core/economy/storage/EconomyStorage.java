@@ -25,8 +25,6 @@
 
 package net.impactdev.impactor.core.economy.storage;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -46,18 +44,13 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.TimeUnit;
 
 public final class EconomyStorage implements Storage {
 
     private final EconomyStorageImplementation implementation;
-    private final Cache<AccountKey, Account> accounts;
 
     public EconomyStorage(EconomyStorageImplementation implementation) {
         this.implementation = implementation;
-        this.accounts = Caffeine.newBuilder()
-                .expireAfterAccess(1, TimeUnit.HOURS)
-                .build();
     }
 
     @Override
@@ -77,26 +70,12 @@ public final class EconomyStorage implements Storage {
 
     @CanIgnoreReturnValue
     public CompletableFuture<Boolean> hasAccount(Currency currency, UUID uuid) {
-        if(this.accounts.getIfPresent(AccountKey.of(currency, uuid)) != null) {
-            return CompletableFuture.completedFuture(true);
-        }
-
         return supply(() -> this.implementation.hasAccount(currency, uuid));
     }
 
     @CanIgnoreReturnValue
     public CompletableFuture<Account> account(Currency currency, UUID uuid, Account.AccountModifier modifier) {
-        Account account = this.accounts.getIfPresent(AccountKey.of(currency, uuid));
-        if(account != null) {
-            return CompletableFuture.completedFuture(account);
-        }
-
-        return supply(() -> {
-            Account result = this.implementation.account(currency, uuid, modifier);
-            this.accounts.put(AccountKey.of(currency, uuid), result);
-
-            return result;
-        });
+        return supply(() -> this.implementation.account(currency, uuid, modifier));
     }
 
     @CanIgnoreReturnValue
@@ -107,17 +86,12 @@ public final class EconomyStorage implements Storage {
     @CanIgnoreReturnValue
     public CompletableFuture<Multimap<Currency, Account>> accounts() {
         Multimap<Currency, Account> results = ArrayListMultimap.create();
-        this.accounts.asMap().forEach((key, account) -> results.put(key.currency, account));
-
         return run(() -> this.implementation.accounts(results)).thenApply(ignore -> results);
     }
 
     @CanIgnoreReturnValue
     public CompletableFuture<Void> delete(Currency currency, UUID uuid) {
-        return run(() -> {
-            this.implementation.delete(currency, uuid);
-            this.accounts.invalidate(AccountKey.of(currency, uuid));
-        });
+        return run(() -> this.implementation.delete(currency, uuid));
     }
 
     @CanIgnoreReturnValue
@@ -163,21 +137,5 @@ public final class EconomyStorage implements Storage {
                 throw new CompletionException(e);
             }
         }, Schedulers.require(Scheduler.ASYNCHRONOUS).executor());
-    }
-
-    private record AccountKey(Currency currency, UUID owner) {
-
-        public static AccountKey of(Currency currency, UUID owner) {
-                return new AccountKey(currency, owner);
-            }
-
-            @Override
-            public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-                AccountKey that = (AccountKey) o;
-                return currency.equals(that.currency) && owner.equals(that.owner);
-            }
-
     }
 }

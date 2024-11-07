@@ -20,7 +20,7 @@ dependencies {
     api(project(":api:text"))
     api(project(":api:translations"))
 
-    api("net.impactdev.impactor.api:commands:5.2.5+1.20.1-SNAPSHOT") {
+    api("net.impactdev.impactor.api:commands:5.3.0.1+1.21.1") {
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")
         exclude("net.impactdev.impactor.api", "players")
@@ -43,6 +43,9 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
 //    implementation("com.squareup.okio:okio:3.3.0")
+
+    // Networking
+    implementation("redis.clients:jedis:5.1.3")
 
     testImplementation("net.kyori:adventure-text-serializer-ansi:4.14.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")

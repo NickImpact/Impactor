@@ -56,6 +56,7 @@ import net.impactdev.impactor.core.utility.future.Futures;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.event.PostResult;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -111,6 +112,16 @@ public final class ImpactorAccount implements Account {
     @Override
     public @NotNull BigDecimal balance() {
         return this.balance;
+    }
+
+    @ApiStatus.Internal
+    void setViaNetworking(BigDecimal amount, EconomyTransactionType type) {
+        switch (type) {
+            case DEPOSIT -> this.balance = this.balance.add(amount);
+            case WITHDRAW -> this.balance = this.balance.subtract(amount);
+            case SET -> this.balance = amount;
+            case RESET -> this.balance = this.currency.defaultAccountBalance();
+        }
     }
 
     @Override

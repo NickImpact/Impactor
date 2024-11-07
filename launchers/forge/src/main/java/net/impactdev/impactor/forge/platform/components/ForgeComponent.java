@@ -27,8 +27,7 @@ package net.impactdev.impactor.forge.platform.components;
 
 import net.impactdev.impactor.api.platform.PlatformComponent;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
-import net.minecraftforge.versions.forge.ForgeVersion;
-import net.minecraftforge.versions.mcp.MCPVersion;
+import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;
 
 public class ForgeComponent implements PlatformComponent {
 
@@ -39,16 +38,12 @@ public class ForgeComponent implements PlatformComponent {
 
     @Override
     public String version() {
-        return ForgeVersion.getVersion();
-    }
-
-    private String mcp() {
-        return MCPVersion.getMCPVersion();
+        return NeoForgeVersion.getVersion();
     }
 
     @Override
     public void print(PrettyPrinter printer) {
-        printer.add("%s - %s (MCP %s)", this.name(), this.version(), this.mcp());
+        printer.add("%s - %s", this.name(), this.version());
     }
 
 }

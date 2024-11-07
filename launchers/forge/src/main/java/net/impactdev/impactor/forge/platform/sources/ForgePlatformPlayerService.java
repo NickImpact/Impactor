@@ -28,7 +28,7 @@ package net.impactdev.impactor.forge.platform.sources;
 import com.google.common.collect.ImmutableSet;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayerService;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.Set;
 import java.util.stream.Collectors;

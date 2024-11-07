@@ -27,11 +27,9 @@ package net.impactdev.impactor.core.text.placeholders.provided;
 
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.EconomyService;
-import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
-import net.impactdev.impactor.api.platform.players.PlatformPlayerService;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
 import net.impactdev.impactor.api.platform.sources.metadata.MetadataKeys;
 import net.impactdev.impactor.api.text.TextProcessor;
@@ -45,7 +43,6 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
-import org.spongepowered.math.vector.Vector3d;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -89,7 +86,7 @@ public final class ImpactorPlaceholders {
     );
     public static final ImpactorPlaceholder MSPT = new ImpactorPlaceholder(
             impactor("mspt"),
-            (viewer, ctx) -> text(THREE_DECIMALS.format(Impactor.instance().platform().performance().averageTickDuration()))
+            (viewer, ctx) -> text(THREE_DECIMALS.format(Impactor.instance().platform().performance().impactor$averageTickDuration()))
     );
 
     public static final ImpactorPlaceholder MEMORY_USAGE = new ImpactorPlaceholder(

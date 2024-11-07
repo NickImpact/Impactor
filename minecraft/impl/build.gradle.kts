@@ -11,12 +11,6 @@ repositories {
     maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
-
 minecraft {
     version("${rootProject.property("minecraft")}")
 }
@@ -26,10 +20,10 @@ dependencies {
     api(project(":impactor"))
     api(project(":minecraft:api"))
 
-    testImplementation("net.kyori:adventure-text-serializer-ansi:4.14.0")
+    testImplementation("net.kyori:adventure-text-serializer-ansi:4.17.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
-    testImplementation("net.kyori:adventure-text-logger-slf4j:4.14.0")
+    testImplementation("net.kyori:adventure-text-logger-slf4j:4.17.0")
 }
 
 publishing {

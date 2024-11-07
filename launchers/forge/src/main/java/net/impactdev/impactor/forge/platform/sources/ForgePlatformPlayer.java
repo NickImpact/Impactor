@@ -28,7 +28,7 @@ package net.impactdev.impactor.forge.platform.sources;
 import net.impactdev.impactor.core.translations.locale.LocaleProvider;
 import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -38,14 +38,6 @@ public final class ForgePlatformPlayer extends ImpactorPlatformPlayer {
 
     public ForgePlatformPlayer(UUID uuid) {
         super(uuid);
-    }
-
-    @Override
-    public Locale locale() {
-        return this.asMinecraftPlayer()
-                .map(player -> (LocaleProvider) player)
-                .map(LocaleProvider::locale)
-                .orElse(Locale.getDefault());
     }
 
     @Override

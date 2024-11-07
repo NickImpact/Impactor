@@ -31,7 +31,8 @@ import net.impactdev.impactor.api.scoreboards.AssignedScoreboard;
 import net.impactdev.impactor.api.scoreboards.ScoreboardRenderer;
 import net.impactdev.impactor.api.scoreboards.lines.ScoreboardLine;
 import net.impactdev.impactor.api.scoreboards.objectives.Objective;
-import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.ServerProvider;
 import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
 import net.impactdev.impactor.minecraft.mixins.MixinBridge;
 import net.impactdev.impactor.minecraft.scoreboard.assigned.ScoreboardComponents;
@@ -42,11 +43,11 @@ import net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket;
 import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket;
 import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket;
 import net.minecraft.network.protocol.game.ClientboundSetScorePacket;
-import net.minecraft.server.ServerScoreboard;
+import net.minecraft.world.scores.DisplaySlot;
 import net.minecraft.world.scores.PlayerTeam;
-import net.minecraft.world.scores.Scoreboard;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PacketBasedRenderer implements ScoreboardRenderer {
@@ -69,13 +70,14 @@ public class PacketBasedRenderer implements ScoreboardRenderer {
 
     private void applyLineTextToPacket(AssignedScoreboard scoreboard, ScoreboardLine.Displayed line, PlayerTeam team, boolean create) {
         final ClientboundSetPlayerTeamPacket update = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, create);
-        Impactor.instance().factories().provide(MixinBridge.class).setPlayerTeamPrefix(update, line.text());
 
+        AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
         final ClientboundSetScorePacket score = new ClientboundSetScorePacket(
-                ServerScoreboard.Method.CHANGE,
-                ScoreboardComponents.OBJECTIVE_NAME,
                 ScoreboardComponents.fakeName(line.require(TEAM_INDEX)),
-                line.score().value()
+                ScoreboardComponents.OBJECTIVE_NAME,
+                line.score().value(),
+                Optional.of(translator.asNative(line.text())),
+                Optional.empty()
         );
 
         this.publish(scoreboard.viewer(), update, score);
@@ -84,7 +86,7 @@ public class PacketBasedRenderer implements ScoreboardRenderer {
     @Override
     public void show(AssignedScoreboard scoreboard) {
         ClientboundSetObjectivePacket create = new ClientboundSetObjectivePacket(ScoreboardComponents.OBJECTIVE, 0);
-        ClientboundSetDisplayObjectivePacket display = new ClientboundSetDisplayObjectivePacket(Scoreboard.DISPLAY_SLOT_SIDEBAR, ScoreboardComponents.OBJECTIVE);
+        ClientboundSetDisplayObjectivePacket display = new ClientboundSetDisplayObjectivePacket(DisplaySlot.SIDEBAR, ScoreboardComponents.OBJECTIVE);
 
         this.publish(scoreboard.viewer(), create, display);
 

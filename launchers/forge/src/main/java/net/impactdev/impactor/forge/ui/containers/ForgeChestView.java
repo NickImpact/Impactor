@@ -32,7 +32,8 @@ import net.impactdev.impactor.api.ui.containers.Icon;
 import net.impactdev.impactor.api.ui.containers.views.ChestView;
 import net.impactdev.impactor.forge.ui.gooey.GooeyIcon;
 import net.impactdev.impactor.forge.ui.gooey.GooeyPageOpenCloser;
-import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.ServerProvider;
 import net.impactdev.impactor.minecraft.ui.containers.views.chests.ImpactorChestView;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,9 +51,10 @@ public final class ForgeChestView extends ImpactorChestView implements GooeyPage
             template.set(slot, new GooeyIcon(icon));
         });
 
+        AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
         this.delegate = GooeyPage.builder()
                 .template(this.template = template.build())
-                .title(AdventureTranslator.toNative(this.title()))
+                .title(translator.asNative(this.title()))
 //                .onClose(action -> view.) // TODO - Add this back to Impactor API, add onClick to Gooey
                 .build();
     }

@@ -27,10 +27,10 @@ package net.impactdev.impactor.fabric;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.impactdev.impactor.fabric.commands.FabricCommandManager;
 import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
+import net.impactdev.impactor.minecraft.api.items.ServerProvider;
 import net.minecraft.server.MinecraftServer;
 import org.apache.logging.log4j.LogManager;
 
@@ -63,7 +63,7 @@ public final class FabricImpactorBootstrap extends ImpactorBootstrapper implemen
     }
 
     private void onServerStarting(MinecraftServer server) {
-        this.server = server;
+        ServerProvider.server = this.server = server;
         this.setup();
         this.plugin.starting();
     }

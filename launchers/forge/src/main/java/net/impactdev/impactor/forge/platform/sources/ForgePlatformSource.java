@@ -27,11 +27,12 @@ package net.impactdev.impactor.forge.platform.sources;
 
 import net.impactdev.impactor.api.platform.sources.SourceType;
 import net.impactdev.impactor.core.platform.sources.ImpactorPlatformSource;
-import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.ServerProvider;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -44,6 +45,7 @@ public final class ForgePlatformSource extends ImpactorPlatformSource {
 
     @Override
     public void sendMessage(@NotNull Identity source, @NotNull Component message, @NotNull MessageType type) {
-        ServerLifecycleHooks.getCurrentServer().sendSystemMessage(AdventureTranslator.toNative(message));
+        AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
+        ServerLifecycleHooks.getCurrentServer().sendSystemMessage(translator.asNative(message));
     }
 }

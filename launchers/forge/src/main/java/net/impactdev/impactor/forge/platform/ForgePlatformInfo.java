@@ -33,10 +33,9 @@ import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.platform.ImpactorPlatformInfo;
 import net.impactdev.impactor.forge.platform.components.ForgeComponent;
 import net.impactdev.impactor.forge.platform.components.ForgeMinecraftComponent;
-import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
-import net.minecraftforge.forgespi.language.IModInfo;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforgespi.language.IModInfo;
 
 import java.util.List;
 import java.util.Optional;

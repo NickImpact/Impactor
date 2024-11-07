@@ -25,6 +25,7 @@
 
 package net.impactdev.impactor.fabric.platform.sources;
 
+import net.impactdev.impactor.core.translations.locale.LocaleCache;
 import net.impactdev.impactor.core.translations.locale.LocaleProvider;
 import net.impactdev.impactor.fabric.FabricImpactorBootstrap;
 import net.impactdev.impactor.minecraft.platform.sources.ImpactorPlatformPlayer;
@@ -38,14 +39,6 @@ public class FabricPlatformPlayer extends ImpactorPlatformPlayer {
 
     public FabricPlatformPlayer(UUID uuid) {
         super(uuid);
-    }
-
-    @Override
-    public Locale locale() {
-        return this.asMinecraftPlayer()
-                .map(player -> (LocaleProvider) player)
-                .map(LocaleProvider::locale)
-                .orElse(Locale.getDefault());
     }
 
     @Override

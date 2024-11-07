@@ -25,12 +25,14 @@
 
 package net.impactdev.impactor.core.economy;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import net.impactdev.impactor.api.configuration.key.ConfigKey;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.storage.StorageCredentials;
 import net.impactdev.impactor.api.storage.StorageType;
+import net.impactdev.impactor.core.economy.networking.messenger.redis.RedisConfig;
 import net.kyori.adventure.key.Key;
 
 import java.math.BigDecimal;
@@ -80,6 +82,15 @@ public final class EconomyConfig {
     public static final ConfigKey<Boolean> ALLOW_TRANSFER_CROSS_CURRENCY = booleanKey("restrictions.allow-cross-currency-transfers", false);
     public static final ConfigKey<Boolean> ALLOW_TRANSFER_ON_NOT_SET = booleanKey("allow-transfer-for-not-set", false);
     public static final ConfigKey<Integer> MAX_BALTOP_ENTRIES = intKey("baltop.max-entries", 10);
+
+    public static final ConfigKey<String> MESSAGING_SERVICE = stringKey("messaging.service", "auto");
+    public static final ConfigKey<RedisConfig> REDIS = key(adapter -> new RedisConfig(
+            adapter.getBoolean("messaging.redis.enabled", false),
+            adapter.getStringList("messaging.redis.addresses", ImmutableList.of()),
+            adapter.getString("messaging.redis.username", "default"),
+            adapter.getString("messaging.redis.password", ""),
+            adapter.getBoolean("messaging.redis.ssl", false)
+    ));
 
     @SuppressWarnings("PatternValidation")
     public static final ConfigKey<List<Currency>> CURRENCIES = key(adapter -> {

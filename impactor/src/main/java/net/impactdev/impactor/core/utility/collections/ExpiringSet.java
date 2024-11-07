@@ -23,29 +23,36 @@
  *
  */
 
-package net.impactdev.impactor.minecraft.api.key;
+package net.impactdev.impactor.core.utility.collections;
 
-import net.kyori.adventure.key.Key;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.github.benmanes.caffeine.cache.Cache;
+import net.impactdev.impactor.core.utility.future.CaffeineFactory;
 
-public class ResourceKeyTranslator {
+import java.util.concurrent.TimeUnit;
 
-    public static @NotNull ResourceLocation asResourceLocation(@NotNull Key key) {
-        return new ResourceLocation(key.namespace(), key.value());
+public final class ExpiringSet<E> {
+
+    private final Cache<E, Long> cache;
+    private final long lifetime;
+
+    public ExpiringSet(long duration, TimeUnit unit) {
+        this.cache = CaffeineFactory.newBuilder().expireAfterWrite(duration, unit).build();
+        this.lifetime = unit.toMillis(duration);
     }
 
-    public static @Nullable ResourceLocation asResourceLocationNullable(@Nullable Key key) {
-        if(key == null) {
-            return null;
-        }
-
-        return asResourceLocation(key);
+    public boolean add(E item) {
+        boolean present = contains(item);
+        this.cache.put(item, System.currentTimeMillis() + lifetime);
+        return !present;
     }
 
-    public static @NotNull Key toAdventure(@NotNull ResourceLocation location) {
-        return Key.key(location.getNamespace(), location.getPath());
+    public boolean contains(E item) {
+        Long timeout = this.cache.getIfPresent(item);
+        return timeout != null && timeout > System.currentTimeMillis();
+    }
+
+    public void remove(E item) {
+        this.cache.invalidate(item);
     }
 
 }

@@ -36,6 +36,8 @@ include("impactor")
 include("minecraft:api")
 include("minecraft:impl")
 include("launchers:forge")
+findProject(":launchers:forge")?.name = "neoforge"
+
 include("launchers:fabric")
 
 // Integrations

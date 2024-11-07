@@ -101,7 +101,7 @@ public final class PlatformSourceParser implements
 
         return names.stream()
                 .filter(name -> name.toLowerCase().startsWith(input.peekString().toLowerCase()))
-                .map(Suggestion::simple)
+                .map(Suggestion::suggestion)
                 .collect(Collectors.toList());
     }
 

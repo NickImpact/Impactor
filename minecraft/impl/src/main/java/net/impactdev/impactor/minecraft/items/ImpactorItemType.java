@@ -44,7 +44,7 @@ public class ImpactorItemType implements ItemType {
 
     public Optional<Item> minecraft() {
         Registry<Item> registry = BuiltInRegistries.ITEM;
-        ResourceLocation location = new ResourceLocation(this.key.namespace() + ":" + this.key.value());
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(this.key.namespace(), this.key.value());
         return registry.getOptional(location);
     }
 

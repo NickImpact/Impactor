@@ -25,33 +25,31 @@
 
 package net.impactdev.impactor.forge;
 
-import ca.landonjw.gooeylibs2.bootstrap.GooeyBootstrapper;
-import ca.landonjw.gooeylibs2.forge.ForgeBootstrapper;
 import net.impactdev.impactor.api.logging.Log4jLogger;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
 import net.impactdev.impactor.core.plugin.ImpactorBootstrapper;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.impactdev.impactor.minecraft.api.items.ServerProvider;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
+import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import org.apache.logging.log4j.LogManager;
 
 @Mod("impactor")
 public final class ForgeImpactorBootstrap extends ImpactorBootstrapper {
 
-    public ForgeImpactorBootstrap() {
+    public ForgeImpactorBootstrap(IEventBus bus) {
         super(new Log4jLogger(LogManager.getLogger("Impactor")));
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onConstruct);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onDedicatedServerSetup);
-        MinecraftForge.EVENT_BUS.addListener(this::onServerShutdown);
-
-        GooeyBootstrapper bootstrapper = new ForgeBootstrapper();
-        bootstrapper.bootstrap();
+        bus.addListener(this::onConstruct);
+        bus.addListener(this::onClientSetup);
+        bus.addListener(this::onDedicatedServerSetup);
+        NeoForge.EVENT_BUS.addListener(this::onServerStarting);
+        NeoForge.EVENT_BUS.addListener(this::onServerShutdown);
     }
 
     @Override
@@ -69,6 +67,10 @@ public final class ForgeImpactorBootstrap extends ImpactorBootstrapper {
 
     public void onClientSetup(FMLClientSetupEvent event) {
         this.setup();
+    }
+
+    public void onServerStarting(ServerStartingEvent event) {
+        ServerProvider.server = event.getServer();
     }
 
     public void onServerShutdown(ServerStoppingEvent event) {

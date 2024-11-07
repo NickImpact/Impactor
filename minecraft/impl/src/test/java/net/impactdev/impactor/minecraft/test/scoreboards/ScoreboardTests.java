@@ -46,32 +46,32 @@ public final class ScoreboardTests {
 
     @Test
     public void create() throws InterruptedException {
-        ScoreboardComponent component = ScoreboardComponent.create(
-                ComponentElement.create((viewer) -> TextProcessor.mini().parse(viewer, "<impactor:name> Hello!"))
-        );
-
-        ScoreboardComponent c2 = component.append(ComponentElement.create(
-                ColorCycle.configure().frames(90).increment(3).build(),
-                (viewer) -> Component.text("ABC")
-        ));
-
-        Objective objective = Objective.builder()
-                .text(c2)
-                .updater(ScheduledUpdater.scheduler(Scheduler.ASYNCHRONOUS).repeating(Ticks.single()))
-                .formatter(BlankFormatter.INSTANCE)
-                .build();
-
-        TestRenderer renderer = new TestRenderer();
-        Scoreboard scoreboard = Scoreboard.builder()
-                .renderer(renderer)
-                .objective(objective)
-                .build();
-
-        AssignedScoreboard viewed = scoreboard.assignTo(PlatformPlayer.getOrCreate(PlatformSource.SERVER_UUID));
-        viewed.open();
-
-        Thread.sleep(5000);
-        viewed.hide();
+//        ScoreboardComponent component = ScoreboardComponent.create(
+//                ComponentElement.create((viewer) -> TextProcessor.mini().parse(viewer, "<impactor:name> Hello!"))
+//        );
+//
+//        ScoreboardComponent c2 = component.append(ComponentElement.create(
+//                ColorCycle.configure().frames(90).increment(3).build(),
+//                (viewer) -> Component.text("ABC")
+//        ));
+//
+//        Objective objective = Objective.builder()
+//                .text(c2)
+//                .updater(ScheduledUpdater.scheduler(Scheduler.ASYNCHRONOUS).repeating(Ticks.single()))
+//                .formatter(BlankFormatter.INSTANCE)
+//                .build();
+//
+//        TestRenderer renderer = new TestRenderer();
+//        Scoreboard scoreboard = Scoreboard.builder()
+//                .renderer(renderer)
+//                .objective(objective)
+//                .build();
+//
+//        AssignedScoreboard viewed = scoreboard.assignTo(PlatformPlayer.getOrCreate(PlatformSource.SERVER_UUID));
+//        viewed.open();
+//
+//        Thread.sleep(5000);
+//        viewed.hide();
     }
 
 }

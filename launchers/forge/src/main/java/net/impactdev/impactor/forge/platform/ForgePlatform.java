@@ -27,7 +27,7 @@ package net.impactdev.impactor.forge.platform;
 
 import net.impactdev.impactor.minecraft.platform.GamePlatform;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 public final class ForgePlatform extends GamePlatform {
 

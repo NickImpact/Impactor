@@ -23,15 +23,36 @@
  *
  */
 
-package net.impactdev.impactor.fabric.mixins.elements.core;
+package net.impactdev.impactor.core.economy.networking.consumption;
 
-import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.gson.JsonElement;
+import net.impactdev.impactor.core.economy.networking.messages.Message;
+import org.jetbrains.annotations.NotNull;
 
-@Mixin(ServerboundClientInformationPacket.class)
-public interface ServerboundClientInformationPacketAccessor {
+public interface MessageConsumer {
 
-    @Accessor("language") String impactor$accessor$language();
+    /**
+     * Consumes a message instance.
+     *
+     * <p>The return type indicates if the platform accepted the message. It is expected
+     * for implementations to return <code>false</code> if a message with an already
+     * received ID has been processed.</p>
+     *
+     * @param message The message being consumed
+     */
+    @CanIgnoreReturnValue
+    void consume(final @NotNull Message message);
+
+    /**
+     * Consumes a message via a relative json element.
+     *
+     * <p>This method will be invoked if the message being consumed was published using
+     * {@link Message#serialized()}.</p>
+     *
+     * @param json The encoding that should be parsed
+     */
+    @CanIgnoreReturnValue
+    void consume(final @NotNull JsonElement json);
 
 }

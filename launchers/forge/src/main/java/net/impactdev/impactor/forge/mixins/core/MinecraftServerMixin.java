@@ -30,33 +30,31 @@ import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Implements;
+import org.spongepowered.asm.mixin.Interface;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+
+import java.util.concurrent.TimeUnit;
 
 @Mixin(MinecraftServer.class)
-public class MinecraftServerMixin implements PerformanceMonitor {
+@Implements(@Interface(iface = PerformanceMonitor.class, prefix = "impactor$"))
+public abstract class MinecraftServerMixin {
 
-    @Shadow private float averageTickTime;
-    @Shadow @Final public long[] tickTimes;
+    @Shadow public abstract long getAverageTickTimeNanos();
 
-    @Override
+    @Unique
     public double ticksPerSecond() {
-        return 1000 / Math.max(50, this.averageTickTime);
+        return 1000.0 / Math.max(50, TimeUnit.NANOSECONDS.toMillis(this.getAverageTickTimeNanos()));
     }
 
-    @Override
+    @Unique
     public double averageTickDuration() {
-        int length = this.tickTimes.length;
-        long sum = 0;
-
-        for(long tick : this.tickTimes) {
-            sum += tick;
-        }
-
-        return (sum / (double) length) / 1000000;
+        return TimeUnit.NANOSECONDS.toMillis(this.getAverageTickTimeNanos());
     }
 
-    @Override
+    @Unique
     public MemoryWatcher memory() {
         return new MemoryWatcher();
     }

@@ -29,7 +29,6 @@ import com.google.common.collect.Lists;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.fabricmc.loader.impl.discovery.ModCandidate;
 import net.impactdev.impactor.fabric.platform.components.FabricComponent;
 import net.impactdev.impactor.fabric.platform.components.FabricMinecraftComponent;
 import net.impactdev.impactor.api.platform.PlatformComponent;
@@ -37,7 +36,6 @@ import net.impactdev.impactor.api.platform.PlatformType;
 import net.impactdev.impactor.api.platform.plugins.PluginMetadata;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
 import net.impactdev.impactor.core.platform.ImpactorPlatformInfo;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;

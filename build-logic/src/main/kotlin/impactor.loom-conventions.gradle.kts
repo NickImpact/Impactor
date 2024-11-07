@@ -7,9 +7,9 @@ plugins {
 loom {
     silentMojangMappingsLicense()
 
-    val identifier: String = project.findProperty("identifier")?.toString() ?: project.name
-    mixin.defaultRefmapName.set("mixins.impactor.$identifier.refmap.json")
-    mixin.useLegacyMixinAp.set(false)
+//    val identifier: String = project.findProperty("identifier")?.toString() ?: project.name
+//    mixin.defaultRefmapName.set("mixins.impactor.$identifier.refmap.json")
+//    mixin.useLegacyMixinAp.set(false)
 }
 
 dependencies {

@@ -25,10 +25,10 @@
 
 package net.impactdev.impactor.fabric.platform;
 
-import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
 import net.impactdev.impactor.api.platform.players.PlatformPlayerService;
 import net.impactdev.impactor.api.platform.sources.PlatformSource;
+import net.impactdev.impactor.fabric.FabricAdventureTranslator;
 import net.impactdev.impactor.fabric.platform.performance.FabricPerformanceMonitorFactory;
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
@@ -39,7 +39,7 @@ import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.platform.sources.metadata.MetadataKeyFactory;
 import net.impactdev.impactor.fabric.platform.sources.FabricPlatformFactory;
 import net.impactdev.impactor.fabric.platform.sources.FabricPlatformPlayerService;
-import net.kyori.event.EventBus;
+import net.impactdev.impactor.minecraft.api.items.AdventureTranslator;
 
 public final class FabricPlatformModule implements ImpactorModule {
 
@@ -51,12 +51,16 @@ public final class FabricPlatformModule implements ImpactorModule {
         FabricPlatformFactory sources = new FabricPlatformFactory();
         provider.register(PlatformSource.Factory.class, sources);
         provider.register(PlatformPlayer.Factory.class, sources);
+
+        provider.register(AdventureTranslator.Server.Factory.class, new FabricAdventureTranslator.FabricServerTranslatorFactory());
     }
 
     @Override
     public void services(ServiceProvider provider) {
         provider.register(Platform.class, new FabricPlatform());
         provider.register(PlatformPlayerService.class, new FabricPlatformPlayerService());
+
+        provider.register(AdventureTranslator.class, new FabricAdventureTranslator());
     }
 
 }

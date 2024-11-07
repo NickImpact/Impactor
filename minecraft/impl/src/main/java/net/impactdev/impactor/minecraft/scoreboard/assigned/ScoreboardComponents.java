@@ -27,7 +27,8 @@ package net.impactdev.impactor.minecraft.scoreboard.assigned;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.ServerProvider;
 import net.kyori.adventure.text.Component;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.PlayerTeam;
@@ -38,6 +39,8 @@ import java.util.List;
 
 public final class ScoreboardComponents {
 
+    private static final AdventureTranslator.Server TRANSLATOR = AdventureTranslator.Server.get(ServerProvider.server());
+
     public static final Scoreboard SCOREBOARD = new Scoreboard();
     public static final String OBJECTIVE_NAME = "»Impactor Objective«";
     public static final String TEAM_NAME_PREFIX = "»Impactor Team - ";
@@ -46,8 +49,10 @@ public final class ScoreboardComponents {
             SCOREBOARD,
             OBJECTIVE_NAME,
             ObjectiveCriteria.DUMMY,
-            AdventureTranslator.toNative(Component.text("Dummy Objective")),
-            ObjectiveCriteria.RenderType.INTEGER
+            TRANSLATOR.asNative(Component.text("Dummy Objective")),
+            ObjectiveCriteria.RenderType.INTEGER,
+            false,
+            null
     );
     private static final List<PlayerTeam> TEAMS = Lists.newArrayList();
     private static final List<String> FAKE_PLAYER_NAMES = Lists.newArrayList();

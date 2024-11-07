@@ -38,7 +38,8 @@ import net.impactdev.impactor.api.text.placeholders.PlaceholderArguments;
 import net.impactdev.impactor.api.text.placeholders.PlaceholderService;
 import net.impactdev.impactor.api.utility.Context;
 import net.impactdev.impactor.fabric.platform.FabricPlatform;
-import net.impactdev.impactor.minecraft.api.text.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.AdventureTranslator;
+import net.impactdev.impactor.minecraft.api.items.ServerProvider;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.event.EventBus;
@@ -83,7 +84,8 @@ public final class PlaceholderAPIIntegration {
                         ctx = PlaceholderContext.of(server);
                     }
 
-                    return AdventureTranslator.fromNative(handler.onPlaceholderRequest(ctx,
+                    AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
+                    return translator.asAdventure(handler.onPlaceholderRequest(ctx,
                             arguments.popOrDefault()).text());
                 });
             });
@@ -93,7 +95,7 @@ public final class PlaceholderAPIIntegration {
     public void registerToPapi() {
         PlaceholderService placeholders = Impactor.instance().services().provide(PlaceholderService.class);
         placeholders.parsers().forEach((key, parser) -> {
-            Placeholders.register(new ResourceLocation(key.namespace(), key.value()), (context, argument) -> {
+            Placeholders.register(ResourceLocation.fromNamespaceAndPath(key.namespace(), key.value()), (context, argument) -> {
                 Context ctx = Context.empty();
                 if(argument != null) {
                     ctx.append(PlaceholderArguments.class, new PlaceholderArguments(new String[]{ argument }));
@@ -107,7 +109,9 @@ public final class PlaceholderAPIIntegration {
                 }
 
                 Component result = parser.parse(viewer, ctx);
-                return PlaceholderResult.value(AdventureTranslator.toNative(result));
+
+                AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
+                return PlaceholderResult.value(translator.asNative(result));
             });
         });
     }

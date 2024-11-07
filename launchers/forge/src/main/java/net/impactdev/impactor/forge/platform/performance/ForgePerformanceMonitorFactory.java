@@ -28,7 +28,7 @@ package net.impactdev.impactor.forge.platform.performance;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
 import net.impactdev.impactor.core.platform.performance.SparkPerformanceMonitor;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 public class ForgePerformanceMonitorFactory implements PerformanceMonitor.Factory {
     @Override

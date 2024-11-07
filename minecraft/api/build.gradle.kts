@@ -15,12 +15,6 @@ minecraft {
     version("${rootProject.property("minecraft")}")
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
-
 dependencies {
     api(project(":api:items"))
     api(project(":api:ui"))

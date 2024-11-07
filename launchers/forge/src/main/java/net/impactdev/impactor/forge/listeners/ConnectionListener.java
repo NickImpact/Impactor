@@ -25,11 +25,16 @@
 
 package net.impactdev.impactor.forge.listeners;
 
-import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME)
 public class ConnectionListener {
 
-    // TODO - Post connection join to our API
+    @SubscribeEvent
+    public static void onPLayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
 
+    }
 }

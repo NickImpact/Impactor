@@ -19,15 +19,15 @@ dependencies {
     listOf(
         "net.kyori:examination-api:1.3.0",
         "net.kyori:examination-string:1.3.0",
-        "net.kyori:adventure-api:4.14.0",
-        "net.kyori:adventure-key:4.14.0",
-        "net.kyori:adventure-nbt:4.14.0",
-        "net.kyori:adventure-text-serializer-plain:4.14.0",
-        "net.kyori:adventure-text-serializer-legacy:4.14.0",
-        "net.kyori:adventure-text-serializer-gson:4.14.0",
-        "net.kyori:adventure-text-serializer-json:4.14.0",
-        "net.kyori:adventure-text-minimessage:4.14.0",
-        "net.kyori:adventure-text-logger-slf4j:4.14.0",
+        "net.kyori:adventure-api:4.17.0",
+        "net.kyori:adventure-key:4.17.0",
+        "net.kyori:adventure-nbt:4.17.0",
+        "net.kyori:adventure-text-serializer-plain:4.17.0",
+        "net.kyori:adventure-text-serializer-legacy:4.17.0",
+        "net.kyori:adventure-text-serializer-gson:4.17.0",
+        "net.kyori:adventure-text-serializer-json:4.17.0",
+        "net.kyori:adventure-text-minimessage:4.17.0",
+        "net.kyori:adventure-text-logger-slf4j:4.17.0",
         "net.kyori:event-api:5.0.0-SNAPSHOT",
     ).forEach { include(it) }
 }
@@ -70,6 +70,7 @@ tasks {
 
             include(dependency("net.impactdev:json:.*"))
             include(dependency("net.impactdev.impactor.api:commands:.*"))
+            include(dependency("net.impactdev.impactor.commands:common:.*"))
 
             listOf(
                 "com.zaxxer:HikariCP:.*",
@@ -87,7 +88,11 @@ tasks {
                 "org.spongepowered:configurate-hocon:.*",
                 "org.spongepowered:configurate-yaml:.*",
                 "org.spongepowered:math:.*",
-                "org.jetbrains.kotlin:kotlin-stdlib:1.7.10"
+                "org.jetbrains.kotlin:kotlin-stdlib:.*",
+                "redis.clients:jedis:.*",
+                "org.apache.commons:commons-pool2:.*",
+                "org.apache.maven:maven-artifact:.*",
+                "org.json:json:.*"
             ).forEach { include(dependency(it)) }
         }
 
@@ -107,7 +112,11 @@ tasks {
             "okio",
             "org.spongepowered.configurate",
             "org.spongepowered.math",
-            "kotlin"
+            "kotlin",
+            "redis.clients",
+            "org.apache.commons.pool2",
+            "org.json",
+            "org.apache.maven"
         ).forEach { relocate(it, "$prefix.$it") }
     }
 

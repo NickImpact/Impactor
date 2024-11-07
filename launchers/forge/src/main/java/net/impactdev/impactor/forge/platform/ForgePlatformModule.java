@@ -25,7 +25,6 @@
 
 package net.impactdev.impactor.forge.platform;
 
-import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.platform.Platform;
 import net.impactdev.impactor.api.platform.performance.PerformanceMonitor;
 import net.impactdev.impactor.api.platform.players.PlatformPlayer;
@@ -36,9 +35,11 @@ import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
 import net.impactdev.impactor.core.modules.ImpactorModule;
 import net.impactdev.impactor.core.platform.sources.metadata.MetadataKeyFactory;
+import net.impactdev.impactor.forge.NeoforgeAdventureTranslator;
 import net.impactdev.impactor.forge.platform.performance.ForgePerformanceMonitorFactory;
 import net.impactdev.impactor.forge.platform.sources.ForgePlatformFactory;
 import net.impactdev.impactor.forge.platform.sources.ForgePlatformPlayerService;
+import net.impactdev.impactor.minecraft.api.items.AdventureTranslator;
 
 @SuppressWarnings("unused")
 public class ForgePlatformModule implements ImpactorModule {
@@ -51,12 +52,16 @@ public class ForgePlatformModule implements ImpactorModule {
         ForgePlatformFactory sources = new ForgePlatformFactory();
         provider.register(PlatformSource.Factory.class, sources);
         provider.register(PlatformPlayer.Factory.class, sources);
+
+        provider.register(AdventureTranslator.Server.Factory.class, new NeoforgeAdventureTranslator.NeoforgeServerTranslatorFactory());
     }
 
     @Override
     public void services(ServiceProvider provider) {
         provider.register(Platform.class, new ForgePlatform());
         provider.register(PlatformPlayerService.class, new ForgePlatformPlayerService());
+
+        provider.register(AdventureTranslator.class, new NeoforgeAdventureTranslator());
     }
 
 }

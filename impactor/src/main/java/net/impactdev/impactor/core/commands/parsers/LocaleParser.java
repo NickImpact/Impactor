@@ -63,7 +63,7 @@ public class LocaleParser implements ArgumentParser<CommandSource, Locale>, Bloc
         Set<LanguageInfo> available = ImpactorTranslations.MANAGER.repository().available().join();
         available.forEach(info -> {
             if(info.id().toLowerCase().startsWith(input.peekString().toLowerCase())) {
-                options.add(Suggestion.simple(info.id()));
+                options.add(Suggestion.suggestion(info.id()));
             }
         });
 

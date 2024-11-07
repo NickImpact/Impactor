@@ -91,7 +91,7 @@ public final class ImpactorCommandRegistry {
                         .entries()
                         .stream()
                         .map(CommandEntry::syntax)
-                        .map(Suggestion::simple)
+                        .map(Suggestion::suggestion)
                         .collect(Collectors.toList())
                 ))
                 .handler(context -> helper.queryCommands(Objects.requireNonNull(context.get("query")), context.sender()))
