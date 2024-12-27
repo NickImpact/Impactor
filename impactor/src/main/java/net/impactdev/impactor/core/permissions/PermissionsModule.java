@@ -63,6 +63,7 @@ public final class PermissionsModule implements ImpactorModule {
 
         PermissionsRegistrationProvider.PermissionServiceSuggestion suggestion = event.provider().suggestion();
         PermissionsService service = suggestion.supplier().get();
+        impactor.services().register(PermissionsService.class, service);
         logger.info("Permissions » Selected \"" + service.name() + "\" (Provider: " + suggestion.metadata().name().orElse(suggestion.metadata().id()) + ", Priority = " + suggestion.priority() + ")");
     }
 }
