@@ -28,7 +28,7 @@ require code, Impactor can be leveraged to feed information to other plugins whi
 to outright support multiple different economy systems.
 
 ## What Platforms Does Impactor Support
-As of 5.2.0-SNAPSHOT, Impactor supports the following platforms:
+As of 5.3.0, Impactor supports the following platforms:
 - Fabric
 - Forge
 
@@ -54,6 +54,6 @@ repositories {
 }
 
 dependencies {
-    implementation("net.impactdev.impactor.api:economy:5.2.0-SNAPSHOT")
+    implementation("net.impactdev.impactor.api:economy:5.3.0")
 }
 ```
