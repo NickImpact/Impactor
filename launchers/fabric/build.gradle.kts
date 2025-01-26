@@ -61,6 +61,7 @@ tasks {
     }
 
     shadowJar {
+        mergeServiceFiles()
         dependencies {
             exclude("**/PlatformMethods.class")
             exclude("**/mappings.tiny")
