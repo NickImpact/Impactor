@@ -60,9 +60,15 @@ public final class ModuleInitializer {
     }
 
     public void initialize(Impactor service, PluginLogger logger) throws Exception {
+        for (ImpactorModule module : this.modules) {
+            module.init(service, logger);
+        }
+    }
+
+    public void shutdown(PluginLogger logger) throws Exception {
         while(!this.modules.isEmpty()) {
             ImpactorModule module = this.modules.poll();
-            module.init(service, logger);
+            module.shutdown(logger);
         }
     }
 

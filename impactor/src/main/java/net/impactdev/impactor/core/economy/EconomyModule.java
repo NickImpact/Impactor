@@ -68,4 +68,12 @@ public class EconomyModule implements ImpactorModule {
         logger.info("Registering economy service (Provider: " + service + ")");
         api.services().register(EconomyService.class, economy.suggestion().supplier().get());
     }
+
+    @Override
+    public void shutdown(PluginLogger logger) throws Exception {
+        final EconomyService service = EconomyService.instance();
+        if (service instanceof ImpactorEconomyService impactor) {
+            impactor.shutdown();
+        }
+    }
 }

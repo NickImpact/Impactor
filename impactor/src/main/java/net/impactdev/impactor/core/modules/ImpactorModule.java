@@ -45,4 +45,6 @@ public interface ImpactorModule {
 
     default void init(Impactor impactor, PluginLogger logger) throws Exception {}
 
+    default void shutdown(PluginLogger logger) throws Exception {}
+
 }

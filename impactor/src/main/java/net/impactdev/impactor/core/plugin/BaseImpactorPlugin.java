@@ -157,6 +157,12 @@ public abstract class BaseImpactorPlugin implements ImpactorPlugin, Configurable
 
     @Override
     public void shutdown() {
+        try {
+            this.initializer.shutdown(this.logger());
+        } catch (Exception e) {
+            ExceptionPrinter.print(this.logger(), e);
+        }
+
         this.logger().info("Shutting down schedulers...");
         AbstractJavaScheduler scheduler = (AbstractJavaScheduler) Impactor.instance().scheduler();
         scheduler.shutdownExecutor();

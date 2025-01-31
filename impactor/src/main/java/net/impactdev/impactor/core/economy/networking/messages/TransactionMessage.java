@@ -98,7 +98,7 @@ public final class TransactionMessage implements Message {
 
         UUID account = UUID.fromString(content.get("account").getAsString());
         BigDecimal amount = new BigDecimal(content.get("amount").getAsString());
-        EconomyTransactionType type = EconomyTransactionType.valueOf(content.get("type").getAsString());
+        EconomyTransactionType type = EconomyTransactionType.values()[content.get("type").getAsInt()];
 
         return new TransactionMessage(id, new TransactionContext(
                 currency,

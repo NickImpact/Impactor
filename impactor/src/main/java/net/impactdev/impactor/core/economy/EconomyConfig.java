@@ -87,7 +87,7 @@ public final class EconomyConfig {
     public static final ConfigKey<RedisConfig> REDIS = key(adapter -> new RedisConfig(
             adapter.getBoolean("messaging.redis.enabled", false),
             adapter.getStringList("messaging.redis.addresses", ImmutableList.of()),
-            adapter.getString("messaging.redis.username", "default"),
+            adapter.getString("messaging.redis.username", ""),
             adapter.getString("messaging.redis.password", ""),
             adapter.getBoolean("messaging.redis.ssl", false)
     ));

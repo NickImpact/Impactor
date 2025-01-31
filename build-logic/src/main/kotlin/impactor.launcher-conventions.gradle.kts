@@ -75,7 +75,7 @@ tasks {
             listOf(
                 "com.zaxxer:HikariCP:.*",
                 "com.h2database:h2:.*",
-                "mysql:mysql-connector-java:.*",
+                "com.mysql:mysql-connector-j:.*",
                 "org.mariadb.jdbc:mariadb-java-client:.*",
                 "org.mongodb:mongo-java-driver:.*",
                 "com.github.ben-manes.caffeine:caffeine:.*",

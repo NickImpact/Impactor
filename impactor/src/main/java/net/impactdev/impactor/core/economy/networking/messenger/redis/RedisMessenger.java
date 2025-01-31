@@ -36,6 +36,8 @@ import net.impactdev.impactor.core.economy.networking.consumption.MessageConsume
 import net.impactdev.impactor.core.economy.networking.messages.Message;
 import net.impactdev.impactor.core.economy.networking.messenger.Messenger;
 import net.kyori.adventure.key.Key;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
 import redis.clients.jedis.DefaultJedisClientConfig;
@@ -118,6 +120,9 @@ public final class RedisMessenger implements Messenger {
 
     @Override
     public void shutdown() {
+        Logger logger = LogManager.getLogger("Redis Shutdown");
+        logger.info("Redis shutdown triggered");
+
         this.closing = true;
         this.subscription.unsubscribe();
         this.jedis.close();

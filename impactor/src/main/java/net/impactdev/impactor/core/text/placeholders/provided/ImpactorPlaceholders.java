@@ -118,9 +118,8 @@ public final class ImpactorPlaceholders {
                     return empty();
                 }
 
-                switch (arguments.pop()) {
-                    case "ranking":
-                        return text(ctx.require(Integer.class));
+                if (arguments.pop().equals("ranking")) {
+                    return text(ctx.require(Integer.class));
                 }
 
                 return empty();

@@ -27,6 +27,9 @@ package net.impactdev.impactor.core.economy.networking;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.impactdev.impactor.api.Impactor;
+import net.impactdev.impactor.api.economy.events.EconomyTransactionEvent;
+import net.impactdev.impactor.api.economy.events.EconomyTransferTransactionEvent;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransferTransaction;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
@@ -62,6 +65,18 @@ public final class EconomyNetworkingService implements MessageConsumer {
         this.logger = plugin.logger();
         this.manager = manager;
         this.messenger = provider.obtain(this);
+
+        Impactor.instance().events().subscribe(EconomyTransactionEvent.Post.class, event -> {
+            this.publishTransaction(event.transaction());
+        });
+
+        Impactor.instance().events().subscribe(EconomyTransferTransactionEvent.Post.class, event -> {
+            this.publishTransaction(event.transaction());
+        });
+    }
+
+    public void shutdown() {
+        this.messenger.shutdown();
     }
 
     public CompletableFuture<Void> publishTransaction(final EconomyTransaction transaction) {
@@ -122,14 +137,14 @@ public final class EconomyNetworkingService implements MessageConsumer {
         }
 
         Key key = Key.key(type.getAsString());
-        JsonElement content = root.get("content");
+        JsonElement content = root.get("transaction");
 
         Message message = this.deserialize(uuid, key, content);
         this.processIncomingMessage(message);
     }
 
     private Message deserialize(UUID id, Key key, JsonElement content) {
-        if(key == TransactionMessage.KEY) {
+        if(key.equals(TransactionMessage.KEY)) {
             return TransactionMessage.deserialize(id, content);
         } else {
             return TransferTransactionMessage.deserialize(id, content);
