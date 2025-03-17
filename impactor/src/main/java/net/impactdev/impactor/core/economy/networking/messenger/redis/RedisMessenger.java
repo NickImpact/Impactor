@@ -120,9 +120,6 @@ public final class RedisMessenger implements Messenger {
 
     @Override
     public void shutdown() {
-        Logger logger = LogManager.getLogger("Redis Shutdown");
-        logger.info("Redis shutdown triggered");
-
         this.closing = true;
         this.subscription.unsubscribe();
         this.jedis.close();
