@@ -69,7 +69,7 @@ public final class FabricImpactorPlugin extends GameImpactorPlugin implements Im
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             PlatformPlayer player = PlatformPlayer.getOrCreate(handler.player.getUUID());
-            player.withDynamic(ImpactorPlatformPlayer.PLAYER_FALLBACK, () -> handler.player);
+            player.withDynamic(ImpactorPlatformPlayer.PLAYER_FALLBACK, () -> server.getPlayerList().getPlayer(player.uuid()));
 
             Impactor.instance().events().post((ClientConnectionEvent.Join) () -> player);
         });

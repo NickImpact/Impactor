@@ -28,10 +28,12 @@ package net.impactdev.impactor.core.economy;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.EconomyService;
 import net.impactdev.impactor.api.economy.accounts.Account;
+import net.impactdev.impactor.api.economy.events.EstablishEconomyServiceEvent;
 import net.impactdev.impactor.api.economy.transactions.composer.TransactionComposer;
 import net.impactdev.impactor.api.economy.transactions.composer.TransferComposer;
 import net.impactdev.impactor.api.events.ImpactorEvent;
 import net.impactdev.impactor.api.logging.PluginLogger;
+import net.impactdev.impactor.api.platform.plugins.PluginMetadata;
 import net.impactdev.impactor.api.providers.BuilderProvider;
 import net.impactdev.impactor.api.providers.FactoryProvider;
 import net.impactdev.impactor.api.providers.ServiceProvider;
@@ -66,7 +68,22 @@ public class EconomyModule implements ImpactorModule {
 
         String service = economy.suggestion().metadata().name().orElse(economy.suggestion().metadata().id());
         logger.info("Registering economy service (Provider: " + service + ")");
-        api.services().register(EconomyService.class, economy.suggestion().supplier().get());
+
+        final EconomyRegistrationProvider.EconomySuggestion suggestion = economy.suggestion();
+        final EconomyService implementation = suggestion.supplier().get();
+        api.services().register(EconomyService.class, implementation);
+
+        api.events().post(new EstablishEconomyServiceEvent() {
+            @Override
+            public PluginMetadata source() {
+                return suggestion.metadata();
+            }
+
+            @Override
+            public EconomyService service() {
+                return implementation;
+            }
+        });
     }
 
     @Override

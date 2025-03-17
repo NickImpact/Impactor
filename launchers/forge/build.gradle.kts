@@ -32,7 +32,7 @@ dependencies {
 
     include("io.leangen.geantyref:geantyref:1.3.13")
 
-    include(modImplementation("net.impactdev.impactor.commands:neoforge:5.3.0.1+1.21.1") {
+    include(modImplementation("net.impactdev.impactor.commands:neoforge:5.3.1+1.21.1") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")

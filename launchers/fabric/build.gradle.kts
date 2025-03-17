@@ -24,7 +24,7 @@ dependencies {
 
     implementation(project(":minecraft:impl"))
     include(modImplementation("ca.landonjw.gooeylibs:fabric-api-repack:3.1.0-1.21.1-SNAPSHOT")!!)
-    include(modImplementation("net.impactdev.impactor.commands:fabric:5.3.0.1+1.21.1") {
+    include(modImplementation("net.impactdev.impactor.commands:fabric:5.3.1+1.21.1") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")

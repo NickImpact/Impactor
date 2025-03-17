@@ -20,7 +20,7 @@ dependencies {
     api(project(":api:text"))
     api(project(":api:translations"))
 
-    api("net.impactdev.impactor.api:commands:5.3.0.1+1.21.1") {
+    api("net.impactdev.impactor.api:commands:5.3.1+1.21.1") {
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")
         exclude("net.impactdev.impactor.api", "players")
