@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "package": "net.impactdev.impactor.api.entities.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "mixins": [
+    "EntityMixin"
+  ]
+}
