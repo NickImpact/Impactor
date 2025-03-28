@@ -1,5 +1,9 @@
+import java.nio.file.Files
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 pluginManagement {
     repositories {
+        mavenCentral()
         gradlePluginPortal()
         maven("https://repo.spongepowered.org/repository/maven-public/")
         maven("https://repo.spongepowered.org/repository/maven-releases/")
@@ -10,32 +14,44 @@ pluginManagement {
         maven("https://repo.papermc.io/repository/maven-public/")
     }
 
-    includeBuild("build-logic")
-}
-
-plugins {
-    id("ca.stellardrift.polyglot-version-catalogs") version "6.1.0"
+    includeBuild("gradle/build-logic")
 }
 
 rootProject.name = "Impactor"
 
+// Impactor Loader
+include("loader")
+
+// API Components
 include("api:core")
+include("api:commands")
 include("api:config")
 include("api:economy")
-include("api:items")
-include("api:mail")
-include("api:players")
-include("api:plugins")
+include("api:entities")
+include("api:events")
+include("api:networking")
+include("api:permissions")
+include("api:platform")
+include("api:schedulers")
 include("api:storage")
 include("api:text")
-include("api:translations")
-include("api:ui")
 
-include("impactor")
-include("minecraft:api")
-include("minecraft:impl")
-include("launchers:forge")
+// Game Level API
+//include("game:adventure")
+//include("game:items")
+//include("game:nbt")
+
+// Launching
 include("launchers:fabric")
 
-// Integrations
-include("integrations:vault")
+fun setupProject(project: String) {
+    include(project)
+    val options = listOf("fabric", "forge", "paper", "velocity")
+
+    options.forEach {
+        val path = project(":$project").projectDir.toPath().resolve("launchers").resolve(it)
+        if (Files.exists(path)) {
+            include("$project:launchers:$it")
+        }
+    }
+}

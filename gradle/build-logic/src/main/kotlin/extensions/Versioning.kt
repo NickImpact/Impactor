@@ -1,0 +1,47 @@
+package extensions
+
+import org.gradle.api.Project
+
+fun Project.isSnapshot(): Boolean {
+    return rootProject.property("snapshot") == "true"
+}
+
+fun Project.isReleaseCandidate(): Boolean {
+    val rc = Integer.parseInt(rootProject.property("release-candidate").toString())
+    return rc > 0
+}
+
+fun Project.isRelease(): Boolean {
+    return !this.isSnapshot() && !this.isReleaseCandidate()
+}
+
+fun Project.writeVersion(includeMinecraft: Boolean): String {
+    val plugin = rootProject.property("plugin")
+    val minecraft = rootProject.property("minecraft")
+    val snapshot = rootProject.property("snapshot") == "true"
+    val rc = Integer.parseInt(rootProject.property("release-candidate").toString())
+
+    var version = if(includeMinecraft) {
+        "$plugin+$minecraft"
+    } else {
+        "$plugin"
+    }
+
+    if(snapshot) {
+        version = "$version-SNAPSHOT"
+    } else {
+        if(rc > 0) {
+            version = "$version-RC$rc"
+        }
+    }
+
+    return version
+}
+
+fun Project.moduleVersion(): String {
+    val version = rootProject.properties[project.name]?.toString()
+        ?: throw NullPointerException("Version not found for ${project.name}")
+
+    return version
+}
+
