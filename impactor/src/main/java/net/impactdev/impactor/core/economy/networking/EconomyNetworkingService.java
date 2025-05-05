@@ -74,11 +74,8 @@ public final class EconomyNetworkingService implements MessageConsumer {
 
         this.accountLocks = Caffeine.newBuilder()
                 .expireAfterAccess(10, TimeUnit.SECONDS)
-                .evictionListener((UUID key, JedisLock lock, RemovalCause cause) -> {
-                    if (lock != null) {
-                        System.out.println("Releasing lock");
-                        lock.release();
-                    }
+                .removalListener((UUID key, JedisLock lock, RemovalCause cause) -> {
+                    if (lock != null) lock.release();
                 })
                 .build();
 
