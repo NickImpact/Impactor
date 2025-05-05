@@ -25,7 +25,9 @@
 
 package net.impactdev.impactor.core.economy.networking;
 
-import com.google.common.collect.Maps;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.rockbb.jedis.toolkit.JedisLock;
@@ -49,7 +51,6 @@ import net.impactdev.impactor.core.utility.collections.ExpiringSet;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -64,12 +65,22 @@ public final class EconomyNetworkingService implements MessageConsumer {
     private final ExpiringSet<UUID> received = new ExpiringSet<>(5, TimeUnit.MINUTES);
 
     // Holds Jedis Locks for transactions in order to release them as soon as possible
-    private final Map<UUID, JedisLock> accountLocks = Maps.newHashMap();
+    private final Cache<UUID, JedisLock> accountLocks;
 
     public EconomyNetworkingService(final BaseImpactorPlugin plugin, final AccountManager manager, final Messenger.Provider provider) {
         this.logger = plugin.logger();
         this.manager = manager;
         this.messenger = provider.obtain(this);
+
+        this.accountLocks = Caffeine.newBuilder()
+                .expireAfterAccess(10, TimeUnit.SECONDS)
+                .evictionListener((UUID key, JedisLock lock, RemovalCause cause) -> {
+                    if (lock != null) {
+                        System.out.println("Releasing lock");
+                        lock.release();
+                    }
+                })
+                .build();
 
         // Lock Requests
         Impactor.instance().events().subscribe(EconomyTransactionEvent.Pre.class, event -> {
@@ -202,9 +213,6 @@ public final class EconomyNetworkingService implements MessageConsumer {
     }
 
     public void releaseAccountLock(UUID uuid) {
-        JedisLock lock = accountLocks.remove(uuid);
-        if (lock != null) {
-            lock.release();
-        }
+        accountLocks.invalidate(uuid);
     }
 }
