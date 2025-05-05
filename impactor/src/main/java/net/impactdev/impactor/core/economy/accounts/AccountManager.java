@@ -45,7 +45,7 @@ public final class AccountManager {
 
     public AccountManager(EconomyStorage storage) {
         this.accounts = Caffeine.newBuilder()
-                .expireAfterAccess(10, TimeUnit.MINUTES)
+                .expireAfterAccess(10, TimeUnit.SECONDS)
                 .buildAsync((key, executor) -> storage.account(key.currency, key.uuid, builder -> builder));
     }
 
