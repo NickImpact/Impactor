@@ -189,7 +189,7 @@ public final class EconomyNetworkingService implements MessageConsumer {
         }
     }
 
-    private boolean acquireAccountLock(UUID uuid) {
+    public boolean acquireAccountLock(UUID uuid) {
         JedisLock lock = messenger.obtainLock(uuid);
 
         if (lock.acquire()) {
@@ -201,7 +201,7 @@ public final class EconomyNetworkingService implements MessageConsumer {
         }
     }
 
-    private void releaseAccountLock(UUID uuid) {
+    public void releaseAccountLock(UUID uuid) {
         JedisLock lock = accountLocks.remove(uuid);
         if (lock != null) {
             lock.release();
