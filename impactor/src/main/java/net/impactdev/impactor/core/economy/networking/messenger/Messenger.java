@@ -36,7 +36,7 @@ public interface Messenger {
 
     void publish(final @NotNull Message message);
 
-    JedisLock getAccountLock(UUID uuid);
+    JedisLock obtainLock(UUID uuid);
 
     default void shutdown() {}
 

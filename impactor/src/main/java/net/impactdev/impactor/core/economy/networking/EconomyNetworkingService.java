@@ -190,7 +190,7 @@ public final class EconomyNetworkingService implements MessageConsumer {
     }
 
     private boolean acquireAccountLock(UUID uuid) {
-        JedisLock lock = messenger.getAccountLock(uuid);
+        JedisLock lock = messenger.obtainLock(uuid);
 
         if (lock.acquire()) {
             accountLocks.put(uuid, lock);

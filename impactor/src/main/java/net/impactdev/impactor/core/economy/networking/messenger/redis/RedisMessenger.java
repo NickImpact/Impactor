@@ -111,7 +111,7 @@ public final class RedisMessenger implements Messenger {
     }
 
     @Override
-    public JedisLock getAccountLock(UUID uuid) {
+    public JedisLock obtainLock(UUID uuid) {
         return switch (jedis) {
             case JedisPooled pooled -> new JedisLock(pooled, uuid.toString(), 1000, 5000);
             case JedisCluster cluster -> new JedisLock(cluster, uuid.toString(), 1000, 5000);
