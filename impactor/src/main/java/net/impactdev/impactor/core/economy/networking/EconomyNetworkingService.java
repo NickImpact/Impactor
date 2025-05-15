@@ -25,14 +25,15 @@
 
 package net.impactdev.impactor.core.economy.networking;
 
+import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.rockbb.jedis.toolkit.JedisLock;
 import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.economy.events.EconomyTransactionEvent;
 import net.impactdev.impactor.api.economy.events.EconomyTransferTransactionEvent;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransferTransaction;
-import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.core.economy.accounts.AccountManager;
 import net.impactdev.impactor.core.economy.accounts.ImpactorAccount;
@@ -48,6 +49,7 @@ import net.impactdev.impactor.core.utility.collections.ExpiringSet;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -61,16 +63,35 @@ public final class EconomyNetworkingService implements MessageConsumer {
 
     private final ExpiringSet<UUID> received = new ExpiringSet<>(5, TimeUnit.MINUTES);
 
+    // Holds Jedis Locks for transactions in order to release them as soon as possible
+    private final Map<UUID, JedisLock> accountLocks = Maps.newHashMap();
+
     public EconomyNetworkingService(final BaseImpactorPlugin plugin, final AccountManager manager, final Messenger.Provider provider) {
         this.logger = plugin.logger();
         this.manager = manager;
         this.messenger = provider.obtain(this);
 
+        // Lock Requests
+        Impactor.instance().events().subscribe(EconomyTransactionEvent.Pre.class, event -> {
+            if (!acquireAccountLock(event.account().owner())) event.cancelled(true);
+        });
+
+        Impactor.instance().events().subscribe(EconomyTransferTransactionEvent.Pre.class, event -> {
+            if (!acquireAccountLock(event.from().owner())) event.cancelled(true);
+            if (!acquireAccountLock(event.to().owner())) event.cancelled(true);
+        });
+
+        // Transaction Messaging
         Impactor.instance().events().subscribe(EconomyTransactionEvent.Post.class, event -> {
+            releaseAccountLock(event.account().owner());
+
             this.publishTransaction(event.transaction());
         });
 
         Impactor.instance().events().subscribe(EconomyTransferTransactionEvent.Post.class, event -> {
+            releaseAccountLock(event.from().owner());
+            releaseAccountLock(event.to().owner());
+
             this.publishTransaction(event.transaction());
         });
     }
@@ -156,15 +177,34 @@ public final class EconomyNetworkingService implements MessageConsumer {
             TransactionContext context = transaction.context();
             this.manager.accountIfPresent(context.account(), context.currency())
                     .map(x -> (ImpactorAccount) x)
-                    .ifPresent(x -> this.manager.update(x, context.amount(), context.type()));
+                    .ifPresent(x -> this.manager.invalidate(x.owner(), x.currency()));
         } else if(message instanceof TransferTransactionMessage transaction) {
             TransferTransactionContext context = transaction.context();
             this.manager.accountIfPresent(context.from(), context.currency())
                     .map(x -> (ImpactorAccount) x)
-                    .ifPresent(x -> this.manager.update(x, context.amount(), EconomyTransactionType.WITHDRAW));
+                    .ifPresent(x -> this.manager.invalidate(x.owner(), x.currency()));
             this.manager.accountIfPresent(context.to(), context.currency())
                     .map(x -> (ImpactorAccount) x)
-                    .ifPresent(x -> this.manager.update(x, context.amount(), EconomyTransactionType.DEPOSIT));
+                    .ifPresent(x -> this.manager.invalidate(x.owner(), x.currency()));
+        }
+    }
+
+    public boolean acquireAccountLock(UUID uuid) {
+        JedisLock lock = messenger.obtainLock(uuid);
+
+        if (lock.acquire()) {
+            accountLocks.put(uuid, lock);
+            return true;
+        } else {
+            logger.severe("Failed to acquire lock for account: " + uuid);
+            return false;
+        }
+    }
+
+    public void releaseAccountLock(UUID uuid) {
+        JedisLock lock = accountLocks.remove(uuid);
+        if (lock != null) {
+            lock.release();
         }
     }
 }

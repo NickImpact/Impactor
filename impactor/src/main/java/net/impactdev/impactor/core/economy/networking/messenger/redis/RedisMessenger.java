@@ -28,7 +28,7 @@ package net.impactdev.impactor.core.economy.networking.messenger.redis;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import net.impactdev.impactor.api.Impactor;
+import com.rockbb.jedis.toolkit.JedisLock;
 import net.impactdev.impactor.api.logging.PluginLogger;
 import net.impactdev.impactor.api.scheduler.v2.Scheduler;
 import net.impactdev.impactor.api.scheduler.v2.Schedulers;
@@ -36,21 +36,13 @@ import net.impactdev.impactor.core.economy.networking.consumption.MessageConsume
 import net.impactdev.impactor.core.economy.networking.messages.Message;
 import net.impactdev.impactor.core.economy.networking.messenger.Messenger;
 import net.kyori.adventure.key.Key;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
-import redis.clients.jedis.DefaultJedisClientConfig;
-import redis.clients.jedis.HostAndPort;
-import redis.clients.jedis.JedisClientConfig;
-import redis.clients.jedis.JedisCluster;
-import redis.clients.jedis.JedisPooled;
-import redis.clients.jedis.JedisPubSub;
-import redis.clients.jedis.Protocol;
-import redis.clients.jedis.UnifiedJedis;
+import redis.clients.jedis.*;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public final class RedisMessenger implements Messenger {
@@ -116,6 +108,15 @@ public final class RedisMessenger implements Messenger {
     @Override
     public void publish(@NotNull Message message) {
         this.jedis.publish(this.channel.asString(), GSON.toJson(message.serialized()));
+    }
+
+    @Override
+    public JedisLock obtainLock(UUID uuid) {
+        return switch (jedis) {
+            case JedisPooled pooled -> new JedisLock(pooled, uuid.toString(), 1000, 5000);
+            case JedisCluster cluster -> new JedisLock(cluster, uuid.toString(), 1000, 5000);
+            default -> throw new IllegalStateException("Unsupported Jedis type: " + jedis.getClass().getName());
+        };
     }
 
     @Override

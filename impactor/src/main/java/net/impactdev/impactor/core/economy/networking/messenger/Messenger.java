@@ -25,13 +25,18 @@
 
 package net.impactdev.impactor.core.economy.networking.messenger;
 
+import com.rockbb.jedis.toolkit.JedisLock;
 import net.impactdev.impactor.core.economy.networking.consumption.MessageConsumer;
 import net.impactdev.impactor.core.economy.networking.messages.Message;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 public interface Messenger {
 
     void publish(final @NotNull Message message);
+
+    JedisLock obtainLock(UUID uuid);
 
     default void shutdown() {}
 
