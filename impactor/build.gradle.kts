@@ -46,7 +46,7 @@ dependencies {
 
     // Networking
     implementation("redis.clients:jedis:5.1.3")
-    implementation(files("libs/jedis-tool-kit-1.1.0-SNAPSHOT.jar"))
+    implementation("com.rockbb.jedis:jedis-tool-kit:1.1.0")
 
     testImplementation("net.kyori:adventure-text-serializer-ansi:4.14.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
