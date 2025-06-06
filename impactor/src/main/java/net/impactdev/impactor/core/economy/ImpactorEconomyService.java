@@ -79,7 +79,11 @@ public final class ImpactorEconomyService implements EconomyService {
 
     public void shutdown() {
         try {
-            this.networking.shutdown();
+            if (this.networking != null)
+            {
+                this.networking.shutdown();
+            }
+
             this.storage.shutdown();
         } catch (Exception e) {
             ExceptionPrinter.print(BaseImpactorPlugin.instance().logger(), e);

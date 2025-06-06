@@ -90,6 +90,7 @@ tasks {
                 "org.spongepowered:math:.*",
                 "org.jetbrains.kotlin:kotlin-stdlib:.*",
                 "redis.clients:jedis:.*",
+                "com.rockbb.jedis:jedis-tool-kit:.*",
                 "org.apache.commons:commons-pool2:.*",
                 "org.apache.maven:maven-artifact:.*",
                 "org.json:json:.*"
@@ -114,6 +115,7 @@ tasks {
             "org.spongepowered.math",
             "kotlin",
             "redis.clients",
+            "com.rockbb.jedis.toolkit",
             "org.apache.commons.pool2",
             "org.json",
             "org.apache.maven"

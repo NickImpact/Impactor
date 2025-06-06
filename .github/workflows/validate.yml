@@ -9,7 +9,7 @@ on:
 jobs:
   validate:
     name: Validate License
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
@@ -28,7 +28,7 @@ jobs:
           arguments: checkLicenses
   build:
     name: Build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: validate
     steps:
       - uses: actions/checkout@v2

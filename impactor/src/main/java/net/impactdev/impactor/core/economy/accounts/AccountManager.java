@@ -33,6 +33,7 @@ import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
 import net.impactdev.impactor.core.economy.ImpactorEconomyService;
+import net.impactdev.impactor.core.economy.networking.EconomyNetworkingService;
 import net.impactdev.impactor.core.economy.storage.EconomyStorage;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,12 +49,7 @@ public final class AccountManager {
 
     public AccountManager(EconomyStorage storage) {
         this.accounts = Caffeine.newBuilder()
-                .expireAfterAccess(10, TimeUnit.SECONDS)
-                .evictionListener((AccountKey key, Account account, RemovalCause cause) -> {
-                    if (key != null && EconomyService.instance() instanceof ImpactorEconomyService impactor) {
-                        impactor.networking().releaseAccountLock(key.uuid);
-                    }
-                })
+                .expireAfterAccess(1, TimeUnit.MINUTES)
                 .buildAsync((key, executor) -> storage.account(key.currency, key.uuid, builder -> builder));
     }
 

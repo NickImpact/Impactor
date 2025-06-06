@@ -35,8 +35,8 @@ open class PublishToDiscord : DefaultTask() {
             .addField(
                 WebhookEmbed.EmbedField(
                 true,
-                "Forge",
-                "https://modrinth.com/mod/impactor/version/$plugin+$minecraft-Forge"
+                "Neoforge",
+                "https://modrinth.com/mod/impactor/version/$plugin+$minecraft-Neoforge"
             ))
 
         client.send(embed.build()).thenAccept { println("Message sent successfully (ID: ${it.id})") }
