@@ -66,6 +66,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
 public final class ImpactorAccount implements Account {
@@ -73,6 +74,8 @@ public final class ImpactorAccount implements Account {
     private final EconomyService service = Impactor.instance()
             .services()
             .provide(EconomyService.class);
+
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     private final UUID owner;
     private final Currency currency;
@@ -111,16 +114,28 @@ public final class ImpactorAccount implements Account {
 
     @Override
     public @NotNull BigDecimal balance() {
-        return this.balance;
+        this.lock.readLock().lock();
+
+        try {
+            return this.balance;
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 
     @ApiStatus.Internal
     void setViaNetworking(BigDecimal amount, EconomyTransactionType type) {
-        switch (type) {
-            case DEPOSIT -> this.balance = this.balance.add(amount);
-            case WITHDRAW -> this.balance = this.balance.subtract(amount);
-            case SET -> this.balance = amount;
-            case RESET -> this.balance = this.currency.defaultAccountBalance();
+        this.lock.writeLock().lock();
+
+        try {
+            switch (type) {
+                case DEPOSIT -> this.balance = this.balance.add(amount);
+                case WITHDRAW -> this.balance = this.balance.subtract(amount);
+                case SET -> this.balance = amount;
+                case RESET -> this.balance = this.currency.defaultAccountBalance();
+            }
+        } finally {
+            this.lock.writeLock().unlock();
         }
     }
 
@@ -394,6 +409,8 @@ public final class ImpactorAccount implements Account {
     }
 
     private <T> T enact(BigDecimal amount, EconomyTransactionType type, TransactionProcessor<T> processor, Supplier<T> fallback) {
+        this.lock.writeLock().lock();
+
         try {
             return processor.process();
         } catch (PostResult.CompositeException exception) {
@@ -427,6 +444,8 @@ public final class ImpactorAccount implements Account {
 
             Schedulers.require(Scheduler.SYNCHRONOUS).executor().execute(() -> printer.log(BaseImpactorPlugin.instance().logger(), PrettyPrinter.Level.ERROR));
             return fallback.get();
+        } finally {
+            this.lock.writeLock().unlock();
         }
     }
 

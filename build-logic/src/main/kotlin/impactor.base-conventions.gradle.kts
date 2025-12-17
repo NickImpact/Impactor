@@ -18,6 +18,14 @@ repositories {
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots") {
         name = "Sonatype 01 Snapshots"
     }
+    maven {
+        name = "luck-repo"
+        url = uri("https://repo.lucko.me")
+        content {
+            includeModule("me.lucko", "spark-api")
+        }
+    }
+
 }
 
 version = rootProject.version
