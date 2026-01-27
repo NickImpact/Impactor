@@ -34,7 +34,6 @@ import net.impactdev.impactor.api.economy.accounts.Account;
 import net.impactdev.impactor.api.economy.currency.Currency;
 import net.impactdev.impactor.api.economy.events.EconomyTransactionEvent;
 import net.impactdev.impactor.api.economy.events.EconomyTransferTransactionEvent;
-import net.impactdev.impactor.api.economy.transactions.composer.TransactionComposer;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyResultType;
 import net.impactdev.impactor.api.economy.transactions.EconomyTransaction;
 import net.impactdev.impactor.api.economy.transactions.details.EconomyTransactionType;
@@ -52,7 +51,6 @@ import net.impactdev.impactor.core.economy.transactions.ImpactorEconomyTransferT
 import net.impactdev.impactor.core.economy.transactions.composers.BaseTransactionComposer;
 import net.impactdev.impactor.core.economy.transactions.composers.TransferTransactionComposer;
 import net.impactdev.impactor.core.plugin.BaseImpactorPlugin;
-import net.impactdev.impactor.core.utility.future.Futures;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.event.PostResult;
@@ -63,8 +61,6 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
@@ -491,7 +487,9 @@ public final class ImpactorAccount implements Account {
         EconomyTransactionEvent.Post event = new ImpactorEconomyTransactionEvent.Post(transaction);
         this.postAndVerify(event);
 
-        ((ImpactorEconomyService) this.service).storage().logTransaction(transaction);
+        if (this.service instanceof ImpactorEconomyService impactorService) {
+            impactorService.storage().logTransaction(transaction);
+        }
         return transaction;
     }
 
