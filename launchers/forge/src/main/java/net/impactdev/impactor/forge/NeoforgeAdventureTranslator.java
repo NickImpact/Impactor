@@ -30,18 +30,18 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.platform.modcommon.MinecraftServerAudiences;
 import net.kyori.adventure.text.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 
 public class NeoforgeAdventureTranslator implements AdventureTranslator {
 
     @Override
-    public Key asAdventure(ResourceLocation location) {
+    public Key asAdventure(Identifier location) {
         return MinecraftAudiences.asAdventure(location);
     }
 
     @Override
-    public ResourceLocation asNative(Key key) {
+    public Identifier asNative(Key key) {
         return MinecraftAudiences.asNative(key);
     }
 

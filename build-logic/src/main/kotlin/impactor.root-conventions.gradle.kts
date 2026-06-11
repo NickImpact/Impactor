@@ -19,8 +19,8 @@ tasks {
 
     val collect by registering(Copy::class) {
         val filters = mapOf(
-            ":launchers:fabric" to "remapProductionJar",
-            ":launchers:neoforge" to "remapProductionJar",
+            ":launchers:fabric" to "shadowJar",
+            ":launchers:neoforge" to "shadowJar",
         )
 
         val tasks = subprojects.filter { filters.containsKey(it.path) }.map { it.tasks.named(filters.getValue(it.path)) }

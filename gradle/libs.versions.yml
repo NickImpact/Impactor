@@ -1,32 +1,31 @@
 versions:
 
   # jetbains
-  kotlin: 1.7.10
-  coroutines: 1.6.1
-  annotations: 23.0.0
-  serialization: 1.3.2
+  kotlin: 2.4.0
+  annotations: 26.1.0
+  serialization: 1.11.0
 
   # plugins
   licenser: 0.6.1
   shadow: 8.1.1
-  blossom: 2.1.0
-  loom: 1.7-SNAPSHOT
-  architectury-plugin: 3.4-SNAPSHOT
+  blossom: 2.2.0
+  loom: 1.17-SNAPSHOT
+  architectury-plugin: 3.5-SNAPSHOT
   minotaur: 2.+
 
   # fabric/remap
-  fabric-loader: 0.14.16
-  fabric-api: 0.92.0+1.20.1
+  fabric-loader: 0.18.4
+  fabric-api: 0.151.0+26.1.2
 
   # forge
   forge: 1.19.2-43.2.0
-  neoforge: 21.1.66
+  neoforge: 26.1.2.75
 
   # sponge
   sponge-gradle: 0.2.1-SNAPSHOT
 
   # architectury
-  architectury: 6.3.49
+  architectury: 20.0.6
 
   # test
   junit: 5.9.0
@@ -42,9 +41,8 @@ versions:
   gson: 2.10.1
 
   # Adventure
-  adventure: 4.17.0
-  adventure-fabric: 5.14.1 # 1.21.1
-  examination: 1.3.0
+  adventure: 5.1.1
+  adventure-fabric: 6.9.0 # 26.1.x
 
 dependencies:
 
@@ -52,6 +50,22 @@ dependencies:
   kotlin:
     group: org.jetbrains.kotlin
     name: kotlin-gradle-plugin
+    version: { ref: kotlin }
+  kotlinReflect:
+    group: org.jetbrains.kotlin
+    name: kotlin-reflect
+    version: { ref: kotlin }
+  kotlinStdlib:
+    group: org.jetbrains.kotlin
+    name: kotlin-stdlib
+    version: { ref: kotlin }
+  kotlinStdlib7:
+    group: org.jetbrains.kotlin
+    name: kotlin-stdlib-jdk7
+    version: { ref: kotlin }
+  kotlinStdlib8:
+    group: org.jetbrains.kotlin
+    name: kotlin-stdlib-jdk8
     version: { ref: kotlin }
   licenser:
     group: gradle.plugin.org.cadixdev.gradle
@@ -66,8 +80,8 @@ dependencies:
     name: blossom
     version: { ref: blossom }
   loom:
-    group: dev.architectury
-    name: architectury-loom
+    group: dev.architectury.loom-no-remap
+    name: dev.architectury.loom-no-remap.gradle.plugin
     version: { ref: loom }
   minotaur:
     group: com.modrinth.minotaur
@@ -236,9 +250,9 @@ dependencies:
     group: net.kyori
     name: adventure-text-logger-slf4j
     version: { ref: adventure }
-  adventureFabric:
+  adventurePlatformModShared:
     group: net.kyori
-    name: adventure-platform-fabric
+    name: adventure-platform-mod-shared
     version: { ref: adventure-fabric }
 
   # Utilities

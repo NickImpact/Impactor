@@ -1,7 +1,5 @@
 import extensions.isRelease
 import extensions.writeVersion
-import net.fabricmc.loom.task.RemapJarTask
-import org.gradle.configurationcache.extensions.capitalized
 
 plugins {
     id("impactor.loom-conventions")
@@ -19,34 +17,20 @@ dependencies {
     listOf(
         "net.kyori:examination-api:1.3.0",
         "net.kyori:examination-string:1.3.0",
-        "net.kyori:adventure-api:4.17.0",
-        "net.kyori:adventure-key:4.17.0",
-        "net.kyori:adventure-nbt:4.17.0",
-        "net.kyori:adventure-text-serializer-plain:4.17.0",
-        "net.kyori:adventure-text-serializer-legacy:4.17.0",
-        "net.kyori:adventure-text-serializer-gson:4.17.0",
-        "net.kyori:adventure-text-serializer-json:4.17.0",
-        "net.kyori:adventure-text-minimessage:4.17.0",
-        "net.kyori:adventure-text-logger-slf4j:4.17.0",
-        "net.kyori:event-api:5.0.0-SNAPSHOT",
+        "net.kyori:adventure-api:4.26.1",
+        "net.kyori:adventure-key:4.26.1",
+        "net.kyori:adventure-nbt:4.26.1",
+        "net.kyori:adventure-text-serializer-plain:4.26.1",
+        "net.kyori:adventure-text-serializer-legacy:4.26.1",
+        "net.kyori:adventure-text-serializer-gson:4.26.1",
+        "net.kyori:adventure-text-serializer-json:4.26.1",
+        "net.kyori:adventure-text-minimessage:4.26.1",
+        "net.kyori:adventure-text-logger-slf4j:4.26.1",
+        "com.github.KyoriPowered.event:event-api:master-SNAPSHOT",
     ).forEach { include(it) }
 }
 
 tasks {
-    val remapProductionJar by registering(RemapJarTask::class) {
-        listOf(shadowJar, remapJar).forEach {
-            dependsOn(it)
-            mustRunAfter(it)
-        }
-
-        inputFile.set(shadowJar.flatMap { it.archiveFile })
-
-        archiveBaseName.set("Impactor-${project.name.capitalize()}")
-        archiveVersion.set(writeVersion(true))
-    }
-
-    val minecraft = rootProject.property("minecraft")
-
     shadowJar {
         archiveBaseName.set("Impactor-${project.name}")
         archiveClassifier.set("dev-shadow")
@@ -121,19 +105,14 @@ tasks {
             "org.apache.maven"
         ).forEach { relocate(it, "$prefix.$it") }
     }
-
-    remapJar {
-        archiveBaseName.set("Impactor-${project.name.capitalize()}")
-        archiveVersion.set("${minecraft}-${rootProject.version}")
-    }
 }
 
 tasks.withType<PublishToMavenRepository> {
-    dependsOn(tasks["remapProductionJar"])
+    dependsOn(tasks["shadowJar"])
 }
 
 tasks.withType<GenerateModuleMetadata> {
-    dependsOn(tasks["remapProductionJar"])
+    dependsOn(tasks["shadowJar"])
 }
 
 tasks.modrinth {
@@ -143,11 +122,11 @@ tasks.modrinth {
 modrinth {
     token.set(System.getenv("MODRINTH_GRADLE_TOKEN"))
     projectId.set("Impactor")
-    versionNumber.set("${writeVersion(true)}-${project.name.capitalized()}")
+    versionNumber.set("${writeVersion(true)}-${project.name}")
     versionName.set("Impactor ${writeVersion(true)}")
 
     versionType.set(if(!isRelease()) "beta" else "release")
-    uploadFile.set(tasks["remapProductionJar"])
+    uploadFile.set(tasks["shadowJar"])
 
     gameVersions.set(listOf(rootProject.property("minecraft").toString()))
 

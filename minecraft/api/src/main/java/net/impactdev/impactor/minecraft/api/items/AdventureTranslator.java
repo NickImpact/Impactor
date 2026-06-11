@@ -29,7 +29,7 @@ import net.impactdev.impactor.api.Impactor;
 import net.impactdev.impactor.api.services.Service;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 
 public interface AdventureTranslator extends Service {
@@ -56,8 +56,8 @@ public interface AdventureTranslator extends Service {
 
     }
 
-    Key asAdventure(ResourceLocation location);
+    Key asAdventure(Identifier location);
 
-    ResourceLocation asNative(Key key);
+    Identifier asNative(Key key);
 
 }

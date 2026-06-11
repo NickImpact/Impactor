@@ -22,6 +22,7 @@ dependencies {
 
     testImplementation("net.kyori:adventure-text-serializer-ansi:4.17.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
     testImplementation("net.kyori:adventure-text-logger-slf4j:4.17.0")
 }

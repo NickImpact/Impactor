@@ -27,7 +27,7 @@ package net.impactdev.impactor.forge.platform.components;
 
 import net.impactdev.impactor.api.platform.PlatformComponent;
 import net.impactdev.impactor.api.utility.printing.PrettyPrinter;
-import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;
+import net.neoforged.neoforge.common.NeoForgeVersion;
 
 public class ForgeComponent implements PlatformComponent {
 

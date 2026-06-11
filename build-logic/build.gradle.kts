@@ -12,8 +12,12 @@ repositories {
 }
 
 dependencies {
+    implementation(libs.kotlinReflect)
+    implementation(libs.kotlinStdlib)
+    implementation(libs.kotlinStdlib7)
+    implementation(libs.kotlinStdlib8)
     implementation(libs.kotlin)
-    implementation(libs.licenser)
+//    implementation(libs.licenser)
     implementation(libs.blossom)
     implementation(libs.shadow)
     implementation(libs.loom)

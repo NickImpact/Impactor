@@ -2,7 +2,7 @@ import extensions.getLatestGitCommitHash
 
 plugins {
     `java-library`
-    id("org.cadixdev.licenser")
+//    id("org.cadixdev.licenser")
     id("net.kyori.blossom")
     kotlin("jvm")
 }
@@ -25,6 +25,7 @@ repositories {
             includeModule("me.lucko", "spark-api")
         }
     }
+    maven("https://jitpack.io")
 
 }
 
@@ -32,27 +33,28 @@ version = rootProject.version
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
 tasks {
     withType<JavaCompile> {
         options.encoding = "UTF-8"
-        dependsOn(updateLicenses)
+//        dependsOn(updateLicenses)
         finalizedBy(test)
     }
 
     jar {
         if(project.parent?.name.equals("api")) {
-            archiveBaseName.set("Impactor-API-${project.name.substring(0, 1).toUpperCase()}${project.name.substring(1)}")
+            archiveBaseName.set("Impactor-API-${project.name.substring(0, 1).uppercase()}${project.name.substring(1)}")
         } else {
-            archiveBaseName.set("Impactor-${project.name.substring(0, 1).toUpperCase()}${project.name.substring(1)}")
+            archiveBaseName.set("Impactor-${project.name.substring(0, 1).uppercase()}${project.name.substring(1)}")
         }
         archiveClassifier.set("dev-slim")
     }
 }
 
+/*
 license {
     header(rootProject.file("HEADER.txt"))
     properties {
@@ -61,6 +63,7 @@ license {
         this.set("year", 2022)
     }
 }
+*/
 
 sourceSets {
     main {

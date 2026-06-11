@@ -43,8 +43,9 @@ import net.impactdev.impactor.minecraft.api.items.ServerProvider;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.event.EventBus;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,7 +61,7 @@ public final class PlaceholderAPIIntegration {
         logger.info("Integrating with PlaceholderAPI...");
 
         bus.subscribe(RegisterPlaceholdersEvent.class, event -> {
-            Placeholders.getPlaceholders().forEach((location, handler) -> {
+            Placeholders.getCommonPlaceholders().forEach((location, handler) -> {
                 Key key = Key.key(location.toString());
                 if(key.namespace().equals("impactor")) {
                     return;
@@ -81,12 +82,12 @@ public final class PlaceholderAPIIntegration {
                     if (player != null) {
                         ctx = PlaceholderContext.of(player);
                     } else {
-                        ctx = PlaceholderContext.of(server);
+                        ctx = PlaceholderContext.of(server.overworld());
                     }
 
                     AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
                     return translator.asAdventure(handler.onPlaceholderRequest(ctx,
-                            arguments.popOrDefault()).text());
+                            arguments.popOrDefault()).component());
                 });
             });
         });
@@ -95,7 +96,7 @@ public final class PlaceholderAPIIntegration {
     public void registerToPapi() {
         PlaceholderService placeholders = Impactor.instance().services().provide(PlaceholderService.class);
         placeholders.parsers().forEach((key, parser) -> {
-            Placeholders.register(ResourceLocation.fromNamespaceAndPath(key.namespace(), key.value()), (context, argument) -> {
+            Placeholders.registerCommon(Identifier.fromNamespaceAndPath(key.namespace(), key.value()), (context, argument) -> {
                 Context ctx = Context.empty();
                 if(argument != null) {
                     ctx.append(PlaceholderArguments.class, new PlaceholderArguments(new String[]{ argument }));
@@ -120,7 +121,7 @@ public final class PlaceholderAPIIntegration {
     private PlatformSource viewer(PlaceholderContext context) {
         if(context.hasPlayer()) {
             return PlatformPlayer.getOrCreate(context.player().getUUID());
-        } else if(context.server() != null) {
+        } else if(context.level() != null && context.level() instanceof ServerLevel) {
             return PlatformSource.server();
         } else if(context.hasEntity()) {
             return PlatformSource.factory().fromID(context.entity().getUUID());

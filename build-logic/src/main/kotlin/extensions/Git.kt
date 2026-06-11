@@ -6,12 +6,11 @@ import java.io.ByteArrayOutputStream
 fun Project.getLatestGitCommitHash(): String {
     return try {
         val byteOut = ByteArrayOutputStream()
-        project.exec {
-            this.commandLine = "git rev-parse --short HEAD".split(" ")
-            this.standardOutput = byteOut
+        val task = providers.exec {
+            commandLine("git rev-parse --short HEAD".split(" "))
         }
 
-        byteOut.toString("UTF-8").trim()
+        task.standardOutput.asText.get()
     } catch (ex: Exception) {
         "Unknown"
     }
@@ -20,15 +19,11 @@ fun Project.getLatestGitCommitHash(): String {
 fun Project.getPreviousTag(): String {
     return try
     {
-        val byteOut = ByteArrayOutputStream()
-        val error = ByteArrayOutputStream()
-        project.exec {
-            this.commandLine = "git describe --abbrev=0 --tags --exclude=${getLatestTag()}".split(" ")
-            this.standardOutput = byteOut
-            this.errorOutput = error
+        val task = providers.exec {
+            commandLine("git describe --abbrev=0 --tags --exclude=${getLatestTag()}".split(" "))
         }
 
-        byteOut.toString("UTF-8").trim()
+        task.standardOutput.asText.get()
     } catch (ex: Exception) {
         "Unknown"
     }
@@ -38,12 +33,11 @@ fun Project.getLatestTag(): String {
     return try
     {
         val byteOut = ByteArrayOutputStream()
-        project.exec {
-            this.commandLine = "git describe --abbrev=0 --tags".split(" ")
-            this.standardOutput = byteOut
+        val task = providers.exec {
+            commandLine("git describe --abbrev=0 --tags".split(" "))
         }
 
-        byteOut.toString("UTF-8").trim()
+        task.standardOutput.asText.get()
     } catch (ex: Exception) {
         "Unknown"
     }

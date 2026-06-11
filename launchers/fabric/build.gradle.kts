@@ -15,16 +15,16 @@ repositories {
 }
 
 dependencies {
-    modImplementation("net.fabricmc:fabric-loader:${rootProject.property("fabric-loader")}")
+    implementation("net.fabricmc:fabric-loader:${rootProject.property("fabric-loader")}")
     listOf(
         "fabric-lifecycle-events-v1",
         "fabric-command-api-v2",
         "fabric-networking-api-v1",
-    ).forEach { modImplementation(fabricApi.module(it, rootProject.property("fabric-api").toString())) }
+    ).forEach { implementation(fabricApi.module(it, rootProject.property("fabric-api").toString())) }
 
     implementation(project(":minecraft:impl"))
-    include(modImplementation("ca.landonjw.gooeylibs:fabric-api-repack:3.1.0-1.21.1-SNAPSHOT")!!)
-    include(modImplementation("net.impactdev.impactor.commands:fabric:5.3.1+1.21.1") {
+    include(implementation("com.github.ApolloNetworkMC:GooeyLibs:26.1.2-SNAPSHOT")!!)
+    include(implementation("net.impactdev.impactor.commands:fabric:5.3.1+1.21.1") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")
@@ -40,13 +40,13 @@ dependencies {
         libs.cloudProcessorsCommon,
     ).forEach { include(it) }
 
-    modImplementation(libs.adventureFabric)
-    include(libs.adventureFabric)
+    implementation(libs.adventurePlatformModShared)
+    include(libs.adventurePlatformModShared)
 
-    include(modImplementation("eu.pb4:placeholder-api:2.4.1+1.21")!!)
+    include(implementation("eu.pb4:placeholder-api:3.0.0+26.1")!!)
     include("io.leangen.geantyref:geantyref:1.3.13")
 
-    modRuntimeOnly("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
+    runtimeOnly("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }
@@ -72,7 +72,7 @@ tasks {
 publishing {
     publications {
         create<MavenPublication>(project.name) {
-            artifact(tasks.remapProductionJar)
+            artifact(tasks.shadowJar)
 
             groupId = "net.impactdev.impactor.launchers"
             artifactId = "fabric"

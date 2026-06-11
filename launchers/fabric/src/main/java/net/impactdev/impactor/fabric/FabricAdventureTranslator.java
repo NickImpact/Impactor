@@ -27,22 +27,22 @@ package net.impactdev.impactor.fabric;
 
 import net.impactdev.impactor.minecraft.api.items.AdventureTranslator;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.platform.fabric.FabricAudiences;
-import net.kyori.adventure.platform.fabric.FabricServerAudiences;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
+import net.kyori.adventure.platform.modcommon.MinecraftServerAudiences;
 import net.kyori.adventure.text.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 
 public class FabricAdventureTranslator implements AdventureTranslator {
 
     @Override
-    public Key asAdventure(ResourceLocation location) {
-        return FabricAudiences.toAdventure(location);
+    public Key asAdventure(Identifier location) {
+        return MinecraftAudiences.asAdventure(location);
     }
 
     @Override
-    public ResourceLocation asNative(Key key) {
-        return FabricAudiences.toNative(key);
+    public Identifier asNative(Key key) {
+        return MinecraftAudiences.asNative(key);
     }
 
     @Override
@@ -50,16 +50,16 @@ public class FabricAdventureTranslator implements AdventureTranslator {
         return "Neoforge Adventure Platform Translator";
     }
 
-    public record FabricServerTranslator(FabricServerAudiences translator) implements Server {
+    public record FabricServerTranslator(MinecraftServerAudiences translator) implements Server {
 
         @Override
         public Component asAdventure(net.minecraft.network.chat.Component component) {
-            return this.translator.toAdventure(component);
+            return this.translator.asAdventure(component);
         }
 
         @Override
         public net.minecraft.network.chat.Component asNative(Component component) {
-            return this.translator.toNative(component);
+            return this.translator.asNative(component);
         }
 
     }
@@ -68,7 +68,7 @@ public class FabricAdventureTranslator implements AdventureTranslator {
 
         @Override
         public Server create(MinecraftServer server) {
-            return new FabricServerTranslator(FabricServerAudiences.of(server));
+            return new FabricServerTranslator(MinecraftServerAudiences.of(server));
         }
 
     }

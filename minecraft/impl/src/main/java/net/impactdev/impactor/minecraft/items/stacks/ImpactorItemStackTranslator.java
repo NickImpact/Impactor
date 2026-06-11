@@ -68,12 +68,12 @@ import net.minecraft.nbt.ShortTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.TagType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemLore;
-import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.NotNull;
@@ -113,17 +113,17 @@ public final class ImpactorItemStackTranslator implements ItemStackTranslator {
         }
 
         for(Enchantment enchantment : stack.enchantments()) {
-            ResourceLocation key = translator.asNative(enchantment.type());
+            Identifier key = translator.asNative(enchantment.type());
             MinecraftServer server = ServerProvider.server();
 
-            server.registries().compositeAccess().registry(Registries.ENCHANTMENT)
+            server.registries().compositeAccess().lookup(Registries.ENCHANTMENT)
                     .ifPresent(registry -> {
-                        result.enchant(registry.getHolder(key).orElseThrow(), enchantment.level());
+                        result.enchant(registry.get(key).orElseThrow(), enchantment.level());
                     });
         }
 
         if(stack.unbreakable()) {
-            result.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
+            result.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
         }
 
         if(stack.nbt() != null) {
@@ -167,7 +167,7 @@ public final class ImpactorItemStackTranslator implements ItemStackTranslator {
                 Holder<net.minecraft.world.item.enchantment.Enchantment> enchantment = entry.getKey();
                 int level = entry.getIntValue();
 
-                Key target = translator.asAdventure(enchantment.unwrapKey().orElseThrow().location());
+                Key target = translator.asAdventure(enchantment.unwrapKey().orElseThrow().identifier());
 
                 builder.enchantment(Enchantment.create(target, level));
             });
@@ -182,19 +182,20 @@ public final class ImpactorItemStackTranslator implements ItemStackTranslator {
 
     private CompoundBinaryTag translateNativeNBT(CompoundTag minecraft) {
         AtomicReference<CompoundBinaryTag> result = new AtomicReference<>(CompoundBinaryTag.empty());
-        minecraft.getAllKeys().forEach(key -> {
-            @NotNull Tag tag = Objects.requireNonNull(minecraft.get(key));
+        minecraft.entrySet().forEach(pair -> {
+            final @NotNull Tag tag = Objects.requireNonNull(pair.getValue());
+            final String key = pair.getKey();
             byte type = tag.getId();
 
             switch (type) {
-                case Tag.TAG_BYTE -> result.set(result.get().putByte(key, from(ByteTag.TYPE, tag).getAsByte()));
-                case Tag.TAG_SHORT -> result.set(result.get().putShort(key, from(ShortTag.TYPE, tag).getAsShort()));
-                case Tag.TAG_INT -> result.set(result.get().putInt(key, from(IntTag.TYPE, tag).getAsInt()));
-                case Tag.TAG_LONG -> result.set(result.get().putLong(key, from(LongTag.TYPE, tag).getAsLong()));
-                case Tag.TAG_FLOAT -> result.set(result.get().putFloat(key, from(FloatTag.TYPE, tag).getAsFloat()));
-                case Tag.TAG_DOUBLE -> result.set(result.get().putDouble(key, from(DoubleTag.TYPE, tag).getAsDouble()));
+                case Tag.TAG_BYTE -> result.set(result.get().putByte(key, from(ByteTag.TYPE, tag).byteValue()));
+                case Tag.TAG_SHORT -> result.set(result.get().putShort(key, from(ShortTag.TYPE, tag).shortValue()));
+                case Tag.TAG_INT -> result.set(result.get().putInt(key, from(IntTag.TYPE, tag).intValue()));
+                case Tag.TAG_LONG -> result.set(result.get().putLong(key, from(LongTag.TYPE, tag).longValue()));
+                case Tag.TAG_FLOAT -> result.set(result.get().putFloat(key, from(FloatTag.TYPE, tag).floatValue()));
+                case Tag.TAG_DOUBLE -> result.set(result.get().putDouble(key, from(DoubleTag.TYPE, tag).doubleValue()));
                 case Tag.TAG_BYTE_ARRAY -> result.set(result.get().putByteArray(key, from(ByteArrayTag.TYPE, tag).getAsByteArray()));
-                case Tag.TAG_STRING -> result.set(result.get().putString(key, from(StringTag.TYPE, tag).getAsString()));
+                case Tag.TAG_STRING -> result.set(result.get().putString(key, from(StringTag.TYPE, tag).value()));
                 case Tag.TAG_LIST -> result.set(result.get().put(key, translateNativeListNBT(from(ListTag.TYPE, tag))));
                 case Tag.TAG_COMPOUND -> result.set(result.get().put(key, translateNativeNBT(from(CompoundTag.TYPE, tag))));
                 case Tag.TAG_INT_ARRAY -> result.set(result.get().putIntArray(key, from(IntArrayTag.TYPE, tag).getAsIntArray()));
@@ -212,12 +213,12 @@ public final class ImpactorItemStackTranslator implements ItemStackTranslator {
             byte type = tag.getId();
 
             switch (type) {
-                case Tag.TAG_BYTE -> result.set(result.get().add(toAdventure(from(ByteTag.TYPE, tag).getAsByte(), ByteBinaryTag::byteBinaryTag)));
-                case Tag.TAG_SHORT -> result.set(result.get().add(toAdventure(from(ShortTag.TYPE, tag).getAsShort(), ShortBinaryTag::shortBinaryTag)));
-                case Tag.TAG_INT -> result.set(result.get().add(toAdventure(from(IntTag.TYPE, tag).getAsInt(), IntBinaryTag::intBinaryTag)));
-                case Tag.TAG_LONG -> result.set(result.get().add(toAdventure(from(LongTag.TYPE, tag).getAsLong(), LongBinaryTag::longBinaryTag)));
-                case Tag.TAG_FLOAT -> result.set(result.get().add(toAdventure(from(FloatTag.TYPE, tag).getAsFloat(), FloatBinaryTag::floatBinaryTag)));
-                case Tag.TAG_DOUBLE -> result.set(result.get().add(toAdventure(from(DoubleTag.TYPE, tag).getAsDouble(), DoubleBinaryTag::doubleBinaryTag)));
+                case Tag.TAG_BYTE -> result.set(result.get().add(toAdventure(from(ByteTag.TYPE, tag).byteValue(), ByteBinaryTag::byteBinaryTag)));
+                case Tag.TAG_SHORT -> result.set(result.get().add(toAdventure(from(ShortTag.TYPE, tag).shortValue(), ShortBinaryTag::shortBinaryTag)));
+                case Tag.TAG_INT -> result.set(result.get().add(toAdventure(from(IntTag.TYPE, tag).intValue(), IntBinaryTag::intBinaryTag)));
+                case Tag.TAG_LONG -> result.set(result.get().add(toAdventure(from(LongTag.TYPE, tag).longValue(), LongBinaryTag::longBinaryTag)));
+                case Tag.TAG_FLOAT -> result.set(result.get().add(toAdventure(from(FloatTag.TYPE, tag).floatValue(), FloatBinaryTag::floatBinaryTag)));
+                case Tag.TAG_DOUBLE -> result.set(result.get().add(toAdventure(from(DoubleTag.TYPE, tag).doubleValue(), DoubleBinaryTag::doubleBinaryTag)));
                 case Tag.TAG_BYTE_ARRAY -> {
                     ByteArrayBinaryTag ba = toAdventure(
                             from(ByteArrayTag.TYPE, tag).getAsByteArray(),
@@ -225,7 +226,7 @@ public final class ImpactorItemStackTranslator implements ItemStackTranslator {
                     );
                     result.set(result.get().add(ba));
                 }
-                case Tag.TAG_STRING -> result.set(result.get().add(toAdventure(from(StringTag.TYPE, tag).getAsString(), StringBinaryTag::stringBinaryTag)));
+                case Tag.TAG_STRING -> result.set(result.get().add(toAdventure(from(StringTag.TYPE, tag).value(), StringBinaryTag::stringBinaryTag)));
                 case Tag.TAG_LIST -> {
                     ListBinaryTag lb = translateNativeListNBT(from(ListTag.TYPE, tag));
                     result.set(result.get().add((BinaryTag) lb));

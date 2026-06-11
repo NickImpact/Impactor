@@ -32,7 +32,7 @@ public final class FabricMinecraftComponent extends MinecraftPlatformComponent {
 
     @Override
     public String version() {
-        return SharedConstants.getCurrentVersion().getName();
+        return SharedConstants.getCurrentVersion().name();
     }
 
 }
