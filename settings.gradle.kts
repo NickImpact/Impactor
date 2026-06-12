@@ -1,6 +1,9 @@
+import org.gradle.kotlin.dsl.mavenCentral
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        mavenCentral()
         maven("https://repo.spongepowered.org/repository/maven-public/")
         maven("https://repo.spongepowered.org/repository/maven-releases/")
         maven("https://repo.spongepowered.org/repository/maven-snapshots")
