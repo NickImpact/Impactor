@@ -23,7 +23,7 @@ dependencies {
     ).forEach { implementation(fabricApi.module(it, rootProject.property("fabric-api").toString())) }
 
     implementation(project(":minecraft:impl"))
-    include(implementation("com.github.ApolloNetworkMC:GooeyLibs:26.1.2-SNAPSHOT")!!)
+    include(implementation("com.github.ApolloNetworkMC.GooeyLibs:fabric:26.1.2-SNAPSHOT")!!)
     include(implementation("net.impactdev.impactor.commands:fabric:5.3.1+1.21.1") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")

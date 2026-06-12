@@ -5,6 +5,11 @@ plugins {
     id("impactor.publishing-conventions")
 }
 
+architectury {
+    platformSetupLoomIde()
+    neoForge()
+}
+
 loom {
     neoForge {
         runs {
@@ -26,7 +31,8 @@ dependencies {
     neoForge(libs.neoforge)
 
     implementation(project(":minecraft:impl"))
-    include(implementation("com.github.ApolloNetworkMC:GooeyLibs:26.1.2-SNAPSHOT")!!)
+    include(implementation("com.github.ApolloNetworkMC.GooeyLibs:neoforge:26.1.2-SNAPSHOT")!!)
+    implementation("com.github.ApolloNetworkMC.GooeyLibs:api:26.1.2-SNAPSHOT")
 
     compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
     annotationProcessor("com.google.auto.service:auto-service:1.1.1")

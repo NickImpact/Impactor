@@ -73,7 +73,7 @@ dependencies:
     version: { ref: licenser }
   shadow:
     group: com.gradleup.shadow
-    name: com.gradleup.shadow.gradle.plugin
+    name: shadow-gradle-plugin
     version: { ref: shadow }
   blossom:
     group: net.kyori
