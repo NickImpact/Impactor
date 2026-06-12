@@ -34,13 +34,13 @@ tasks {
         dependsOn(changelog)
         doLast {
             val plugin = this.project.rootProject.property("plugin")
-            val target = this.project.projectDir.toPath().resolve("$buildDir").resolve("deploy").resolve("$plugin.md")
-            if(!Files.exists(target)) {
-                Files.createDirectories(target.parent)
-                Files.createFile(target)
+            val target = getLayout().buildDirectory.dir("deploy").get().file("$plugin.md")
+            if(!target.asFile.exists()) {
+                target.asFile.parentFile?.mkdirs()
+                target.asFile.createNewFile()
             }
 
-            Files.write(target, changelog.get().result.encodeToByteArray())
+            target.asFile.writeText(changelog.get().result)
         }
     }
 

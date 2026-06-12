@@ -14,10 +14,10 @@ loom {
     neoForge {
         runs {
             val client = maybeCreate("client")
-            client.vmArgs("-Dmixin.debug.export=true")
+            client.jvmArguments.add("-Dmixin.debug.export=true")
 
             val server = maybeCreate("server")
-            server.vmArgs("-Dmixin.debug.export=true")
+            server.jvmArguments.add("-Dmixin.debug.export=true")
         }
     }
 }
