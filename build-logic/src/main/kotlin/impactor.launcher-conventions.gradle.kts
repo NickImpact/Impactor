@@ -5,7 +5,7 @@ plugins {
     id("impactor.loom-conventions")
 
     id("com.modrinth.minotaur")
-    id("com.github.johnrengelman.shadow")
+    id("com.gradleup.shadow")
 }
 
 val bundle: Configuration by configurations.creating {

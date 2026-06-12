@@ -7,7 +7,7 @@ versions:
 
   # plugins
   licenser: 0.6.1
-  shadow: 8.1.1
+  shadow: 9.0.0-beta12
   blossom: 2.2.0
   loom: 1.17-SNAPSHOT
   architectury-plugin: 3.5-SNAPSHOT
@@ -72,8 +72,8 @@ dependencies:
     name: licenser
     version: { ref: licenser }
   shadow:
-    group: com.github.johnrengelman
-    name: shadow
+    group: com.gradleup.shadow
+    name: shadow-gradle-plugin
     version: { ref: shadow }
   blossom:
     group: net.kyori
