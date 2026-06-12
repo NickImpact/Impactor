@@ -9,7 +9,7 @@ versions:
   licenser: 0.6.1
   shadow: 9.4.2
   blossom: 2.2.0
-  loom: 1.17-SNAPSHOT
+  loom: 1.17.480
   architectury-plugin: 3.5-SNAPSHOT
   minotaur: 2.+
 
