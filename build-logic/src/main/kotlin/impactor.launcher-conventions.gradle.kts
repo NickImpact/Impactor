@@ -62,8 +62,13 @@ dependencies {
 
 tasks {
     shadowJar {
+        dependsOn(tasks.jar)
         archiveBaseName.set("Impactor-${project.name}")
         archiveClassifier.set("dev-shadow")
+
+        from(
+            zipTree(tasks.jar.get().archiveFile.get().asFile)
+        )
 
         dependencies {
             include(project(":api:core"))
