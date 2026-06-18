@@ -45,7 +45,7 @@ import net.impactdev.impactor.minecraft.scoreboard.ScoreboardModule;
 import net.impactdev.impactor.minecraft.ui.UIModule;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.IdentifierArgument;
 import org.incendo.cloud.brigadier.argument.BrigadierMapping;
 import org.incendo.cloud.brigadier.argument.BrigadierMappings;
 import org.incendo.cloud.parser.ArgumentParser;
@@ -76,7 +76,7 @@ public abstract class GameImpactorPlugin extends BaseImpactorPlugin {
         Impactor.instance().events().subscribe(RegisterBrigadierMappingsEvent.class, event -> {
             BrigadierMappings<CommandSource, CommandSourceStack> mappings = (BrigadierMappings<CommandSource, CommandSourceStack>) event.mappings();
             BrigadierMapping<?, CurrencyParser, CommandSourceStack> currency = this.createMapping(
-                    parser -> ResourceLocationArgument.id()
+                    parser -> IdentifierArgument.id()
             );
 
             BrigadierMapping<?, PlatformSourceParser, CommandSourceStack> sources = this.createMapping(

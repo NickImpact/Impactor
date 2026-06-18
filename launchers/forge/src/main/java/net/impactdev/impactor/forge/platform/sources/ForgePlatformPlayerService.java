@@ -39,7 +39,7 @@ public final class ForgePlatformPlayerService extends ImpactorPlatformPlayerServ
         return ImmutableSet.copyOf(ServerLifecycleHooks.getCurrentServer().getPlayerList()
                 .getPlayers()
                 .stream()
-                .map(player -> this.getOrCreate(player.getUUID()))
+                .map(player -> this.getOrCreate(player.nameAndId().id()))
                 .collect(Collectors.toSet()));
     }
 }

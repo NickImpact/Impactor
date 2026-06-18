@@ -5,34 +5,41 @@ plugins {
     id("impactor.publishing-conventions")
 }
 
+architectury {
+    platformSetupLoomIde()
+    neoForge()
+}
+
 loom {
     neoForge {
         runs {
             val client = maybeCreate("client")
-            client.vmArgs("-Dmixin.debug.export=true")
+            client.jvmArguments.add("-Dmixin.debug.export=true")
 
             val server = maybeCreate("server")
-            server.vmArgs("-Dmixin.debug.export=true")
+            server.jvmArguments.add("-Dmixin.debug.export=true")
         }
     }
 }
 
 repositories {
     maven(url = "https://maven.neoforged.net/releases")
+    mavenLocal()
 }
 
 dependencies {
     neoForge(libs.neoforge)
 
     implementation(project(":minecraft:impl"))
-    include(modImplementation("ca.landonjw.gooeylibs:api:3.1.0-1.21.1-SNAPSHOT")!!)
+    include(implementation("com.github.ApolloNetworkMC.GooeyLibs:neoforge:26.1.2-SNAPSHOT")!!)
+    implementation("com.github.ApolloNetworkMC.GooeyLibs:api:26.1.2-SNAPSHOT")
 
     compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
     annotationProcessor("com.google.auto.service:auto-service:1.1.1")
 
     include("io.leangen.geantyref:geantyref:1.3.13")
 
-    include(modImplementation("net.impactdev.impactor.commands:neoforge:5.3.1+1.21.1") {
+    include(implementation("net.impactdev.impactor.commands:neoforge:5.3.1+26.1.2") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")
@@ -48,7 +55,7 @@ dependencies {
         libs.cloudMinecraftExtras,
     ).forEach { include(it) }
 
-    include(modImplementation("net.kyori:adventure-platform-neoforge:6.0.0")!!)
+    include(implementation("net.kyori:adventure-platform-neoforge:6.9.0")!!)
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
@@ -67,10 +74,19 @@ tasks {
     }
 
     processResources {
+        val minecraft: String = rootProject.property("minecraft") as String
+        val neoforge: String = rootProject.property("neoforge") as String
+
         inputs.property("version", writeVersion(true))
+        inputs.property("minecraft", minecraft)
+        inputs.property("neoforge", neoforge)
 
         filesMatching("META-INF/neoforge.mods.toml") {
-            expand("version" to writeVersion(true))
+            expand(
+                "version" to writeVersion(true),
+                "minecraft" to minecraft,
+                "neoforge" to neoforge
+            )
         }
     }
 }
@@ -78,7 +94,7 @@ tasks {
 publishing {
     publications {
         create<MavenPublication>(project.name) {
-            artifact(tasks.remapProductionJar)
+            artifact(tasks.shadowJar)
 
             groupId = "net.impactdev.impactor.launchers"
             artifactId = "neoforge"

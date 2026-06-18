@@ -68,7 +68,8 @@ import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.server.players.GameProfileCache;
+import net.minecraft.server.players.NameAndId;
+import net.minecraft.server.players.UserNameToIdResolver;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -114,7 +115,7 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
         this.offer(MetadataKeys.PERMISSION_LEVEL, () -> this.asMinecraftPlayer()
                 .map(player -> {
                     MinecraftServer server = ((GamePlatform) Impactor.instance().platform()).server();
-                    if(server.getPlayerList().isOp(player.getGameProfile())) {
+                    if(server.getPlayerList().isOp(player.nameAndId())) {
                         return 4;
                     }
 
@@ -126,8 +127,8 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
 
     public abstract Optional<ServerPlayer> asMinecraftPlayer();
 
-    private Optional<GameProfile> profile() {
-        GameProfileCache cache = ((GamePlatform) Impactor.instance().platform()).server().getProfileCache();
+    private Optional<NameAndId> profile() {
+        UserNameToIdResolver cache = ((GamePlatform) Impactor.instance().platform()).server().services().nameToIdCache();
         return cache.get(this.uuid());
     }
 
@@ -139,7 +140,7 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
                 .map(Player::getName)
                 .map(translator::asAdventure)
                 .orElseGet(() -> this.profile()
-                        .map(GameProfile::getName)
+                        .map(NameAndId::name)
                         .map(Component::text)
                         .orElse(Component.text("Unknown"))
                 );
@@ -175,7 +176,7 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
         this.asMinecraftPlayer().ifPresent(target -> {
             final ServerGamePacketListenerImpl connection = target.connection;
             final Inventory inventory = target.getInventory();
-            final int slot = inventory.items.size() + inventory.selected;
+            final int slot = inventory.getNonEquipmentItems().size() + inventory.getSelectedSlot();
 
             final BookStack item = ImpactorItemStack.book()
                     .title(GlobalTranslator.render(book.title(), this.locale()))
@@ -188,7 +189,7 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
 
             connection.send(new ClientboundContainerSetSlotPacket(0, target.containerMenu.getStateId(), slot, vanilla));
             connection.send(new ClientboundOpenBookPacket(InteractionHand.MAIN_HAND));
-            connection.send(new ClientboundContainerSetSlotPacket(0, target.containerMenu.getStateId(), slot, inventory.getSelected()));
+            connection.send(new ClientboundContainerSetSlotPacket(0, target.containerMenu.getStateId(), slot, inventory.getSelectedItem()));
         });
     }
 
@@ -255,10 +256,7 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
         AdventureTranslator translator = AdventureTranslator.get();
 
         this.asMinecraftPlayer().ifPresent(target -> {
-            final Optional<Holder.Reference<SoundEvent>> reference = BuiltInRegistries.SOUND_EVENT.holders()
-                    .filter(event -> event.is(translator.asNative(sound.name())))
-                    .findFirst();
-
+            final Optional<Holder.Reference<SoundEvent>> reference = BuiltInRegistries.SOUND_EVENT.get(translator.asNative(sound.name()));
             reference.ifPresent(soundEventReference -> target.connection.send(new ClientboundSoundPacket(
                     soundEventReference,
                     SoundSource.valueOf(sound.source().name()),
@@ -277,10 +275,7 @@ public abstract class ImpactorPlatformPlayer extends ImpactorPlatformSource impl
         AdventureTranslator translator = AdventureTranslator.get();
 
         this.asMinecraftPlayer().ifPresent(target -> {
-            final Optional<Holder.Reference<SoundEvent>> reference = BuiltInRegistries.SOUND_EVENT.holders()
-                    .filter(event -> event.is(translator.asNative(sound.name())))
-                    .findFirst();
-
+            final Optional<Holder.Reference<SoundEvent>> reference = BuiltInRegistries.SOUND_EVENT.get(translator.asNative(sound.name()));
             if(reference.isPresent()) {
                 final Entity tracked;
                 if(emitter == Sound.Emitter.self()) {

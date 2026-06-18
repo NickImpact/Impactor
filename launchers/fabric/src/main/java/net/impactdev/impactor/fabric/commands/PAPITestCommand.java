@@ -26,12 +26,14 @@
 package net.impactdev.impactor.fabric.commands;
 
 import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
 import net.impactdev.impactor.api.commands.CommandSource;
 import net.impactdev.impactor.fabric.FabricImpactorBootstrap;
 import net.impactdev.impactor.minecraft.api.items.AdventureTranslator;
 import net.impactdev.impactor.minecraft.api.items.ServerProvider;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import org.incendo.cloud.annotation.specifier.Greedy;
 import org.incendo.cloud.annotations.Argument;
@@ -51,11 +53,11 @@ public final class PAPITestCommand {
             return;
         }
 
-        Component input = Component.literal(placeholder);
-        Component result = Placeholders.parseText(input, PlaceholderContext.of(minecraft));
+        Identifier input = Identifier.parse(placeholder);
+        PlaceholderResult result = Placeholders.parseCommonPlaceholder(input, null, PlaceholderContext.of(minecraft));
 
         AdventureTranslator.Server translator = AdventureTranslator.Server.get(ServerProvider.server());
-        source.sendMessage(translator.asAdventure(result));
+        source.sendMessage(translator.asAdventure(result.component()));
     }
 
 }

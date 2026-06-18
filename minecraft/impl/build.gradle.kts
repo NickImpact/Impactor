@@ -2,17 +2,13 @@ import extensions.writeVersion
 
 plugins {
     id("impactor.base-conventions")
+    id("impactor.loom-conventions")
     id("impactor.publishing-conventions")
-    id("org.spongepowered.gradle.vanilla")
 }
 
 repositories {
     mavenCentral()
     maven("https://oss.sonatype.org/content/repositories/snapshots")
-}
-
-minecraft {
-    version("${rootProject.property("minecraft")}")
 }
 
 dependencies {
@@ -22,6 +18,7 @@ dependencies {
 
     testImplementation("net.kyori:adventure-text-serializer-ansi:4.17.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
     testImplementation("net.kyori:adventure-text-logger-slf4j:4.17.0")
 }

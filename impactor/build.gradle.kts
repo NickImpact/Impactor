@@ -7,6 +7,7 @@ plugins {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -20,11 +21,14 @@ dependencies {
     api(project(":api:text"))
     api(project(":api:translations"))
 
-    api("net.impactdev.impactor.api:commands:5.3.1+1.21.1") {
+    api("net.impactdev.impactor.api:commands:5.3.1+26.1.2") {
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")
         exclude("net.impactdev.impactor.api", "players")
     }
+
+    implementation("org.incendo:cloud-annotations:2.0.0")
+    implementation("org.incendo:cloud-minecraft-extras:2.0.0-beta.15")
 
     // Databases
     api("com.zaxxer:HikariCP:5.0.1")
@@ -50,6 +54,7 @@ dependencies {
 
     testImplementation("net.kyori:adventure-text-serializer-ansi:4.14.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
     testImplementation("org.mockito:mockito-core:5.2.0")
     testRuntimeOnly("org.apache.logging.log4j:log4j-core:2.20.0")
@@ -72,11 +77,12 @@ sourceSets {
     }
 }
 
-license {
-    exclude("**/datasize/DataSize.java")
-    exclude("**/datasize/DataSizeUtils.java")
-    exclude("**/datasize/DataUnit.java")
-}
+
+//license {
+//    exclude("**/datasize/DataSize.java")
+//    exclude("**/datasize/DataSizeUtils.java")
+//    exclude("**/datasize/DataUnit.java")
+//}
 
 publishing {
     publications {

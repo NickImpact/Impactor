@@ -2,17 +2,13 @@ import extensions.writeVersion
 
 plugins {
     id("impactor.base-conventions")
+    id("impactor.loom-conventions")
     id("impactor.publishing-conventions")
-    id("org.spongepowered.gradle.vanilla")
 }
 
 repositories {
     mavenCentral()
     maven("https://oss.sonatype.org/content/repositories/snapshots")
-}
-
-minecraft {
-    version("${rootProject.property("minecraft")}")
 }
 
 dependencies {

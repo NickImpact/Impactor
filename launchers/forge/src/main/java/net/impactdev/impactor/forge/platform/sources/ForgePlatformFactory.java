@@ -77,7 +77,7 @@ public class ForgePlatformFactory implements PlatformSource.Factory, PlatformPla
                     PlatformSource source = new ForgePlatformSource(id, SourceType.ENTITY);
                     source.offer(MetadataKeys.WORLD, () -> {
                         ResourceKey<Level> key = level.dimension();
-                        return Key.key(key.location().getNamespace(), key.location().getPath());
+                        return Key.key(key.identifier().getNamespace(), key.identifier().getPath());
                     });
                     source.offer(GameMetadataKeys.ENTITY, () -> entity);
                     source.offer(MetadataKeys.POSITION, () -> {

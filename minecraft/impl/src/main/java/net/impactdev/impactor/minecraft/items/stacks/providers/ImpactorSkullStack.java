@@ -32,7 +32,7 @@ import net.impactdev.impactor.api.items.types.ItemTypes;
 import net.impactdev.impactor.minecraft.items.stacks.builders.ImpactorSkullStackBuilder;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
-import net.minecraft.nbt.NbtUtils;
+import net.minecraft.core.UUIDUtil;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -87,7 +87,7 @@ public final class ImpactorSkullStack extends AbstractedItemStack implements Sku
             } else {
                 if (this.metadata.texture().isPresent()) {
                     CompoundBinaryTag owner = CompoundBinaryTag.empty();
-                    owner = owner.putIntArray("Id", NbtUtils.createUUID(UUID.randomUUID()).getAsIntArray());
+                    owner = owner.putIntArray("Id", UUIDUtil.uuidToIntArray(UUID.randomUUID()));
                     owner = this.properties(owner);
 
                     nbt = nbt.put("SkullOwner", owner);

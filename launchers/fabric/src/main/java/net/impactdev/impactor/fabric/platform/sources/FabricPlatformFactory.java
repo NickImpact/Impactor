@@ -39,8 +39,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.GameProfileCache;
+import net.minecraft.server.players.NameAndId;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.server.players.UserNameToIdResolver;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
@@ -73,8 +74,8 @@ public class FabricPlatformFactory implements PlatformSource.Factory, PlatformPl
             MinecraftServer server = FabricImpactorBootstrap.instance().server().get();
             PlayerList players = server.getPlayerList();
             ServerPlayer player = players.getPlayer(id);
-            GameProfileCache cache = server.getProfileCache();
-            Optional<GameProfile> profile = cache.get(uuid);
+            UserNameToIdResolver cache = server.services().nameToIdCache();
+            Optional<NameAndId> profile = cache.get(uuid);
 
             if(player != null || profile.isPresent()) {
                 return new FabricPlatformPlayer(id);
@@ -86,7 +87,7 @@ public class FabricPlatformFactory implements PlatformSource.Factory, PlatformPl
                     PlatformSource source = new FabricPlatformSource(id, SourceType.ENTITY);
                     source.offer(MetadataKeys.WORLD, () -> {
                         ResourceKey<Level> key = level.dimension();
-                        return Key.key(key.location().getNamespace(), key.location().getPath());
+                        return Key.key(key.identifier().getNamespace(), key.identifier().getPath());
                     });
                     source.offer(GameMetadataKeys.ENTITY, () -> entity);
                     source.offer(MetadataKeys.POSITION, () -> {

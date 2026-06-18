@@ -11,13 +11,13 @@ description = "General Purpose Minecraft API"
 [[dependencies.impactor]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.21.1]"
+versionRange = "[${minecraft}]"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.impactor]]
 modId = "neoforge"
 mandatory = true
-versionRange = "[21.1.6,)"
+versionRange = "[${neoforge},)"
 ordering = "NONE"
 side = "BOTH"

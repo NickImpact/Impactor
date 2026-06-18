@@ -27,9 +27,11 @@ package net.impactdev.impactor.minecraft.items;
 
 import net.impactdev.impactor.api.items.types.ItemType;
 import net.kyori.adventure.key.Key;
-import net.minecraft.core.Registry;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 
 import java.util.Optional;
@@ -42,10 +44,14 @@ public class ImpactorItemType implements ItemType {
         this.key = key;
     }
 
+    public Optional<Holder.Reference<Item>> minecraftHolder() {
+        Identifier location = Identifier.fromNamespaceAndPath(this.key.namespace(), this.key.value());
+        ResourceKey<Item> registry = ResourceKey.create(Registries.ITEM, location);
+        return BuiltInRegistries.ITEM.get(registry);
+    }
+
     public Optional<Item> minecraft() {
-        Registry<Item> registry = BuiltInRegistries.ITEM;
-        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(this.key.namespace(), this.key.value());
-        return registry.getOptional(location);
+        return minecraftHolder().map(Holder.Reference::value);
     }
 
     @Override

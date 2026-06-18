@@ -1,13 +1,11 @@
 import extensions.isRelease
 import extensions.writeVersion
-import net.fabricmc.loom.task.RemapJarTask
-import org.gradle.configurationcache.extensions.capitalized
 
 plugins {
     id("impactor.loom-conventions")
 
     id("com.modrinth.minotaur")
-    id("com.github.johnrengelman.shadow")
+    id("com.gradleup.shadow")
 }
 
 val bundle: Configuration by configurations.creating {
@@ -19,37 +17,58 @@ dependencies {
     listOf(
         "net.kyori:examination-api:1.3.0",
         "net.kyori:examination-string:1.3.0",
-        "net.kyori:adventure-api:4.17.0",
-        "net.kyori:adventure-key:4.17.0",
-        "net.kyori:adventure-nbt:4.17.0",
-        "net.kyori:adventure-text-serializer-plain:4.17.0",
-        "net.kyori:adventure-text-serializer-legacy:4.17.0",
-        "net.kyori:adventure-text-serializer-gson:4.17.0",
-        "net.kyori:adventure-text-serializer-json:4.17.0",
-        "net.kyori:adventure-text-minimessage:4.17.0",
-        "net.kyori:adventure-text-logger-slf4j:4.17.0",
-        "net.kyori:event-api:5.0.0-SNAPSHOT",
+        "net.kyori:adventure-api:4.26.1",
+        "net.kyori:adventure-key:4.26.1",
+        "net.kyori:adventure-nbt:4.26.1",
+        "net.kyori:adventure-text-serializer-plain:4.26.1",
+        "net.kyori:adventure-text-serializer-legacy:4.26.1",
+        "net.kyori:adventure-text-serializer-gson:4.26.1",
+        "net.kyori:adventure-text-serializer-json:4.26.1",
+        "net.kyori:adventure-text-minimessage:4.26.1",
+        "net.kyori:adventure-text-logger-slf4j:4.26.1",
+        "com.github.KyoriPowered.event:event-api:master-SNAPSHOT",
     ).forEach { include(it) }
 }
 
+dependencies {
+    include(project(":api:core"))
+    include(project(":api:config"))
+    include(project(":api:economy"))
+    include(project(":api:items"))
+    include(project(":api:mail"))
+    include(project(":api:players"))
+    include(project(":api:plugins"))
+    include(project(":api:scoreboard"))
+    include(project(":api:storage"))
+    include(project(":api:text"))
+    include(project(":api:translations"))
+    include(project(":api:ui"))
+    include(project(":impactor"))
+    include(project(":minecraft:api"))
+    include(project(":minecraft:impl"))
+
+
+    //from :impactor - api
+    include("net.impactdev.impactor.api:commands:5.3.1+26.1.2")
+
+    include("com.zaxxer:HikariCP:5.0.1")
+    include("com.h2database:h2:2.1.214")
+    include("mysql:mysql-connector-java:8.0.33")
+    include("org.mariadb.jdbc:mariadb-java-client:3.1.2")
+    include("org.mongodb:mongo-java-driver:3.12.12")
+
+    include("com.github.ben-manes.caffeine:caffeine:3.1.5")
+}
+
 tasks {
-    val remapProductionJar by registering(RemapJarTask::class) {
-        listOf(shadowJar, remapJar).forEach {
-            dependsOn(it)
-            mustRunAfter(it)
-        }
-
-        inputFile.set(shadowJar.flatMap { it.archiveFile })
-
-        archiveBaseName.set("Impactor-${project.name.capitalize()}")
-        archiveVersion.set(writeVersion(true))
-    }
-
-    val minecraft = rootProject.property("minecraft")
-
     shadowJar {
+        dependsOn(tasks.jar)
         archiveBaseName.set("Impactor-${project.name}")
         archiveClassifier.set("dev-shadow")
+
+        from(
+            zipTree(tasks.jar.get().archiveFile.get().asFile)
+        )
 
         dependencies {
             include(project(":api:core"))
@@ -121,19 +140,14 @@ tasks {
             "org.apache.maven"
         ).forEach { relocate(it, "$prefix.$it") }
     }
-
-    remapJar {
-        archiveBaseName.set("Impactor-${project.name.capitalize()}")
-        archiveVersion.set("${minecraft}-${rootProject.version}")
-    }
 }
 
 tasks.withType<PublishToMavenRepository> {
-    dependsOn(tasks["remapProductionJar"])
+    dependsOn(tasks["shadowJar"])
 }
 
 tasks.withType<GenerateModuleMetadata> {
-    dependsOn(tasks["remapProductionJar"])
+    dependsOn(tasks["shadowJar"])
 }
 
 tasks.modrinth {
@@ -143,11 +157,11 @@ tasks.modrinth {
 modrinth {
     token.set(System.getenv("MODRINTH_GRADLE_TOKEN"))
     projectId.set("Impactor")
-    versionNumber.set("${writeVersion(true)}-${project.name.capitalized()}")
+    versionNumber.set("${writeVersion(true)}-${project.name}")
     versionName.set("Impactor ${writeVersion(true)}")
 
     versionType.set(if(!isRelease()) "beta" else "release")
-    uploadFile.set(tasks["remapProductionJar"])
+    uploadFile.set(tasks["shadowJar"])
 
     gameVersions.set(listOf(rootProject.property("minecraft").toString()))
 
