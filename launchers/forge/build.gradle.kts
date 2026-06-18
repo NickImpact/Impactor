@@ -74,10 +74,19 @@ tasks {
     }
 
     processResources {
+        val minecraft: String = rootProject.property("minecraft") as String
+        val neoforge: String = rootProject.property("neoforge") as String
+
         inputs.property("version", writeVersion(true))
+        inputs.property("minecraft", minecraft)
+        inputs.property("neoforge", neoforge)
 
         filesMatching("META-INF/neoforge.mods.toml") {
-            expand("version" to writeVersion(true))
+            expand(
+                "version" to writeVersion(true),
+                "minecraft" to minecraft,
+                "neoforge" to neoforge
+            )
         }
     }
 }
