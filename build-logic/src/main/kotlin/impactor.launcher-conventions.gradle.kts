@@ -30,6 +30,36 @@ dependencies {
     ).forEach { include(it) }
 }
 
+dependencies {
+    include(project(":api:core"))
+    include(project(":api:config"))
+    include(project(":api:economy"))
+    include(project(":api:items"))
+    include(project(":api:mail"))
+    include(project(":api:players"))
+    include(project(":api:plugins"))
+    include(project(":api:scoreboard"))
+    include(project(":api:storage"))
+    include(project(":api:text"))
+    include(project(":api:translations"))
+    include(project(":api:ui"))
+    include(project(":impactor"))
+    include(project(":minecraft:api"))
+    include(project(":minecraft:impl"))
+
+
+    //from :impactor - api
+    include("net.impactdev.impactor.api:commands:5.3.1+26.1.2")
+
+    include("com.zaxxer:HikariCP:5.0.1")
+    include("com.h2database:h2:2.1.214")
+    include("mysql:mysql-connector-java:8.0.33")
+    include("org.mariadb.jdbc:mariadb-java-client:3.1.2")
+    include("org.mongodb:mongo-java-driver:3.12.12")
+
+    include("com.github.ben-manes.caffeine:caffeine:3.1.5")
+}
+
 tasks {
     shadowJar {
         archiveBaseName.set("Impactor-${project.name}")

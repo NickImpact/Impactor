@@ -26,7 +26,7 @@ repositories {
         }
     }
     maven("https://jitpack.io")
-
+    mavenLocal()
 }
 
 version = rootProject.version

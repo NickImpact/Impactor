@@ -39,7 +39,7 @@ dependencies {
 
     include("io.leangen.geantyref:geantyref:1.3.13")
 
-    include(implementation("net.impactdev.impactor.commands:neoforge:5.3.1+1.21.1") {
+    include(implementation("net.impactdev.impactor.commands:neoforge:5.3.1+26.1.2") {
         exclude("net.impactdev.impactor.api", "config")
         exclude("net.impactdev.impactor.api", "core")
         exclude("net.impactdev.impactor.api", "items")
